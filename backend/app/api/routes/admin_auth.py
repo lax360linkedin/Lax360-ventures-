@@ -14,7 +14,7 @@ from app.core.permissions import is_staff
 from app.core.rate_limit import rate_limit
 from app.db.session import get_db
 from app.models import AuthSession
-from app.schemas.auth import LoginRequest
+from app.schemas.auth import AdminLoginRequest
 from app.services import audit_service, auth_service
 
 router = APIRouter(prefix="/admin/auth", tags=["admin: authentication"])
@@ -25,7 +25,7 @@ def _out(session: AuthSession) -> dict:
 
 
 @router.post("/login", dependencies=[Depends(rate_limit("admin_login", "login_rate_limit_max", "login_rate_limit_window_seconds"))])
-def login(body: LoginRequest, response: Response, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> dict:
+def login(body: AdminLoginRequest, response: Response, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> dict:
     user = auth_service.authenticate(db, body.email, body.password)
     if user is None or not is_staff(user):
         db.rollback()
@@ -43,7 +43,10 @@ def login(body: LoginRequest, response: Response, db: Session = Depends(get_db),
     audit_service.record(db, user, "auth.login", resource_type="session")
     db.commit()
     set_session_cookie(response, token, settings, realm="admin")
-    return _out(session)
+    out = _out(session)
+    if body.issue_token:  # only on request, only in this response; never stored server-side in clear and never logged
+        out["session_token"] = token
+    return out
 
 
 @router.get("/session")

@@ -133,6 +133,7 @@ function AdminLogin() {
         </div>
         <Card>
           {notice === 'expired' && <p role="status" className="mb-4 rounded-lg border border-edge bg-glass-strong p-3 text-sm">Your session expired. Please sign in again.</p>}
+          {notice === 'lost' && <p role="status" className="mb-4 rounded-lg border border-edge bg-glass-strong p-3 text-sm">The server no longer recognises your admin session (it may have ended or been signed out elsewhere). Please sign in again.</p>}
           <form onSubmit={submit} noValidate className="space-y-4" aria-busy={state.busy}>
             {state.error && <p role="alert" className="rounded-lg border border-error/40 bg-error/10 p-3 text-sm font-medium text-error">{state.error}</p>}
             <Field label="Email or username" required error={state.fields.email}>{(p) => <Input {...p} type="text" autoComplete="username" autoCapitalize="none" spellCheck={false} placeholder="admin@example.com" value={values.email} onChange={(e) => setValues({ ...values, email: e.target.value })} />}</Field>

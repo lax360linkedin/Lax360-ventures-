@@ -22,10 +22,14 @@ const TIMEOUT = 'The server took too long to respond. Please try again.'
 // Each has its own session cookie on the server, so each has its own CSRF token and its own "session expired" signal here.
 const realmOf = (path) => (/^\/api\/admin(?:[/?]|$)/.test(path) ? 'admin' : 'public')
 const csrfTokens = { public: null, admin: null }
+// Company admin only: when the browser refuses the cross-site session cookie, the server's session token is sent as `Authorization: Bearer`
+// instead (see hooks/useAdminAuth.js). Normally null: the HttpOnly cookie does the work and JavaScript never sees a token.
+let adminBearer = null
+export const setAdminBearer = (token) => { adminBearer = token || null }
 export const setCsrfToken = (token, realm = 'public') => { csrfTokens[realm] = token || null }
 
 const expiredListeners = { public: new Set(), admin: new Set() }
-/** Called when the server says the login session expired. Returns an unsubscribe function. */
+/** Called when the server says the login session expired / is missing (the listener receives the error code). Returns an unsubscribe function. */
 export const onSessionExpired = (fn, realm = 'public') => { expiredListeners[realm].add(fn); return () => expiredListeners[realm].delete(fn) }
 
 export async function api(path, { method = 'GET', body, rawBody, contentType, as = 'json', signal, timeoutMs = 20000 } = {}) {
@@ -40,6 +44,7 @@ export async function api(path, { method = 'GET', body, rawBody, contentType, as
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (rawBody !== undefined) headers['Content-Type'] = contentType || 'application/octet-stream' // file uploads: the bytes themselves
   if (method !== 'GET' && csrfTokens[realm]) headers['X-CSRF-Token'] = csrfTokens[realm]
+  if (realm === 'admin' && adminBearer) headers.Authorization = `Bearer ${adminBearer}`
 
   let res
   try {
@@ -64,7 +69,10 @@ export async function api(path, { method = 'GET', body, rawBody, contentType, as
       message: e?.message || (res.status >= 500 ? 'Something went wrong on our side. Please try again.' : 'That request could not be completed.'),
       fields: e?.fields || null,
     })
-    if (error.code === 'session_expired') expiredListeners[realm].forEach((fn) => fn())
+    // Public site: only a clearly expired session is announced (a plain 401 just means "not signed in", which is normal there).
+    // Company admin: ANY 401 on a protected call (the sign-in request itself excepted) means this browser no longer has a valid admin session.
+    const lost = realm === 'admin' ? res.status === 401 && !path.startsWith('/api/admin/auth/login') : error.code === 'session_expired'
+    if (lost) expiredListeners[realm].forEach((fn) => fn(error.code))
     throw error
   }
   const total = res.headers.get('X-Total-Count')

@@ -40,11 +40,27 @@ export function Spinner({ label = 'Loading…' }) {
 export const EmptyState = ({ title = 'Nothing here yet', children }) => (
   <div className="flex flex-col items-center gap-2 py-12 text-center text-soft"><Inbox className="size-8" aria-hidden="true" /><p className="font-semibold text-fg">{title}</p>{children && <p className="max-w-sm text-sm">{children}</p>}</div>
 )
+/** What kind of failure is this? (the server's own message is always shown too) */
+export function describeError(error) {
+  const s = error?.status
+  if (s === 401) return 'Not signed in'
+  if (s === 403) return 'You do not have permission'
+  if (s === 404) return 'Not found'
+  if (s === 409 || s === 422) return 'The request was not accepted'
+  if (s === 429) return 'Too many requests'
+  if (s >= 500) return 'Server problem'
+  if (error?.code === 'timeout') return 'The server took too long to answer'
+  if (error?.code === 'network' || s === 0) return 'Cannot reach the server'
+  return 'Something went wrong'
+}
+
 export function ErrorState({ error, onRetry }) {
+  const retryable = !(error?.status === 401 || error?.status === 403)
   return (
     <div role="alert" className="flex flex-col items-start gap-3 rounded-xl border border-error/40 bg-error/10 p-4 text-sm">
-      <p className="flex items-center gap-2 font-semibold text-error"><AlertCircle className="size-4" aria-hidden="true" /> {error?.message || 'Something went wrong.'}</p>
-      {onRetry && <Btn onClick={onRetry}>Try again</Btn>}
+      <p className="flex items-center gap-2 font-semibold text-error"><AlertCircle className="size-4" aria-hidden="true" /> {describeError(error)}</p>
+      {error?.message && <p className="text-soft">{error.message}</p>}
+      {onRetry && retryable && <Btn onClick={onRetry}>Try again</Btn>}
     </div>
   )
 }

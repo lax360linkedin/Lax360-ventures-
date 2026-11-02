@@ -13,6 +13,12 @@ class LoginRequest(ApiModel):
     password: str = Field(min_length=1, max_length=256)
 
 
+class AdminLoginRequest(LoginRequest):
+    """Company-admin login. `issue_token` asks for the session token in the response too (only used as a fallback when the browser blocks the cookie)."""
+
+    issue_token: bool = False
+
+
 class RegisterRequest(ApiModel):
     """Public sign-up. There is deliberately no role field (the schema rejects unknown fields): everyone who registers is a customer."""
 

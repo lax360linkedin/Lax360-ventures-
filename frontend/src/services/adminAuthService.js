@@ -3,5 +3,5 @@
 import { api } from './apiClient.js'
 
 export const fetchAdminSession = () => api('/api/admin/auth/session') // identity + permissions + csrf_token, or 401
-export const adminLogin = (email, password) => api('/api/admin/auth/login', { method: 'POST', body: { email, password } })
+export const adminLogin = (email, password) => api('/api/admin/auth/login', { method: 'POST', body: { email, password, issue_token: true } }) // the token is only used if the cookie is blocked
 export const adminLogout = () => api('/api/admin/auth/logout', { method: 'POST' })

@@ -37,8 +37,19 @@ def clear_session_cookie(response: Response, settings: Settings, realm: str = "p
     response.delete_cookie(name, path=path, domain=settings.cookie_domain, secure=settings.cookie_secure_on, httponly=True, samesite=settings.cookie_samesite)
 
 
+def _token_for(request: Request, settings: Settings, realm: str) -> str | None:
+    """The session token of this realm. Company-admin endpoints also accept it as `Authorization: Bearer <token>`, for browsers that refuse to keep
+    the cross-site session cookie. It is the same opaque, server-side, revocable, expiring session token (not a signed JWT), and it only ever
+    works in the admin realm: the public website ignores the header, and a customer's token is refused by the admin system."""
+    if realm == "admin":
+        scheme, _, value = request.headers.get("authorization", "").partition(" ")
+        if scheme.lower() == "bearer" and value.strip():
+            return value.strip()
+    return request.cookies.get(_cookie(settings, realm)[0])
+
+
 def _session_for(request: Request, db: Session, settings: Settings, realm: str) -> auth_service.Resolved:
-    return auth_service.resolve_session(db, request.cookies.get(_cookie(settings, realm)[0]), settings, realm)
+    return auth_service.resolve_session(db, _token_for(request, settings, realm), settings, realm)
 
 
 def _require(resolved: auth_service.Resolved) -> AuthSession:

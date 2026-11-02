@@ -229,3 +229,114 @@ def test_the_realm_migration_keeps_existing_admins_and_their_passwords(engine, d
         assert row.role == "super_admin" and row.password_hash == pw_hash and row.is_active  # account and credentials intact
         assert conn.execute(text("select realm from auth_sessions")).scalar() == "public"  # old sessions land in the public realm (and staff cannot use those)
         assert conn.execute(text("select count(*) from users")).scalar() == 1
+
+
+# ---- cross-site deployments (website on one domain, API on another) ---------------------------------------------------
+def test_cors_preflight_allows_every_method_the_admin_panel_uses(client):
+    """Production returned only GET, POST, PATCH: every PUT (settings, order, schedule, poster) and DELETE from the admin panel was blocked."""
+    for method in ("GET", "POST", "PUT", "PATCH", "DELETE"):
+        r = client.options("/api/admin/settings", headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": method, "Access-Control-Request-Headers": "content-type,x-csrf-token"})
+        assert r.status_code == 200, method
+        assert method in r.headers["access-control-allow-methods"] and r.headers["access-control-allow-credentials"] == "true"
+        assert r.headers["access-control-allow-origin"] == "http://localhost:5173"
+    other = client.options("/api/admin/settings", headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "PUT"})
+    assert "access-control-allow-origin" not in other.headers  # only the configured origins
+
+
+def test_admin_cookie_can_be_issued_for_a_cross_site_frontend(env, db):
+    """COOKIE_SAMESITE=none (with Secure) is the setting that lets a cookie set by the API be stored when the website is on another site."""
+    env(COOKIE_SAMESITE="none", COOKIE_SECURE="true")
+    from app.main import create_app
+
+    make_user(db, email="boss@example.com", role="super_admin")
+    with TestClient(create_app(), base_url="https://testserver", raise_server_exceptions=False) as c:
+        r = c.post("/api/admin/auth/login", json={"email": "boss@example.com", "password": PASSWORD})
+    cookie = r.headers["set-cookie"].lower()
+    assert r.status_code == 200 and "samesite=none" in cookie and "secure" in cookie and "httponly" in cookie and "path=/api/admin" in cookie
+
+
+def test_startup_warns_when_the_site_and_api_are_on_different_domains_with_lax_cookies(env, caplog, monkeypatch):
+    import logging
+
+    from app.core.config import get_settings
+    from app.main import _warn_cross_site_cookies
+
+    monkeypatch.setenv("RENDER_EXTERNAL_URL", "https://lax360-ventures.onrender.com")
+    env(APP_ENV="production", CORS_ORIGINS="https://lax360-ventures.vercel.app", COOKIE_SAMESITE="lax")
+    with caplog.at_level(logging.WARNING, logger="app"):
+        _warn_cross_site_cookies(get_settings())
+    assert "different site" in caplog.text and "lax360-ventures.vercel.app" in caplog.text
+    caplog.clear()
+    env(COOKIE_SAMESITE="none")
+    with caplog.at_level(logging.WARNING, logger="app"):
+        _warn_cross_site_cookies(get_settings())
+    assert not caplog.text  # nothing to warn about once cross-site cookies are enabled
+    env(COOKIE_SAMESITE="lax", CORS_ORIGINS="https://lax360-ventures.onrender.com")
+    with caplog.at_level(logging.WARNING, logger="app"):
+        _warn_cross_site_cookies(get_settings())
+    assert not caplog.text  # same host as the API: first-party cookies work
+
+
+# ---- direct admin sign-in, and the Bearer fallback for browsers that block the cross-site cookie -------------------------
+def test_a_super_admin_signs_in_directly_without_any_public_website_login(app, db):
+    make_user(db, email="boss@example.com", name="Boss", role="super_admin")
+    fresh = new_client(app)  # a brand-new browser: no public account, no public session, no cookies at all
+    assert fresh.get("/api/auth/me").status_code == 401 and fresh.get("/api/admin/auth/session").status_code == 401
+    r = fresh.post("/api/admin/auth/login", json={"email": "boss@example.com", "password": PASSWORD})
+    assert r.status_code == 200 and r.json()["user"]["role"] == "super_admin"
+    assert fresh.get("/api/admin/auth/session").status_code == 200 and fresh.get("/api/admin/dashboard").status_code == 200  # valid admin session
+    assert fresh.get("/api/auth/me").status_code == 401  # and still not signed in to the public website
+    assert PUBLIC not in fresh.cookies.keys()
+
+
+def test_bearer_fallback_is_off_unless_asked_and_works_without_cookies(app, db):
+    make_user(db, email="boss@example.com", role="super_admin")
+    c = new_client(app)
+    plain = c.post("/api/admin/auth/login", json={"email": "boss@example.com", "password": PASSWORD})
+    assert "session_token" not in plain.json()  # the token is never returned by default (JavaScript only ever needs it as a fallback)
+    asked = new_client(app).post("/api/admin/auth/login", json={"email": "boss@example.com", "password": PASSWORD, "issue_token": True})
+    token, csrf = asked.json()["session_token"], {"X-CSRF-Token": asked.json()["csrf_token"]}
+    no_cookie = new_client(app)  # a browser that kept no cookie: only the header
+    auth = {"Authorization": f"Bearer {token}"}
+    assert no_cookie.get("/api/admin/auth/session").status_code == 401
+    assert no_cookie.get("/api/admin/auth/session", headers=auth).status_code == 200
+    assert no_cookie.get("/api/admin/dashboard", headers=auth).status_code == 200
+    # state changes still need the CSRF header and the module permission
+    put = {"values": {"tagline": "Bearer test"}}
+    assert no_cookie.put("/api/admin/settings", json=put, headers=auth).status_code == 403
+    assert no_cookie.put("/api/admin/settings", json=put, headers={**auth, **csrf}).status_code == 200
+    assert no_cookie.get("/api/admin/dashboard", headers={"Authorization": "Bearer not-a-real-token"}).status_code == 401
+    assert no_cookie.get("/api/admin/dashboard", headers={"Authorization": f"Basic {token}"}).status_code == 401  # only the Bearer scheme
+
+
+def test_bearer_tokens_never_cross_between_the_public_site_and_the_admin_system(app, db):
+    make_user(db, email="cust@example.com")
+    make_user(db, email="boss@example.com", role="super_admin")
+    customer = new_client(app)
+    cust_token = customer.post("/api/auth/login", json={"email": "cust@example.com", "password": PASSWORD}).cookies.get(PUBLIC)
+    admin_login = new_client(app).post("/api/admin/auth/login", json={"email": "boss@example.com", "password": PASSWORD, "issue_token": True}).json()
+    probe = new_client(app)
+    assert probe.get("/api/admin/dashboard", headers={"Authorization": f"Bearer {cust_token}"}).status_code == 401  # a customer's token opens nothing in admin
+    assert probe.get("/api/auth/me", headers={"Authorization": f"Bearer {admin_login['session_token']}"}).status_code == 401  # the public site ignores the header
+    assert probe.get("/api/users/me", headers={"Authorization": f"Bearer {admin_login['session_token']}"}).status_code == 401
+
+
+def test_logout_and_expiry_end_a_bearer_session(app, db):
+    make_user(db, email="boss@example.com", role="super_admin")
+    data = new_client(app).post("/api/admin/auth/login", json={"email": "boss@example.com", "password": PASSWORD, "issue_token": True}).json()
+    auth, csrf = {"Authorization": f"Bearer {data['session_token']}"}, {"X-CSRF-Token": data["csrf_token"]}
+    c = new_client(app)
+    assert c.get("/api/admin/auth/session", headers=auth).status_code == 200
+    assert c.post("/api/admin/auth/logout", headers={**auth, **csrf}).status_code == 204
+    gone = c.get("/api/admin/auth/session", headers=auth)
+    assert gone.status_code == 401 and gone.json()["error"]["code"] == "session_expired"
+    again = new_client(app).post("/api/admin/auth/login", json={"email": "boss@example.com", "password": PASSWORD, "issue_token": True}).json()
+    db.execute(text("update auth_sessions set expires_at = now() - interval '1 minute' where revoked_at is null"))
+    db.commit()
+    expired = c.get("/api/admin/auth/session", headers={"Authorization": f"Bearer {again['session_token']}"})
+    assert expired.status_code == 401 and expired.json()["error"]["code"] == "session_expired"
+
+
+def test_cors_allows_the_authorization_header_for_the_fallback(client):
+    r = client.options("/api/admin/auth/session", headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": "GET", "Access-Control-Request-Headers": "authorization,x-csrf-token"})
+    assert r.status_code == 200 and "authorization" in r.headers["access-control-allow-headers"].lower()
