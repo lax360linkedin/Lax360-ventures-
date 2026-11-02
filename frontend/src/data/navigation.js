@@ -1,0 +1,55 @@
+import { site } from './site.js'
+
+// Primary header links. "Work" only appears once real projects are published (site.workIsLive).
+// Header order is fixed: About → Services → Solutions → Career → Contact.
+// (Academy and Work stay reachable from Services, the footer and the home page.)
+export const primaryNav = [
+  { label: 'About', to: '/about' },
+  { label: 'Services', to: '/services' },
+  { label: 'Solutions', to: '/solutions' },
+  { label: 'Career', to: '/career' },
+  { label: 'Contact', to: '/contact' },
+]
+
+export const footerColumns = [
+  {
+    title: 'Divisions',
+    links: [
+      { label: 'Software & Apps', to: '/services/software' },
+      { label: 'AI & Automation', to: '/services/ai' },
+      { label: 'Digital Growth', to: '/services/growth' },
+      { label: 'CAD & Engineering', to: '/services/engineering' },
+      { label: 'Academy', to: '/training' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About', to: '/about' },
+      { label: 'Services overview', to: '/services' },
+      { label: 'Solutions', to: '/solutions' },
+      { label: 'Work', to: '/work' },
+      { label: 'Career', to: '/career' },
+      { label: 'Contact', to: '/contact' },
+    ],
+  },
+]
+
+export const legalLinks = [
+  { label: 'Privacy Policy', to: '/privacy' },
+  { label: 'Terms of Use', to: '/terms' },
+]
+
+// Enquiry types shared by the contact form, CTAs (?type=) and the chatbot.
+export const enquiryTypes = [
+  { id: 'project', label: 'Software project' },
+  { id: 'ai', label: 'AI consultation' },
+  { id: 'website-app', label: 'Website or app' },
+  { id: 'marketing', label: 'Digital marketing' },
+  { id: 'cad', label: 'CAD & engineering' },
+  { id: 'course', label: 'Course enquiry' },
+  { id: 'workshop', label: 'College workshop' },
+  { id: 'partnership', label: 'Partnership' },
+  { id: 'career', label: 'Careers' },
+  { id: 'general', label: 'Something else' },
+]

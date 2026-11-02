@@ -1,0 +1,15 @@
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+.pgtest/
+.pgdev/
+.env
+.env.*
+!.env.example
+tests/
+scripts/
+sql/
+*.log

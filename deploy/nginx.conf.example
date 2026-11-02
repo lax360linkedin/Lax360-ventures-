@@ -1,0 +1,77 @@
+# Example nginx site for ONE domain serving the website and the API (recommended: same origin, so the session cookie and
+# CSRF work without cross-site settings). UNTESTED in this project (nginx was not available): adapt, then test with
+# `nginx -t` and a real browser. Replace every <PLACEHOLDER>.
+#
+#   website  -> static files built by `npm run build` in frontend/ (copy frontend/dist to /var/www/lax360)
+#   /api/*   -> the FastAPI backend on 127.0.0.1:8000  (run it with APP_ENV=production, TRUST_PROXY_HEADERS=true)
+
+server {
+    listen 80;
+    server_name <YOUR-DOMAIN>;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name <YOUR-DOMAIN>;
+
+    ssl_certificate     <PATH-TO>/fullchain.pem;   # e.g. from Let's Encrypt
+    ssl_certificate_key <PATH-TO>/privkey.pem;
+
+    root /var/www/lax360;
+    index index.html;
+    client_max_body_size 128k;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    # Security headers for the static site (the API sets its own).
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    # A Content-Security-Policy is recommended but must be tested with the site first (the theme script in index.html is inline).
+    # Start with Content-Security-Policy-Report-Only and tighten once the browser console is clean.
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    # Homepage video uploads (admin only): allow files up to HERO_VIDEO_MAX_BYTES and stream them straight to the API.
+    location /api/admin/hero-videos {
+        client_max_body_size 60m;
+        proxy_request_buffering off;
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+
+    # Hashed build assets can be cached forever.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # Signed-in-only pages and the admin panel are rendered in the browser (not prerendered): serve the app shell.
+    location ~ ^/((profile|demo|user(/dashboard)?)/?|admin(/.*)?|company-admin(/.*)?)$ {
+        try_files /index.html =404;
+    }
+
+    # Everything else is a prerendered page (about/index.html, services/ai/index.html, ...).
+    location / {
+        try_files $uri $uri/index.html =404;
+    }
+
+    error_page 404 /404.html;
+}

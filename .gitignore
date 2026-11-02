@@ -1,0 +1,23 @@
+# Secrets: never commit real environment files (the *.example templates are committed)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+*.log
+
+# Uploaded homepage videos (kept on disk, not in Git)
+backend/storage/

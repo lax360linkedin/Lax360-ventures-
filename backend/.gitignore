@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.pgtest/
+.env
+.env.*
+!.env.example
+*.log
+.pgdev/
+venv/
+env/
