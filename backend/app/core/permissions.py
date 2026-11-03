@@ -15,6 +15,9 @@ MODULES: dict[str, str] = {
     "chatbot": "AI chatbot",
     "media": "Media library",
     "hero_videos": "Homepage videos",
+    "services": "Services & categories",
+    "careers": "Careers",
+    "navigation": "Navigation & SEO",
     "settings": "Website settings",
 }
 SUPER_ONLY = ("users", "audit", "system")

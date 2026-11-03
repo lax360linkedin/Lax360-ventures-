@@ -6,6 +6,7 @@ import HeaderBot from './HeaderBot.jsx'
 import AccountMenu from './AccountMenu.jsx'
 import ThemeToggle from '../ui/ThemeToggle.jsx'
 import { primaryNav } from '../../data/navigation.js'
+import { useNav } from '../../hooks/useSite.js'
 import { useScrollDirection } from '../../hooks/useScrollDirection.js'
 import { useMediaQuery } from '../../hooks/useMediaQuery.js'
 
@@ -24,6 +25,7 @@ const linkCls = 'relative z-10 inline-flex min-h-11 items-center px-[1.125rem] t
  */
 export default function Header({ onOpenMenu, menuButtonRef }) {
   const { pathname } = useLocation()
+  const nav = useNav('header', primaryNav) // the admin panel can replace the menu
   const { y } = useScrollDirection()
   const wide = useMediaQuery('(min-width: 1024px)')
   const [indicator, setIndicator] = useState(null)
@@ -35,7 +37,7 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
   const scrolled = y > 24
 
   // The nav item for the page being viewed (Services also covers /services/*). Null on Home and on pages outside the nav.
-  const activeTo = primaryNav.find((n) => pathname === n.to || pathname.startsWith(`${n.to}/`))?.to ?? null
+  const activeTo = nav.find((n) => !n.external && (pathname === n.to || pathname.startsWith(`${n.to}/`)))?.to ?? null
 
   // ---- glass highlight under the current / hovered link (relative to the nav pill) ----
   const measure = useCallback((el) => {
@@ -116,7 +118,9 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
                 style={{ transform: `translateX(${indicator.x}px)`, width: indicator.w }}
               />
             )}
-            {primaryNav.map((item) => (
+            {nav.map((item) => (item.external ? (
+              <a key={item.to} href={item.to} target="_blank" rel="noopener noreferrer" className={`${linkCls} ${color(false)}`}>{item.label}<span className="sr-only"> (opens in a new tab)</span></a>
+            ) : (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -127,7 +131,7 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
               >
                 {item.label}
               </NavLink>
-            ))}
+            )))}
           </div>
         </nav>
 

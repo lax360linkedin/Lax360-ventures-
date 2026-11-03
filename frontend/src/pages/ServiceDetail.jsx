@@ -11,13 +11,23 @@ import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { getDivision, divisions } from '../data/services.js'
 import { slugify } from '../utils/slugify.js'
+import CmsServiceDetail from '../components/cms/CmsServiceDetail.jsx'
+import { useContent, useContentReady } from '../hooks/useSite.js'
 import NotFound from './NotFound.jsx'
 
 /** One template for all four division pages; the AI page swaps in the violet accent and workflow block. */
 export default function ServiceDetail() {
   const { slug } = useParams()
   const d = getDivision(slug)
-  if (!d) return <NotFound />
+  const cmsServices = useContent('service')
+  const cmsCategories = useContent('service_category')
+  const ready = useContentReady()
+  if (!d) { // not one of the built-in divisions: maybe a service created in the admin panel
+    const svc = cmsServices?.find((s) => s.slug === slug)
+    if (svc) return <CmsServiceDetail service={svc} categoryTitle={cmsCategories?.find((c) => c.slug === svc.data.category)?.title} />
+    if (!ready) return <div className="wrap section min-h-[50vh]" role="status"><p className="text-soft">Loading…</p></div>
+    return <NotFound />
+  }
   const isAi = d.slug === 'ai'
   const accentText = isAi ? 'text-violet' : 'text-lav'
   const related = d.related.map(getDivision).filter(Boolean)

@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useSeo, useSiteSettings } from './useSite.js'
 
 const SITE_URL = (import.meta.env.VITE_SITE_URL || '').replace(/\/$/, '')
 const DEFAULT_TITLE = 'LAX360 Ventures — Software, AI, Digital Growth, CAD & Academy'
@@ -20,7 +21,11 @@ function upsert(selector, tag, attrs) {
  * - In the browser an effect keeps the tags in sync during client-side navigation.
  */
 export function useDocumentHead({ title, description, path = '/', jsonLd = null, noindex = false }) {
-  const fullTitle = title ? `${title} | LAX360 Ventures` : DEFAULT_TITLE
+  const seo = useSeo(path) // "Page titles & SEO" set in the admin panel override the built-in text
+  const settings = useSiteSettings()
+  const fullTitle = seo?.title || (title ? `${title} | LAX360 Ventures` : DEFAULT_TITLE)
+  description = seo?.description || description
+  const image = seo?.image || settings.default_og_image_url || null
 
   if (typeof document === 'undefined') {
     globalThis.__SSR_HEAD__ = { title: fullTitle, description, path, jsonLd, noindex }
@@ -34,6 +39,10 @@ export function useDocumentHead({ title, description, path = '/', jsonLd = null,
     upsert('meta[property="og:title"]', 'meta', { property: 'og:title', content: fullTitle })
     upsert('meta[property="og:description"]', 'meta', { property: 'og:description', content: description })
     upsert('meta[property="og:url"]', 'meta', { property: 'og:url', content: url })
+    if (image) {
+      upsert('meta[property="og:image"]', 'meta', { property: 'og:image', content: image })
+      upsert('meta[name="twitter:image"]', 'meta', { name: 'twitter:image', content: image })
+    }
 
     const robots = document.head.querySelector('meta[name="robots"]')
     if (noindex) upsert('meta[name="robots"]', 'meta', { name: 'robots', content: 'noindex' })
@@ -47,5 +56,5 @@ export function useDocumentHead({ title, description, path = '/', jsonLd = null,
     } else {
       ld?.remove()
     }
-  }, [fullTitle, description, path, jsonLd, noindex])
+  }, [fullTitle, description, path, jsonLd, noindex, image])
 }

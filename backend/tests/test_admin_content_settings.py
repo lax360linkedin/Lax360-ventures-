@@ -9,7 +9,8 @@ FAQ = {"title": "Do you work with startups?", "data": {"group": "home", "answer"
 def test_content_kinds_describe_only_what_the_site_actually_uses(app, db):
     admin, _, _ = staff(app, db, permissions=["content"])
     body = admin.get("/api/admin/content/kinds").json()
-    assert [k["kind"] for k in body["kinds"]] == ["hero", "faq", "project"]
+    # an admin who only holds the `content` module sees the homepage / about / portfolio kinds; services, careers and navigation are separate modules
+    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "faq", "about_block", "project"]
     assert all(f["name"] for k in body["kinds"] for f in k["fields"])
     assert admin.get("/api/admin/content/testimonial").status_code == 404  # not a managed section
 

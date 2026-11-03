@@ -16,19 +16,22 @@ log = logging.getLogger("app.errors")
 
 
 class ApiError(Exception):
-    def __init__(self, status_code: int, code: str, message: str, *, fields: dict[str, str] | None = None, headers: dict[str, str] | None = None) -> None:
+    def __init__(self, status_code: int, code: str, message: str, *, fields: dict[str, str] | None = None, headers: dict[str, str] | None = None, details: dict | None = None) -> None:
         super().__init__(message)
         self.status_code = status_code
         self.code = code
         self.message = message
         self.fields = fields
         self.headers = headers
+        self.details = details  # structured extras for the client (e.g. where a file is used), never secrets
 
 
-def envelope(code: str, message: str, fields: dict[str, str] | None = None) -> dict:
+def envelope(code: str, message: str, fields: dict[str, str] | None = None, details: dict | None = None) -> dict:
     body: dict = {"code": code, "message": message}
     if fields:
         body["fields"] = fields
+    if details:
+        body["details"] = details
     return {"error": body}
 
 
@@ -40,7 +43,7 @@ def _field_name(loc: tuple) -> str:
 def install_error_handlers(app: FastAPI, *, expose_hints: bool) -> None:
     @app.exception_handler(ApiError)
     async def _api_error(_: Request, exc: ApiError):
-        return JSONResponse(envelope(exc.code, exc.message, exc.fields), status_code=exc.status_code, headers=exc.headers)
+        return JSONResponse(envelope(exc.code, exc.message, exc.fields, exc.details), status_code=exc.status_code, headers=exc.headers)
 
     @app.exception_handler(StarletteHTTPException)
     async def _http_error(_: Request, exc: StarletteHTTPException):

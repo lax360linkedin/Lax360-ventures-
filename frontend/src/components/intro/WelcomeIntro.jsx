@@ -212,7 +212,8 @@ function letterColor(i, n) {
 function preload(src) {
   return new Promise((resolve, reject) => {
     const img = new Image()
-    img.onload = () => (img.decode ? img.decode().then(resolve, resolve) : resolve())
+    // decoding ahead of time is only a nicety (and can hang in a background tab): never wait more than 800 ms for it once the file has loaded
+    img.onload = () => Promise.race([img.decode ? img.decode().catch(() => {}) : Promise.resolve(), new Promise((r) => setTimeout(r, 800))]).then(resolve)
     img.onerror = () => reject(new Error(`could not load ${src}`))
     img.src = src
   })
@@ -336,7 +337,7 @@ export default function WelcomeIntro() {
   // where the real header logo is, so the intro logo can land exactly on it
   const measureHeaderLogo = useCallback(() => {
     const s = live.current
-    const img = document.querySelector('header img[src$="logo-shield.png"]')
+    const img = document.querySelector('header a[aria-label="LAX360 Ventures home"] img')
     const rect = img?.getBoundingClientRect()
     const { w, h } = s.view
     const ox = (w - s.L.w * s.scale) / 2

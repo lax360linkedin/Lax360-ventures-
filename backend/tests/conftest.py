@@ -21,9 +21,9 @@ import pytest
 logging.raiseExceptions = False  # pgserver logs from an atexit hook after pytest has closed its streams
 ORIGINAL_ENV = dict(os.environ)  # kept so the opt-in live OpenAI test can read credentials you exported
 for _k in list(os.environ):
-    if _k.startswith(("ADMIN_", "OPENAI_", "GEMINI_", "AI_", "CHAT_", "COOKIE_", "SESSION_", "LOGIN_", "CONTACT_", "DEMO_")) or _k in ("DATABASE_URL", "AUTH_SECRET", "APP_ENV", "DOCS_ENABLED"):
+    if _k.startswith(("ADMIN_", "SUPABASE_", "MEDIA_", "HERO_", "OPENAI_", "GEMINI_", "AI_", "CHAT_", "COOKIE_", "SESSION_", "LOGIN_", "CONTACT_", "DEMO_")) or _k in ("DATABASE_URL", "AUTH_SECRET", "APP_ENV", "DOCS_ENABLED"):
         del os.environ[_k]
-os.environ.update({"APP_ENV": "test", "AUTH_SECRET": "test-secret-" + "x" * 40, "COOKIE_SECURE": "false", "CORS_ORIGINS": "http://localhost:5173"})
+os.environ.update({"MEDIA_DIR": tempfile.mkdtemp(prefix="lax360_media_test_"), "APP_ENV": "test", "AUTH_SECRET": "test-secret-" + "x" * 40, "COOKIE_SECURE": "false", "CORS_ORIGINS": "http://localhost:5173"})
 
 from alembic import command  # noqa: E402
 from alembic.config import Config  # noqa: E402

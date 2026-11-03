@@ -145,7 +145,7 @@ def create_app() -> FastAPI:
         CORSMiddleware, allow_origins=origins, allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "X-CSRF-Token", "Authorization"], max_age=600,
     )
-    app.add_middleware(BodyLimitMiddleware, max_bytes=settings.max_request_body_bytes, media_bytes=settings.media_max_bytes, video_bytes=settings.hero_video_max_bytes)
+    app.add_middleware(BodyLimitMiddleware, max_bytes=settings.max_request_body_bytes, media_bytes=max(settings.media_max_bytes, settings.hero_video_max_bytes), video_bytes=settings.hero_video_max_bytes)
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):

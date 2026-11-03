@@ -58,7 +58,11 @@ class MediaAsset(UUIDPk, Timestamps, Base):
     """An uploaded image/PDF stored in the database (no extra storage credentials). Private unless `is_public`."""
 
     __tablename__ = "media_assets"
-    __table_args__ = (Index("ix_media_assets_created_at", "created_at"),)
+    __table_args__ = (
+        Index("ix_media_assets_created_at", "created_at"), Index("ix_media_assets_sha256", "sha256"), Index("ix_media_assets_kind", "kind"),
+        CheckConstraint("storage in ('db','local','supabase')", name="storage"), CheckConstraint("kind in ('image','video','document')", name="kind"),
+        CheckConstraint("data IS NOT NULL OR storage_key IS NOT NULL", name="has_file"),
+    )
 
     filename: Mapped[str] = mapped_column(String(200))
     content_type: Mapped[str] = mapped_column(String(60))
@@ -66,7 +70,13 @@ class MediaAsset(UUIDPk, Timestamps, Base):
     alt_text: Mapped[str | None] = mapped_column(String(200))
     is_public: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     uploaded_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
-    data: Mapped[bytes] = deferred(mapped_column(LargeBinary, nullable=False))  # loaded only when a file is served
+    # Where the file lives: 'supabase' (durable object storage), 'local' (development disk) or 'db' (older uploads kept in the database; never removed).
+    storage: Mapped[str] = mapped_column(String(10), default="db", server_default="db")
+    storage_key: Mapped[str | None] = mapped_column(String(120))
+    bucket: Mapped[str | None] = mapped_column(String(63))
+    sha256: Mapped[str | None] = mapped_column(String(64))  # content hash: identical re-uploads are detected instead of stored twice
+    kind: Mapped[str] = mapped_column(String(12), default="image", server_default="image")  # image | video | document
+    data: Mapped[bytes | None] = deferred(mapped_column(LargeBinary, nullable=True))  # only for storage='db'; loaded only when a file is served
 
 
 class AuditLog(UUIDPk, Base):

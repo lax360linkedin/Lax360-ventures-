@@ -53,7 +53,15 @@ def snapshot(db: Session, settings: Settings) -> list[dict]:
     items.append(_item(other, f"{other_name} (inactive)", "not_tested" if configured_other else "configuration_missing",
                        "Configured but not the active provider." if configured_other else f"Not configured. Selecting {other} would require {other.upper()}_API_KEY and {other.upper()}_MODEL."))
     count, size = media_service.usage(db)
-    items.append(_item("media", "Media storage (database)", "connected", f"{count} files, {size / 1024 / 1024:.1f} MB. Stored in PostgreSQL."))
+    items.append(_item("media", "Media library", "connected", f"{count} files, {size / 1024 / 1024:.1f} MB (file data lives in object storage; older uploads stay in the database)."))
+    from app.services import hero_video_service
+
+    store = hero_video_service.storage_info(settings)
+    items.append(_item("video_storage", "Homepage video storage", "connected" if store["durable"] else "configuration_missing", store.get("warning") or store["detail"]))
+    from app.services import object_storage
+
+    media = object_storage.durability(settings)
+    items.append(_item("media_storage", "Media library storage", "connected" if media["durable"] else "configuration_missing", media.get("warning") or f"Files are kept permanently in {media['detail']}."))
     items.append(_item("email", "Email delivery", "not_implemented", "Not implemented: enquiries are stored and shown here; no emails are sent."))
     return items
 

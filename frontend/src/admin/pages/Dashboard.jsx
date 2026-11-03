@@ -1,12 +1,35 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bot, CalendarCheck, Inbox, MessageSquareWarning, UserRound } from 'lucide-react'
+import { Bot, CalendarCheck, FileText, Image as ImageIcon, Inbox, MessageSquareWarning, UserRound } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import { useAdmin } from '../AdminApp.jsx'
 import { Badge, Btn, Card, EmptyState, ErrorState, Field, Input, PageHeader, Spinner, fmtDate, label, useFetch } from '../ui.jsx'
 
 const iso = (d) => d.toISOString().slice(0, 10)
 const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return iso(d) }
+
+/** Website content at a glance: how much is live and how much is waiting as a draft, plus the media library. Hidden if the account has no CMS access. */
+function CmsOverview() {
+  const content = useFetch(() => api('/api/admin/content/kinds').catch(() => null), [])
+  const media = useFetch(() => api('/api/admin/media?page_size=1').catch(() => null), [])
+  if (!content.data && !media.data) return null
+  const groups = {}
+  ;(content.data?.kinds || []).forEach((k) => {
+    const c = content.data.counts[k.kind]
+    groups[k.group] = groups[k.group] || { published: 0, draft: 0 }
+    groups[k.group].published += c.published
+    groups[k.group].draft += c.draft
+  })
+  return (
+    <Card className="mt-6">
+      <div className="flex items-center justify-between"><h3 className="flex items-center gap-2 text-sm font-semibold"><FileText className="size-4 text-lav" aria-hidden="true" /> Website content</h3><Link to="/company-admin/content" className="text-sm font-semibold text-lav hover:underline">Manage</Link></div>
+      <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        {Object.entries(groups).map(([g, c]) => <li key={g} className="flex items-center justify-between rounded-lg border border-edge px-3 py-2"><span>{g}</span><span className="text-soft"><strong className="text-fg">{c.published}</strong> live{c.draft ? <> · <span className="text-amber-500">{c.draft} draft</span></> : ''}</span></li>)}
+        {media.data && <li className="flex items-center justify-between rounded-lg border border-edge px-3 py-2"><span className="flex items-center gap-2"><ImageIcon className="size-4 text-lav" aria-hidden="true" /> Media library</span><Link to="/company-admin/media" className="text-soft hover:underline"><strong className="text-fg">{media.data.usage.files}</strong> files</Link></li>}
+      </ul>
+    </Card>
+  )
+}
 
 function Stat({ icon: Icon, name, value, hint, to }) {
   const body = (
@@ -115,6 +138,7 @@ export default function Dashboard() {
               )}
             </Card>
           )}
+          <CmsOverview />
         </div>
       )}
     </>

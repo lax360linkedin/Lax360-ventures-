@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { api } from '../services/apiClient.js'
+import { MediaField } from './MediaPicker.jsx'
 import { Btn, Card, Field, Input, Textarea, Toggle, label, useToast } from './ui.jsx'
 
-const GROUPS = { general: 'General', contact: 'Contact details', social: 'Social media', footer: 'Footer', maintenance: 'Maintenance mode', chatbot: 'Chatbot' }
+const GROUPS = { general: 'General', global: 'Global website settings', contact: 'Contact details', social: 'Social media', footer: 'Footer', maintenance: 'Maintenance mode', chatbot: 'Chatbot' }
 
 /** Generic settings editor driven by the field list the server sends (labels, types, limits). Blank text = “use the website default”. */
 export default function SettingsForm({ endpoint, payload, onSaved, groups }) {
@@ -35,7 +36,9 @@ export default function SettingsForm({ endpoint, payload, onSaved, groups }) {
                 ? <div key={f.key} className="flex flex-col justify-center gap-1"><Toggle checked={get(f)} onChange={(v) => setDraft({ ...draft, [f.key]: v })} label={f.label} />{f.help && <p className="text-xs text-soft">{f.help}</p>}{errors[f.key] && <p role="alert" className="text-xs font-medium text-error">{errors[f.key]}</p>}</div>
                 : (
                   <Field key={f.key} label={f.label} hint={f.help} error={errors[f.key]} className={f.type === 'text' ? 'md:col-span-2' : ''}>
-                    {(p) => (f.type === 'text'
+                    {(p) => (f.type === 'image'
+                      ? <MediaField {...p} kind="image" value={get(f)} onChange={(v) => setDraft({ ...draft, [f.key]: v })} />
+                      : f.type === 'text'
                       ? <Textarea {...p} maxLength={f.max} value={get(f)} onChange={(e) => setDraft({ ...draft, [f.key]: e.target.value })} />
                       : <Input {...p} type={f.type === 'email' ? 'email' : f.type === 'url' ? 'url' : 'text'} maxLength={f.max} value={get(f)} onChange={(e) => setDraft({ ...draft, [f.key]: e.target.value })} />)}
                   </Field>

@@ -6,6 +6,7 @@ import SectionHeading from '../components/ui/SectionHeading.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import Button from '../components/ui/Button.jsx'
 import { allDivisions } from '../data/services.js'
+import { AboutIntro, AboutMore, useAboutBlocks } from '../components/cms/AboutBlocks.jsx'
 import { useSite } from '../hooks/useSite.js'
 import { branchSentence } from '../data/branches.js'
 import BranchCards from '../components/sections/BranchCards.jsx'
@@ -22,6 +23,7 @@ const principles = [
 
 export default function About() {
   const site = useSite()
+  const blocks = useAboutBlocks()
   return (
     <PageContainer
       path="/about"
@@ -35,6 +37,7 @@ export default function About() {
         lead="LAX360 Ventures designs, builds and supports software, AI automation and digital growth for businesses — and trains people to use it."
       />
 
+      {blocks.intro.length > 0 ? <AboutIntro blocks={blocks} /> : (
       <section className="wrap section grid gap-10 lg:grid-cols-12" aria-labelledby="intro-title">
         <h2 id="intro-title" className="h2 lg:col-span-5">Technology that works together.</h2>
         <div className="space-y-5 text-lg text-soft lg:col-span-7">
@@ -43,6 +46,8 @@ export default function About() {
           <p>We have branches in {branchSentence}.</p>
         </div>
       </section>
+      )}
+      <AboutMore blocks={blocks} />
 
       <section className="border-y border-edge bg-base2/50" aria-labelledby="principles-title">
         <div className="wrap section">

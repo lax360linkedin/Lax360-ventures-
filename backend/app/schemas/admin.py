@@ -22,14 +22,18 @@ class NoteCreate(ApiModel):
 
 class ContentCreate(ApiModel):
     title: str = Field(default="", max_length=200)
-    data: dict[str, str] = Field(default_factory=dict)
+    data: dict[str, str | bool] = Field(default_factory=dict)
     status: Literal["draft", "published"] = "draft"
     sort_order: int = Field(default=0, ge=0, le=100000)
 
 
+class ContentOrder(ApiModel):
+    ids: list[uuid.UUID] = Field(max_length=500)
+
+
 class ContentUpdate(ApiModel):
     title: str | None = Field(default=None, max_length=200)
-    data: dict[str, str] | None = None
+    data: dict[str, str | bool] | None = None
     status: Literal["draft", "published"] | None = None
     sort_order: int | None = Field(default=None, ge=0, le=100000)
 

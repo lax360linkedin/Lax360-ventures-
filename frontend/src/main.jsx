@@ -3,6 +3,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { LazyMotion } from 'framer-motion'
 import App from './App.jsx'
+import { noindexRoutes, routes } from './routes.js'
 import './styles/index.css'
 
 const root = document.getElementById('root')
@@ -20,6 +21,7 @@ const app = (
 
 // Production pages are prerendered (scripts/prerender.js), so hydrate them; in dev the root is empty.
 // Signed-in-only pages have no prerendered HTML (a host may serve its 404 shell there), so they render fresh.
-const clientOnly = /^\/(profile|demo|user(\/dashboard)?)\/?$|^\/(admin|company-admin)(\/|$)/.test(window.location.pathname)
+const prerendered = new Set([...routes, ...noindexRoutes])
+const clientOnly = !prerendered.has(window.location.pathname.replace(/\/+$/, '') || '/') // user pages, admin, CMS service pages and unknown URLs have no prerendered HTML
 if (root.hasChildNodes() && !clientOnly) hydrateRoot(root, app)
 else createRoot(root).render(app)

@@ -13,7 +13,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.errors import ApiError
-from app.models import SiteSetting, User
+from app.models import MediaAsset, SiteSetting, User
+from app.services import media_service
 from app.utils_validation import EMAIL
 
 _PHONE = re.compile(r"^\+?[0-9][0-9\s().-]{5,24}$")
@@ -31,6 +32,10 @@ SPEC: dict[str, dict] = {
     "contact_email": S("Contact email", "contact", "email"),
     "contact_phone_1": S("Phone 1", "contact", "phone"),
     "contact_phone_2": S("Phone 2", "contact", "phone"),
+    "contact_email_2": S("Second email (e.g. careers)", "contact", "email"),
+    "contact_address": S("Office address(es)", "contact", "text", max_len=600, help="Shown on the Contact page. Use a new line for each office."),
+    "contact_description": S("Contact page introduction", "contact", "text", max_len=500),
+    "map_link": S("Google Maps / location link", "contact", "url"),
     "whatsapp_number": S("WhatsApp number", "contact", "phone", help="Digits with country code, e.g. 919876543210"),
     "contact_form_enabled": S("Contact form enabled", "contact", "bool"),
     "contact_form_notice": S("Notice above the contact form", "contact", "text", max_len=300, help="Optional message shown above the enquiry form."),
@@ -40,7 +45,13 @@ SPEC: dict[str, dict] = {
     "social_x": S("X (Twitter) URL", "social", "url"),
     "social_facebook": S("Facebook URL", "social", "url"),
     # footer
-    "footer_text": S("Footer legal line", "footer", "text", max_len=300),
+    "footer_text": S("Footer legal line / copyright text", "footer", "text", max_len=300),
+    "footer_tagline": S("Footer introduction text", "footer", "text", max_len=300),
+    # global
+    "site_logo": S("Website logo (replaces the official logo only when you choose one)", "global", "image", help="Leave empty to keep the official LAX360 logo."),
+    "site_favicon": S("Favicon (browser tab icon)", "global", "image"),
+    "default_og_image": S("Default sharing image (social media / search)", "global", "image"),
+    "site_name": S("Website name", "global", max_len=80),
     # maintenance
     "maintenance_mode": S("Maintenance mode", "maintenance", "bool", help="Shows a maintenance page to visitors (admin panel stays available)."),
     "maintenance_message": S("Maintenance message", "maintenance", "text", max_len=300),
@@ -55,7 +66,7 @@ CHATBOT_KEYS = tuple(k for k, v in SPEC.items() if v["group"] == "chatbot")
 SITE_KEYS = tuple(k for k in SPEC if k not in CHATBOT_KEYS)
 
 
-def _validate(key: str, value):
+def _validate(key: str, value, db: Session | None = None):
     spec = SPEC[key]
     kind = spec["type"]
     if kind == "bool":
@@ -75,6 +86,13 @@ def _validate(key: str, value):
         raise ValueError("Enter a valid phone number.")
     if kind == "url" and not _URL.match(value):
         raise ValueError("Enter a full URL starting with https://")
+    if kind == "image":  # holds the id of a media-library image
+        try:
+            asset = db.get(MediaAsset, uuid.UUID(value)) if db is not None else None
+        except ValueError:
+            asset = None
+        if asset is None or asset.kind != "image":
+            raise ValueError("Choose an image from the media library.")
     return value
 
 
@@ -87,8 +105,17 @@ def get(db: Session, key: str, default=None):
     return default if row is None else row.value
 
 
-def public_settings(db: Session) -> dict:
-    return {row.key: row.value for row in db.scalars(select(SiteSetting).where(SiteSetting.is_public.is_(True))) if row.key in SPEC}
+def public_settings(db: Session, settings=None) -> dict:
+    """Public settings. Image settings hold a media id; the browser also gets `<key>_url` (None when the file is gone or not public)."""
+    out = {row.key: row.value for row in db.scalars(select(SiteSetting).where(SiteSetting.is_public.is_(True))) if row.key in SPEC}
+    for key, spec in SPEC.items():
+        if spec["type"] == "image" and out.get(key) and settings is not None:
+            try:
+                asset = db.get(MediaAsset, uuid.UUID(out[key]))
+            except ValueError:
+                asset = None
+            out[key + "_url"] = media_service.url_of(settings, asset) if asset is not None and asset.is_public else None
+    return out
 
 
 def update(db: Session, user: User, values: dict, *, allowed: tuple[str, ...]) -> list[str]:
@@ -100,11 +127,12 @@ def update(db: Session, user: User, values: dict, *, allowed: tuple[str, ...]) -
             errors[key] = "Unknown or not allowed setting."
             continue
         try:
-            clean[key] = _validate(key, raw)
+            clean[key] = _validate(key, raw, db)
         except ValueError as exc:
             errors[key] = str(exc)
     if errors:
         raise ApiError(422, "validation_error", "Please check the highlighted fields.", fields=errors)
+    media_service.make_public(db, {uuid.UUID(v) for k, v in clean.items() if v and SPEC[k]["type"] == "image"})
     changed = []
     for key, value in clean.items():
         row = db.get(SiteSetting, key)

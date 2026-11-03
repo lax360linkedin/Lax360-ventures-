@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('3512f082-f46e-45d4-893b-b0534c671938', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('6173bc40-2db8-47e0-9d35-e6a112d64553', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('4b27bac8-5900-4940-b655-a68a05923bdd', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('3b01944f-fe8f-41ad-b8e0-574b97be33a8', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('7f81ed48-37dd-4468-81b2-c28312f2b270', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('1c943ebc-d037-40f8-8f96-6ca697dabdfe', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -417,6 +417,86 @@ ALTER TABLE auth_sessions ADD COLUMN realm VARCHAR(10) DEFAULT 'public' NOT NULL
 ALTER TABLE auth_sessions ADD CONSTRAINT ck_auth_sessions_ck_auth_sessions_realm CHECK (realm in ('public','admin'));
 
 UPDATE alembic_version SET version_num='0006' WHERE alembic_version.version_num = '0005';
+
+-- Running upgrade 0006 -> 0007
+
+ALTER TABLE hero_videos ADD COLUMN storage VARCHAR(10) DEFAULT 'local' NOT NULL;
+
+ALTER TABLE hero_videos ADD CONSTRAINT ck_hero_videos_ck_hero_videos_storage CHECK (storage in ('local','supabase'));
+
+UPDATE alembic_version SET version_num='0007' WHERE alembic_version.version_num = '0006';
+
+-- Running upgrade 0007 -> 0008
+
+ALTER TABLE media_assets ADD COLUMN storage VARCHAR(10) DEFAULT 'db' NOT NULL;
+
+ALTER TABLE media_assets ADD COLUMN storage_key VARCHAR(120);
+
+ALTER TABLE media_assets ADD COLUMN bucket VARCHAR(63);
+
+ALTER TABLE media_assets ADD COLUMN sha256 VARCHAR(64);
+
+ALTER TABLE media_assets ADD COLUMN kind VARCHAR(12) DEFAULT 'image' NOT NULL;
+
+ALTER TABLE media_assets ALTER COLUMN data DROP NOT NULL;
+
+UPDATE media_assets SET kind = 'document' WHERE content_type = 'application/pdf';
+
+UPDATE media_assets SET kind = 'video' WHERE content_type LIKE 'video/%%';
+
+UPDATE media_assets SET sha256 = encode(sha256(data), 'hex') WHERE data IS NOT NULL AND sha256 IS NULL;
+
+ALTER TABLE media_assets ADD CONSTRAINT ck_media_assets_ck_media_assets_storage CHECK (storage in ('db','local','supabase'));
+
+ALTER TABLE media_assets ADD CONSTRAINT ck_media_assets_ck_media_assets_kind CHECK (kind in ('image','video','document'));
+
+ALTER TABLE media_assets ADD CONSTRAINT ck_media_assets_ck_media_assets_has_file CHECK (data IS NOT NULL OR storage_key IS NOT NULL);
+
+CREATE INDEX ix_media_assets_sha256 ON media_assets (sha256);
+
+CREATE INDEX ix_media_assets_kind ON media_assets (kind);
+
+UPDATE alembic_version SET version_num='0008' WHERE alembic_version.version_num = '0007';
+
+-- Running upgrade 0008 -> 0009
+
+ALTER TABLE hero_videos ADD COLUMN bucket VARCHAR(63);
+
+ALTER TABLE hero_videos ADD COLUMN sha256 VARCHAR(64);
+
+ALTER TABLE hero_videos ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE hero_videos ADD COLUMN delete_error VARCHAR(300);
+
+ALTER TABLE hero_videos ADD COLUMN available_from TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE hero_videos ADD COLUMN available_until TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE hero_videos ADD COLUMN is_fallback BOOLEAN DEFAULT 'false' NOT NULL;
+
+ALTER TABLE hero_videos ADD COLUMN verify_status VARCHAR(10) DEFAULT 'unknown' NOT NULL;
+
+ALTER TABLE hero_videos ADD COLUMN verified_at TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE hero_videos ADD COLUMN verify_detail VARCHAR(300);
+
+ALTER TABLE hero_videos ADD COLUMN last_play_ok_at TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE hero_videos ADD COLUMN last_play_error VARCHAR(120);
+
+ALTER TABLE hero_videos ADD COLUMN last_play_error_at TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE hero_videos ADD CONSTRAINT ck_hero_videos_ck_hero_videos_verify_status CHECK (verify_status in ('unknown','ok','missing','error'));
+
+ALTER TABLE hero_videos ADD CONSTRAINT ck_hero_videos_ck_hero_videos_window CHECK (available_from IS NULL OR available_until IS NULL OR available_until > available_from);
+
+CREATE UNIQUE INDEX uq_hero_videos_sha256_live ON hero_videos (sha256) WHERE sha256 IS NOT NULL AND deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uq_hero_videos_one_fallback ON hero_videos (is_fallback) WHERE is_fallback AND deleted_at IS NULL;
+
+CREATE INDEX ix_hero_videos_deleted_at ON hero_videos (deleted_at);
+
+UPDATE alembic_version SET version_num='0009' WHERE alembic_version.version_num = '0008';
 
 COMMIT;
 

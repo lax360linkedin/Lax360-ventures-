@@ -9,6 +9,7 @@ import SectionHeading from '../components/ui/SectionHeading.jsx'
 import BotHighlight from '../components/ui/BotHighlight.jsx'
 import { allDivisions } from '../data/services.js'
 import { branchSentence } from '../data/branches.js'
+import CmsJobs, { useJobs } from '../components/cms/CmsJobs.jsx'
 import { useSite } from '../hooks/useSite.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 
@@ -22,6 +23,7 @@ const principles = [
 
 export default function Career() {
   const site = useSite()
+  const jobs = useJobs()
   return (
     <PageContainer
       path="/career"
@@ -43,10 +45,12 @@ export default function Career() {
               <Button to="/contact?type=career" arrow>Tell us about yourself</Button>
               <Button href={`mailto:${site.email}?subject=Career%20enquiry`} variant="secondary"><Mail className="size-5" aria-hidden="true" /> Email us</Button>
             </div>
-            <p className="mt-6 max-w-xl text-sm text-soft">We don&apos;t list open roles on this site yet. Send an enquiry and the team will get back to you.</p>
+            <p className="mt-6 max-w-xl text-sm text-soft">{jobs.length ? <>We are hiring: see the <a href="#openings" className="font-semibold text-fg underline">open positions</a> below, or tell us about yourself.</> : 'We don&apos;t list open roles on this site yet. Send an enquiry and the team will get back to you.'}</p>
           </Reveal>
         </div>
       </section>
+
+      <CmsJobs />
 
       <section className="wrap section" aria-labelledby="areas-title">
         <SectionHeading id="areas-title" eyebrow="Where we work" title="Five areas" gradient="to explore." lead="These are the areas LAX360 Ventures works in — not a list of vacancies." />

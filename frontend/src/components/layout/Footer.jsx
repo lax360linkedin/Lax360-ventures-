@@ -3,7 +3,7 @@ import { ArrowUpRight, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import Logo from './Logo.jsx'
 import Reveal from '../ui/Reveal.jsx'
 import { footerColumns, legalLinks } from '../../data/navigation.js'
-import { useSite } from '../../hooks/useSite.js'
+import { useNav, useSite } from '../../hooks/useSite.js'
 import { whatsappLink } from '../../utils/whatsapp.js'
 import { replayIntro } from '../../utils/welcomeIntro.js'
 
@@ -12,6 +12,10 @@ const linkCls = 'inline-flex min-h-11 items-center text-soft transition-colors d
 /** Deep-violet footer: ambient light, closing CTA strip, organised links and a large typographic wordmark. */
 export default function Footer() {
   const navigate = useNavigate()
+  const columns = [
+    { title: footerColumns[0].title, links: useNav('footer_divisions', footerColumns[0].links) },
+    { title: footerColumns[1].title, links: useNav('footer_company', footerColumns[1].links) },
+  ]
   const replay = () => { navigate('/'); window.setTimeout(replayIntro, 60) } // go Home first; the intro only plays on the homepage
   const site = useSite()
   return (
@@ -33,7 +37,7 @@ export default function Footer() {
           <div className="lg:col-span-4">
             <Logo />
             <p className="mt-6 max-w-sm text-base text-soft">
-              One team to build, automate and grow your business — software, AI, digital growth, CAD engineering and training.
+              {site.footerTagline || 'One team to build, automate and grow your business — software, AI, digital growth, CAD engineering and training.'}
             </p>
             <ul className="mt-5 flex gap-3" aria-label="Social profiles">
               {site.social.map((s) => (
@@ -47,12 +51,12 @@ export default function Footer() {
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8">
-            {footerColumns.map((col) => (
+            {columns.map((col) => (
               <nav key={col.title} aria-label={col.title}>
                 <h2 className="eyebrow mb-3 font-sans text-lav">{col.title}</h2>
                 <ul className="text-base">
                   {col.links.map((l) => (
-                    <li key={l.to}><Link to={l.to} className={linkCls}>{l.label}</Link></li>
+                    <li key={l.to}>{l.external ? <a href={l.to} target="_blank" rel="noopener noreferrer" className={linkCls}>{l.label}<span className="sr-only"> (opens in a new tab)</span></a> : <Link to={l.to} className={linkCls}>{l.label}</Link>}</li>
                   ))}
                 </ul>
               </nav>

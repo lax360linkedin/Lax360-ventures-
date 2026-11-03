@@ -16,7 +16,7 @@ const divisionName = Object.fromEntries(divisions.map((d) => [d.slug, d.name]))
  */
 export default function Projects() {
   const managed = useContent('project') // projects published in the admin panel
-  const list = managed ? managed.map((p) => ({ id: p.id, title: p.title, division: p.data.division, summary: p.data.summary })) : projects
+  const list = managed ? managed.map((p) => ({ id: p.id, title: p.title, division: p.data.division, summary: p.data.summary, image: p.data.image, video: p.data.video, link: p.data.link, category: p.data.category })) : projects
   const hasProjects = list.length > 0
   const items = hasProjects ? list : concepts
   const [filter, setFilter] = useState('all')
@@ -65,9 +65,12 @@ export default function Projects() {
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((item) => (
               <li key={item.id || item.slug} className="flex flex-col rounded-xl border border-edge bg-glass p-6 transition-colors hover:border-2 hover:border-edge-strong hover:p-[23px]">
-                <p className="eyebrow text-lav">{divisionName[item.division]}</p>
+                {item.video ? <video src={item.video} className="-mx-6 -mt-6 mb-5 aspect-[16/9] w-[calc(100%+3rem)] max-w-none rounded-t-xl object-cover" controls muted playsInline preload="metadata" poster={item.image || undefined} />
+                  : item.image && <img src={item.image} alt="" className="-mx-6 -mt-6 mb-5 aspect-[16/9] w-[calc(100%+3rem)] max-w-none rounded-t-xl object-cover" loading="lazy" />}
+                <p className="eyebrow text-lav">{divisionName[item.division]}{item.category ? ` · ${item.category}` : ''}</p>
                 <h3 className="mt-3 font-display text-2xl font-semibold">{item.title}</h3>
                 <p className="mt-2 flex-1 text-soft">{item.text || item.summary}</p>
+                {item.link && <a href={item.link} className="link-underline mt-4 inline-flex min-h-11 items-center font-semibold text-lav" {...(/^https?:/.test(item.link) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>View case study</a>}
                 {!hasProjects && <p className="mt-4 text-xs font-bold uppercase tracking-wider text-soft">Concept</p>}
               </li>
             ))}

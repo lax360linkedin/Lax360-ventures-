@@ -23,7 +23,7 @@ const NAV = [
   { to: '/company-admin/dashboard', end: true, label: 'Dashboard', icon: LayoutDashboard, module: null },
   { to: '/company-admin/enquiries', label: 'Enquiries', icon: Inbox, module: 'enquiries' },
   { to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests' },
-  { to: '/company-admin/content', label: 'Website content', icon: FileText, module: 'content' },
+  { to: '/company-admin/content', label: 'Website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'] },
   { to: '/company-admin/chatbot', label: 'AI chatbot', icon: Bot, module: 'chatbot' },
   { to: '/company-admin/media', label: 'Media', icon: ImageIcon, module: 'media' },
   { to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos' },
@@ -48,7 +48,7 @@ function AdminShell() {
   if (!identity) return <Navigate to="/company-admin/login" replace state={{ from: location.pathname }} />
 
   const { permissions, user: profile } = identity
-  const can = (module) => module === null || permissions.includes(module)
+  const can = (module) => module === null || (Array.isArray(module) ? module.some((m) => permissions.includes(m)) : permissions.includes(module))
   const logout = async () => { await signOut(); navigate('/company-admin/login', { replace: true }) }
 
   return (
@@ -166,7 +166,7 @@ export default function AdminApp() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="enquiries" element={<Guard module="enquiries"><Enquiries /></Guard>} />
           <Route path="demos" element={<Guard module="demo_requests"><Demos /></Guard>} />
-          <Route path="content" element={<Guard module="content"><Content /></Guard>} />
+          <Route path="content" element={<Guard module={['content', 'services', 'careers', 'navigation']}><Content /></Guard>} />
           <Route path="chatbot" element={<Guard module="chatbot"><Chatbot /></Guard>} />
           <Route path="media" element={<Guard module="media"><Media /></Guard>} />
           <Route path="homepage-videos" element={<Guard module="hero_videos"><HeroVideos /></Guard>} />

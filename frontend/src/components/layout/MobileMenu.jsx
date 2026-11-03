@@ -6,7 +6,7 @@ import Logo from './Logo.jsx'
 import Button from '../ui/Button.jsx'
 import ThemeToggle from '../ui/ThemeToggle.jsx'
 import { primaryNav } from '../../data/navigation.js'
-import { useSite } from '../../hooks/useSite.js'
+import { useNav, useSite } from '../../hooks/useSite.js'
 import { whatsappLink } from '../../utils/whatsapp.js'
 import { useAuth } from '../../hooks/useAuth.js'
 
@@ -16,6 +16,7 @@ const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1
 /** Frosted full-screen sheet for < 1024px: staggered items, focus trapped, Esc closes, body scroll locked. */
 export default function MobileMenu({ open, onClose, returnFocusRef }) {
   const site = useSite()
+  const nav = useNav('header', primaryNav)
   const panelRef = useRef(null)
   const closeRef = useRef(null)
   const { pathname } = useLocation()
@@ -76,8 +77,8 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
 
           <nav aria-label="Mobile" className="wrap flex-1 py-4">
             <ul className="divide-y divide-edge border-y border-edge font-display text-3xl font-semibold">
-              {primaryNav.map((n, i) => (
-                <m.li key={n.to} {...item(i)}><Link to={n.to} onClick={onClose} className={link(n.to)}>{n.label}</Link></m.li>
+              {nav.map((n, i) => (
+                <m.li key={n.to} {...item(i)}>{n.external ? <a href={n.to} target="_blank" rel="noopener noreferrer" onClick={onClose} className={link(n.to)}>{n.label}</a> : <Link to={n.to} onClick={onClose} className={link(n.to)}>{n.label}</Link>}</m.li>
               ))}
             </ul>
           </nav>

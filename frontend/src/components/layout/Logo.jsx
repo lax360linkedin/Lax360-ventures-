@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useSite } from '../../hooks/useSite.js'
 
 /**
  * Shield mark (transparent PNG cut from the supplied logo) on a soft glass tile + temporary text wordmark.
@@ -8,10 +9,11 @@ import { Link } from 'react-router-dom'
  * The icon and the text are one link to Home.
  */
 export default function Logo({ className = '', aRef }) {
+  const site = useSite()
   return (
     <Link to="/" aria-label="LAX360 Ventures home" className={`group inline-flex items-center gap-3 ${className}`}>
       <span className="rounded-xl bg-white/95 p-1 shadow-[0_0_0_1px_rgba(196,181,253,0.35)] transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105">
-        <img src="/assets/logo-shield.png" alt="" width="40" height="42" className="h-9 w-auto" />
+        <img src={site.logoUrl || '/assets/logo-shield.png'} alt="" width="40" height="42" className="h-9 w-auto" />
       </span>
       <span className="flex flex-col font-display leading-none text-fg">
         <span className="text-xl font-bold tracking-tight">L<span ref={aRef} className="inline-block">A</span>X360</span>{' '}

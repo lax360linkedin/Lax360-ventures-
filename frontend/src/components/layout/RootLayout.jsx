@@ -6,6 +6,7 @@ import MobileMenu from './MobileMenu.jsx'
 import MobileBottomBar from './MobileBottomBar.jsx'
 import WhatsAppFloat from './WhatsAppFloat.jsx'
 import { useScrollDirection } from '../../hooks/useScrollDirection.js'
+import PreviewBanner from '../cms/PreviewBanner.jsx'
 import { useSite, useSiteSettings } from '../../hooks/useSite.js'
 
 // Loaded after the page itself / on first use, so they never compete with first paint.
@@ -59,6 +60,13 @@ export default function RootLayout() {
   const openEnquiry = useCallback(() => { setEnquiryEverOpened(true); setEnquiryOpen(true) }, [])
   const closeEnquiry = useCallback(() => setEnquiryOpen(false), [])
   const [chatReady, setChatReady] = useState(false)
+  const favicon = settings.site_favicon_url
+  useEffect(() => { // a favicon chosen in the admin panel replaces the built-in one
+    if (!favicon) return
+    const el = document.head.querySelector('link[rel="icon"]') || Object.assign(document.createElement('link'), { rel: 'icon' })
+    el.setAttribute('href', favicon)
+    if (!el.isConnected) document.head.appendChild(el)
+  }, [favicon])
 
   useEffect(() => closeMenu(), [pathname, closeMenu])
   useEffect(() => {
@@ -91,6 +99,7 @@ export default function RootLayout() {
       </main>
       <Footer />
       <MobileBottomBar visible={barVisible} />
+      <PreviewBanner />
       <WhatsAppFloat />
       {chatReady && settings.chatbot_enabled !== false && (
         <Suspense fallback={null}>

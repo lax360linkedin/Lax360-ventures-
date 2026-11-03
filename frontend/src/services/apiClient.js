@@ -6,12 +6,13 @@
 import { apiUrl } from './apiConfig.js'
 
 export class ApiError extends Error {
-  constructor({ status = 0, code = 'error', message, fields = null }) {
+  constructor({ status = 0, code = 'error', message, fields = null, details = null }) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.code = code
     this.fields = fields
+    this.details = details // structured extras, e.g. where a media file is used
   }
 }
 
@@ -68,6 +69,7 @@ export async function api(path, { method = 'GET', body, rawBody, contentType, as
       code: e?.code || 'http_error',
       message: e?.message || (res.status >= 500 ? 'Something went wrong on our side. Please try again.' : 'That request could not be completed.'),
       fields: e?.fields || null,
+      details: e?.details || null,
     })
     // Public site: only a clearly expired session is announced (a plain 401 just means "not signed in", which is normal there).
     // Company admin: ANY 401 on a protected call (the sign-in request itself excepted) means this browser no longer has a valid admin session.
@@ -78,4 +80,35 @@ export async function api(path, { method = 'GET', body, rawBody, contentType, as
   const total = res.headers.get('X-Total-Count')
   if (total !== null && Array.isArray(data)) Object.defineProperty(data, 'total', { value: Number(total) }) // list endpoints that paginate via a header
   return data
+}
+
+/**
+ * Upload a file as the raw request body with REAL progress (fetch cannot report upload progress). Same session, CSRF and Bearer handling as
+ * `api()`. Resolves with the parsed JSON response; rejects with an ApiError.
+ */
+export function upload(path, file, { method = 'POST', contentType, onProgress, timeoutMs = 10 * 60 * 1000 } = {}) {
+  const realm = realmOf(path)
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open(method, apiUrl(path))
+    xhr.withCredentials = true
+    xhr.timeout = timeoutMs
+    xhr.setRequestHeader('Accept', 'application/json')
+    xhr.setRequestHeader('Content-Type', contentType || file.type || 'application/octet-stream')
+    if (csrfTokens[realm]) xhr.setRequestHeader('X-CSRF-Token', csrfTokens[realm])
+    if (realm === 'admin' && adminBearer) xhr.setRequestHeader('Authorization', `Bearer ${adminBearer}`)
+    xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress?.(e.loaded / e.total) }
+    xhr.onload = () => {
+      let data = null
+      try { data = JSON.parse(xhr.responseText) } catch { /* non-JSON body */ }
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(data)
+      const e = data?.error
+      const error = new ApiError({ status: xhr.status, code: e?.code || 'http_error', message: e?.message || (xhr.status >= 500 ? 'Something went wrong on our side. Please try again.' : 'That upload could not be completed.'), fields: e?.fields || null, details: e?.details || null })
+      if (realm === 'admin' && xhr.status === 401) expiredListeners.admin.forEach((fn) => fn(error.code))
+      return reject(error)
+    }
+    xhr.onerror = () => reject(new ApiError({ code: 'network', message: NETWORK }))
+    xhr.ontimeout = () => reject(new ApiError({ code: 'timeout', message: TIMEOUT }))
+    xhr.send(file)
+  })
 }

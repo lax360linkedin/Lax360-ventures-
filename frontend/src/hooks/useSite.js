@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useSyncExternalStore } from 'react'
 import { site as defaults } from '../data/site.js'
 import { EMPTY, getState, loadContent, loadSite, subscribe } from '../services/siteService.js'
+import { pagePathToKey } from '../utils/cms.js'
 
 const digits = (v) => String(v || '').replace(/\D/g, '')
 const toTel = (display) => `+${digits(display)}`
@@ -19,6 +20,16 @@ export function mergeSite(s = {}) {
     whatsappNumber: digits(s.whatsapp_number) || defaults.whatsappNumber,
     legalLine: s.footer_text || defaults.legalLine,
     social,
+    // managed in the admin panel (Website settings): all optional, the built-in website supplies defaults
+    siteName: s.site_name || '',
+    logoUrl: s.site_logo_url || null,
+    faviconUrl: s.site_favicon_url || null,
+    defaultImage: s.default_og_image_url || null,
+    address: s.contact_address || '',
+    contactIntro: s.contact_description || '',
+    mapLink: s.map_link || '',
+    email2: s.contact_email_2 || '',
+    footerTagline: s.footer_tagline || '',
   }
 }
 
@@ -49,4 +60,49 @@ export function useFaqs(group, fallback) {
     const mine = (items || []).filter((i) => (i.data.group || 'home') === group)
     return mine.length ? mine.map((i) => ({ q: i.title, a: i.data.answer })) : fallback
   }, [items, group, fallback])
+}
+
+/** True once the managed content has been fetched (so a page can tell "not published" from "not loaded yet"). */
+export function useContentReady() {
+  useEffect(() => { loadContent() }, [])
+  return useSiteState().ready
+}
+
+/** Is the site showing an administrator's unpublished drafts (the "Preview on the website" button)? */
+export function usePreviewMode() {
+  useEffect(() => { loadContent() }, [])
+  return useSiteState().preview
+}
+
+/** Menu links: the published navigation items for this menu when there are any, otherwise the built-in `fallback`. */
+export function useNav(place, fallback) {
+  const items = useContent('nav_item')
+  return useMemo(() => {
+    const mine = (items || []).filter((i) => i.data.place === place && i.data.enabled !== false && i.data.link)
+    return mine.length ? mine.map((i) => ({ label: i.title, to: i.data.link, external: /^https?:/.test(i.data.link) })) : fallback
+  }, [items, place, fallback])
+}
+
+/** Title / description / image set for a page in the admin panel ("Page titles & SEO"), or null to keep the built-in text. */
+export function useSeo(path) {
+  const items = useContent('seo_page')
+  const key = pagePathToKey(path)
+  return useMemo(() => {
+    const mine = key && (items || []).find((i) => i.data.page === key)
+    return mine ? { title: mine.title, description: mine.data.meta_description || '', image: mine.data.image || null } : null
+  }, [items, key])
+}
+
+/** Home page sections in display order: the built-in order, re-ordered / hidden by the published "Home page sections" items. */
+export function useHomeSections(defaults) {
+  const items = useContent('section')
+  return useMemo(() => {
+    if (!items) return defaults
+    const cfg = new Map(items.map((i) => [i.data.key, i]))
+    const listed = [...cfg.values()].filter((i) => defaults.includes(i.data.key)).sort((a, b) => a.sort_order - b.sort_order).map((i) => i.data.key)
+    const slots = defaults.map((k, i) => (cfg.has(k) ? i : -1)).filter((i) => i >= 0)
+    const order = [...defaults]
+    slots.forEach((slot, n) => { order[slot] = listed[n] }) // listed sections swap places among their own slots; the others stay where they are
+    return order.filter((k) => cfg.get(k)?.data.enabled !== false)
+  }, [items, defaults])
 }

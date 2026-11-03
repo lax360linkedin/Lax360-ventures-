@@ -36,6 +36,15 @@ export default function Contact() {
               <li><a href={`mailto:${site.email}`} className="link-underline inline-flex min-h-11 items-center gap-3 break-all"><Mail className="size-5 shrink-0" aria-hidden="true" /> {site.email}</a></li>
             </ul>
           </div>
+          {(site.address || site.mapLink || site.contactIntro || site.email2) && (
+            <div>
+              <h2 className="eyebrow text-lav">Visit or write</h2>
+              {site.contactIntro && <p className="mt-4 text-soft">{site.contactIntro}</p>}
+              {site.address && <address className="mt-4 whitespace-pre-line not-italic text-lg">{site.address}</address>}
+              {site.email2 && <p className="mt-3"><a href={`mailto:${site.email2}`} className="link-underline break-all font-semibold">{site.email2}</a></p>}
+              {site.mapLink && <p className="mt-3"><a href={site.mapLink} target="_blank" rel="noopener noreferrer" className="link-underline inline-flex min-h-11 items-center gap-2 font-semibold text-lav">Open in maps<span className="sr-only"> (opens in a new tab)</span></a></p>}
+            </div>
+          )}
           {site.responseTime && (
             <p className="flex gap-3 text-soft"><Clock className="mt-1 size-5 shrink-0" aria-hidden="true" /> We reply {site.responseTime}.</p>
           )}

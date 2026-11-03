@@ -2,6 +2,7 @@ import PageContainer from '../components/layout/PageContainer.jsx'
 import ServicesHero from '../components/sections/services/ServicesHero.jsx'
 import CategoryNav from '../components/sections/services/CategoryNav.jsx'
 import ServiceCategories from '../components/sections/services/ServiceCategories.jsx'
+import CmsServices from '../components/cms/CmsServices.jsx'
 import ProcessTimeline from '../components/sections/ProcessTimeline.jsx'
 import ContactCta from '../components/sections/ContactCta.jsx'
 import Accordion from '../components/ui/Accordion.jsx'
@@ -24,6 +25,7 @@ export default function Services() {
       <ServicesHero />
       <CategoryNav />
       <ServiceCategories />
+      <CmsServices />
       <ProcessTimeline eyebrow="How we work" title="Every service follows the same four steps." />
       <section className="wrap section" aria-labelledby="faq-title">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">

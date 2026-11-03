@@ -80,7 +80,7 @@ export default function Hero() {
         <div className="mx-auto flex w-full max-w-4xl flex-col items-center text-center [text-shadow:0_2px_24px_rgba(11,7,20,0.55)]">
           <p className="a-rise glass-flat inline-flex items-center gap-2.5 !rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav" style={{ '--d': '0.25s' }}>
             <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(168,85,247,0.8)]" />
-            Software · AI · Growth · Engineering · Academy
+            {hero.eyebrow || 'Software · AI · Growth · Engineering · Academy'}
           </p>
           <h1 id="hero-title" className="h1 mt-7 !text-[clamp(2.5rem,6vw,5.75rem)]">
             {lines.map((line, n) => (

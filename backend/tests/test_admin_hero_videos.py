@@ -16,13 +16,13 @@ def box(kind: bytes, payload: bytes = b"") -> bytes:
     return struct.pack(">I4s", 8 + len(payload), kind) + payload
 
 
-def make_mp4(seconds: float = 10.0, *, video_track: bool = True, with_moov: bool = True, pad: int = 0) -> bytes:
+def make_mp4(seconds: float = 10.0, *, video_track: bool = True, with_moov: bool = True, pad: int = 0, tag: bytes = b"") -> bytes:
     ftyp = box(b"ftyp", b"isom" + b"\x00\x00\x02\x00" + b"isomiso2mp41")
     mvhd = box(b"mvhd", b"\x00\x00\x00\x00" + b"\x00" * 8 + struct.pack(">II", 1000, int(seconds * 1000)) + b"\x00" * 80)
     hdlr = box(b"hdlr", b"\x00\x00\x00\x00" + b"\x00" * 4 + (b"vide" if video_track else b"soun") + b"\x00" * 12 + b"x\x00")
     trak = box(b"trak", box(b"mdia", hdlr))
     moov = box(b"moov", mvhd + trak) if with_moov else b""
-    return ftyp + moov + box(b"mdat", b"\x00" * pad)
+    return ftyp + moov + box(b"mdat", b"\x00" * pad + tag)
 
 
 def make_webm(seconds: float = 10.0) -> bytes:
@@ -60,7 +60,7 @@ def admin(videos_dir, app, db, clock):
 
 def upload(admin, title, data=None, filename=None, ctype="video/mp4"):
     client, csrf = admin
-    return client.post(f"/api/admin/hero-videos?filename={filename or title + '.mp4'}&title={title}", content=data if data is not None else make_mp4(), headers={**csrf, "Content-Type": ctype})
+    return client.post(f"/api/admin/hero-videos?filename={filename or title + '.mp4'}&title={title}", content=data if data is not None else make_mp4(tag=title.encode()), headers={**csrf, "Content-Type": ctype})
 
 
 def active(client):
@@ -215,11 +215,11 @@ def test_deleting_videos_is_safe_including_the_last_one(admin, clock, client, vi
     ids = three(admin)
     c, csrf = admin
     clock(datetime(2026, 11, 5, 9, 0, tzinfo=IST))
-    assert c.delete(f"/api/admin/hero-videos/{ids['B']}", headers=csrf).status_code == 204
+    assert c.delete(f"/api/admin/hero-videos/{ids['B']}", headers=csrf).status_code == 200
     assert active(client)[0]["id"] == ids["C"] and len(list(videos_dir.glob("*.mp4"))) == 2
     assert client.get(f"/api/public/hero-videos/{ids['B']}/file").status_code == 404
     for name in ("A", "C"):
-        assert c.delete(f"/api/admin/hero-videos/{ids[name]}", headers=csrf).status_code == 204
+        assert c.delete(f"/api/admin/hero-videos/{ids[name]}", headers=csrf).status_code == 200
     slot, body = active(client)
     assert slot is None and body["fallback"] is True and body["next"] is None
     assert not list(videos_dir.glob("*.mp4"))

@@ -1,6 +1,6 @@
 import openai
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.models import AuditLog, MediaAsset
 from tests.admin_helpers import PNG, staff
@@ -144,10 +144,12 @@ def test_upload_preview_publish_replace_and_delete(app, db, client):
     rep = admin.put(f"/api/admin/media/{asset['id']}/file", content=jpeg, headers={**csrf, "Content-Type": "application/octet-stream"})
     assert rep.status_code == 200 and rep.json()["content_type"] == "image/jpeg" and rep.json()["filename"].endswith(".jpg")
     listing = admin.get("/api/admin/media").json()
-    assert listing["total"] == 1 and listing["usage"]["files"] == 1 and listing["limits"]["max_bytes"] == 2097152
+    # replacing keeps the previous file as its own library item (nothing is deleted unless the admin asks), so there are now two
+    assert listing["total"] == 2 and listing["usage"]["files"] == 2 and listing["limits"]["max_bytes"] == 10485760 and rep.json()["previous_item"]
     assert admin.delete(f"/api/admin/media/{asset['id']}").status_code == 403  # CSRF
     assert admin.delete(f"/api/admin/media/{asset['id']}", headers=csrf).status_code == 204
-    assert client.get(pub["url"]).status_code == 404 and db.scalar(select(MediaAsset.id)) is None
+    assert client.get(pub["url"]).status_code == 404 and db.scalar(select(func.count()).select_from(MediaAsset)) == 1  # the kept previous version remains
+    assert admin.delete(f"/api/admin/media/{rep.json()['previous_item']}", headers=csrf).status_code == 204 and db.scalar(select(MediaAsset.id)) is None
 
 
 @pytest.mark.parametrize(("name", "content"), [

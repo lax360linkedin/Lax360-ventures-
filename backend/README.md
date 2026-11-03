@@ -77,6 +77,22 @@ uvicorn app.main:app --reload --port 8000
 ```
 `/api/health` and `/health` never touch the database; `/api/health/ready` does (and returns 503 with `"database": "unreachable"` on failure).
 
+### Homepage background videos: permanent storage (Supabase Storage)
+Render's disk is **temporary** (wiped on every restart, redeploy and spin-down), so videos must live in Supabase Storage. On Render set:
+`SUPABASE_URL=https://<project-ref>.supabase.co` and `SUPABASE_SERVICE_ROLE_KEY=<service_role key>` (Project Settings -> API; **backend only**, never in the frontend or Vercel). Optional: `HERO_VIDEO_BUCKET` (default `hero-videos`).
+- The bucket is created **public** on the first upload (visitors play the video straight from the storage CDN); the service key is only used by the backend. If you create it yourself: Storage -> New bucket -> `hero-videos` -> Public. No other storage policies are needed (uploads/deletes use the service key; RLS stays on).
+- An upload only counts as successful after the backend has **verified** the object exists in the bucket and is publicly readable (size checked); otherwise the new object is removed, no record is saved and the admin sees why. A database row is never treated as proof that a file exists.
+- **Deletion only happens when an authorized admin confirms it** (Delete -> confirm). Refreshing, logging out, deactivating, reordering, changing the schedule, a restart or a redeploy never delete a video. Deleting marks the record, removes the stored file, and only after the file is confirmed gone drops the record; if storage refuses, the record is kept as a pending deletion ("Deletions that did not finish") that can be retried or restored. Every step is in the audit log.
+- Admin -> Homepage Videos shows per video: file status (verified/missing/error + time + reason), where it is stored, the last playback result reported by visitors, availability window and fallback. **Check files** re-verifies everything; a missing file is skipped (never deleted) and you can re-upload it with **Replace file**. The star marks the single **fallback video** that plays only when no scheduled video is eligible.
+
+**Recovery commands** (run in `backend/`; none of them deletes anything):
+```powershell
+python -m app.cli hero-videos-report --json > videos-metadata-backup.json   # metadata backup + which stored files exist
+python -m app.cli hero-videos-report --verify                               # also records the check on each video
+python -m app.cli hero-videos-migrate                                       # dry run: videos still on the server disk
+python -m app.cli hero-videos-migrate --apply                               # copy them to Supabase, verified, local file left in place
+```
+
 ### Security notes for Supabase
 - **Row-level security is enabled on every table (migration 0002) with no policies**, and the `anon`/`authenticated` API roles are
   stripped of table privileges. Supabase otherwise exposes `public` tables through its REST API using the public anon key. The backend

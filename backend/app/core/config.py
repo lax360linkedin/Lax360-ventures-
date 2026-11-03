@@ -36,10 +36,18 @@ class Settings(BaseSettings):
     docs_enabled: bool | None = None  # default: on outside production, off in production
     trust_proxy_headers: bool = False  # honour X-Forwarded-For (only behind a proxy you control)
     max_request_body_bytes: int = 65_536
-    media_max_bytes: int = 2_097_152  # largest uploaded image/PDF (stored in the database)
+    media_max_bytes: int = 10_485_760  # largest uploaded image/PDF (videos use HERO_VIDEO_MAX_BYTES)
+    media_bucket: str = "site-media"  # Supabase Storage bucket for the media library (created public on first upload)
+    media_dir: str = "storage/media"  # development only: where files go when Supabase Storage is not configured
     app_timezone: str = "Asia/Kolkata"  # the timezone every schedule (homepage videos) is calculated and displayed in
     hero_video_dir: str = "storage/hero_videos"  # homepage background videos live on disk (relative paths are inside backend/), NOT in the database
     hero_video_max_bytes: int = 52_428_800  # largest homepage video upload (50 MB)
+    # Durable storage for homepage videos. Render's disk is ephemeral (wiped on every restart/redeploy), so in production keep the files in
+    # Supabase Storage: set both of these (the service-role key is a SERVER-SIDE secret: never put it in the frontend). Without them, local disk is used.
+    supabase_url: str | None = None  # https://<project-ref>.supabase.co
+    supabase_service_role_key: SecretStr | None = None
+    hero_video_bucket: str = "hero-videos"  # created automatically (public) on first upload if it does not exist
+    hero_video_disk_is_persistent: bool = False  # set true only if HERO_VIDEO_DIR is on a persistent disk (e.g. a Render Disk): silences the warning
     hero_video_slot_seconds: int | None = None  # development/test ONLY: replaces the 3-day slot length so rotation can be watched in minutes
 
     # --- CORS / frontend ---------------------------------------------------------------------
@@ -104,12 +112,12 @@ class Settings(BaseSettings):
     def _provider_lower(cls, v):
         return v.strip().lower() if isinstance(v, str) else v
 
-    @field_validator("openai_api_key", "gemini_api_key", "auth_secret", "admin_password", mode="before")
+    @field_validator("openai_api_key", "gemini_api_key", "auth_secret", "admin_password", "supabase_service_role_key", mode="before")
     @classmethod
     def _blank_secret_is_none(cls, v):
         return None if isinstance(v, str) and not v.strip() else v
 
-    @field_validator("openai_model", "gemini_model", "admin_email", "admin_username", "hero_video_slot_seconds", "database_url", "cookie_domain", "docs_enabled", "cookie_secure", "db_disable_prepared_statements", mode="before")
+    @field_validator("openai_model", "gemini_model", "admin_email", "admin_username", "supabase_url", "hero_video_slot_seconds", "database_url", "cookie_domain", "docs_enabled", "cookie_secure", "db_disable_prepared_statements", mode="before")
     @classmethod
     def _blank_is_none(cls, v):
         return None if isinstance(v, str) and not v.strip() else v
@@ -125,6 +133,11 @@ class Settings(BaseSettings):
         if self.frontend_origin and self.frontend_origin.rstrip("/") not in origins:
             origins.append(self.frontend_origin.rstrip("/"))
         return origins
+
+    @property
+    def video_storage(self) -> str:
+        """Where homepage video files are kept: "supabase" (durable object storage) when configured, else "local" disk."""
+        return "supabase" if self.supabase_url and self.supabase_service_role_key else "local"
 
     @property
     def docs_on(self) -> bool:

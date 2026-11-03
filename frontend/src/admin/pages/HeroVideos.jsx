@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { ArrowDown, ArrowUp, CalendarClock, Film, Pencil, Play, Replace, Trash2, Upload } from 'lucide-react'
+import { ArrowDown, ArrowUp, CalendarClock, Clock, Film, Pencil, Play, Replace, RotateCcw, ShieldCheck, Star, Trash2, Upload } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import { Badge, Btn, Card, ConfirmDialog, EmptyState, ErrorState, Field, Input, Modal, PageHeader, Spinner, Toggle, cx, useFetch, useToast } from '../ui.jsx'
 
@@ -116,14 +116,20 @@ export default function HeroVideos() {
   const [confirm, setConfirm] = useState(null)
   const [busy, setBusy] = useState('')
   const [form, setForm] = useState(null)
+  const [window_, setWindow_] = useState(null)
   const pickRef = useRef(null)
   const replaceRef = useRef(null)
   const replaceTarget = useRef(null)
 
   if (loading && !data) return <Spinner />
   if (error && !data) return <ErrorState error={error} onRetry={reload} />
-  const { items, config, current, next, limits, usage } = data
+  const { items: all, config, current, next, limits, usage, storage } = data
+  const items = all.filter((v) => v.status !== 'deleting') // a pending deletion is not part of the queue (its file could not be removed yet)
+  const pending = all.filter((v) => v.status === 'deleting')
+  const problems = items.filter((v) => v.verify_status === 'missing' || v.verify_status === 'error')
   const tz = config.timezone
+  const local = (iso) => (iso ? new Date(iso).toLocaleString('sv-SE', { timeZone: tz }).replace(' ', 'T').slice(0, 16) : '') // for <input type="datetime-local">, in the site's time zone
+  const toIso = (value) => (value ? `${value}:00+05:30` : null) // the site's wall time (Asia/Kolkata); the server stores it as an absolute time
   const when = (iso) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', timeZone: tz }) : '—')
   const f = form || { start_date: config.start_date, slot_days: config.slot_days, repeat: config.repeat }
   const run = async (name, fn, ok) => {
@@ -162,9 +168,19 @@ export default function HeroVideos() {
         actions={<>
           <input ref={pickRef} type="file" multiple className="sr-only" tabIndex={-1} accept="video/mp4,video/webm,.mp4,.m4v,.webm" onChange={choose} aria-label="Choose videos to upload" />
           <input ref={replaceRef} type="file" className="sr-only" tabIndex={-1} accept="video/mp4,video/webm,.mp4,.m4v,.webm" onChange={replace} aria-label="Choose a replacement video" />
+          <Btn loading={busy === 'verify-all'} onClick={() => run('verify-all', () => api(`${BASE}/verify-all`, { method: 'POST' }), 'All files checked')}><ShieldCheck className="size-4" aria-hidden="true" /> Check files</Btn>
           <Btn kind="primary" onClick={() => pickRef.current?.click()}><Upload className="size-4" aria-hidden="true" /> Upload videos</Btn>
         </>} />
 
+      {storage?.warning && <p role="alert" className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm"><strong>Videos may disappear.</strong> {storage.warning}</p>}
+      {problems.length > 0 && <p role="alert" className="mb-6 rounded-xl border border-error/40 bg-error/10 p-4 text-sm"><strong>{problems.length} video file{problems.length === 1 ? ' needs' : 's need'} attention:</strong> {problems.map((v) => v.title).join(', ')}. Nothing was deleted. Re-upload the file with “Replace file”, or check the storage bucket, then press “Check files”.</p>}
+      {pending.length > 0 && <Card className="mb-6 !border-amber-500/40">
+        <h2 className="mb-2 font-display text-base font-semibold">Deletions that did not finish</h2>
+        <ul className="space-y-2 text-sm">{pending.map((v) => (
+          <li key={v.id} className="flex flex-wrap items-center gap-2"><span className="font-medium">{v.title}</span><span className="flex-1 text-soft">{v.delete_error || 'The stored file could not be removed.'} The record was kept.</span>
+            <Btn loading={busy === `retry-${v.id}`} onClick={() => run(`retry-${v.id}`, async () => { const r = await api(`${BASE}/${v.id}`, { method: 'DELETE' }); if (!r.deleted) throw new Error(r.message) }, 'Video deleted')}><Trash2 className="size-4" aria-hidden="true" /> Retry deletion</Btn>
+            <Btn loading={busy === `restore-${v.id}`} onClick={() => run(`restore-${v.id}`, () => api(`${BASE}/${v.id}/restore`, { method: 'POST' }), 'Video restored (switched off)')}><RotateCcw className="size-4" aria-hidden="true" /> Restore</Btn></li>))}</ul>
+      </Card>}
       <div className="mb-6 grid gap-4 md:grid-cols-2">
         <Card>
           <p className="text-xs font-semibold uppercase tracking-wide text-soft">Playing now</p>
@@ -188,7 +204,7 @@ export default function HeroVideos() {
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Btn kind="primary" loading={busy === 'schedule'} disabled={!form} onClick={() => run('schedule', async () => { await api(`${BASE}/schedule`, { method: 'PUT', body: { start_date: f.start_date || null, slot_days: Number(f.slot_days), repeat: f.repeat } }); setForm(null) }, 'Schedule saved')}>Save schedule</Btn>
-          <p className="text-xs text-soft">Times are shown in {tz}. {usage.files} {usage.files === 1 ? 'video' : 'videos'}, {size(usage.bytes)} stored on the server.</p>
+          <p className="text-xs text-soft">Times are shown in {tz}. {usage.files} {usage.files === 1 ? 'video' : 'videos'}, {size(usage.bytes)}. Stored in: {storage?.detail || 'the server'}.</p>
         </div>
       </Card>
 
@@ -211,11 +227,23 @@ export default function HeroVideos() {
                   <div className="min-w-0 flex-1 basis-56">
                     <p className="flex flex-wrap items-center gap-2"><span className="text-xs font-semibold text-soft">#{i + 1}</span><span className="truncate font-display text-base font-semibold">{v.title}</span><Badge value={v.status} /></p>
                     <p className="mt-1 text-xs text-soft">{v.content_type.replace('video/', '').toUpperCase()} · {size(v.size_bytes)} · {length(v.duration_seconds)} · uploaded {when(v.created_at)}</p>
-                    <p className="mt-1 text-xs text-soft">{v.status === 'missing_file' ? <span className="font-medium text-error">The video file is missing on the server, so it is skipped. Replace it or delete this entry.</span>
+                    <p className="mt-1 text-xs text-soft">{v.status === 'missing_file' ? <span className="font-medium text-error">The video file is missing{v.verify_detail ? `: ${v.verify_detail}` : ' on the server'}, so it is skipped. The record is kept: re-upload with “Replace file”, or delete this entry.</span>
                       : v.starts_at ? <>Slot: {when(v.starts_at)} → {v.ends_at ? when(v.ends_at) : 'no end (last video)'}</> : v.is_active ? 'Not scheduled yet' : 'Switched off: skipped in the rotation'}</p>
+                    <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-soft">
+                      <span className={cx('font-medium', v.verify_status === 'ok' ? 'text-success' : v.verify_status === 'unknown' ? '' : 'text-error')}>File: {v.verify_status === 'ok' ? 'verified' : v.verify_status === 'unknown' ? 'not checked yet' : v.verify_status}{v.verified_at ? ` (${when(v.verified_at)})` : ''}</span>
+                      <span>{v.storage === 'supabase' ? `Stored permanently (${v.bucket || 'bucket'})` : 'On the server disk (temporary)'}</span>
+                      {v.last_play_ok_at && <span>Last played by a visitor: {when(v.last_play_ok_at)}</span>}
+                      {v.last_play_error && <span className="text-error">Last playback problem: {v.last_play_error}{v.last_play_error_at ? ` (${when(v.last_play_error_at)})` : ''}</span>}
+                      {v.is_fallback && <span className="font-medium text-lav">Fallback video</span>}
+                      {(v.available_from || v.available_until) && <span>Available {v.available_from ? `from ${when(v.available_from)}` : ''} {v.available_until ? `until ${when(v.available_until)}` : ''}</span>}
+                    </p>
+                    {v.verify_detail && v.verify_status !== 'ok' && <p className="mt-1 text-xs text-error">{v.verify_detail}</p>}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Toggle checked={v.is_active} disabled={busy === `active-${v.id}`} onChange={(on) => run(`active-${v.id}`, () => api(`${BASE}/${v.id}`, { method: 'PATCH', body: { is_active: on } }), on ? 'Video activated' : 'Video deactivated')} label={<span className="sr-only">{v.is_active ? `Deactivate ${v.title}` : `Activate ${v.title}`}</span>} />
+                    <Btn aria-label={`Check the file of ${v.title}`} loading={busy === `verify-${v.id}`} onClick={() => run(`verify-${v.id}`, () => api(`${BASE}/${v.id}/verify`, { method: 'POST' }), 'File checked')}><ShieldCheck className="size-4" aria-hidden="true" /></Btn>
+                    <Btn aria-label={v.is_fallback ? `Stop using ${v.title} as the fallback` : `Use ${v.title} as the fallback video`} aria-pressed={v.is_fallback} className={cx(v.is_fallback && '!border-lav !text-lav')} onClick={() => run(`fb-${v.id}`, () => api(`${BASE}/${v.id}`, { method: 'PATCH', body: { is_fallback: !v.is_fallback } }), v.is_fallback ? 'Fallback removed' : 'Fallback video set')}><Star className="size-4" aria-hidden="true" /></Btn>
+                    <Btn aria-label={`Availability window of ${v.title}`} onClick={() => setWindow_({ id: v.id, title: v.title, from: local(v.available_from), until: local(v.available_until) })}><Clock className="size-4" aria-hidden="true" /></Btn>
                     <Btn aria-label={`Rename ${v.title}`} onClick={() => setRename({ id: v.id, title: v.title })}><Pencil className="size-4" aria-hidden="true" /></Btn>
                     <Btn aria-label={`Replace the file of ${v.title}`} loading={busy === `replace-${v.id}`} onClick={() => { replaceTarget.current = v; replaceRef.current?.click() }}><Replace className="size-4" aria-hidden="true" /></Btn>
                     <Btn kind="danger" aria-label={`Delete ${v.title}`} onClick={() => setConfirm(v)}><Trash2 className="size-4" aria-hidden="true" /></Btn>
@@ -237,8 +265,18 @@ export default function HeroVideos() {
       <Modal open={!!rename} onClose={() => setRename(null)} title="Rename video" footer={<><Btn onClick={() => setRename(null)}>Cancel</Btn><Btn kind="primary" loading={busy === 'rename'} disabled={!rename?.title.trim()} onClick={async () => { await run('rename', () => api(`${BASE}/${rename.id}`, { method: 'PATCH', body: { title: rename.title.trim() } }), 'Title saved'); setRename(null) }}>Save</Btn></>}>
         {rename && <Field label="Title (internal label)">{(p) => <Input {...p} maxLength={120} value={rename.title} onChange={(e) => setRename({ ...rename, title: e.target.value })} />}</Field>}
       </Modal>
-      <ConfirmDialog open={!!confirm} busy={busy === 'delete'} title="Delete this video?" onClose={() => setConfirm(null)} onConfirm={async () => { await run('delete', () => api(`${BASE}/${confirm.id}`, { method: 'DELETE' }), 'Video deleted'); setConfirm(null) }}>
-        “{confirm?.title}” and its file will be removed permanently.{confirm?.status === 'playing' ? ' It is playing now: the next video takes over immediately.' : ''}
+      <Modal open={!!window_} onClose={() => setWindow_(null)} title={`Availability: ${window_?.title || ''}`}
+        footer={<><Btn onClick={() => run('window', () => api(`${BASE}/${window_.id}`, { method: 'PATCH', body: { clear_window: true } }), 'Window removed').then(() => setWindow_(null))}>Always available</Btn>
+          <Btn kind="primary" loading={busy === 'window'} onClick={() => run('window', () => api(`${BASE}/${window_.id}`, { method: 'PATCH', body: { available_from: toIso(window_.from), available_until: toIso(window_.until) } }), 'Window saved').then(() => setWindow_(null))}>Save</Btn></>}>
+        {window_ && <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Available from" hint={`Optional. ${tz} time.`}>{(p) => <Input {...p} type="datetime-local" value={window_.from} onChange={(e) => setWindow_({ ...window_, from: e.target.value })} />}</Field>
+          <Field label="Available until" hint="Optional. Must be after the start.">{(p) => <Input {...p} type="datetime-local" value={window_.until} onChange={(e) => setWindow_({ ...window_, until: e.target.value })} />}</Field>
+          <p className="text-xs text-soft sm:col-span-2">Outside this window the video is skipped in the rotation, but it is never deleted. If no video is eligible the fallback video (star) plays.</p>
+        </div>}
+      </Modal>
+      <ConfirmDialog open={!!confirm} busy={busy === 'delete'} title="Permanently delete this video?" confirmLabel="Delete permanently" onClose={() => setConfirm(null)}
+        onConfirm={async () => { await run('delete', async () => { const r = await api(`${BASE}/${confirm.id}`, { method: 'DELETE' }); if (!r.deleted) throw new Error(r.message || 'The file could not be removed, so the record was kept.') }, 'Video deleted'); setConfirm(null) }}>
+        “{confirm?.title}” and its stored file will be removed permanently. This cannot be undone. If the file cannot be removed from storage, the entry is kept so you can retry.{confirm?.status === 'playing' ? ' It is playing now: the next video takes over immediately.' : ''}
       </ConfirmDialog>
     </div>
   )

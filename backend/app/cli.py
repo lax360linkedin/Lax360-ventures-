@@ -9,6 +9,8 @@
     python -m app.cli check-db
     python -m app.cli check-config
     python -m app.cli check-ai
+    python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
+    python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
 
 Passwords are always typed at a hidden prompt (or read from the LAX360_NEW_PASSWORD environment variable for
 non-interactive provisioning); they are never accepted as command-line arguments, so they stay out of shell history.
@@ -184,6 +186,92 @@ def check_db(_: argparse.Namespace) -> None:
         raise SystemExit(2) from None
 
 
+def _hero_rows(db):
+    from app.models import HeroVideo
+
+    return list(db.scalars(select(HeroVideo).order_by(HeroVideo.position, HeroVideo.created_at)))
+
+
+def hero_videos_report(args: argparse.Namespace) -> None:
+    """Recovery report. Read-only unless --verify, which only records each file's check result. Nothing is ever deleted or repaired automatically."""
+    import json
+
+    from app.services import hero_video_service as svc
+
+    settings = get_settings()
+    out = []
+    with _factory()() as db:
+        for v in _hero_rows(db):
+            if args.verify:
+                svc.verify_video(settings, v)
+            else:
+                status, detail = svc.verify_object(settings, v)
+                if detail == "error":
+                    detail = "The file on disk has a different size than the upload."
+                live = (status, detail)
+            status, detail = (v.verify_status, v.verify_detail) if args.verify else live
+            out.append({"id": str(v.id), "title": v.title, "original_name": v.original_name, "storage": v.storage, "bucket": v.bucket or (settings.hero_video_bucket if v.storage == "supabase" else None),
+                        "object": v.storage_key, "mime": v.content_type, "size_bytes": v.size_bytes, "sha256": v.sha256, "active": v.is_active, "fallback": v.is_fallback,
+                        "pending_deletion": v.deleted_at is not None, "position": v.position, "uploaded_at": v.created_at.isoformat(),
+                        "available_from": v.available_from.isoformat() if v.available_from else None, "available_until": v.available_until.isoformat() if v.available_until else None,
+                        "file_check": status, "detail": detail})
+        if args.verify:
+            db.commit()
+        else:
+            db.rollback()
+    if args.json:
+        print(json.dumps(out, indent=2))
+        return
+    if not out:
+        print("No homepage videos recorded.")
+    for r in out:
+        flag = {"ok": "OK     ", "missing": "MISSING", "error": "PROBLEM", "unknown": "UNKNOWN"}.get(r["file_check"], r["file_check"])
+        print(f"[{flag}] {r['title']}  ({r['storage']}, {r['size_bytes']} bytes, {'active' if r['active'] else 'inactive'}{', PENDING DELETION' if r['pending_deletion'] else ''})")
+        print(f"          {r['detail']}")
+    bad = [r for r in out if r["file_check"] != "ok"]
+    local = [r for r in out if r["storage"] == "local"]
+    print(f"\n{len(out)} video(s): {len(out) - len(bad)} verified, {len(bad)} need attention, {len(local)} held only on the server disk (temporary: run hero-videos-migrate while the file is still there).")
+    print("No records or files were deleted or changed by this report.")
+
+
+def hero_videos_migrate(args: argparse.Namespace) -> None:
+    """Copy videos that live on the server's own disk into Supabase Storage. The upload is verified before the record is repointed, and the local file is
+    left in place. Without --apply it only lists what it would do."""
+    from app.services import hero_video_service as svc
+
+    settings = get_settings()
+    if settings.video_storage != "supabase":
+        raise SystemExit("Supabase Storage is not configured (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY). Nothing to migrate to.")
+    moved = skipped = 0
+    with _factory()() as db:
+        for v in _hero_rows(db):
+            if v.storage != "local" or v.deleted_at is not None:
+                continue
+            path = svc.file_path(settings, v.storage_key)
+            if not path.is_file():
+                print(f"SKIP  {v.title}: the file is no longer on this server's disk (re-upload it from the admin panel).")
+                skipped += 1
+                continue
+            if not args.apply:
+                print(f"WOULD COPY  {v.title} ({v.size_bytes} bytes)")
+                continue
+            digest = svc.file_sha256(path)
+            key = f"{__import__('uuid').uuid4().hex}{path.suffix}"
+            svc._upload_object(settings, path, key, v.content_type)
+            status, detail = svc.verify_remote(settings, key, v.size_bytes)
+            if status != "ok":
+                svc._delete_object(settings, key)
+                print(f"FAIL  {v.title}: {detail} (the record was left unchanged)")
+                skipped += 1
+                continue
+            v.storage, v.storage_key, v.bucket, v.sha256 = "supabase", key, settings.hero_video_bucket, v.sha256 or digest
+            v.verify_status, v.verified_at, v.verify_detail = "ok", svc.now_utc(), "Copied to Supabase Storage and verified."
+            db.commit()
+            print(f"MOVED {v.title}")
+            moved += 1
+    print(f"Done: {moved} copied, {skipped} skipped. Local files were not deleted.")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -210,6 +298,13 @@ def main(argv: list[str] | None = None) -> None:
     cc.set_defaults(func=check_config)
     cd = sub.add_parser("check-db", help="test the database connection and report schema / row-level security status")
     cd.set_defaults(func=check_db)
+    hr = sub.add_parser("hero-videos-report", help="read-only report of homepage videos and whether each stored file exists")
+    hr.add_argument("--verify", action="store_true", help="also record the check result on each video")
+    hr.add_argument("--json", action="store_true", help="machine-readable output (also usable as a metadata backup)")
+    hr.set_defaults(func=hero_videos_report)
+    hm = sub.add_parser("hero-videos-migrate", help="copy videos held on the server disk to Supabase Storage (verified; never deletes)")
+    hm.add_argument("--apply", action="store_true", help="actually copy (default is a dry run)")
+    hm.set_defaults(func=hero_videos_migrate)
     args = parser.parse_args(argv)
     try:
         args.func(args)
