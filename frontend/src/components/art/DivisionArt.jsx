@@ -75,7 +75,7 @@ function Engineering() {
   )
 }
 
-function Academy() {
+function Training() {
   return (
     <>
       <path d="M40 250h330" {...sw} />
@@ -90,7 +90,7 @@ function Academy() {
   )
 }
 
-const art = { software: Software, ai: Ai, growth: Growth, engineering: Engineering, training: Academy }
+const art = { software: Software, ai: Ai, growth: Growth, engineering: Engineering, training: Training }
 
 /** `id` is a division slug (software, ai, growth, engineering, training). Decorative by default. */
 export default function DivisionArt({ id, className = '', label }) {

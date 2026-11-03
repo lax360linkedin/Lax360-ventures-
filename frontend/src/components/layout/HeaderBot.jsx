@@ -3,7 +3,7 @@ import { useReducedMotion } from 'framer-motion'
 import MiniBot from '../art/MiniBot.jsx'
 
 // How the bot reacts when it reaches each nav item (poses are defined in MiniBot.jsx).
-const POSE_FOR = { '/about': 'point', '/services': 'hold', '/solutions': 'wave', '/career': 'reach', '/contact': 'cheer' }
+const POSE_FOR = { '/about': 'point', '/services': 'hold', '/industries': 'wave', '/insights': 'point', '/our-network': 'hold', '/our-team': 'cheer', '/career': 'reach', '/contact': 'cheer' }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 /**

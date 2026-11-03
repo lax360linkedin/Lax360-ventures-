@@ -222,31 +222,6 @@ function Engineering() {
   )
 }
 
-/** 06 — Academy: the real courses as a compact list. */
-function Academy() {
-  return (
-    <section id="academy" aria-label="Academy" className="scroll-mt-32 wrap section !pt-0">
-      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-        <CategoryHead className="lg:col-span-5" n="06" Icon={GraduationCap} title="Academy" text="Workshops for colleges and courses for professionals, including AI tools, prompt engineering and Python with AI. Fees and schedules are shared when you enquire." to="/training" linkLabel="Explore the Academy" enquiry="/contact?type=course" />
-        <ul className="divide-y divide-edge overflow-hidden rounded-3xl border border-edge bg-glass lg:col-span-7">
-          {courses.map((c, i) => (
-            <Reveal as="li" key={c.slug} delay={i * 0.1} y={10}>
-              <Link to={`/training#${c.slug}`} className="group flex items-center gap-5 p-5 transition-colors hover:bg-glass-strong md:p-6">
-                <span className="font-display text-3xl font-semibold text-lav">0{i + 1}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-display text-xl font-semibold transition-colors group-hover:text-lav">{c.title}</span>
-                  <span className="mt-0.5 block text-sm text-soft">{c.format} · {c.duration}</span>
-                </span>
-                <ArrowUpRight className="size-5 shrink-0 text-soft transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-lav" aria-hidden="true" />
-              </Link>
-            </Reveal>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )
-}
-
 /** Consulting is the first step of every engagement (not a standalone division), so it gets a closing band. */
 function Consulting() {
   return (
@@ -274,7 +249,6 @@ export default function ServiceCategories() {
       <WebMobile />
       <Growth />
       <Engineering />
-      <Academy />
       <Consulting />
     </>
   )

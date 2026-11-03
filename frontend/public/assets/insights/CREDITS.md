@@ -1,0 +1,3 @@
+Industry and insight photos are from Unsplash (Unsplash License: free for commercial use, no attribution required). Photo ids: https://unsplash.com/photos/<id>
+industries: manufacturing 1581091212991-8891c7d4bd9b, retail 1743228672550-8b8f22cf0031, healthcare 1758691462353-36b215702253, education 1509062522246-3755977927d7, logistics 1587293852726-70cdb56c2866, construction 1479839672679-a46483c0e7c8, finance 1738737271801-d404a575d870, hospitality 1551632436-cbf8dd35adfa
+insights: ai-trends 1737644467636-6b0053476bb2, ai-automation 1694903089438-bf28d4697d9a, software-teams 1522071820081-009f0129c71c, digital-transformation 1759661966728-4a02e3c6ed91, tech-watch 1768150082786-980039ae5ae9, mobile-apps 1551650975-87deedd944c3

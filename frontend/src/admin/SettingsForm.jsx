@@ -3,7 +3,8 @@ import { api } from '../services/apiClient.js'
 import { MediaField } from './MediaPicker.jsx'
 import { Btn, Card, Field, Input, Textarea, Toggle, label, useToast } from './ui.jsx'
 
-const GROUPS = { general: 'General', global: 'Global website settings', contact: 'Contact details', social: 'Social media', footer: 'Footer', maintenance: 'Maintenance mode', chatbot: 'Chatbot' }
+const ON = new Set(['chatbot_enabled', 'contact_form_enabled', 'contact_bar_enabled', 'social_band_enabled', 'social_robot_enabled']) // on unless an admin turns them off
+const GROUPS = { general: 'General', global: 'Global website settings', contact: 'Contact details', social: 'Social media', contactbar: 'Top contact bar & social section', footer: 'Footer', maintenance: 'Maintenance mode', chatbot: 'Chatbot' }
 
 /** Generic settings editor driven by the field list the server sends (labels, types, limits). Blank text = “use the website default”. */
 export default function SettingsForm({ endpoint, payload, onSaved, groups }) {
@@ -12,13 +13,13 @@ export default function SettingsForm({ endpoint, payload, onSaved, groups }) {
   const [errors, setErrors] = useState({})
   const [busy, setBusy] = useState(false)
   const fields = payload.fields.filter((f) => !groups || groups.includes(f.group))
-  const get = (f) => (f.type === 'bool' ? (draft[f.key] ?? (f.key === 'chatbot_enabled' || f.key === 'contact_form_enabled')) : (draft[f.key] ?? ''))
-  const dirty = fields.some((f) => get(f) !== (f.type === 'bool' ? (payload.values[f.key] ?? (f.key === 'chatbot_enabled' || f.key === 'contact_form_enabled')) : (payload.values[f.key] ?? '')))
+  const get = (f) => (f.type === 'bool' ? (draft[f.key] ?? ON.has(f.key)) : (draft[f.key] ?? ''))
+  const dirty = fields.some((f) => get(f) !== (f.type === 'bool' ? (payload.values[f.key] ?? ON.has(f.key)) : (payload.values[f.key] ?? '')))
 
   const save = async (e) => {
     e.preventDefault()
     const values = {}
-    fields.forEach((f) => { const now = get(f); const before = f.type === 'bool' ? (payload.values[f.key] ?? (f.key === 'chatbot_enabled' || f.key === 'contact_form_enabled')) : (payload.values[f.key] ?? ''); if (now !== before) values[f.key] = now })
+    fields.forEach((f) => { const now = get(f); const before = f.type === 'bool' ? (payload.values[f.key] ?? ON.has(f.key)) : (payload.values[f.key] ?? ''); if (now !== before) values[f.key] = now })
     if (!Object.keys(values).length) return
     setBusy(true)
     setErrors({})

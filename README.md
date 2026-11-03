@@ -99,7 +99,7 @@ On start-up in production the API logs a warning when the configured website ori
 - **Dashboard**: live counts and charts from the database (enquiries, demo requests, customers, chatbot conversations, AI errors), date filter, status distribution, recent activity.
 - **Enquiries**: search (name, email, phone, type), filter (status, dates, archived), sort, paginate; status workflow New → In progress → Contacted → Converted → Closed; assign to an admin; internal notes; archive; delete (with confirmation); CSV export of the filtered list.
 - **Demo requests**: search/filter and status updates.
-- **Website content**: hero text and buttons (home page), FAQ entries (home/services and academy pages), projects (Work page): create, edit, preview, publish, unpublish, delete. If nothing is published the website keeps its built-in text.
+- **Website content**: hero text and buttons (home page), FAQ entries (home and services pages), projects (Work page): create, edit, preview, publish, unpublish, delete. If nothing is published the website keeps its built-in text.
 - **AI chatbot**: switch on/off, welcome message, fallback message, extra business information for the assistant, conversation history (search/filter, viewing is audited), usage and failure review. Provider and model are shown read-only; they are set in the server environment, and API keys are never shown or editable.
 - **Media**: upload PNG/JPEG/GIF/WebP/PDF (checked by their real bytes, max `MEDIA_MAX_BYTES`, default 2 MB), preview, replace, delete, public/private. Files live in the database and are private unless made public.
 - **Settings**: contact email/phones, WhatsApp number, social links, footer line, About tagline, contact-form switch and notice, maintenance mode.
@@ -107,7 +107,7 @@ On start-up in production the API logs a warning when the configured website ori
 
 ### What the public website reads from the panel
 Contact details and social links (footer, contact pages, mobile menu, chat panel, WhatsApp button), footer legal line, About tagline, the home hero, FAQ lists,
-the Work page projects, chatbot on/off and welcome text, contact-form switch/notice and maintenance mode. Everything else (services, solutions, courses, About body text,
+the Work page projects, chatbot on/off and welcome text, contact-form switch/notice and maintenance mode. Everything else (services, courses, About body text,
 testimonials) is **not** managed from the panel yet and still lives in `frontend/src/data/`.
 
 ### Welcome intro

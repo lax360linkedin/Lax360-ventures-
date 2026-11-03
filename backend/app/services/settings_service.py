@@ -44,6 +44,12 @@ SPEC: dict[str, dict] = {
     "social_linkedin": S("LinkedIn URL", "social", "url"),
     "social_x": S("X (Twitter) URL", "social", "url"),
     "social_facebook": S("Facebook URL", "social", "url"),
+    "social_youtube": S("YouTube URL", "social", "url"),
+    # top contact bar + animated social/robot band (the individual social links are managed under Navigation & SEO > Social media links)
+    "contact_bar_enabled": S("Show the top contact bar", "contactbar", "bool", help="Phone, email, WhatsApp and social icons above the menu."),
+    "contact_bar_pages": S("Pages that show the contact bar", "contactbar", help="Type all, home, or a comma-separated list of pages, e.g. home,about,contact. Leave empty for all pages."),
+    "social_band_enabled": S("Show the animated social icons section", "contactbar", "bool", help="The floating social icons section above the footer."),
+    "social_robot_enabled": S("Show the animated robot in that section", "contactbar", "bool", help="Clicking the robot opens the website assistant."),
     # footer
     "footer_text": S("Footer legal line / copyright text", "footer", "text", max_len=300),
     "footer_tagline": S("Footer introduction text", "footer", "text", max_len=300),

@@ -6,7 +6,6 @@ export const categoryLinks = [
   { id: 'web-mobile', label: 'Web & Mobile' },
   { id: 'growth', label: 'Digital Marketing' },
   { id: 'engineering', label: 'CAD & Engineering' },
-  { id: 'academy', label: 'Academy' },
 ]
 
 /** Smooth-scroll to a section (instant under reduced motion) and keep the URL hash in sync. */

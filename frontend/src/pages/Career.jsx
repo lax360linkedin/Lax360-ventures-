@@ -53,8 +53,8 @@ export default function Career() {
       <CmsJobs />
 
       <section className="wrap section" aria-labelledby="areas-title">
-        <SectionHeading id="areas-title" eyebrow="Where we work" title="Five areas" gradient="to explore." lead="These are the areas LAX360 Ventures works in — not a list of vacancies." />
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <SectionHeading id="areas-title" eyebrow="Where we work" title="Four areas" gradient="to explore." lead="These are the areas LAX360 Ventures works in — not a list of vacancies." />
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {allDivisions.map((d, i) => {
             const Icon = divisionIcons[d.slug]
             return (

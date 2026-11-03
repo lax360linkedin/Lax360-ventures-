@@ -5,6 +5,8 @@ import Footer from './Footer.jsx'
 import MobileMenu from './MobileMenu.jsx'
 import MobileBottomBar from './MobileBottomBar.jsx'
 import WhatsAppFloat from './WhatsAppFloat.jsx'
+import TopBar from './TopBar.jsx'
+import SocialBand from '../sections/SocialBand.jsx'
 import { useScrollDirection } from '../../hooks/useScrollDirection.js'
 import PreviewBanner from '../cms/PreviewBanner.jsx'
 import { useSite, useSiteSettings } from '../../hooks/useSite.js'
@@ -88,15 +90,17 @@ export default function RootLayout() {
         Skip to content
       </a>
       <ScrollToTop />
+      <TopBar />
       <Header onOpenMenu={() => setMenuOpen(true)} menuButtonRef={menuButtonRef} />
       <MobileMenu open={menuOpen} onClose={closeMenu} returnFocusRef={menuButtonRef} />
       {/* The home hero is full-bleed under a transparent header; every other page clears the header. */}
-      <main id="main" tabIndex={-1} className={`outline-none ${pathname === '/' ? '' : 'pt-[72px] lg:pt-[92px]'}`}>
+      <main id="main" tabIndex={-1} className={`outline-none ${pathname === '/' ? '' : 'pt-[calc(72px+var(--topbar-h,0px))] lg:pt-[calc(92px+var(--topbar-h,0px))]'}`}>
         {/* Suspense lives inside the layout so header and footer stay on screen while a page chunk loads. */}
         <Suspense fallback={<div className="wrap section min-h-screen" role="status"><p className="text-soft">Loading…</p></div>}>
           <Outlet />
         </Suspense>
       </main>
+      <SocialBand />
       <Footer />
       <MobileBottomBar visible={barVisible} />
       <PreviewBanner />

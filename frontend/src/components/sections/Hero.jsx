@@ -4,6 +4,7 @@ import { Bot, Code2, DraftingCompass, Globe2, MessageCircle } from 'lucide-react
 import Button from '../ui/Button.jsx'
 import BotHighlight from '../ui/BotHighlight.jsx'
 import HeroVideo from './HeroVideo.jsx'
+import HeroCarousel from './HeroCarousel.jsx'
 import HeroBackground from '../art/HeroBackground.jsx'
 import { useMediaQuery } from '../../hooks/useMediaQuery.js'
 import { useContent } from '../../hooks/useSite.js'
@@ -73,16 +74,12 @@ export default function Hero() {
   const hero = useContent('hero')?.[0]?.data || {} // published override from the admin panel, else the built-in text
   const lines = [hero.headline_1 || 'One team to build,', hero.headline_2 || 'automate and grow', hero.headline_3 || 'your business.']
   return (
-    <section aria-labelledby="hero-title" className="relative isolate overflow-hidden">
+    <section aria-labelledby="hero-title" className="hero-media relative isolate overflow-hidden">
       <HeroBackground />
       <HeroVideo />
-      <div className="wrap relative flex min-h-[min(100svh,58rem)] items-center justify-center pb-16 pt-[116px] md:pt-[140px] lg:pb-24">
+      <HeroCarousel home={(
         <div className="mx-auto flex w-full max-w-4xl flex-col items-center text-center [text-shadow:0_2px_24px_rgba(11,7,20,0.55)]">
-          <p className="a-rise glass-flat inline-flex items-center gap-2.5 !rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav" style={{ '--d': '0.25s' }}>
-            <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(168,85,247,0.8)]" />
-            {hero.eyebrow || 'Software · AI · Growth · Engineering · Academy'}
-          </p>
-          <h1 id="hero-title" className="h1 mt-7 !text-[clamp(2.5rem,6vw,5.75rem)]">
+          <h1 id="hero-title" className="h1 !text-[clamp(2.5rem,6vw,5.75rem)]">
             {lines.map((line, n) => (
               <span key={line} className="a-rise block" style={{ '--d': `${0.35 + n * 0.12}s` }}>
                 {n === 1 ? <span className="text-gradient">{line}</span> : line}
@@ -95,7 +92,7 @@ export default function Hero() {
           </p>
           <div className="mt-9 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
             <div className="a-rise w-full sm:w-auto" style={{ '--d': '1.1s' }}><CtaButton link={hero.cta_primary_link || '/contact?type=project'} arrow className="w-full sm:w-auto">{hero.cta_primary_label || 'Discuss Your Project'}</CtaButton></div>
-            <div className="a-rise w-full sm:w-auto" style={{ '--d': '1.22s' }}><CtaButton link={hero.cta_secondary_link || '/solutions'} variant="secondary" className="w-full sm:w-auto">{hero.cta_secondary_label || 'Explore Our Solutions'}</CtaButton></div>
+            <div className="a-rise w-full sm:w-auto" style={{ '--d': '1.22s' }}><CtaButton link={hero.cta_secondary_link || '/services'} variant="secondary" className="w-full sm:w-auto">{hero.cta_secondary_label || 'Explore Our Services'}</CtaButton></div>
           </div>
           <ul className="mt-8 flex flex-wrap justify-center gap-2" aria-label="What we do">
             {chips.map(({ icon: Icon, label }, i) => (
@@ -111,7 +108,7 @@ export default function Hero() {
             </a>
           </p>
         </div>
-      </div>
+      )} />
     </section>
   )
 }

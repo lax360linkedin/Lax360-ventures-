@@ -33,7 +33,7 @@ DIVISIONS = [
     ("CAD & Engineering (/services/engineering)",
      "CAD support for civil and mechanical engineering: drafting and 2D/3D modelling prepared from sketches, markups or briefs. Software, deliverable formats and turnaround are confirmed per project. "
      "Files are shared by email after the brief is reviewed; there is no file upload on the website."),
-    ("Academy (/training)",
+    ("Training and workshops (enquire via /contact?type=course)",
      "Training and college workshops. Courses on the website: 'AI Tools & Prompt Engineering' (5-hour college workshop: 2 hours theory + 3 hours practicals), "
      "'3-Day Hands-on AI Workshop' (AI fundamentals, AI-assisted development, AI agents and a mini-project), and 'Python with Artificial Intelligence' (eight sessions; total length to be confirmed). "
      "Fees, schedules, certificates and online/in-person mode are shared when someone enquires."),
@@ -87,7 +87,7 @@ def build_knowledge(branches: Iterable[Branch]) -> str:
     cities = ", ".join(b.city for b in branches) or "Salem, Bangalore and Mumbai"
     parts = [
         "COMPANY\n" + COMPANY,
-        "SERVICES (five divisions)\n" + "\n".join(f"- {name}: {text}" for name, text in DIVISIONS),
+        "SERVICES\n" + "\n".join(f"- {name}: {text}" for name, text in DIVISIONS),
         "SOLUTION PACKAGES\n" + "\n".join(f"- {s}" for s in SOLUTIONS),
         PROCESS,
         f"BRANCHES (offices in {cities})\n" + "\n".join(_branch_lines(branches)),

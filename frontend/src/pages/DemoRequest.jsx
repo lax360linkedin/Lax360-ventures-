@@ -9,7 +9,7 @@ import { createDemoRequest, fetchMyDemoRequests } from '../services/branchServic
 import { EMAIL } from '../utils/validators.js'
 import { whatsappLink } from '../utils/whatsapp.js'
 
-const interests = ['Custom software, CRM or ERP', 'Websites and mobile apps', 'AI assistants and automation', 'Digital marketing', 'CAD and engineering', 'Academy training', 'Not sure yet']
+const interests = ['Custom software, CRM or ERP', 'Websites and mobile apps', 'AI assistants and automation', 'Digital marketing', 'CAD and engineering', 'Training and workshops', 'Not sure yet']
 const STATUS_TEXT = { pending: 'Pending — the team will follow up', contacted: 'Contacted', confirmed: 'Confirmed', cancelled: 'Cancelled' }
 // Backend field names → this form's field ids.
 const FIELD_MAP = { preferred_date: 'date', branch_id: 'branch' }

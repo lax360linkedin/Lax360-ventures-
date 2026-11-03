@@ -1,4 +1,4 @@
-// The five approved divisions. All copy lives here so pages never hard-code content.
+// The four approved divisions. All copy lives here so pages never hard-code content.
 // Scope for Digital Growth and CAD & Engineering is marked [Confirm] in the planning
 // document, so the copy below stays at the level of "what we can discuss", not guarantees.
 
@@ -162,22 +162,8 @@ export const divisions = [
   },
 ]
 
-export const academyDivision = {
-  slug: 'training',
-  number: '05',
-  name: 'Academy',
-  short: 'Software training, professional courses and college workshops.',
-  outcome: 'Learn the skills we use every day.',
-  tags: ['Workshops', 'Python with AI', 'Prompt engineering'],
-  enquiryType: 'course',
-  to: '/training',
-}
-
-// All five, in homepage order. Academy links to /training rather than /services/*.
-export const allDivisions = [
-  ...divisions.map((d) => ({ ...d, to: `/services/${d.slug}` })),
-  academyDivision,
-]
+// All four divisions, in homepage order.
+export const allDivisions = divisions.map((d) => ({ ...d, to: `/services/${d.slug}` }))
 
 export const getDivision = (slug) => divisions.find((d) => d.slug === slug)
 

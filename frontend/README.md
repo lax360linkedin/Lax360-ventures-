@@ -18,7 +18,6 @@ npm run preview    # serve the production build
 | --- | --- |
 | Phone, email, address, social, legal line, "needs confirmation" list | `src/data/site.js` |
 | Divisions / service pages / FAQs | `src/data/services.js` |
-| Solutions | `src/data/solutions.js` |
 | Courses & workshops | `src/data/courses.js` |
 | Projects (Work page) | `src/data/projects.js` + set `workIsLive` in `site.js` |
 | Navigation, enquiry types | `src/data/navigation.js` |
@@ -32,8 +31,8 @@ npm run preview    # serve the production build
 
 ## Routes
 
-`/`, `/about`, `/services`, `/services/{software,ai,growth,engineering}`, `/solutions`, `/work`, `/training`, `/career`, `/contact`, `/privacy`, `/terms`, 404.
-`/projects` redirects to `/work` and `/academy` redirects to `/training` (the planning document's canonical URLs).
+`/`, `/about`, `/services`, `/services/{software,ai,growth,engineering}`, `/work`, `/career`, `/contact`, `/privacy`, `/terms`, 404.
+`/projects` redirects to `/work` (the planning document's canonical URL).
 Contact accepts `?type=` (project, ai, website-app, marketing, cad, course, workshop, partnership, general) and `?course=<slug>`.
 
 ## Demo behaviour (important)
@@ -54,11 +53,11 @@ Contact accepts `?type=` (project, ai, website-app, marketing, cad, course, work
 
 ## Navigation, mini-bot and branches
 
-- **Header order:** About → Services → Solutions → Career → Contact (`primaryNav` in `src/data/navigation.js`). Logo + brand name link to `/`. Services is a plain link — no dropdown. Academy/Work remain reachable from Services, the footer and the home page. `/career` is a new page (no open roles are listed; it invites enquiries via `/contact?type=career`).
+- **Header order:** About → Services → Industries → Insights → Our Network → Our Team → Careers → Contact (`primaryNav` in `src/data/navigation.js`). Logo + brand name link to `/`. Services is a plain link — no dropdown. Work remains reachable from Services, the footer and the home page. `/career` is a new page (no open roles are listed; it invites enquiries via `/contact?type=career`).
 - **Fixed header (`Header.jsx`):** one shared header, `position: fixed`, constant height (72px, 92px from `lg`), never hides on scroll; more opaque/blurred after scrolling. `RootLayout` pads `<main>` by the same amount (`pt-[72px] lg:pt-[92px]`; the home hero is full-bleed under it) and the sticky Services category bar uses the same offsets. From `lg` it is a three-column grid (`minmax(0,1fr) auto minmax(0,1fr)`) so the nav is truly centred; the CTA is icon-only at `lg`, with text from `xl`.
 - **Mini-bot (`src/components/art/MiniBot.jsx`):** a vector version of the LAX360 mascot with separate parts (head, eyes, two arms, heart). Poses live in `BOT_POSES`.
 - **Header bot (`src/components/layout/HeaderBot.jsx`):** lives in a non-interactive overlay (`pointer-events: none`, `aria-hidden`) and stands on the "A" of LAX360 (`Logo` exposes `aRef`). On load it drops in, bounces, lands and waves, then idles. Clicking a nav link makes it hop along the navbar to that link, land, react with a per-link pose, then hop back to the "A"; navigation is never delayed. Hovering (hover-capable devices only, 220ms debounce) sends it to the link too. Every ~30–45s it does a small wave or short walk, paused while scrolling/hovering/hidden. Positions are measured from the DOM (A and link text rects) and re-measured on resize; motion uses the Web Animations API with transforms only. Below `lg` it stays on the "A" (smaller). Reduced motion: it simply stands on the "A".
-- **Where the bot rests:** always above the *active* page's link (`Header.jsx` computes it from the route; Services also covers `/services/*`), or on the "A" of LAX360 on Home, on pages outside the nav (Work, Academy, Login…) and below `lg`. Hover and click trips never change that; navigating (link, logo, footer, back button) hops it to the new active link. Resize, theme switches and layout changes re-measure it.
+- **Where the bot rests:** always above the *active* page's link (`Header.jsx` computes it from the route; Services also covers `/services/*`), or on the "A" of LAX360 on Home, on pages outside the nav (Work, Login…) and below `lg`. Hover and click trips never change that; navigating (link, logo, footer, back button) hops it to the new active link. Resize, theme switches and layout changes re-measure it.
 - **Login / profile:** the header's right side shows a **Login** button (→ `/login`) or, when signed in, an avatar menu with My Profile (`/profile`), Get a Demo (`/demo`) and Logout; the mobile menu has the same entries. Sign-in is real: `useAuth` asks the backend (`GET /api/auth/me`) and the session is an HttpOnly cookie. `/profile` and `/demo` are guarded by `RequireAuth` (the server re-checks every call). Accounts are created by the CLI in `backend/`; there is no public sign-up. `/login` is prerendered but noindex and kept out of the sitemap; `/profile` and `/demo` are browser-rendered only.
 - **Word highlight (`src/components/ui/BotHighlight.jsx`):** replaces the old underline strokes. Wrap a key word/phrase; when it scrolls into view it gets a soft halo, a small bot appears beside it, points, holds ~2s, then idles. The bot sits in a reserved inline slot (no layout shift, handles multi-line headings). Used sparingly: hero keyword, positioning statement, services bento heading, Services hero, Contact branches heading, Career hero. `SectionHeading` accepts `bot` for headings that use `gradient`.
 - **Branches (`src/data/branches.js`):** Salem, Bangalore, Mumbai — single source for the hero, footer, About, Contact (`#branches` cards), Career, chatbot demo and Organization JSON-LD. Only Salem has an address on file; add `address` to the others when real details exist.

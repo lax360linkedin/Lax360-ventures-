@@ -142,7 +142,7 @@ export default function ServiceDetail() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-sm text-soft">Other divisions: {divisions.filter((x) => x.slug !== d.slug).map((x) => x.name).join(', ')}, Academy.</p>
+          <p className="mt-6 text-sm text-soft">Other divisions: {divisions.filter((x) => x.slug !== d.slug).map((x) => x.name).join(', ')}.</p>
         </div>
       </section>
 

@@ -9,9 +9,9 @@ const toTel = (display) => `+${digits(display)}`
 /** The built-in company facts (data/site.js) with any overrides an administrator has saved. Safe to call anywhere. */
 export function mergeSite(s = {}) {
   const phones = [s.contact_phone_1, s.contact_phone_2].filter(Boolean).map((display) => ({ display, tel: toTel(display) }))
-  const overrides = { Instagram: s.social_instagram, LinkedIn: s.social_linkedin, X: s.social_x, Facebook: s.social_facebook }
+  const overrides = { Instagram: s.social_instagram, LinkedIn: s.social_linkedin, X: s.social_x, Facebook: s.social_facebook, YouTube: s.social_youtube }
   const social = defaults.social.map((x) => ({ ...x, href: overrides[x.label] || x.href }))
-  if (overrides.Facebook && !social.some((x) => x.label === 'Facebook')) social.push({ label: 'Facebook', href: overrides.Facebook })
+  ;['Facebook', 'YouTube'].forEach((label) => { if (overrides[label] && !social.some((x) => x.label === label)) social.push({ label, href: overrides[label] }) })
   return {
     ...defaults,
     tagline: s.tagline || defaults.tagline,
@@ -105,4 +105,28 @@ export function useHomeSections(defaults) {
     slots.forEach((slot, n) => { order[slot] = listed[n] }) // listed sections swap places among their own slots; the others stay where they are
     return order.filter((k) => cfg.get(k)?.data.enabled !== false)
   }, [items, defaults])
+}
+
+const PLATFORM_LABEL = { instagram: 'Instagram', facebook: 'Facebook', linkedin: 'LinkedIn', youtube: 'YouTube', x: 'X' }
+
+/** Social profiles for the contact bar and the social section: the published "Social media links" items (order, on/off) when there are
+ *  any, otherwise the built-in / Website-settings links. Each entry is { platform, label, href }. */
+export function useSocial() {
+  const items = useContent('social_link')
+  const site = useSite()
+  return useMemo(() => {
+    if (items) {
+      return items.filter((i) => i.data.enabled !== false && i.data.url && PLATFORM_LABEL[i.data.platform])
+        .map((i) => ({ platform: i.data.platform, label: i.title || PLATFORM_LABEL[i.data.platform], href: i.data.url }))
+    }
+    return site.social.map((x) => ({ platform: x.label.toLowerCase(), label: x.label, href: x.href })).filter((x) => PLATFORM_LABEL[x.platform])
+  }, [items, site.social])
+}
+
+/** Which pages show the contact bar / social section: "all" (or empty), "home", or a comma list like "home,about,contact". */
+export function showOnPage(setting, pathname) {
+  const list = String(setting || 'all').toLowerCase().split(/[,\s]+/).filter(Boolean)
+  if (!list.length || list.includes('all')) return true
+  const path = pathname.replace(/\/+$/, '') || '/'
+  return list.some((t) => { const to = t === 'home' ? '/' : `/${t.replace(/^\//, '')}`; return to === '/' ? path === '/' : path === to || path.startsWith(`${to}/`) })
 }

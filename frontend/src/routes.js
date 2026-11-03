@@ -1,5 +1,7 @@
+import { articles } from './data/articles.js'
+
 // Single list of indexable routes. Used by the prerender script and the sitemap generator.
-// Keep in sync with src/App.jsx. Redirect aliases (/projects, /academy) are excluded.
+// Keep in sync with src/App.jsx. Redirect aliases (/projects) are excluded.
 export const routes = [
   '/',
   '/about',
@@ -8,9 +10,12 @@ export const routes = [
   '/services/ai',
   '/services/growth',
   '/services/engineering',
-  '/solutions',
+  '/industries',
+  '/insights',
+  ...articles.map((a) => `/insights/${a.slug}`), // built-in starter articles (articles published in the admin panel are rendered in the browser)
+  '/our-network',
+  '/our-team',
   '/work',
-  '/training',
   '/career',
   '/contact',
   '/privacy',

@@ -5,7 +5,7 @@ import Reveal from '../ui/Reveal.jsx'
 
 // Illustrative situations, not claims about past clients. [Confirm] in the planning document.
 const rows = [
-  { problem: 'Billing, stock and customers live in five different places.', solution: 'One CRM / ERP built around your process.', to: '/solutions', cta: 'See solutions' },
+  { problem: 'Billing, stock and customers live in five different places.', solution: 'One CRM / ERP built around your process.', to: '/services/software', cta: 'Software & Apps' },
   { problem: 'Your team answers the same questions all day.', solution: 'An AI assistant that answers from approved information.', to: '/services/ai', cta: 'AI & Automation' },
   { problem: 'People find you, but they don’t enquire.', solution: 'A website and digital growth plan that work together.', to: '/services/growth', cta: 'Digital Growth' },
 ]

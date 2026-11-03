@@ -10,7 +10,7 @@ def test_content_kinds_describe_only_what_the_site_actually_uses(app, db):
     admin, _, _ = staff(app, db, permissions=["content"])
     body = admin.get("/api/admin/content/kinds").json()
     # an admin who only holds the `content` module sees the homepage / about / portfolio kinds; services, careers and navigation are separate modules
-    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "faq", "about_block", "project"]
+    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "faq", "about_block", "industry", "network_partner", "team_member", "article", "project"]
     assert all(f["name"] for k in body["kinds"] for f in k["fields"])
     assert admin.get("/api/admin/content/testimonial").status_code == 404  # not a managed section
 
@@ -118,3 +118,74 @@ def test_settings_changes_are_audited_by_key_not_value(app, db):
     admin.put("/api/admin/settings", json={"values": {"footer_text": "A very specific footer sentence"}}, headers=csrf)
     log = db.scalar(select(AuditLog).where(AuditLog.action == "settings.update"))
     assert log.detail == {"keys": ["footer_text"]} and "specific footer" not in str(log.detail)
+
+
+def test_contact_bar_settings_and_social_links_are_configurable_and_validated(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["settings", "navigation"])
+    values = {"contact_bar_enabled": False, "contact_bar_pages": "home,contact", "social_band_enabled": True, "social_robot_enabled": False, "social_youtube": "https://www.youtube.com/@lax360"}
+    assert admin.put("/api/admin/settings", json={"values": values}, headers=csrf).status_code == 200
+    site = client.get("/api/public/site").json()["settings"]
+    assert site["contact_bar_enabled"] is False and site["contact_bar_pages"] == "home,contact" and site["social_robot_enabled"] is False and site["social_youtube"].endswith("@lax360")
+    assert admin.put("/api/admin/settings", json={"values": {"contact_bar_enabled": "no"}}, headers=csrf).status_code == 422
+
+    item = {"title": "Instagram", "data": {"platform": "instagram", "url": "https://www.instagram.com/lax360pvtltd", "enabled": True}, "status": "published", "sort_order": 1}
+    assert admin.post("/api/admin/content/social_link", json=item, headers=csrf).status_code == 201
+    for bad in ("javascript:alert(1)", "http://insecure.example", "/relative"):
+        r = admin.post("/api/admin/content/social_link", json={**item, "data": {**item["data"], "url": bad}}, headers=csrf)
+        assert r.status_code == 422, bad  # only full https profile addresses are accepted
+    assert admin.post("/api/admin/content/social_link", json={**item, "data": {**item["data"], "platform": "tiktok"}}, headers=csrf).status_code == 422
+    public = client.get("/api/public/content?kind=social_link").json()["items"]
+    assert [i["data"]["platform"] for i in public] == ["instagram"]
+
+
+def test_industries_and_insights_are_managed_published_unpublished_and_deleted(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    industry = {"title": "Healthcare", "data": {"summary": "Booking, records and patient communication.", "solutions": "Appointment system\nPatient portal"}, "status": "published", "sort_order": 1}
+    r = admin.post("/api/admin/content/industry", json=industry, headers=csrf)
+    assert r.status_code == 201
+    assert admin.post("/api/admin/content/industry", json={**industry, "title": "x", "data": {}}, headers=csrf).status_code == 422  # summary is required
+
+    article = {"title": "What AI agents change for small teams", "data": {"category": "ai", "published_on": "2026-11-03", "excerpt": "A short summary.", "body": "First paragraph.\n\n## A heading\n\nSecond paragraph."}, "status": "published", "sort_order": 1}
+    r = admin.post("/api/admin/content/article", json=article, headers=csrf)
+    assert r.status_code == 201
+    article_id = r.json()["id"]
+    for bad in ({"category": "gossip"}, {"published_on": "03/11/2026"}, {"published_on": "2026-13-45"}, {"body": ""}):
+        r = admin.post("/api/admin/content/article", json={**article, "data": {**article["data"], **bad}}, headers=csrf)
+        assert r.status_code == 422, bad
+
+    public = client.get("/api/public/content?kind=article").json()["items"]
+    assert [i["title"] for i in public] == [article["title"]] and public[0]["slug"] and public[0]["data"]["published_on"] == "2026-11-03"
+    assert len(client.get("/api/public/content?kind=industry").json()["items"]) == 1
+
+    assert admin.patch(f"/api/admin/content/item/{article_id}", json={"status": "draft"}, headers=csrf).status_code == 200
+    assert client.get("/api/public/content?kind=article").json()["items"] == []  # unpublished = not on the website
+    assert admin.delete(f"/api/admin/content/item/{article_id}", headers=csrf).status_code in (200, 204)
+
+
+def test_network_partners_and_team_members_are_managed_validated_ordered_and_removable(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    partner = {"title": "Example Partner", "data": {"category": "authorized", "location": "Salem", "description": "Confirmed authorized partner."}, "status": "published", "sort_order": 1}
+    assert admin.post("/api/admin/content/network_partner", json=partner, headers=csrf).status_code == 201
+    for bad in ({"category": "friend"}, {"website_link": "javascript:alert(1)"}, {"website_link": "ftp://x.example"}, {"description": ""}):
+        assert admin.post("/api/admin/content/network_partner", json={**partner, "data": {**partner["data"], **bad}}, headers=csrf).status_code == 422, bad
+    ok = admin.post("/api/admin/content/network_partner", json={**partner, "title": "Second", "data": {**partner["data"], "category": "technology", "website_link": "https://example.com"}}, headers=csrf)
+    assert ok.status_code == 201
+    assert [i["title"] for i in client.get("/api/public/content?kind=network_partner").json()["items"]] == ["Example Partner", "Second"]
+
+    def member(name, **extra):
+        return {"title": name, "data": {"group": "software", "designation": "Engineer", "bio": "Builds things.", **extra}, "status": "published", "sort_order": 1}
+    ids = []
+    for name in ("Asha", "Ravi"):
+        r = admin.post("/api/admin/content/team_member", json=member(name), headers=csrf)
+        assert r.status_code == 201
+        ids.append(r.json()["id"])
+    for bad in ({"group": "interns"}, {"linkedin_link": "https://evil.example/in/x"}, {"linkedin_link": "http://www.linkedin.com/in/x"}, {"designation": ""}):
+        assert admin.post("/api/admin/content/team_member", json=member("Bad", **bad), headers=csrf).status_code == 422, bad
+    assert admin.post("/api/admin/content/team_member", json=member("Linked", linkedin_link="https://www.linkedin.com/in/linked"), headers=csrf).status_code == 201
+
+    assert admin.put("/api/admin/content/team_member/order", json={"ids": list(reversed(ids))}, headers=csrf).status_code in (200, 204, 409)
+    assert admin.patch(f"/api/admin/content/item/{ids[0]}", json={"status": "draft"}, headers=csrf).status_code == 200
+    names = [i["title"] for i in client.get("/api/public/content?kind=team_member").json()["items"]]
+    assert "Asha" not in names and "Ravi" in names  # unpublished profiles are not public
+    assert admin.delete(f"/api/admin/content/item/{ids[1]}", headers=csrf).status_code in (200, 204)
+    assert "Ravi" not in [i["title"] for i in client.get("/api/public/content?kind=team_member").json()["items"]]

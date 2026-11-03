@@ -65,10 +65,3 @@ export const courses = [
     enquiryType: 'course',
   },
 ]
-
-export const academyFaq = [
-  { q: 'Do you run workshops at colleges?', a: 'Yes. Workshops for colleges are part of the Academy. Use the workshop enquiry to invite us.' },
-  { q: 'What are the fees?', a: 'Fees depend on the programme and format. Send an enquiry and we will share details.' },
-  { q: 'Do courses include a certificate?', a: 'Certificate details are confirmed per programme when you enquire.' },
-  { q: 'Is the training online or in person?', a: 'The mode depends on the programme. Tell us your preference when you enquire.' },
-]

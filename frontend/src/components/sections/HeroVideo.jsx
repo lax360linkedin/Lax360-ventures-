@@ -324,7 +324,7 @@ export default function HeroVideo() {
       {!still && layers.map((l) => <Layer key={l.key} layer={l} hold={offscreen} resumeSignal={intro} onPlaying={ready} onFail={failed} onFaded={dropOlder} />)}
       {/* readability: a soft dark veil plus a gradient that is strongest behind the text and fades into the page below */}
       {(shown || (still && poster)) && <div className="absolute inset-0 bg-night/45" />}
-      {(shown || (still && poster)) && <div className="absolute inset-0 bg-gradient-to-b from-night/70 via-night/20 to-night" />}
+      {(shown || (still && poster)) && <div className="hero-veil absolute inset-0" />}
     </div>
   )
 }

@@ -337,3 +337,36 @@ html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s 
   .bot-eyes, .bot-bob, .bot-pulse, .bot-hop, .bot[data-wave="true"] .bot-arm-r, .bot[data-cheer="true"] .bot-arm-l { animation: none !important; }
   .bot-slot > .bot-slot-inner { transform: none; transition: none; }
 }
+
+/* ---- social band + contact bar: slow, GPU-friendly motion; switched off for reduced-motion users ---- */
+@keyframes social-float { 0%, 100% { transform: translate3d(0,0,0) rotate(-5deg); } 50% { transform: translate3d(0,-9px,0) rotate(5deg); } }
+@keyframes bot-bob { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(0,-8px,0); } }
+@keyframes bot-wave { 0%, 60%, 100% { transform: rotate(0deg); } 70% { transform: rotate(-6deg); } 80% { transform: rotate(5deg); } 90% { transform: rotate(-4deg); } }
+.anim-social-float { animation: social-float 5s ease-in-out infinite; animation-delay: var(--d, 0s); will-change: transform; }
+.anim-bot-bob { animation: bot-bob 4.5s ease-in-out infinite; will-change: transform; }
+.anim-bot-wave { animation: bot-wave 6s ease-in-out infinite; transform-origin: 50% 90%; }
+@media (prefers-reduced-motion: reduce) { .anim-social-float, .anim-bot-bob, .anim-bot-wave { animation: none !important; } }
+
+/* ---- media stays vivid in light mode ----
+ * --page-bg is the page colour (the hero video fades into it at the bottom). While the home hero shows a video or poster, the hero
+ * is drawn with the dark-theme values (dark scrim, light text) so the video looks exactly as bright and colourful as in dark mode;
+ * the white "night" token is never used as a veil over media. */
+:root { --page-bg: #0b0714; }
+:root[data-theme="light"] { --page-bg: #ffffff; }
+:root[data-theme="light"] .hero-media:has([data-hero-video="playing"], [data-hero-video="poster"]) {
+  color-scheme: dark;
+  color: var(--color-fg); /* inherited text colour is resolved at <body>, so re-apply it inside the scope */
+  --color-night: #0b0714; --color-base2: #120b20; --color-deep: #24103d; --color-fg: #f8f7fc; --color-soft: #c4bed2;
+  --color-primary: #7c3aed; --color-primary-hover: #6d28d9; --color-accent: #a855f7; --color-lav: #c4b5fd; --color-sky: #60a5fa;
+  --color-glass: rgba(255, 255, 255, 0.055); --color-glass-strong: rgba(255, 255, 255, 0.1);
+  --color-edge: rgba(196, 181, 253, 0.2); --color-edge-strong: rgba(196, 181, 253, 0.4);
+  --color-violet: #a855f7; --color-success: #4ade80; --color-error: #fca5a5; --color-tint: #ffffff;
+  --glass-a: rgba(255, 255, 255, 0.085); --glass-b: rgba(255, 255, 255, 0.03); --glass-flat-a: rgba(255, 255, 255, 0.075); --glass-flat-b: rgba(255, 255, 255, 0.028);
+  --glass-inset: rgba(255, 255, 255, 0.1); --glass-shadow: rgba(0, 0, 0, 0.8); --shine: rgba(255, 255, 255, 0.14);
+  --grad-a: #c4b5fd; --grad-b: #a855f7; --grad-c: #60a5fa;
+  --bot-line: rgba(196, 181, 253, 0.6); --bot-glow: rgba(168, 85, 247, 0.6); --bot-hl: rgba(168, 85, 247, 0.2);
+}
+/* Readability gradient over the hero video. Dark: strongest at the top, fading into the page. Light: the video keeps its dark scrim and
+ * only the last stretch blends into the white page, so the text near the bottom is not washed out by a white haze. */
+.hero-veil { background: linear-gradient(to bottom, color-mix(in srgb, var(--color-night) 70%, transparent), color-mix(in srgb, var(--color-night) 20%, transparent), var(--page-bg)); }
+:root[data-theme="light"] .hero-veil { background: linear-gradient(to bottom, color-mix(in srgb, var(--color-night) 70%, transparent), color-mix(in srgb, var(--color-night) 20%, transparent) 50%, color-mix(in srgb, var(--color-night) 20%, transparent) 90%, var(--page-bg)); }

@@ -8,9 +8,12 @@ import Home from './pages/Home.jsx'
 const About = lazy(() => import('./pages/About.jsx'))
 const Services = lazy(() => import('./pages/Services.jsx'))
 const ServiceDetail = lazy(() => import('./pages/ServiceDetail.jsx'))
-const Solutions = lazy(() => import('./pages/Solutions.jsx'))
+const Industries = lazy(() => import('./pages/Industries.jsx'))
+const Insights = lazy(() => import('./pages/Insights.jsx'))
+const ArticleDetail = lazy(() => import('./pages/ArticleDetail.jsx'))
+const Network = lazy(() => import('./pages/Network.jsx'))
+const Team = lazy(() => import('./pages/Team.jsx'))
 const Projects = lazy(() => import('./pages/Projects.jsx'))
-const Academy = lazy(() => import('./pages/Academy.jsx'))
 const Career = lazy(() => import('./pages/Career.jsx'))
 const Contact = lazy(() => import('./pages/Contact.jsx'))
 const Privacy = lazy(() => import('./pages/Privacy.jsx'))
@@ -41,9 +44,12 @@ export default function App() {
         <Route path="about" element={<About />} />
         <Route path="services" element={<Services />} />
         <Route path="services/:slug" element={<ServiceDetail />} />
-        <Route path="solutions" element={<Solutions />} />
+        <Route path="industries" element={<Industries />} />
+        <Route path="insights" element={<Insights />} />
+        <Route path="insights/:slug" element={<ArticleDetail />} />
+        <Route path="our-network" element={<Network />} />
+        <Route path="our-team" element={<Team />} />
         <Route path="work" element={<Projects />} />
-        <Route path="training" element={<Academy />} />
         <Route path="career" element={<Career />} />
         <Route path="contact" element={<Contact />} />
         <Route path="login" element={<Login />} />
@@ -57,7 +63,6 @@ export default function App() {
         <Route path="terms" element={<Terms />} />
         {/* Names used in the brief map onto the planning document's canonical URLs. */}
         <Route path="projects" element={<Navigate to="/work" replace />} />
-        <Route path="academy" element={<Navigate to="/training" replace />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

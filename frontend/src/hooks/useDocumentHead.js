@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useSeo, useSiteSettings } from './useSite.js'
 
 const SITE_URL = (import.meta.env.VITE_SITE_URL || '').replace(/\/$/, '')
-const DEFAULT_TITLE = 'LAX360 Ventures — Software, AI, Digital Growth, CAD & Academy'
+const DEFAULT_TITLE = 'LAX360 Ventures — Software, AI, Digital Growth, CAD & Engineering'
 
 function upsert(selector, tag, attrs) {
   let el = document.head.querySelector(selector)

@@ -7,6 +7,7 @@ permissions and what the public website may read. Items are stored in `content_i
 
 from __future__ import annotations
 
+import datetime
 import re
 import uuid
 
@@ -29,12 +30,19 @@ def F(name, label, kind="text", required=False, max_len=300, options=None, help=
 
 DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & Apps"), ("ai", "AI & Automation"), ("growth", "Digital Growth"), ("engineering", "CAD & Engineering"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
-    ("marquee", "Scrolling strip under the hero"), ("positioning", "Positioning statement"), ("services", "Services overview"), ("outcomes", "Outcomes"),
-    ("solutions", "Solutions strip"), ("tech", "Technology stack"), ("concept", "Concept stack"), ("ai", "AI spotlight"), ("process", "How we work"),
-    ("why", "Why LAX360"), ("academy", "Academy"), ("faq", "FAQ"), ("contact", "Contact call-to-action"))]
-PAGES = [{"value": v, "label": l} for v, l in (("home", "Home"), ("about", "About"), ("services", "Services"), ("solutions", "Solutions"), ("work", "Work"),
-                                              ("training", "Academy / Training"), ("career", "Career"), ("contact", "Contact"))]
+    ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Outcomes"),
+    ("tech", "Technology stack"), ("concept", "Concept stack"), ("ai", "AI spotlight"), ("process", "How we work"),
+    ("why", "Why LAX360"), ("faq", "FAQ"), ("contact", "Contact call-to-action"))]
+PAGES = [{"value": v, "label": l} for v, l in (("home", "Home"), ("about", "About"), ("services", "Services"), ("industries", "Industries"), ("insights", "Insights"), ("network", "Our Network"), ("team", "Our Team"),
+                                              ("work", "Work"), ("career", "Career"), ("contact", "Contact"))]
+NETWORK_CATEGORIES = [{"value": v, "label": l} for v, l in (("authorized", "Authorized Partners"), ("technology", "Technology Partners"), ("associated", "Associated Companies"), ("collaboration", "Strategic Collaborations"))]
+TEAM_GROUPS = [{"value": v, "label": l} for v, l in (("leadership", "Founder & Leadership"), ("management", "Management Team"), ("heads", "Department Heads"), ("software", "Software Development Team"),
+                                                    ("ai", "AI & Automation Team"), ("marketing", "Digital Marketing Team"), ("cad", "CAD Engineering Team"))]
+ARTICLE_CATEGORIES = [{"value": v, "label": l} for v, l in (("ai", "Artificial Intelligence"), ("software", "Software Development"), ("transformation", "Digital Transformation"),
+                                                          ("news", "Technology News & Updates"), ("blog", "Technology Blog"))]
 NAV_PLACES = [{"value": "header", "label": "Header menu"}, {"value": "footer_divisions", "label": "Footer: Divisions column"}, {"value": "footer_company", "label": "Footer: Company column"}]
+
+SOCIAL_PLATFORMS = [{"value": v, "label": l} for v, l in (("instagram", "Instagram"), ("facebook", "Facebook"), ("linkedin", "LinkedIn"), ("youtube", "YouTube"), ("x", "X (Twitter)"))]
 
 KINDS: dict[str, dict] = {
     # ---- Homepage -------------------------------------------------------------------------------------------------------------------
@@ -61,7 +69,7 @@ KINDS: dict[str, dict] = {
         "label": "FAQ entries", "group": "Homepage", "module": "content", "single": False, "preview_path": "/",
         "help": "Shown in the FAQ accordions. If a group has no published entries the website's built-in questions are used.",
         "fields": [
-            F("group", "Where it appears", "select", True, options=[{"value": "home", "label": "Home page & Services page"}, {"value": "academy", "label": "Academy page"}]),
+            F("group", "Where it appears", "select", True, options=[{"value": "home", "label": "Home page & Services page"}]),
             F("answer", "Answer", "textarea", True, max_len=1500),
         ],
         "title_label": "Question",
@@ -96,6 +104,60 @@ KINDS: dict[str, dict] = {
             F("block", "Type", "select", True, options=[{"value": v, "label": l} for v, l in (("intro", "Company introduction"), ("vision", "Vision"), ("mission", "Mission"),
                                                                                               ("value", "Company value"), ("achievement", "Achievement"), ("team", "Team member"), ("image", "Image"))]),
             F("text", "Text", "textarea", max_len=2000), F("role", "Role / figure (team members, achievements)", max_len=120), F("image", "Image", "image"),
+        ],
+    },
+    # ---- Industries -----------------------------------------------------------------------------------------------------------------
+    "industry": {
+        "label": "Industries", "group": "Industries", "module": "content", "single": False, "preview_path": "/industries",
+        "help": "The industries LAX360 Ventures builds technology for. When at least one is published, the Industries page lists these in place of its built-in industries.",
+        "title_label": "Industry name",
+        "fields": [
+            F("summary", "Short description (card text)", "textarea", True, max_len=300),
+            F("description", "Longer description", "textarea", max_len=2000, help="Plain paragraphs. A blank line starts a new paragraph."),
+            F("solutions", "Technology solutions we provide", "textarea", max_len=2000, help="One solution per line."),
+            F("image", "Image", "image"),
+        ],
+    },
+    # ---- Our Network ----------------------------------------------------------------------------------------------------------------
+    "network_partner": {
+        "label": "Network partners & companies", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
+        "help": "Companies LAX360 Ventures works with. Pick the category that matches the real relationship: only mark someone an Authorized Partner when that authorization is confirmed. "
+                "Published entries appear on the Our Network page.",
+        "title_label": "Company name",
+        "fields": [
+            F("category", "Relationship", "select", True, options=NETWORK_CATEGORIES),
+            F("location", "Location (optional)", max_len=80, help="e.g. Salem"),
+            F("description", "Description", "textarea", True, max_len=600),
+            F("website_link", "Official website (optional)", max_len=300, help="The full https:// address of the company's own website"),
+            F("logo", "Logo (optional)", "image"),
+        ],
+    },
+    # ---- Our Team -------------------------------------------------------------------------------------------------------------------
+    "team_member": {
+        "label": "Team members", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team",
+        "help": "The people behind LAX360 Ventures. Choose the team each person belongs to; use the order number to arrange people within a team. Publish to show a profile, unpublish to hide it.",
+        "title_label": "Name",
+        "fields": [
+            F("group", "Team", "select", True, options=TEAM_GROUPS),
+            F("designation", "Designation", "text", True, max_len=120),
+            F("bio", "Short biography", "textarea", max_len=800),
+            F("photo", "Photo", "image"),
+            F("linkedin_link", "LinkedIn profile (optional)", max_len=300, help="The person's full LinkedIn address, e.g. https://www.linkedin.com/in/name"),
+        ],
+    },
+    # ---- Insights -------------------------------------------------------------------------------------------------------------------
+    "article": {
+        "label": "Insights articles", "group": "Insights", "module": "content", "single": False, "preview_path": "/insights",
+        "help": "Blog posts, AI updates, software and digital transformation insights and technology news. Publish to list an article on the Insights page; "
+                "unpublish to take it down. When at least one article is published, the Insights page shows these in place of the built-in starter articles.",
+        "title_label": "Article title",
+        "fields": [
+            F("category", "Category", "select", True, options=ARTICLE_CATEGORIES),
+            F("published_on", "Publication date", "text", True, max_len=10, help="YYYY-MM-DD, e.g. 2026-11-03"),
+            F("excerpt", "Short summary", "textarea", True, max_len=300),
+            F("body", "Article text", "textarea", True, max_len=20000, help="Plain paragraphs; a blank line starts a new paragraph. A line starting with \"## \" becomes a sub-heading."),
+            F("image", "Cover image", "image"),
+            F("author", "Author", max_len=80, help="Defaults to the LAX360 team."),
         ],
     },
     # ---- Portfolio ------------------------------------------------------------------------------------------------------------------
@@ -134,6 +196,12 @@ KINDS: dict[str, dict] = {
         "title_label": "Menu label",
         "fields": [F("place", "Menu", "select", True, options=NAV_PLACES), F("link", "Link", max_len=300, required=True, help="A page like /about or a full https:// URL"), F("enabled", "Show in the menu", "bool", default=True)],
     },
+    "social_link": {
+        "label": "Social media links", "group": "Navigation & SEO", "module": "navigation", "single": False, "preview_path": "/",
+        "help": "The social icons in the top contact bar and the animated social section. When at least one is published, these replace the built-in links; drag the order with the order number, and switch a link off with “Show”.",
+        "title_label": "Name (e.g. Instagram)",
+        "fields": [F("platform", "Platform", "select", True, options=SOCIAL_PLATFORMS), F("url", "Profile URL", "text", True, max_len=300, help="The full https:// address of the official profile"), F("enabled", "Show", "bool", default=True)],
+    },
     "seo_page": {
         "label": "Page titles & SEO", "group": "Navigation & SEO", "module": "navigation", "single": False, "slug_field": "page", "preview_path": "/",
         "help": "The browser/search title and description for a page. Leave a page unlisted to keep its built-in text.",
@@ -141,7 +209,7 @@ KINDS: dict[str, dict] = {
         "fields": [F("page", "Page", "select", True, options=PAGES), F("meta_description", "Meta description", "textarea", max_len=320), F("image", "Social sharing image", "image")],
     },
 }
-GROUP_ORDER = ["Homepage", "Services", "About", "Portfolio", "Careers", "Navigation & SEO"]
+GROUP_ORDER = ["Homepage", "Services", "Industries", "Insights", "Network", "Team", "About", "Portfolio", "Careers", "Navigation & SEO"]
 
 
 def kinds_for_ui(db: Session, user=None) -> list[dict]:
@@ -218,6 +286,21 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
                 errors[name] = f"Choose {'an image' if kind_t == 'image' else 'a video'} from the media library."
         elif kind_t == "select" and value and value not in _options(db, f):
             errors[name] = "Choose one of the listed options."
+        elif name == "website_link":
+            if value and not re.match(r"^https?://[^\s]{3,300}$", value):
+                errors[name] = "Enter the company's full website address starting with https://"
+        elif name == "linkedin_link":
+            if value and not re.match(r"^https://([a-z0-9-]+\.)?linkedin\.com/[^\s]+$", value, re.I):
+                errors[name] = "Enter the full LinkedIn address starting with https://www.linkedin.com/"
+        elif name == "published_on":
+            try:
+                if value:
+                    datetime.date.fromisoformat(value)
+            except ValueError:
+                errors[name] = "Use the date format YYYY-MM-DD."
+        elif name == "url":
+            if value and not re.match(r"^https://[^\s]{3,300}$", value):
+                errors[name] = "Enter the full profile address starting with https://"
         elif name in _LINK_FIELDS or name.endswith("_link"):
             if value and not ((value.startswith("/") and not value.startswith("//")) or _LINK.match(value) or (name == "apply_link" and re.match(r"^mailto:[^\s@]+@[^\s@]+$", value))):
                 errors[name] = "Use a page path like /contact or a full https:// URL."

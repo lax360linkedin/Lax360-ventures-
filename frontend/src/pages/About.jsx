@@ -65,7 +65,7 @@ export default function About() {
       </section>
 
       <section className="wrap section" aria-labelledby="caps-title">
-        <SectionHeading id="caps-title" eyebrow="Capabilities" title="Five divisions, one story." lead="Technology consulting runs through all five as the first step of every engagement." />
+        <SectionHeading id="caps-title" eyebrow="Capabilities" title="Four divisions, one story." lead="Technology consulting runs through all four as the first step of every engagement." />
         <ul className="mt-12 divide-y divide-edge border-y border-edge">
           {allDivisions.map((d) => (
             <li key={d.slug}>

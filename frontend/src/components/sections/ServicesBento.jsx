@@ -6,19 +6,18 @@ import DivisionArt from '../art/DivisionArt.jsx'
 import { allDivisions } from '../../data/services.js'
 import { divisionIcons } from '../../utils/divisionIcons.js'
 
-// Five divisions as a varied bento (not identical cards). Each card is one link to its page.
+// Four divisions as a varied bento (not identical cards). Each card is one link to its page.
 const layout = {
   software: { span: 'md:col-span-4 md:row-span-2', art: true, icon: 'from-primary to-accent', glow: 'hover:shadow-[0_24px_50px_-20px_rgba(124,58,237,0.7)]' },
   ai: { span: 'md:col-span-2', icon: 'from-accent to-[#e879f9]', glow: 'hover:shadow-[0_24px_50px_-20px_rgba(168,85,247,0.7)]' },
   growth: { span: 'md:col-span-2', icon: 'from-sky to-primary', glow: 'hover:shadow-[0_24px_50px_-20px_rgba(96,165,250,0.55)]' },
-  engineering: { span: 'md:col-span-3', icon: 'from-sky to-[#818cf8]', glow: 'hover:shadow-[0_24px_50px_-20px_rgba(96,165,250,0.55)]' },
-  training: { span: 'md:col-span-3', icon: 'from-lav to-accent', glow: 'hover:shadow-[0_24px_50px_-20px_rgba(196,181,253,0.45)]' },
+  engineering: { span: 'md:col-span-6', icon: 'from-sky to-[#818cf8]', glow: 'hover:shadow-[0_24px_50px_-20px_rgba(96,165,250,0.55)]' },
 }
 
 export default function ServicesBento() {
   return (
     <section aria-labelledby="divisions-title" className="wrap section">
-      <SectionHeading id="divisions-title" eyebrow="Divisions" title="Five ways we" gradient="help." bot lead="Pick what you need now — we'll connect the rest." />
+      <SectionHeading id="divisions-title" eyebrow="Divisions" title="Four ways we" gradient="help." bot lead="Pick what you need now — we'll connect the rest." />
       <ul className="mt-12 grid gap-4 md:grid-cols-6">
         {allDivisions.map((d, i) => {
           const cfg = layout[d.slug]

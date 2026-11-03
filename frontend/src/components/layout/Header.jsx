@@ -10,7 +10,7 @@ import { useNav } from '../../hooks/useSite.js'
 import { useScrollDirection } from '../../hooks/useScrollDirection.js'
 import { useMediaQuery } from '../../hooks/useMediaQuery.js'
 
-const linkCls = 'relative z-10 inline-flex min-h-11 items-center px-[1.125rem] text-[0.9375rem] font-medium tracking-tight transition-colors duration-200'
+const linkCls = 'relative z-10 inline-flex min-h-11 items-center px-2.5 text-sm xl:px-4 xl:text-[0.9375rem] 2xl:px-[1.125rem] font-medium tracking-tight transition-colors duration-200'
 
 /**
  * The one shared header. It is `position: fixed` on every page and never hides on scroll; its height is constant
@@ -18,7 +18,7 @@ const linkCls = 'relative z-10 inline-flex min-h-11 items-center px-[1.125rem] t
  *
  * Desktop layout is a three-column grid — [logo] [navigation] [theme toggle + CTA] with `minmax(0,1fr)` outer columns —
  * so the links stay truly centred whatever the logo or the controls need. Below `lg` it is logo + controls + menu button.
- * Order: About → Services → Solutions → Career → Contact. Dark: transparent deep-violet glass; light: translucent
+ * Order: About → Services → Industries → Insights → Our Network → Our Team → Careers → Contact. Dark: transparent deep-violet glass; light: translucent
  * white glass; both get a more opaque, blurred surface after scrolling.
  *
  * The mini-bot (HeaderBot) lives in a non-interactive overlay. It rests above the active page's link (the "A" of LAX360 on Home) and travels to hovered/clicked links.
@@ -32,12 +32,13 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
   const navRef = useRef(null)
   const aRef = useRef(null)
   const botRef = useRef(null)
+  const headerRef = useRef(null)
   const leaveTimer = useRef(null)
 
   const scrolled = y > 24
 
-  // The nav item for the page being viewed (Services also covers /services/*). Null on Home and on pages outside the nav.
-  const activeTo = nav.find((n) => !n.external && (pathname === n.to || pathname.startsWith(`${n.to}/`)))?.to ?? null
+  // The nav item for the page being viewed (Services also covers /services/*). Null on Home (the bot stands on the "A" of LAX360 there, even though Home is now a menu link) and on pages outside the nav.
+  const activeTo = nav.find((n) => !n.external && n.to !== '/' && (pathname === n.to || pathname.startsWith(`${n.to}/`)))?.to ?? null
 
   // ---- glass highlight under the current / hovered link (relative to the nav pill) ----
   const measure = useCallback((el) => {
@@ -57,20 +58,22 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
 
   // ---- positions for the bot, measured from the DOM every time (nothing is hard-coded) ----
   // Where the bot settles: above the active page's link, or on the "A" of LAX360 (Home, other pages, and below lg).
+  // The bot is positioned inside the header, which sits below the fixed contact bar, so viewport measurements are made relative to the header's top edge.
+  const headerTop = () => headerRef.current?.getBoundingClientRect().top || 0
   const measureLink = useCallback((path) => {
     const a = navRef.current?.querySelector(`a[href="${path}"]`)
     if (!a || a.offsetParent === null) return null // nav is hidden below lg
     const range = document.createRange()
     range.selectNodeContents(a)
     const t = range.getBoundingClientRect()
-    return { x: t.left + t.width / 2, y: t.top - 1 } // feet just above the label text
+    return { x: t.left + t.width / 2, y: t.top - 1 - headerTop() } // feet just above the label text
   }, [])
   const measureRest = useCallback(() => {
     const link = activeTo && measureLink(activeTo)
     if (link) return link
     const r = aRef.current?.getBoundingClientRect()
     if (!r || !r.width) return null
-    return { x: r.left + r.width / 2, y: r.top + r.height * 0.22 } // feet on the apex of the "A"
+    return { x: r.left + r.width / 2, y: r.top + r.height * 0.22 - headerTop() } // feet on the apex of the "A"
   }, [activeTo, measureLink])
 
   // Keep the bot on its spot when the layout moves without a window resize (fonts, account control, theme).
@@ -98,7 +101,8 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
 
   return (
     <header
-      className={`a-drop fixed inset-x-0 top-0 z-40 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${scrolled ? 'border-edge bg-night/75 shadow-[0_10px_40px_-18px_rgba(124,58,237,0.5)] backdrop-blur-xl' : 'border-edge/60 bg-night/40 backdrop-blur-md'}`}
+      ref={headerRef}
+      className={`a-drop fixed inset-x-0 top-[var(--topbar-offset,0px)] z-40 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${scrolled ? 'border-edge bg-night/75 shadow-[0_10px_40px_-18px_rgba(124,58,237,0.5)] backdrop-blur-xl' : 'border-edge/60 bg-night/40 backdrop-blur-md [[data-theme=light]_&]:bg-night/85' /* light mode: solid enough to read over the vivid hero video */}`}
       style={{ '--d': '0.1s' }}
     >
       <div className="wrap flex h-[72px] items-center justify-between gap-3 pt-2 lg:grid lg:h-[92px] lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-6 lg:pt-3">
