@@ -63,7 +63,7 @@ export default function Contact() {
         </section>
       </div>
 
-      <section id="branches" className="wrap pb-20 md:pb-28" aria-labelledby="branches-title">
+      <section id="branches" className="wrap pb-12 md:pb-16" aria-labelledby="branches-title">
         <SectionHeading id="branches-title" eyebrow="Office locations" title="Visit our" gradient="branches." bot lead={`LAX360 Ventures has branches in ${branchSentence}.`} />
         <BranchCards className="mt-10" />
       </section>

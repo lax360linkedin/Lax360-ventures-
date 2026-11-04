@@ -19,7 +19,7 @@ export default function Footer() {
   const replay = () => { navigate('/'); window.setTimeout(replayIntro, 60) } // go Home first; the intro only plays on the homepage
   const site = useSite()
   return (
-    <footer className="relative overflow-hidden border-t border-edge bg-gradient-to-b from-base2 to-deep/70 pb-24 pt-20 lg:pb-0 lg:pt-28">
+    <footer className="relative overflow-hidden border-t border-edge bg-gradient-to-b from-base2 to-deep/70 pb-24 pt-14 lg:pb-0 lg:pt-20">
       <div aria-hidden="true" className="pointer-events-none absolute -left-32 top-0 size-[28rem] rounded-full bg-primary/25 blur-3xl" />
       <div aria-hidden="true" className="pointer-events-none absolute -right-24 bottom-10 size-[24rem] rounded-full bg-sky/10 blur-3xl" />
       <div className="wrap relative">

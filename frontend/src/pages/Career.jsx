@@ -32,7 +32,7 @@ export default function Career() {
     >
       <section className="relative overflow-hidden border-b border-edge">
         <div aria-hidden="true" className="pointer-events-none absolute -right-32 -top-24 size-[32rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(124,58,237,0.28), transparent)' }} />
-        <div className="wrap relative pb-16 pt-6 md:pb-24 md:pt-10">
+        <div className="wrap relative pb-10 pt-6 md:pb-16 md:pt-10">
           <Reveal y={12} className="max-w-4xl">
             <p className="eyebrow mb-6 flex items-center gap-3 text-lav"><span aria-hidden="true" className="h-px w-10 bg-current" />Career</p>
             <h1 className="h1 !text-[clamp(2.5rem,5.6vw,5.5rem)]">

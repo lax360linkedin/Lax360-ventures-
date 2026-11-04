@@ -11,6 +11,8 @@
     python -m app.cli check-ai
     python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
+    python -m app.cli seed-sample-testimonials [--remove]       (add / remove the six fictional placeholder testimonials; never touches real ones)
+    python -m app.cli seed-sample-clients [--remove]            (add / remove the six placeholder "Our Clients" entries; never touches real clients)
 
 Passwords are always typed at a hidden prompt (or read from the LAX360_NEW_PASSWORD environment variable for
 non-interactive provisioning); they are never accepted as command-line arguments, so they stay out of shell history.
@@ -272,6 +274,79 @@ def hero_videos_migrate(args: argparse.Namespace) -> None:
     print(f"Done: {moved} copied, {skipped} skipped. Local files were not deleted.")
 
 
+SAMPLE_CLIENTS = [  # fictional companies with placeholder artwork shipped in frontend/public/assets/clients/ (flagged is_sample)
+    ("sample-aurelia-textiles", "Aurelia Textiles", "/assets/clients/sample-1.svg"),
+    ("sample-vertex-logistics", "Vertex Logistics", "/assets/clients/sample-2.svg"),
+    ("sample-nimbus-health", "Nimbus Health", "/assets/clients/sample-3.svg"),
+    ("sample-harbor-pine-foods", "Harbor & Pine Foods", "/assets/clients/sample-4.svg"),
+    ("sample-kestrel-engineering", "Kestrel Engineering", "/assets/clients/sample-5.svg"),
+    ("sample-brightwave-retail", "Brightwave Retail", "/assets/clients/sample-6.svg"),
+]
+
+
+def seed_sample_clients(args: argparse.Namespace) -> None:
+    """Add (or with --remove, delete) the six placeholder clients. Idempotent; only touches rows whose slug starts with "sample-"."""
+    from app.models import ContentItem
+
+    get_settings()
+    with _factory()() as db:
+        existing = {i.slug: i for i in db.scalars(select(ContentItem).where(ContentItem.kind == "client", ContentItem.slug.like("sample-%")))}
+        if args.remove:
+            for item in existing.values():
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(existing)} sample client(s). Real clients were not touched.")
+            return
+        added = 0
+        for n, (slug, name, logo) in enumerate(SAMPLE_CLIENTS, start=1):
+            if slug in existing:
+                continue
+            db.add(ContentItem(kind="client", slug=slug, title=name, data={"logo_url": logo, "is_sample": True}, status="published", sort_order=n * 10))
+            added += 1
+        db.commit()
+        print(f"Added {added} sample client(s) ({len(SAMPLE_CLIENTS) - added} already present). They are placeholders: edit or delete them in the admin panel (Website content > Clients).")
+
+
+SAMPLE_TESTIMONIALS = [  # fictional people and organisations; every entry is flagged is_sample and shown with a "Sample" label on the website
+    ("Meera Nair", "client", "Operations Head", "Aurelia Textiles (sample)",
+     "LAX360 took our scattered order and billing sheets and turned them into one simple system. They listened first, suggested only what we needed, and delivered on the date they promised."),
+    ("Arvind Kumar", "client", "Customer Support Lead", "Vertex Logistics (sample)",
+     "The AI assistant answers our routine delivery questions from approved information and hands over to a person when needed. Our team now spends its time on the cases that really need them."),
+    ("Sana Iqbal", "client", "Marketing Manager", "Brightwave Retail (sample)",
+     "Their digital marketing plan was clear and honest about what to expect. Reporting was easy to follow, and the website and campaigns finally worked together."),
+    ("Rohan Menon", "client", "Project Engineer", "Kestrel Engineering (sample)",
+     "We send sketches and markups and get back neat 2D drawings and 3D models. The team is careful with details and quick to clarify anything unclear."),
+    ("Karthik R.", "student", "B.E. Computer Science student", "Sample Institute of Technology",
+     "The AI tools and prompt engineering workshop was practical from the first hour. We built a small project ourselves instead of only listening to theory."),
+    ("Divya S.", "student", "Final-year B.Sc. student", "Sample College of Arts & Science",
+     "I joined the Python with AI course with little experience. The trainers explained each step patiently and the hands-on sessions gave me real confidence."),
+]
+
+
+def seed_sample_testimonials(args: argparse.Namespace) -> None:
+    """Add (or with --remove, delete) the six fictional placeholder testimonials. Idempotent; only touches rows whose slug starts with "sample-"."""
+    from app.models import ContentItem
+
+    get_settings()
+    with _factory()() as db:
+        existing = {i.slug: i for i in db.scalars(select(ContentItem).where(ContentItem.kind == "testimonial", ContentItem.slug.like("sample-%")))}
+        if args.remove:
+            for item in existing.values():
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(existing)} sample testimonial(s). Real testimonials were not touched.")
+            return
+        added = 0
+        for n, (name, kind, role, org, quote) in enumerate(SAMPLE_TESTIMONIALS, start=1):
+            slug = f"sample-testimonial-{n}"
+            if slug in existing:
+                continue
+            db.add(ContentItem(kind="testimonial", slug=slug, title=name, data={"person_type": kind, "role": role, "organization": org, "quote": quote, "is_sample": True}, status="published", sort_order=n * 10))
+            added += 1
+        db.commit()
+        print(f"Added {added} sample testimonial(s) ({len(SAMPLE_TESTIMONIALS) - added} already present). They are fictional placeholders: edit or delete them in the admin panel (Website content > Testimonials).")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -305,6 +380,12 @@ def main(argv: list[str] | None = None) -> None:
     hm = sub.add_parser("hero-videos-migrate", help="copy videos held on the server disk to Supabase Storage (verified; never deletes)")
     hm.add_argument("--apply", action="store_true", help="actually copy (default is a dry run)")
     hm.set_defaults(func=hero_videos_migrate)
+    sc = sub.add_parser("seed-sample-clients", help="add (or --remove) six placeholder 'Our Clients' entries for the home page")
+    sc.add_argument("--remove", action="store_true", help="delete the sample clients instead of adding them")
+    sc.set_defaults(func=seed_sample_clients)
+    st = sub.add_parser("seed-sample-testimonials", help="add (or --remove) six fictional placeholder testimonials for the home page")
+    st.add_argument("--remove", action="store_true", help="delete the sample testimonials instead of adding them")
+    st.set_defaults(func=seed_sample_testimonials)
     args = parser.parse_args(argv)
     try:
         args.func(args)

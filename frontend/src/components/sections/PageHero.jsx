@@ -7,7 +7,7 @@ import Reveal from '../ui/Reveal.jsx'
 export default function PageHero({ eyebrow, title, lead, accent = 'monogram', art, children, className = '' }) {
   return (
     <section className={`relative overflow-hidden border-b border-edge ${className}`}>
-      <div className={`wrap grid items-center gap-10 pb-14 pt-12 md:pb-20 md:pt-20 ${art ? 'lg:grid-cols-12 lg:gap-12' : ''}`}>
+      <div className={`wrap grid items-center gap-10 pb-10 pt-10 md:pb-14 md:pt-14 ${art ? 'lg:grid-cols-12 lg:gap-12' : ''}`}>
         <Reveal y={12} className={art ? 'lg:col-span-8' : 'max-w-5xl'}>
           <p className={`eyebrow mb-6 flex items-center gap-3 ${accent === 'violet' ? 'text-violet' : 'text-lav'}`}>
             <span aria-hidden="true" className="h-px w-10 bg-current" />

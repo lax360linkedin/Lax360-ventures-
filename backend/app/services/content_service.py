@@ -30,9 +30,9 @@ def F(name, label, kind="text", required=False, max_len=300, options=None, help=
 
 DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & Apps"), ("ai", "AI & Automation"), ("growth", "Digital Growth"), ("engineering", "CAD & Engineering"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
-    ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Outcomes"),
-    ("tech", "Technology stack"), ("concept", "Concept stack"), ("ai", "AI spotlight"), ("process", "How we work"),
-    ("why", "Why LAX360"), ("faq", "FAQ"), ("contact", "Contact call-to-action"))]
+    ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
+    ("ai", "AI spotlight"), ("process", "How we work"),
+    ("faq", "FAQ"), ("contact", "Contact call-to-action"))]
 PAGES = [{"value": v, "label": l} for v, l in (("home", "Home"), ("about", "About"), ("services", "Services"), ("industries", "Industries"), ("insights", "Insights"), ("network", "Our Network"), ("team", "Our Team"),
                                               ("work", "Work"), ("career", "Career"), ("contact", "Contact"))]
 NETWORK_CATEGORIES = [{"value": v, "label": l} for v, l in (("authorized", "Authorized Partners"), ("technology", "Technology Partners"), ("associated", "Associated Companies"), ("collaboration", "Strategic Collaborations"))]
@@ -160,6 +160,35 @@ KINDS: dict[str, dict] = {
             F("author", "Author", max_len=80, help="Defaults to the LAX360 team."),
         ],
     },
+    # ---- Clients --------------------------------------------------------------------------------------------------------------------
+    "client": {
+        "label": "Our clients", "group": "Clients", "module": "content", "single": False, "preview_path": "/",
+        "help": "Genuine clients only, with their permission to be shown. Published clients appear in the \"Our Clients\" strip on the home page, in this order (use the order number to arrange them). "
+                "Entries marked as samples are placeholders: edit or delete them once you have real clients. With none published, the section is hidden.",
+        "title_label": "Company name",
+        "fields": [
+            F("logo", "Logo", "image", help="Use the client's real logo. It is shown at its original proportions."),
+            F("website_link", "Website (optional)", max_len=300, help="The client's own website, full https:// address"),
+            F("is_sample", "Sample entry (placeholder, not a real client)", "bool", default=False, help="Tick only for placeholders. Replace a sample by editing it (upload a real logo, rename it, untick this) or delete it."),
+            F("logo_url", "Built-in sample logo (leave empty for real clients)", max_len=120, help="Path of artwork shipped with the website, used only when no logo is uploaded above."),
+        ],
+    },
+    # ---- Testimonials ---------------------------------------------------------------------------------------------------------------
+    "testimonial": {
+        "label": "Client & student testimonials", "group": "Testimonials", "module": "content", "single": False, "preview_path": "/",
+        "help": "Real feedback only, shown with the person's permission. Published testimonials appear one at a time in \"What Our Clients & Students Say\" on the home page, in this order "
+                "(use the order number to arrange them). Entries marked as samples are fictional placeholders shown with a \"Sample\" label: edit or delete them once you have real feedback. "
+                "With none published, the section is hidden.",
+        "title_label": "Person's name",
+        "fields": [
+            F("person_type", "Client or student", "select", True, options=[{"value": "client", "label": "Client"}, {"value": "student", "label": "Student"}]),
+            F("role", "Designation / role", "text", True, max_len=120, help="e.g. Operations Manager, or B.E. student"),
+            F("organization", "Company or institution", max_len=160),
+            F("quote", "Testimonial", "textarea", True, max_len=700),
+            F("photo", "Profile photo (optional)", "image", help="A square photo works best. Without one, the person's initials are shown."),
+            F("is_sample", "Sample (fictional placeholder, not real feedback)", "bool", default=False, help="Untick once you replace the content with real feedback."),
+        ],
+    },
     # ---- Portfolio ------------------------------------------------------------------------------------------------------------------
     "project": {
         "label": "Projects & solutions", "group": "Portfolio", "module": "content", "single": False, "preview_path": "/work",
@@ -209,7 +238,7 @@ KINDS: dict[str, dict] = {
         "fields": [F("page", "Page", "select", True, options=PAGES), F("meta_description", "Meta description", "textarea", max_len=320), F("image", "Social sharing image", "image")],
     },
 }
-GROUP_ORDER = ["Homepage", "Services", "Industries", "Insights", "Network", "Team", "About", "Portfolio", "Careers", "Navigation & SEO"]
+GROUP_ORDER = ["Homepage", "Services", "Industries", "Insights", "Network", "Team", "Clients", "Testimonials", "About", "Portfolio", "Careers", "Navigation & SEO"]
 
 
 def kinds_for_ui(db: Session, user=None) -> list[dict]:
@@ -286,6 +315,9 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
                 errors[name] = f"Choose {'an image' if kind_t == 'image' else 'a video'} from the media library."
         elif kind_t == "select" and value and value not in _options(db, f):
             errors[name] = "Choose one of the listed options."
+        elif name == "logo_url":
+            if value and not re.match(r"^/assets/clients/[A-Za-z0-9._-]+\.(svg|png|webp)$", value):
+                errors[name] = "Leave this empty, or use a built-in artwork path such as /assets/clients/sample-1.svg"
         elif name == "website_link":
             if value and not re.match(r"^https?://[^\s]{3,300}$", value):
                 errors[name] = "Enter the company's full website address starting with https://"

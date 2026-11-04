@@ -53,7 +53,7 @@ export default function ServicesHero() {
   return (
     <section className="relative overflow-hidden border-b border-edge" aria-labelledby="services-title">
       <div aria-hidden="true" className="pointer-events-none absolute -left-40 top-0 size-[36rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(124,58,237,0.3), transparent)' }} />
-      <div className="wrap relative grid items-center gap-12 pb-16 pt-6 md:pb-24 md:pt-10 lg:grid-cols-12 lg:gap-8">
+      <div className="wrap relative grid items-center gap-12 pb-10 pt-6 md:pb-16 md:pt-10 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-7">
           <p className="a-rise glass-flat inline-flex items-center gap-2.5 !rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav" style={{ '--d': '0.2s' }}>
             <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(168,85,247,0.8)]" />

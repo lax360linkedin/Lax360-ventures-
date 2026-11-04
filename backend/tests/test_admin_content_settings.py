@@ -10,9 +10,9 @@ def test_content_kinds_describe_only_what_the_site_actually_uses(app, db):
     admin, _, _ = staff(app, db, permissions=["content"])
     body = admin.get("/api/admin/content/kinds").json()
     # an admin who only holds the `content` module sees the homepage / about / portfolio kinds; services, careers and navigation are separate modules
-    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "faq", "about_block", "industry", "network_partner", "team_member", "article", "project"]
+    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "faq", "about_block", "industry", "network_partner", "team_member", "article", "client", "testimonial", "project"]
     assert all(f["name"] for k in body["kinds"] for f in k["fields"])
-    assert admin.get("/api/admin/content/testimonial").status_code == 404  # not a managed section
+    assert admin.get("/api/admin/content/pricing_table").status_code == 404  # not a managed section
 
 
 def test_draft_is_private_until_published_then_unpublish_hides_it_again(app, db, client):
@@ -189,3 +189,64 @@ def test_network_partners_and_team_members_are_managed_validated_ordered_and_rem
     assert "Asha" not in names and "Ravi" in names  # unpublished profiles are not public
     assert admin.delete(f"/api/admin/content/item/{ids[1]}", headers=csrf).status_code in (200, 204)
     assert "Ravi" not in [i["title"] for i in client.get("/api/public/content?kind=team_member").json()["items"]]
+
+
+def test_clients_are_managed_ordered_and_removable_and_never_invented(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    assert client.get("/api/public/content?kind=client").json()["items"] == []  # nothing is shown until an administrator adds a real client
+    ids = []
+    for name in ("Client A", "Client B"):
+        r = admin.post("/api/admin/content/client", json={"title": name, "data": {"website_link": "https://example.com"}, "status": "published", "sort_order": len(ids) + 1}, headers=csrf)
+        assert r.status_code == 201
+        ids.append(r.json()["id"])
+    assert admin.post("/api/admin/content/client", json={"title": "", "data": {}, "status": "published", "sort_order": 1}, headers=csrf).status_code == 422  # a name is required
+    assert admin.post("/api/admin/content/client", json={"title": "Bad", "data": {"website_link": "javascript:alert(1)"}, "status": "published", "sort_order": 1}, headers=csrf).status_code == 422
+    assert admin.post("/api/admin/content/client", json={"title": "Bad", "data": {"logo": "not-a-media-id"}, "status": "published", "sort_order": 1}, headers=csrf).status_code == 422
+    assert [i["title"] for i in client.get("/api/public/content?kind=client").json()["items"]] == ["Client A", "Client B"]
+    assert admin.put("/api/admin/content/client/order", json={"ids": list(reversed(ids))}, headers=csrf).status_code in (200, 204)
+    assert [i["title"] for i in client.get("/api/public/content?kind=client").json()["items"]] == ["Client B", "Client A"]
+    assert admin.delete(f"/api/admin/content/item/{ids[0]}", headers=csrf).status_code in (200, 204)
+    assert [i["title"] for i in client.get("/api/public/content?kind=client").json()["items"]] == ["Client B"]
+
+
+def test_sample_client_entries_carry_builtin_artwork_flag_and_can_be_edited_or_deleted(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    sample = {"title": "Sample Co", "data": {"logo_url": "/assets/clients/sample-1.svg", "is_sample": True}, "status": "published", "sort_order": 1}
+    r = admin.post("/api/admin/content/client", json=sample, headers=csrf)
+    assert r.status_code == 201
+    item_id = r.json()["id"]
+    for bad in ("https://evil.example/x.svg", "/assets/other/x.svg", "/assets/clients/../x.svg", "javascript:alert(1)"):
+        assert admin.post("/api/admin/content/client", json={**sample, "title": "Bad", "data": {**sample["data"], "logo_url": bad}}, headers=csrf).status_code == 422, bad
+    public = client.get("/api/public/content?kind=client").json()["items"]
+    assert public[0]["data"]["is_sample"] is True and public[0]["data"]["logo_url"].endswith("sample-1.svg")
+    # replacing a sample with a real client: rename it and clear the sample flag; then delete
+    assert admin.patch(f"/api/admin/content/item/{item_id}", json={"title": "Real Client Ltd", "data": {"website_link": "https://example.com", "is_sample": False}}, headers=csrf).status_code == 200
+    edited = client.get("/api/public/content?kind=client").json()["items"][0]
+    assert edited["title"] == "Real Client Ltd" and not edited["data"].get("is_sample") and "logo_url" not in edited["data"]
+    assert admin.delete(f"/api/admin/content/item/{item_id}", headers=csrf).status_code in (200, 204)
+    assert client.get("/api/public/content?kind=client").json()["items"] == []
+
+
+def test_testimonials_are_managed_typed_reorderable_unpublishable_and_deletable(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    assert client.get("/api/public/content?kind=testimonial").json()["items"] == []
+    base = {"person_type": "client", "role": "Manager", "organization": "Sample Co", "quote": "Great work.", "is_sample": True}
+    ids = []
+    for name, ptype in (("Asha", "client"), ("Ravi", "student")):
+        r = admin.post("/api/admin/content/testimonial", json={"title": name, "data": {**base, "person_type": ptype}, "status": "published", "sort_order": len(ids) + 1}, headers=csrf)
+        assert r.status_code == 201
+        ids.append(r.json()["id"])
+    for bad in ({"person_type": "visitor"}, {"role": ""}, {"quote": ""}, {"quote": "x" * 701}, {"photo": "not-a-media-id"}):
+        assert admin.post("/api/admin/content/testimonial", json={"title": "Bad", "data": {**base, **bad}, "status": "published", "sort_order": 1}, headers=csrf).status_code == 422, bad
+    assert admin.post("/api/admin/content/testimonial", json={"title": "", "data": base, "status": "published", "sort_order": 1}, headers=csrf).status_code == 422
+    pub = client.get("/api/public/content?kind=testimonial").json()["items"]
+    assert [i["title"] for i in pub] == ["Asha", "Ravi"] and [i["data"]["person_type"] for i in pub] == ["client", "student"] and pub[0]["data"]["is_sample"] is True
+    assert admin.put("/api/admin/content/testimonial/order", json={"ids": list(reversed(ids))}, headers=csrf).status_code in (200, 204)
+    assert [i["title"] for i in client.get("/api/public/content?kind=testimonial").json()["items"]] == ["Ravi", "Asha"]
+    assert admin.patch(f"/api/admin/content/item/{ids[0]}", json={"status": "draft"}, headers=csrf).status_code == 200
+    assert [i["title"] for i in client.get("/api/public/content?kind=testimonial").json()["items"]] == ["Ravi"]
+    assert admin.patch(f"/api/admin/content/item/{ids[1]}", json={"data": {**base, "person_type": "student", "is_sample": False, "quote": "Edited."}}, headers=csrf).status_code == 200
+    edited = client.get("/api/public/content?kind=testimonial").json()["items"][0]["data"]
+    assert edited["quote"] == "Edited." and not edited.get("is_sample")
+    assert admin.delete(f"/api/admin/content/item/{ids[1]}", headers=csrf).status_code in (200, 204)
+    assert client.get("/api/public/content?kind=testimonial").json()["items"] == []

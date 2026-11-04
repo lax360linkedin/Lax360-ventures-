@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 72" width="240" height="72" role="img" aria-label="Harbor & Pine Foods (sample logo)">
+  <title>Harbor & Pine Foods (sample logo)</title>
+  <g transform="translate(8 8)"><rect width="56" height="56" rx="14" fill="#15803d"/><path d="M28 12 L40 30 H33 L42 42 H14 L23 30 H16 Z" fill="#fff"/><rect x="25.5" y="42" width="5" height="6" fill="#fff"/></g>
+  <text x="72" y="36" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="21" font-weight="700" fill="#1a1033" letter-spacing="-0.3">Harbor &amp; Pine</text>
+  <text x="72" y="55" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="12.5" font-weight="600" fill="#15803d" letter-spacing="2.2">FOODS</text>
+</svg>

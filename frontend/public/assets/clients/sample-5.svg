@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 72" width="240" height="72" role="img" aria-label="Kestrel Engineering (sample logo)">
+  <title>Kestrel Engineering (sample logo)</title>
+  <g transform="translate(8 8)"><rect width="56" height="56" rx="14" fill="#7c3aed"/><path d="M12 38 L28 14 L44 38" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 38 H37" stroke="#ddd6fe" stroke-width="5" stroke-linecap="round"/></g>
+  <text x="72" y="36" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="21" font-weight="700" fill="#1a1033" letter-spacing="-0.3">Kestrel</text>
+  <text x="72" y="55" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="12.5" font-weight="600" fill="#7c3aed" letter-spacing="2.2">ENGINEERING</text>
+</svg>

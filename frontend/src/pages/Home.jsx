@@ -5,21 +5,20 @@ import { useHomeSections } from '../hooks/useSite.js'
 import Hero from '../components/sections/Hero.jsx'
 import Marquee from '../components/sections/Marquee.jsx'
 import WhoWeAre from '../components/sections/WhoWeAre.jsx'
-import ServicesBento from '../components/sections/ServicesBento.jsx'
-import Outcomes from '../components/sections/Outcomes.jsx'
-import TechStack from '../components/sections/TechStack.jsx'
-import ConceptStack from '../components/sections/ConceptStack.jsx'
+import OurServices from '../components/sections/OurServices.jsx'
+import WhyChooseUs from '../components/sections/WhyChooseUs.jsx'
+import OurClients from '../components/sections/OurClients.jsx'
+import Testimonials from '../components/sections/Testimonials.jsx'
 import AiSpotlight from '../components/sections/AiSpotlight.jsx'
 import ProcessTimeline from '../components/sections/ProcessTimeline.jsx'
-import WhyUs from '../components/sections/WhyUs.jsx'
 import FaqSection from '../components/sections/FaqSection.jsx'
 import ContactCta from '../components/sections/ContactCta.jsx'
 
 // The built-in home page sections, in their default order. The admin panel can re-order and hide them (Website content > Home page sections).
-const DEFAULT_ORDER = ['marquee', 'whoweare', 'services', 'outcomes', 'tech', 'concept', 'ai', 'process', 'why', 'faq', 'contact']
+const DEFAULT_ORDER = ['marquee', 'whoweare', 'services', 'outcomes', 'clients', 'testimonials', 'ai', 'process', 'faq', 'contact']
 const SECTIONS = {
-  marquee: <Marquee />, whoweare: <WhoWeAre />, services: <ServicesBento />, outcomes: <Outcomes />, tech: <TechStack />,
-  concept: <ConceptStack />, ai: <AiSpotlight />, process: <ProcessTimeline />, why: <WhyUs />, faq: <FaqSection />, contact: <ContactCta />,
+  marquee: <Marquee />, whoweare: <WhoWeAre />, services: <OurServices />, outcomes: <WhyChooseUs />, clients: <OurClients />, testimonials: <Testimonials />,
+  ai: <AiSpotlight />, process: <ProcessTimeline />, faq: <FaqSection />, contact: <ContactCta />,
 }
 
 const WelcomeIntro = lazy(() => import('../components/intro/WelcomeIntro.jsx')) // separate chunk

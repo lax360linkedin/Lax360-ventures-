@@ -156,9 +156,9 @@ html.theme-switching, html.theme-switching *, html.theme-switching *::before, ht
   .wrap { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 1rem; }
   @media (min-width: 768px) { .wrap { padding-inline: 2rem; } }
   @media (min-width: 1024px) { .wrap { padding-inline: 3rem; } }
-  .section { padding-block: 4.5rem; }
-  @media (min-width: 768px) { .section { padding-block: 6.5rem; } }
-  @media (min-width: 1024px) { .section { padding-block: 8rem; } }
+  .section { padding-block: 3rem; }
+  @media (min-width: 768px) { .section { padding-block: 4rem; } }
+  @media (min-width: 1024px) { .section { padding-block: 5rem; } }
 
   .eyebrow { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
   @media (min-width: 768px) { .eyebrow { font-size: 0.8125rem; } }
@@ -239,8 +239,7 @@ html.theme-switching, html.theme-switching *, html.theme-switching *::before, ht
 .typing-dot:nth-child(2) { animation-delay: .15s; }
 .typing-dot:nth-child(3) { animation-delay: .3s; }
 
-/* Skip rendering work for sections far below the fold. */
-main section + section { content-visibility: auto; contain-intrinsic-size: auto 700px; }
+/* Sections are laid out at their real height. (A content-visibility placeholder size used to reserve ~700px for every section below the fold, which showed up as large blank areas.) */
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -340,10 +339,10 @@ html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s 
 
 /* ---- social band + contact bar: slow, GPU-friendly motion; switched off for reduced-motion users ---- */
 @keyframes social-float { 0%, 100% { transform: translate3d(0,0,0) rotate(-5deg); } 50% { transform: translate3d(0,-9px,0) rotate(5deg); } }
-@keyframes bot-bob { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(0,-8px,0); } }
+@keyframes mascot-bob { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(0,-8px,0); } } /* own name: the header mini-bot has its own bot-bob keyframes */
 @keyframes bot-wave { 0%, 60%, 100% { transform: rotate(0deg); } 70% { transform: rotate(-6deg); } 80% { transform: rotate(5deg); } 90% { transform: rotate(-4deg); } }
 .anim-social-float { animation: social-float 5s ease-in-out infinite; animation-delay: var(--d, 0s); will-change: transform; }
-.anim-bot-bob { animation: bot-bob 4.5s ease-in-out infinite; will-change: transform; }
+.anim-bot-bob { animation: mascot-bob 4.5s ease-in-out infinite; will-change: transform; }
 .anim-bot-wave { animation: bot-wave 6s ease-in-out infinite; transform-origin: 50% 90%; }
 @media (prefers-reduced-motion: reduce) { .anim-social-float, .anim-bot-bob, .anim-bot-wave { animation: none !important; } }
 
@@ -370,3 +369,14 @@ html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s 
  * only the last stretch blends into the white page, so the text near the bottom is not washed out by a white haze. */
 .hero-veil { background: linear-gradient(to bottom, color-mix(in srgb, var(--color-night) 70%, transparent), color-mix(in srgb, var(--color-night) 20%, transparent), var(--page-bg)); }
 :root[data-theme="light"] .hero-veil { background: linear-gradient(to bottom, color-mix(in srgb, var(--color-night) 70%, transparent), color-mix(in srgb, var(--color-night) 20%, transparent) 50%, color-mix(in srgb, var(--color-night) 20%, transparent) 90%, var(--page-bg)); }
+
+/* ---- testimonials: the mascot "presents" each testimonial; the card slides in at the same moment (all off for reduced motion) ---- */
+@keyframes mascot-present { 0% { transform: translate3d(0,0,0) rotate(0) scale(1); } 28% { transform: translate3d(12px,-12px,0) rotate(-5deg) scale(1.05); } 55% { transform: translate3d(8px,0,0) rotate(3deg) scale(1.02); } 100% { transform: translate3d(0,0,0) rotate(0) scale(1); } }
+@keyframes present-ring { 0% { opacity: 0.75; transform: scale(0.6); } 100% { opacity: 0; transform: scale(1.3); } }
+@keyframes testi-next { from { opacity: 0; transform: translate3d(32px,0,0); } to { opacity: 1; transform: translate3d(0,0,0); } }
+@keyframes testi-prev { from { opacity: 0; transform: translate3d(-32px,0,0); } to { opacity: 1; transform: translate3d(0,0,0); } }
+.anim-present { animation: mascot-present 0.95s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.anim-present-ring { animation: present-ring 1.1s ease-out both; }
+.anim-testi-next { animation: testi-next 0.6s var(--ease-signal) 0.18s both; }
+.anim-testi-prev { animation: testi-prev 0.6s var(--ease-signal) 0.18s both; }
+@media (prefers-reduced-motion: reduce) { .anim-present, .anim-present-ring, .anim-testi-next, .anim-testi-prev { animation: none !important; } }
