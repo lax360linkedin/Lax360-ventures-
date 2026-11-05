@@ -1,18 +1,37 @@
-// Single source of truth for LAX360 Ventures branch locations. Everything that mentions offices
-// (hero, footer, About, Contact, Career, chatbot demo, structured data) reads from here.
-//
-// Only the Salem street address exists in the project data (copied from lax360.in, still marked
-// [Confirm] in the planning document). Bangalore and Mumbai have NO confirmed address, so none is
-// shown — add an `address` array to those entries once the real details are supplied.
+// Single source of truth for LAX360 Ventures branch locations and branch phone numbers. Everything that mentions offices
+// (hero, footer, About, Contact, Career, Our Network, chatbot demo, structured data) reads from here.
+// These are the official details supplied by LAX360 Ventures. The same details are stored in the database (branches table, migration 0010),
+// so keep both in step when they change.
+const mapUrl = (query) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+
 export const branches = [
   {
     id: 'salem',
     city: 'Salem',
     name: 'LAX360 Ventures — Salem Branch',
-    address: ['LAX360 Pvt Ltd', '1st Floor, 16, CPS Tower', 'Advaitha Ashram Rd, Fairlands', 'Salem, Tamil Nadu 636007'],
+    address: ['1st Floor, 16, CPS Tower', 'Advaitha Ashram Road, Fairlands', 'Salem, Tamil Nadu – 636004'],
+    phone: '+91 95666 79928',
+    tel: '+919566679928',
+    mapUrl: mapUrl('1st Floor, 16, CPS Tower, Advaitha Ashram Road, Fairlands, Salem, Tamil Nadu 636004'),
   },
-  { id: 'bangalore', city: 'Bangalore', name: 'LAX360 Ventures — Bangalore Branch' },
-  { id: 'mumbai', city: 'Mumbai', name: 'LAX360 Ventures — Mumbai Branch' },
+  {
+    id: 'bangalore',
+    city: 'Bangalore',
+    name: 'LAX360 Ventures — Bangalore Branch',
+    address: ['472/7, 20th L Cross Road', 'AVS Layout, Koramangala', 'Bengaluru, Karnataka – 560034'],
+    phone: '+91 95666 79928',
+    tel: '+919566679928',
+    mapUrl: mapUrl('472/7, 20th L Cross Road, AVS Layout, Koramangala, Bengaluru, Karnataka 560034'),
+  },
+  {
+    id: 'mumbai',
+    city: 'Mumbai',
+    name: 'LAX360 Ventures — Mumbai Branch',
+    address: ['Level 4, Dynasty Business Park', 'Andheri–Kurla Road, A-Wing, J. B. Nagar', 'Andheri East, Mumbai, Maharashtra – 400059'],
+    phone: '+91 95666 05272',
+    tel: '+919566605272',
+    mapUrl: mapUrl('Level 4, Dynasty Business Park, Andheri-Kurla Road, A-Wing, J. B. Nagar, Andheri East, Mumbai, Maharashtra 400059'),
+  },
 ]
 
 export const branchCities = branches.map((b) => b.city)

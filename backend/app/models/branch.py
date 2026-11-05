@@ -7,7 +7,7 @@ from app.db.base import Base, Timestamps, UUIDPk
 
 
 class Branch(UUIDPk, Timestamps, Base):
-    """Company branch. Address/phone stay NULL until the business supplies them — nothing is invented."""
+    """Company branch with its official address (newline-separated lines) and phone number. Kept in step with frontend/src/data/branches.js (migration 0010)."""
 
     __tablename__ = "branches"
 

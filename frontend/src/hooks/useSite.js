@@ -53,11 +53,17 @@ export function useContent(kind) {
   return items && items.length ? items : null
 }
 
+/** Which page(s) a question is for: "home" = home and services (the original setting), "home_only", "services_only". */
+export const faqOnPage = (where, page) => {
+  const w = where || 'home'
+  return page === 'services' ? w === 'home' || w === 'services_only' : w === 'home' || w === 'home_only'
+}
+
 /** FAQ entries for a page group: the published CMS entries when there are any, otherwise the built-in `fallback` list. */
 export function useFaqs(group, fallback) {
   const items = useContent('faq')
   return useMemo(() => {
-    const mine = (items || []).filter((i) => (i.data.group || 'home') === group)
+    const mine = (items || []).filter((i) => faqOnPage(i.data.group, group))
     return mine.length ? mine.map((i) => ({ q: i.title, a: i.data.answer })) : fallback
   }, [items, group, fallback])
 }

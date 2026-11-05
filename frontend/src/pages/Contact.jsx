@@ -32,7 +32,7 @@ export default function Contact() {
             <h2 className="eyebrow text-lav">Talk now</h2>
             <ul className="mt-4 space-y-3 text-lg">
               <li><a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="link-underline inline-flex min-h-11 items-center gap-3 font-semibold"><MessageCircle className="size-5" aria-hidden="true" /> WhatsApp us</a></li>
-              {site.phones.map((p) => <li key={p.tel}><a href={`tel:${p.tel}`} className="link-underline inline-flex min-h-11 items-center gap-3"><Phone className="size-5" aria-hidden="true" /> {p.display}</a></li>)}
+              {site.phones.map((p) => <li key={p.tel}><a href={`tel:${p.tel}`} className="link-underline inline-flex min-h-11 items-center gap-3"><Phone className="size-5" aria-hidden="true" /> {p.display}{p.label && <span className="text-base text-soft">({p.label})</span>}</a></li>)}
               <li><a href={`mailto:${site.email}`} className="link-underline inline-flex min-h-11 items-center gap-3 break-all"><Mail className="size-5 shrink-0" aria-hidden="true" /> {site.email}</a></li>
             </ul>
           </div>

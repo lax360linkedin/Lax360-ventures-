@@ -26,7 +26,10 @@ export default function Accordion({ items }) {
                   onClick={() => setOpen(isOpen ? null : i)}
                   className="flex min-h-16 w-full items-center justify-between gap-6 rounded-2xl px-5 py-4 text-left font-display text-lg font-medium md:px-6 md:text-xl"
                 >
-                  <span className={`transition-colors duration-200 ${isOpen ? 'text-lav' : ''}`}>{item.q}</span>
+                  <span className={`transition-colors duration-200 ${isOpen ? 'text-lav' : ''}`}>
+                    {item.tag && <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.12em] text-soft">{item.tag}</span>}
+                    {item.q}
+                  </span>
                   <span className={`flex size-8 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${isOpen ? 'rotate-45 border-lav bg-primary/30 text-lav' : 'border-edge-strong text-soft'}`}>
                     <Plus className="size-4" aria-hidden="true" />
                   </span>

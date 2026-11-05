@@ -91,7 +91,7 @@ def test_missing_database_url_gives_a_clear_safe_error(client, env):
 def test_check_db_reports_a_real_connection(env, capsys):
     cli.main(["check-db"])
     out = capsys.readouterr().out
-    assert "Connected: yes" in out and "Migration revision: 0009" in out and "Tables: all present" in out
+    assert "Connected: yes" in out and "Migration revision: 0010" in out and "Tables: all present" in out
     assert "Row-level security: enabled on all app tables" in out
     assert "password" not in out.lower()
 
@@ -160,7 +160,7 @@ def test_exported_sql_builds_the_same_schema_as_the_migrations(database_url):
     url = scratch_database(database_url, "lax360_test_sqlfile")
     with psycopg.connect(url, autocommit=True) as c:
         c.execute(sql)
-        assert c.execute("select version_num from alembic_version").fetchone()[0] == "0009"
+        assert c.execute("select version_num from alembic_version").fetchone()[0] == "0010"
         assert c.execute("select count(*) from branches").fetchone()[0] == 3
         assert c.execute("select bool_and(relrowsecurity) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r'").fetchone()[0]
     engine = create_engine(url.replace("postgresql://", "postgresql+psycopg://", 1))

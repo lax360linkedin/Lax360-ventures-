@@ -1,0 +1,42 @@
+{
+  "categories": [
+    { "slug": "company", "title": "Company & Services", "description": "Who we are and what we do." },
+    { "slug": "software", "title": "Software & Technology", "description": "Software, websites, apps, AI and automation." },
+    { "slug": "delivery", "title": "Project Development & Delivery", "description": "How a project starts, runs and finishes." },
+    { "slug": "pricing", "title": "Pricing & Payments", "description": "How costs are worked out." },
+    { "slug": "support", "title": "Support & Maintenance", "description": "Help after your project goes live." },
+    { "slug": "partnerships", "title": "Partnerships & Collaboration", "description": "Working with other businesses." }
+  ],
+  "items": [
+    { "category": "company", "q": "What is LAX360 Ventures?", "a": "LAX360 Ventures is a technology company with branches in Salem, Bangalore and Mumbai. One team plans, builds, automates and supports software, AI solutions, digital marketing and CAD engineering work, so you deal with a single point of contact instead of several vendors." },
+    { "category": "company", "q": "What services does LAX360 Ventures offer?", "a": "We offer custom software (including CRM and ERP), websites and mobile apps, AI assistants and business automation, digital marketing, and CAD drafting and modelling for civil and mechanical work. We also run training workshops. The Services page describes each area in more detail." },
+    { "category": "company", "q": "Which industries does LAX360 Ventures serve?", "a": "Our Industries page lists the sectors we build technology for, such as manufacturing, retail, healthcare, education, logistics, construction, finance and hospitality. If your business is in a different field, tell us about it: most business problems are similar across industries." },
+    { "category": "company", "q": "Do you provide customised solutions based on business requirements?", "a": "Yes. We start by listening to your requirements and the problem you want to solve, and we recommend only what your business needs. We do not push services you do not need." },
+
+    { "category": "software", "q": "Can you develop custom software for my business?", "a": "Yes. We build custom business applications such as order, billing, inventory, approval and reporting tools, as well as CRM and ERP systems, shaped around how your team already works." },
+    { "category": "software", "q": "Do you develop websites and mobile applications?", "a": "Yes. We build business websites, web applications and Android and iOS apps. Where it makes sense we plan them together so the website, web platform and app stay consistent." },
+    { "category": "software", "q": "Can you integrate AI into existing business operations?", "a": "Often, yes. We first look at where AI genuinely helps, such as answering routine questions from approved information or summarising documents, and where a simpler solution is better. People stay in the loop for decisions that matter, and data handling is agreed before anything is built." },
+    { "category": "software", "q": "Do you provide business automation solutions?", "a": "Yes. We connect the tools you already use so enquiries, follow-ups and records move without manual re-entry, for example creating a record, notifying the right person and scheduling a follow-up automatically." },
+    { "category": "software", "q": "Can you upgrade or maintain existing software?", "a": "We can review existing software and discuss improving, extending or maintaining it. What is possible depends on the technology and the condition of the code, so we recommend sharing details with us first and we will tell you honestly what we can do." },
+
+    { "category": "delivery", "q": "How do I get started with a project?", "a": "Send an enquiry through the Contact page, or reach us on WhatsApp, phone or email. We will arrange a conversation to understand your needs, then follow up with a written scope and estimate before any work begins." },
+    { "category": "delivery", "q": "How do you understand and analyse client requirements?", "a": "We listen first, ask questions about your goals, users and constraints, and write the problem down in plain language. We then agree a written scope with you, so everyone knows what will be built." },
+    { "category": "delivery", "q": "How long does it take to complete a project?", "a": "It depends on the size and complexity of the work. We do not quote a fixed duration without understanding your requirements. Once the scope is agreed, we share a realistic timeline for your project and keep you updated if anything changes." },
+    { "category": "delivery", "q": "Can I request changes during development?", "a": "Yes. We build in small steps and show working progress, so feedback arrives early. Changes are discussed openly, and if a change affects scope, time or cost, we explain how before going ahead." },
+    { "category": "delivery", "q": "Will I be involved throughout the development process?", "a": "Yes. You have one point of contact, and we share progress regularly so you can review, give feedback and approve key stages. How often we meet is agreed with you at the start." },
+
+    { "category": "pricing", "q": "How do you determine project costs?", "a": "Costs depend on the scope: what needs to be built, its complexity, the technology involved and the time required. We estimate after understanding your requirements, and the estimate is shared in writing before work starts." },
+    { "category": "pricing", "q": "Do you provide customised quotations?", "a": "Yes. Every quotation is prepared for your specific requirements, because projects differ. Please describe what you need through the Contact page and we will respond with the next steps." },
+    { "category": "pricing", "q": "Are there any recurring or additional charges?", "a": "Some services have ongoing costs, for example hosting, third-party licences, or support and maintenance. We discuss these up front so you know what to expect. Any additional work outside the agreed scope is discussed with you before it is started." },
+    { "category": "pricing", "q": "Can I choose services based on my budget?", "a": "Yes. Tell us your budget and priorities, and we can suggest what to build first and what can wait, so you get value without paying for features you do not need." },
+
+    { "category": "support", "q": "Do you provide support after project delivery?", "a": "Support options are discussed before you sign off, not after. What is included and for how long is agreed in writing for each project." },
+    { "category": "support", "q": "Do you offer ongoing maintenance and updates?", "a": "Yes, where required. Ongoing maintenance, updates and improvements can be arranged after delivery. The scope and terms are agreed with you so they match your needs." },
+    { "category": "support", "q": "How can I contact your support team?", "a": "Use the Contact page, WhatsApp, phone or email listed on the website. For a live project, you also have your project contact. Support arrangements and response expectations are agreed per project." },
+    { "category": "support", "q": "What happens if I encounter an issue after deployment?", "a": "Report it to us through your agreed support channel with as much detail as you can, such as what you were doing and any messages shown. We will look into it and tell you what we find and what the fix involves." },
+
+    { "category": "partnerships", "q": "Does LAX360 Ventures offer business partnerships?", "a": "We work with partners and associated companies, and our Our Network page shows how those relationships are described. Each relationship is agreed individually, and authorized-partner status applies only where it is stated." },
+    { "category": "partnerships", "q": "How can a company become a technology or business partner?", "a": "Contact us through the Contact page and choose the partnership enquiry type. Tell us about your company and what you have in mind, and our team will respond to discuss whether and how we can work together." },
+    { "category": "partnerships", "q": "Do you collaborate with startups and growing businesses?", "a": "Yes. We work with startups and growing businesses as well as established ones. Share your idea, stage and budget, and we will suggest a practical way to start, without pushing more than you need." }
+  ]
+}

@@ -11,6 +11,7 @@
     python -m app.cli check-ai
     python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
+    python -m app.cli seed-faqs [--remove]                      (load the home page FAQ questions and categories into the CMS so they can be edited; --remove deletes only those)
     python -m app.cli seed-sample-testimonials [--remove]       (add / remove the six fictional placeholder testimonials; never touches real ones)
     python -m app.cli seed-sample-clients [--remove]            (add / remove the six placeholder "Our Clients" entries; never touches real clients)
 
@@ -347,6 +348,42 @@ def seed_sample_testimonials(args: argparse.Namespace) -> None:
         print(f"Added {added} sample testimonial(s) ({len(SAMPLE_TESTIMONIALS) - added} already present). They are fictional placeholders: edit or delete them in the admin panel (Website content > Testimonials).")
 
 
+def seed_faqs(args: argparse.Namespace) -> None:
+    """Load the home page FAQ (frontend/src/data/faqs.json) into the CMS as categories and questions, so administrators can edit, reorder and unpublish them.
+    Idempotent: rows are identified by slug (category slugs as written; questions "seed-faq-NN"). --remove deletes only those rows."""
+    import json
+    from pathlib import Path
+
+    from app.models import ContentItem
+
+    src = Path(__file__).resolve().parents[2] / "frontend" / "src" / "data" / "faqs.json"
+    data = json.loads(src.read_text(encoding="utf8"))
+    get_settings()
+    with _factory()() as db:
+        cat_slugs = {c["slug"] for c in data["categories"]}
+        q_slugs = {f"seed-faq-{n:02d}" for n in range(1, len(data["items"]) + 1)}
+        existing = {(i.kind, i.slug): i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(["faq_category", "faq"])))}
+        if args.remove:
+            gone = [i for (kind, slug), i in existing.items() if (kind == "faq_category" and slug in cat_slugs) or (kind == "faq" and slug in q_slugs)]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} seeded FAQ row(s). Questions you added yourself were not touched.")
+            return
+        added = 0
+        for n, cat in enumerate(data["categories"], start=1):
+            if ("faq_category", cat["slug"]) not in existing:
+                db.add(ContentItem(kind="faq_category", slug=cat["slug"], title=cat["title"], data={"description": cat.get("description", "")}, status="published", sort_order=n * 10))
+                added += 1
+        for n, item in enumerate(data["items"], start=1):
+            slug = f"seed-faq-{n:02d}"
+            if ("faq", slug) not in existing:
+                db.add(ContentItem(kind="faq", slug=slug, title=item["q"], data={"group": "home_only", "category": item["category"], "answer": item["a"]}, status="published", sort_order=n * 10))
+                added += 1
+        db.commit()
+        print(f"Added {added} FAQ row(s) ({len(data['categories']) + len(data['items']) - added} already present). Edit them in the admin panel (Website content > FAQ entries / FAQ categories).")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -386,6 +423,9 @@ def main(argv: list[str] | None = None) -> None:
     st = sub.add_parser("seed-sample-testimonials", help="add (or --remove) six fictional placeholder testimonials for the home page")
     st.add_argument("--remove", action="store_true", help="delete the sample testimonials instead of adding them")
     st.set_defaults(func=seed_sample_testimonials)
+    sf = sub.add_parser("seed-faqs", help="load the home page FAQ categories and questions into the CMS (or --remove them)")
+    sf.add_argument("--remove", action="store_true", help="delete the seeded FAQ rows instead of adding them")
+    sf.set_defaults(func=seed_faqs)
     args = parser.parse_args(argv)
     try:
         args.func(args)

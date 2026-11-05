@@ -15,17 +15,17 @@ const PHOTO = {
 }
 
 /** Home "Our Services": heading, short introduction and a card per major service (photo, icon, short description), then a button to the Services page. */
-export default function OurServices() {
+export default function OurServices({ eyebrow = 'What we do', title = 'Our', gradient = 'Services', lead = 'Software, AI, digital growth and CAD engineering from one accountable team — planned, built and supported around how your business works.' }) {
   return (
     <section aria-labelledby="our-services-title" className="wrap section">
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <SectionHeading
           id="our-services-title"
-          eyebrow="What we do"
-          title="Our"
-          gradient="Services"
+          eyebrow={eyebrow}
+          title={title}
+          gradient={gradient}
           bot
-          lead="Software, AI, digital growth and CAD engineering from one accountable team — planned, built and supported around how your business works."
+          lead={lead}
         />
         <Reveal delay={0.1} className="shrink-0"><Button to="/services" arrow>View All Services</Button></Reveal>
       </div>

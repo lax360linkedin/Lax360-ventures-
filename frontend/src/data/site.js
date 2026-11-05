@@ -11,12 +11,12 @@ export const site = {
   locations: branchLine, // Salem · Bangalore · Mumbai (see data/branches.js)
   branches,
   email: 'lax360tech@gmail.com', // [Confirm] a domain email for Ventures is recommended
+  // Official branch phone numbers (see data/branches.js for the full address of each branch).
   phones: [
-    { display: '95666 79928', tel: '+919566679928' },
-    { display: '95666 79958', tel: '+919566679958' },
+    { display: '+91 95666 79928', tel: '+919566679928', label: 'Salem & Bangalore' },
+    { display: '+91 95666 05272', tel: '+919566605272', label: 'Mumbai' },
   ],
-  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '919566679958',
-  address: branches[0].address, // Salem — the only branch with an address on file
+  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '919566679928',
   // Handles come from the planning document; Facebook has no confirmed handle so it is omitted.
   social: [
     { label: 'Instagram', href: 'https://www.instagram.com/lax360pvtltd' },
@@ -31,8 +31,6 @@ export const site = {
 export const needsConfirmation = [
   'Footer legal wording (brand of LAX360 Pvt Ltd)',
   'Domain email for LAX360 Ventures',
-  'Bangalore and Mumbai street addresses (none shown until supplied)',
-  'Salem address (copied from lax360.in)',
   'Social URLs (Instagram, LinkedIn, X) and the Facebook handle',
   'Business hours and response-time promise',
   'Digital marketing and CAD scope',

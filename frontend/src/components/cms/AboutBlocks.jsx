@@ -9,7 +9,7 @@ const TITLES = { vision: 'Our vision', mission: 'Our mission' }
 export function useAboutBlocks() {
   const items = useContent('about_block')
   const by = (type) => (items || []).filter((i) => i.data.block === type)
-  return { any: Boolean(items), intro: by('intro'), vision: by('vision'), mission: by('mission'), values: by('value'), achievements: by('achievement'), team: by('team'), images: by('image') }
+  return { any: Boolean(items), intro: by('intro'), vision: by('vision'), mission: by('mission'), story: by('story'), values: by('value'), achievements: by('achievement'), team: by('team'), images: by('image') }
 }
 
 export function AboutIntro({ blocks }) {
@@ -29,9 +29,9 @@ export function AboutIntro({ blocks }) {
   )
 }
 
-export function AboutMore({ blocks }) {
-  const visionMission = [...blocks.vision, ...blocks.mission]
-  if (!(visionMission.length || blocks.values.length || blocks.achievements.length || blocks.team.length || blocks.images.length)) return null
+export function AboutMore({ blocks, skipVisionMission = false, skipValues = false }) {
+  const visionMission = skipVisionMission ? [] : [...blocks.vision, ...blocks.mission]
+  if (!(visionMission.length || (!skipValues && blocks.values.length) || blocks.achievements.length || blocks.team.length || blocks.images.length)) return null
   return (
     <>
       {visionMission.length > 0 && (
@@ -39,7 +39,7 @@ export function AboutMore({ blocks }) {
           {visionMission.map((b) => <Reveal key={b.id} className="glass-flat p-6 md:p-8"><p className="eyebrow text-lav">{TITLES[b.data.block]}</p><h3 className="mt-3 font-display text-2xl font-semibold">{b.title}</h3><p className="mt-3 whitespace-pre-line text-soft">{b.data.text}</p></Reveal>)}
         </div></section>
       )}
-      {blocks.values.length > 0 && (
+      {!skipValues && blocks.values.length > 0 && (
         <section className="wrap section" aria-labelledby="values-title"><SectionHeading id="values-title" eyebrow="What we stand for" title="Our" gradient="values." />
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{blocks.values.map((b, i) => <Reveal as="li" key={b.id} delay={i * 0.05} className="glass-flat p-6"><h3 className="font-display text-xl font-semibold">{b.title}</h3><p className="mt-2 text-soft">{b.data.text}</p></Reveal>)}</ul>
         </section>

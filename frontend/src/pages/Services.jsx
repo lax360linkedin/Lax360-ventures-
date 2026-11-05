@@ -15,7 +15,7 @@ import { useFaqs } from '../hooks/useSite.js'
  * six category sections in varied layouts (each links to its detail page / anchor), process, FAQ and an enquiry CTA.
  */
 export default function Services() {
-  const faqs = useFaqs('home', servicesFaq)
+  const faqs = useFaqs('services', servicesFaq)
   return (
     <PageContainer
       path="/services"

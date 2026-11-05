@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('6173bc40-2db8-47e0-9d35-e6a112d64553', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('c39a3454-4c8c-4707-a411-f3dccaa4f462', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('3b01944f-fe8f-41ad-b8e0-574b97be33a8', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('fdf73253-5545-4ffa-a792-09a1e2b51412', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('1c943ebc-d037-40f8-8f96-6ca697dabdfe', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('0d55a04c-9b2f-43b0-9104-906888f92314', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -497,6 +497,22 @@ CREATE UNIQUE INDEX uq_hero_videos_one_fallback ON hero_videos (is_fallback) WHE
 CREATE INDEX ix_hero_videos_deleted_at ON hero_videos (deleted_at);
 
 UPDATE alembic_version SET version_num='0009' WHERE alembic_version.version_num = '0008';
+
+-- Running upgrade 0009 -> 0010
+
+UPDATE branches SET address='1st Floor, 16, CPS Tower
+Advaitha Ashram Road, Fairlands
+Salem, Tamil Nadu – 636004', phone='+91 95666 79928' WHERE branches.slug = 'salem';
+
+UPDATE branches SET address='472/7, 20th L Cross Road
+AVS Layout, Koramangala
+Bengaluru, Karnataka – 560034', phone='+91 95666 79928' WHERE branches.slug = 'bangalore';
+
+UPDATE branches SET address='Level 4, Dynasty Business Park
+Andheri–Kurla Road, A-Wing, J. B. Nagar
+Andheri East, Mumbai, Maharashtra – 400059', phone='+91 95666 05272' WHERE branches.slug = 'mumbai';
+
+UPDATE alembic_version SET version_num='0010' WHERE alembic_version.version_num = '0009';
 
 COMMIT;
 

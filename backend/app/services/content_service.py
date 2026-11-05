@@ -31,8 +31,11 @@ def F(name, label, kind="text", required=False, max_len=300, options=None, help=
 DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & Apps"), ("ai", "AI & Automation"), ("growth", "Digital Growth"), ("engineering", "CAD & Engineering"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
     ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
-    ("ai", "AI spotlight"), ("process", "How we work"),
+    ("process", "How we work"),
     ("faq", "FAQ"), ("contact", "Contact call-to-action"))]
+ABOUT_SECTIONS = [{"value": v, "label": l} for v, l in (
+    ("story", "Our story"), ("motto", "Our motto"), ("purpose", "Mission & vision"), ("expertise", "Core expertise"), ("features", "Our features"),
+    ("values", "Our values"), ("technology", "Our approach to technology"), ("cta", "Final call to action"))]
 PAGES = [{"value": v, "label": l} for v, l in (("home", "Home"), ("about", "About"), ("services", "Services"), ("industries", "Industries"), ("insights", "Insights"), ("network", "Our Network"), ("team", "Our Team"),
                                               ("work", "Work"), ("career", "Career"), ("contact", "Contact"))]
 NETWORK_CATEGORIES = [{"value": v, "label": l} for v, l in (("authorized", "Authorized Partners"), ("technology", "Technology Partners"), ("associated", "Associated Companies"), ("collaboration", "Strategic Collaborations"))]
@@ -65,11 +68,25 @@ KINDS: dict[str, dict] = {
             F("key", "Section", "select", True, options=SECTION_KEYS), F("enabled", "Show this section", "bool", default=True),
         ],
     },
+    "about_section": {
+        "label": "About page sections", "group": "About", "module": "content", "single": False, "slug_field": "key", "preview_path": "/about",
+        "help": "Show or hide a section of the About page. A section you do not list stays visible. Publish an item to apply it; untick \"Show this section\" to hide the section.",
+        "title_label": "Name (for you)",
+        "fields": [F("key", "Section", "select", True, options=ABOUT_SECTIONS), F("enabled", "Show this section", "bool", default=True)],
+    },
+    "faq_category": {
+        "label": "FAQ categories", "group": "Homepage", "module": "content", "single": False, "preview_path": "/",
+        "help": "The headings the home page FAQ is organised under (for example Pricing & Payments). Add, rename, reorder or remove them freely; a question without a category appears under \"General\".",
+        "title_label": "Category name",
+        "fields": [F("description", "Short description (optional)", "textarea", max_len=200)],
+    },
     "faq": {
         "label": "FAQ entries", "group": "Homepage", "module": "content", "single": False, "preview_path": "/",
-        "help": "Shown in the FAQ accordions. If a group has no published entries the website's built-in questions are used.",
+        "help": "The questions in the home page FAQ and the Services page FAQ. Choose a category and where each question appears; use the order number to arrange questions within a category, "
+                "and unpublish one to hide it. If nothing is published for a page, the website's built-in questions are used.",
         "fields": [
-            F("group", "Where it appears", "select", True, options=[{"value": "home", "label": "Home page & Services page"}]),
+            F("group", "Where it appears", "select", True, options=[{"value": "home", "label": "Home page & Services page"}, {"value": "home_only", "label": "Home page only"}, {"value": "services_only", "label": "Services page only"}]),
+            F("category", "Category", "select", False, options_from="faq_category"),
             F("answer", "Answer", "textarea", True, max_len=1500),
         ],
         "title_label": "Question",
@@ -98,11 +115,11 @@ KINDS: dict[str, dict] = {
     "about_block": {
         "label": "About Us content", "group": "About", "module": "content", "single": False, "preview_path": "/about",
         "help": "Company introduction, vision, mission, values, achievements, team members and images for the About page. "
-                "When at least one block is published, the About page shows these in place of its built-in company text.",
+                "When at least one block is published, the About page shows these in place of its built-in text: introduction, vision and mission replace those panels; \"Our story step\" blocks (in order) replace the story timeline; company values replace the values cards.",
         "title_label": "Heading / name",
         "fields": [
             F("block", "Type", "select", True, options=[{"value": v, "label": l} for v, l in (("intro", "Company introduction"), ("vision", "Vision"), ("mission", "Mission"),
-                                                                                              ("value", "Company value"), ("achievement", "Achievement"), ("team", "Team member"), ("image", "Image"))]),
+                                                                                              ("story", "Our story step"), ("value", "Company value"), ("achievement", "Achievement"), ("team", "Team member"), ("image", "Image"))]),
             F("text", "Text", "textarea", max_len=2000), F("role", "Role / figure (team members, achievements)", max_len=120), F("image", "Image", "image"),
         ],
     },

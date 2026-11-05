@@ -49,7 +49,7 @@ SOLUTIONS = [
 PROCESS = "Typical process: Discover (listen and write down the problem), Design (experience, architecture and a written scope), Develop (build in steps with early feedback), Deploy & Improve."
 
 CONTACT = (
-    "Official contact details listed on the website: email lax360tech@gmail.com; phone 95666 79928 and 95666 79958; WhatsApp is available from the website's WhatsApp button; "
+    "Official contact details listed on the website: email lax360tech@gmail.com; phone +91 95666 79928 (Salem and Bangalore) and +91 95666 05272 (Mumbai); WhatsApp is available from the website's WhatsApp button; "
     "an enquiry form at /contact. Instagram: lax360pvtltd; LinkedIn: lax360-pvt-ltd; X: lax360tech."
 )
 
@@ -67,7 +67,6 @@ UNCONFIRMED = [
     "course fees, schedules, certificates, placement promises",
     "client names, case studies, results or statistics (none are published yet)",
     "partnerships, certifications, awards or guarantees (do NOT claim any, and never claim an official OpenAI partnership)",
-    "street addresses or phone numbers for the Bangalore and Mumbai branches (none supplied yet)",
     "the exact scope of Digital Growth and CAD & Engineering services (still being confirmed)",
 ]
 
@@ -75,10 +74,11 @@ UNCONFIRMED = [
 def _branch_lines(branches: Iterable[Branch]) -> list[str]:
     lines = []
     for b in branches:
+        phone = f"; phone {b.phone}" if b.phone else ""
         if b.address:
-            lines.append(f"- {b.city}: {', '.join(l.strip() for l in b.address.splitlines() if l.strip())} (address as on the website; still to be confirmed)")
+            lines.append(f"- {b.city}: {', '.join(l.strip() for l in b.address.splitlines() if l.strip())}{phone} (official branch details)")
         else:
-            lines.append(f"- {b.city}: branch confirmed; street address not yet published")
+            lines.append(f"- {b.city}: branch confirmed; street address not yet published{phone}")
     return lines
 
 

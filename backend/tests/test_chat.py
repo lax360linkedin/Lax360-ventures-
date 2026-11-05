@@ -73,7 +73,8 @@ def test_company_knowledge_is_verified_and_does_not_invent(client, ai):
     say(client)
     text = ai.responses.calls[0]["instructions"]
     assert "Never claim LAX360 Ventures is an official OpenAI partner" in text
-    assert "not yet published" in text  # Bangalore / Mumbai addresses are not invented
+    assert "Dynasty Business Park" in text and "+91 95666 05272" in text and "CPS Tower" in text  # the assistant is told the official branch addresses and phones (from the database)
+    assert "not yet published" not in text
     assert "Tamil" in text and "Thanglish" in text
     assert "NOT CONFIRMED" in text and "pricing" in text
 

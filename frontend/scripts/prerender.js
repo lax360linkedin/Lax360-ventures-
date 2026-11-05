@@ -18,6 +18,17 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').repl
 // JSON inside <script> must not contain "</script>" or HTML comment openers.
 const json = (o) => JSON.stringify(o).replace(/</g, '\\u003c')
 
+const REGION = { Salem: 'Tamil Nadu', Bangalore: 'Karnataka', Mumbai: 'Maharashtra' }
+/** Structured-data postal address from a branch's address lines (last line ends with the PIN code). */
+const postal = (b) => ({
+  '@type': 'PostalAddress',
+  streetAddress: b.address.slice(0, -1).join(', '),
+  addressLocality: b.city === 'Bangalore' ? 'Bengaluru' : b.city,
+  addressRegion: REGION[b.city],
+  postalCode: (b.address.at(-1).match(/(\d{6})\s*$/) || [])[1],
+  addressCountry: 'IN',
+})
+
 const organization = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -27,13 +38,9 @@ const organization = {
   logo: `${SITE}/assets/logo-shield.png`,
   email: site.email,
   telephone: site.phones.map((p) => p.tel),
-  address: { '@type': 'PostalAddress', streetAddress: '1st Floor, 16, CPS Tower, Advaitha Ashram Rd, Fairlands', addressLocality: 'Salem', addressRegion: 'Tamil Nadu', postalCode: '636007', addressCountry: 'IN' },
-  // One Place per branch. Street details are included only where they exist in data/branches.js (Salem).
-  location: site.branches.map((b) => ({
-    '@type': 'Place',
-    name: b.name,
-    address: { '@type': 'PostalAddress', addressLocality: b.city, addressCountry: 'IN' },
-  })),
+  address: postal(site.branches[0]),
+  // One Place per branch, with the official address and phone from data/branches.js.
+  location: site.branches.map((b) => ({ '@type': 'Place', name: b.name, telephone: b.tel, hasMap: b.mapUrl, address: postal(b) })),
   sameAs: site.social.map((s) => s.href),
 }
 

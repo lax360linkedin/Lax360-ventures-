@@ -10,7 +10,7 @@ def test_content_kinds_describe_only_what_the_site_actually_uses(app, db):
     admin, _, _ = staff(app, db, permissions=["content"])
     body = admin.get("/api/admin/content/kinds").json()
     # an admin who only holds the `content` module sees the homepage / about / portfolio kinds; services, careers and navigation are separate modules
-    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "faq", "about_block", "industry", "network_partner", "team_member", "article", "client", "testimonial", "project"]
+    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_partner", "team_member", "article", "client", "testimonial", "project"]
     assert all(f["name"] for k in body["kinds"] for f in k["fields"])
     assert admin.get("/api/admin/content/pricing_table").status_code == 404  # not a managed section
 
@@ -250,3 +250,36 @@ def test_testimonials_are_managed_typed_reorderable_unpublishable_and_deletable(
     assert edited["quote"] == "Edited." and not edited.get("is_sample")
     assert admin.delete(f"/api/admin/content/item/{ids[1]}", headers=csrf).status_code in (200, 204)
     assert client.get("/api/public/content?kind=testimonial").json()["items"] == []
+
+
+def test_faq_categories_and_where_each_question_appears_are_managed(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    cat = admin.post("/api/admin/content/faq_category", json={"title": "Pricing & Payments", "data": {"description": "Costs"}, "status": "published", "sort_order": 1}, headers=csrf)
+    assert cat.status_code == 201
+    slug = cat.json()["slug"]
+    base = {"group": "home_only", "category": slug, "answer": "It depends on the scope."}
+    ok = admin.post("/api/admin/content/faq", json={"title": "How do you set costs?", "data": base, "status": "published", "sort_order": 1}, headers=csrf)
+    assert ok.status_code == 201
+    legacy = admin.post("/api/admin/content/faq", json={"title": "Old style entry?", "data": {"group": "home", "answer": "Still valid."}, "status": "published", "sort_order": 2}, headers=csrf)
+    assert legacy.status_code == 201  # entries without a category (the original format) keep working
+    for bad in ({"group": "elsewhere"}, {"category": "no-such-category"}):
+        assert admin.post("/api/admin/content/faq", json={"title": "Bad?", "data": {**base, **bad}, "status": "published", "sort_order": 3}, headers=csrf).status_code == 422, bad
+    public = client.get("/api/public/content?kind=faq").json()["items"]
+    assert [(i["title"], i["data"]["group"], i["data"].get("category")) for i in public] == [("How do you set costs?", "home_only", slug), ("Old style entry?", "home", None)]
+    assert [i["title"] for i in client.get("/api/public/content?kind=faq_category").json()["items"]] == ["Pricing & Payments"]
+    assert admin.patch(f"/api/admin/content/item/{ok.json()['id']}", json={"status": "draft"}, headers=csrf).status_code == 200
+    assert [i["title"] for i in client.get("/api/public/content?kind=faq").json()["items"]] == ["Old style entry?"]
+    assert admin.delete(f"/api/admin/content/item/{cat.json()['id']}", headers=csrf).status_code in (200, 204)
+
+
+def test_about_page_sections_can_be_hidden_and_story_steps_managed(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    hide = {"title": "Hide the motto", "data": {"key": "motto", "enabled": False}, "status": "published", "sort_order": 1}
+    assert admin.post("/api/admin/content/about_section", json=hide, headers=csrf).status_code == 201
+    assert admin.post("/api/admin/content/about_section", json={**hide, "title": "Again"}, headers=csrf).status_code == 409  # one entry per section
+    assert admin.post("/api/admin/content/about_section", json={**hide, "title": "Bad", "data": {"key": "hero", "enabled": False}}, headers=csrf).status_code == 422
+    public = client.get("/api/public/content?kind=about_section").json()["items"]
+    assert [(i["data"]["key"], i["data"]["enabled"]) for i in public] == [("motto", False)]
+    step = {"title": "Where it started", "data": {"block": "story", "text": "A first step in the story."}, "status": "published", "sort_order": 1}
+    assert admin.post("/api/admin/content/about_block", json=step, headers=csrf).status_code == 201
+    assert [i["data"]["block"] for i in client.get("/api/public/content?kind=about_block").json()["items"]] == ["story"]

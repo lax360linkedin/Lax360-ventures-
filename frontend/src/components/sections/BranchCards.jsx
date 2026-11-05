@@ -1,10 +1,10 @@
-import { MapPin } from 'lucide-react'
+import { ArrowUpRight, MapPin, Phone } from 'lucide-react'
 import Reveal from '../ui/Reveal.jsx'
 import { branches } from '../../data/branches.js'
 
 /**
  * The three LAX360 Ventures branches as glass cards. Data comes from `data/branches.js`.
- * A street address is shown only when one exists in that data (currently Salem only) — never invented.
+ * Each card shows the official address, a tap-to-call phone number and a Google Maps link for that branch.
  */
 export default function BranchCards({ className = '' }) {
   return (
@@ -21,6 +21,16 @@ export default function BranchCards({ className = '' }) {
               <address className="mt-4 border-t border-edge pt-4 text-sm not-italic leading-relaxed text-soft">
                 {b.address.map((line) => <span key={line} className="block">{line}</span>)}
               </address>
+            )}
+            {b.phone && (
+              <a href={`tel:${b.tel}`} className="mt-3 inline-flex min-h-11 items-center gap-2 self-start font-semibold text-fg hover:text-lav">
+                <Phone className="size-4 text-lav" aria-hidden="true" /> {b.phone}
+              </a>
+            )}
+            {b.mapUrl && (
+              <a href={b.mapUrl} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex min-h-11 items-center gap-1.5 self-start pt-1 text-sm font-semibold text-lav hover:underline">
+                View on Google Maps <ArrowUpRight className="size-4" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span>
+              </a>
             )}
           </article>
         </Reveal>

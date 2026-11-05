@@ -9,16 +9,15 @@ import OurServices from '../components/sections/OurServices.jsx'
 import WhyChooseUs from '../components/sections/WhyChooseUs.jsx'
 import OurClients from '../components/sections/OurClients.jsx'
 import Testimonials from '../components/sections/Testimonials.jsx'
-import AiSpotlight from '../components/sections/AiSpotlight.jsx'
-import ProcessTimeline from '../components/sections/ProcessTimeline.jsx'
+import ProcessWorkflow from '../components/sections/ProcessWorkflow.jsx'
 import FaqSection from '../components/sections/FaqSection.jsx'
 import ContactCta from '../components/sections/ContactCta.jsx'
 
 // The built-in home page sections, in their default order. The admin panel can re-order and hide them (Website content > Home page sections).
-const DEFAULT_ORDER = ['marquee', 'whoweare', 'services', 'outcomes', 'clients', 'testimonials', 'ai', 'process', 'faq', 'contact']
+const DEFAULT_ORDER = ['marquee', 'whoweare', 'services', 'outcomes', 'clients', 'testimonials', 'process', 'faq', 'contact']
 const SECTIONS = {
   marquee: <Marquee />, whoweare: <WhoWeAre />, services: <OurServices />, outcomes: <WhyChooseUs />, clients: <OurClients />, testimonials: <Testimonials />,
-  ai: <AiSpotlight />, process: <ProcessTimeline />, faq: <FaqSection />, contact: <ContactCta />,
+  process: <ProcessWorkflow />, faq: <FaqSection />, contact: <ContactCta />,
 }
 
 const WelcomeIntro = lazy(() => import('../components/intro/WelcomeIntro.jsx')) // separate chunk

@@ -20,7 +20,7 @@ export default function ContactCta({ defaultType = 'project', title = 'Tell us w
             <li><a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="group flex min-h-14 items-center gap-3 hover:text-white"><MessageCircle className="size-5" aria-hidden="true" /> WhatsApp us <span aria-hidden="true" className="ml-auto transition-transform group-hover:translate-x-1">→</span></a></li>
             <li><a href={`mailto:${site.email}`} className="group flex min-h-14 items-center gap-3 break-all hover:text-white"><Mail className="size-5 shrink-0" aria-hidden="true" /> {site.email}</a></li>
             {site.phones.map((p) => (
-              <li key={p.tel}><a href={`tel:${p.tel}`} className="group flex min-h-14 items-center gap-3 hover:text-white"><Phone className="size-5" aria-hidden="true" /> {p.display}</a></li>
+              <li key={p.tel}><a href={`tel:${p.tel}`} className="group flex min-h-14 items-center gap-3 hover:text-white"><Phone className="size-5" aria-hidden="true" /> {p.display}{p.label && <span className="text-sm opacity-80">({p.label})</span>}</a></li>
             ))}
           </ul>
         </div>
