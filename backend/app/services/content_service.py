@@ -58,6 +58,7 @@ SOFTWARE_OWNERSHIP = [{"value": v, "label": l} for v, l in (("lax360", "Develope
 TEAM_GROUPS = [{"value": v, "label": l} for v, l in (("leadership", "Founder & Leadership"), ("management", "Management Team"), ("heads", "Department Heads"), ("software", "Software Development Team"),
                                                     ("ai", "AI & Automation Team"), ("marketing", "Digital Marketing Team"))]
 TEAM_LEADERSHIP_ROLES = [{"value": v, "label": l} for v, l in (("managing_director", "Managing Director"), ("founder", "Founder / Co-Founder"), ("technical_director", "Technical Director"), ("department_head", "Department Head"), ("leadership", "Other leadership"))]
+TEAM_DEPARTMENTS = [{"value": v, "label": l} for v, l in (("software-development", "Software Development"), ("ai-automation", "AI & Automation"), ("digital-marketing", "Digital Marketing"), ("business-operations", "Business & Operations"))]
 TEAM_GALLERY_CATEGORIES = [{"value": v, "label": l} for v, l in (("activities", "Team activities"), ("office", "Office environment"), ("celebrations", "Team celebrations"), ("workshops", "Technical workshops"),
                                                                 ("knowledge", "Knowledge-sharing sessions"), ("learning", "Learning & development"), ("achievements", "Employee achievements"))]
 ARTICLE_CATEGORIES =[{"value": v, "label": l} for v, l in (("ai", "Artificial Intelligence & Generative AI"), ("software", "Software Development & Technology"), ("automation", "Business Automation"),
@@ -218,7 +219,7 @@ KINDS: dict[str, dict] = {
         "title_label": "Name", "public_filter": ("active", False, "exclude"),
         "fields": [
             F("leadership_role", "Leadership role", "select", False, options=TEAM_LEADERSHIP_ROLES, help="Set this to show the person in the Leadership section. Leave empty for a regular team member."),
-            F("department", "Department", "select", False, options_from="team_department", help="Departments are managed under Team > Departments."),
+            F("department", "Department", "select", False, options=TEAM_DEPARTMENTS, options_from="team_department", help="The four standard departments, plus any you add under Team > Departments."),
             F("group", "Team group (optional)", "select", False, options=TEAM_GROUPS, help="Older grouping, kept for existing profiles."),
             F("designation", "Designation", "text", True, max_len=120),
             F("bio", "Short biography", "textarea", max_len=800),
