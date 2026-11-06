@@ -99,10 +99,44 @@ export function useSoftware() {
   return useMemo(() => (items || softwareEntries).map((i) => ({ slug: i.slug, name: i.title, vendor: i.data.vendor || '', category: i.data.software_category || 'other', ownership: i.data.ownership || 'third_party', description: i.data.description || '', link: i.data.product_link || '', cta: i.data.cta_link || '' })), [items])
 }
 
-/** Team profiles published in the admin panel (there are no built-in profiles), in the order set there. */
+const csv = (text) => String(text || '').replace(/\s*[\r\n]+\s*/g, ',').split(',').map((t) => t.trim()).filter(Boolean)
+
+/** Team profiles published in the admin panel (there are no built-in profiles), in the order set there. Deactivated profiles never reach the website. */
 export function useTeam() {
   const items = useContent('team_member')
-  return useMemo(() => (items || []).map((i) => ({ slug: i.slug, name: i.title, group: i.data.group, designation: i.data.designation, bio: i.data.bio, photo: i.data.photo, photoAlt: i.data.photo_alt || '', linkedin: i.data.linkedin_link })), [items])
+  return useMemo(() => (items || []).map((i) => {
+    const d = i.data || {}
+    return {
+      slug: i.slug, name: i.title, designation: d.designation || '', bio: d.bio || '', photo: d.photo || '', photoAlt: d.photo_alt || '', group: d.group || '',
+      leadershipRole: d.leadership_role || '', department: d.department || '', expertise: csv(d.expertise), featured: d.featured === true,
+      isLeader: Boolean(d.leadership_role) || ['leadership', 'management', 'heads'].includes(d.group),
+      links: [['linkedin', d.linkedin_link], ['x', d.twitter_link], ['github', d.github_link], ['instagram', d.instagram_link]].filter(([, href]) => href).map(([platform, href]) => ({ platform, href })),
+    }
+  }), [items])
+}
+
+/** Departments created in the admin panel (name, description, roles, image). */
+export function useTeamDepartments() {
+  const items = useContent('team_department')
+  return useMemo(() => (items || []).map((i) => ({ slug: i.slug, name: i.title, description: i.data.description || '', roles: lines(i.data.roles), image: i.data.image || '', imageAlt: i.data.image_alt || '' })), [items])
+}
+
+/** Genuine team & culture photographs published in the admin panel. */
+export function useTeamGallery() {
+  const items = useContent('team_gallery')
+  return useMemo(() => (items || []).filter((i) => i.data.image).map((i) => ({ slug: i.slug, caption: i.title, category: i.data.category || 'activities', image: i.data.image, alt: i.data.image_alt || i.title, text: i.data.description || '' })), [items])
+}
+
+/** Expertise groups published in the admin panel, or null to use the built-in list. */
+export function useTeamExpertise() {
+  const items = useContent('team_expertise')
+  return useMemo(() => (items ? items.map((i) => ({ title: i.title, text: i.data.description || '', tags: csv(i.data.tags) })) : null), [items])
+}
+
+/** Hero and section text of the Our Team page (admin panel > Team > Our Team page text); every field is optional. */
+export function useTeamPageText() {
+  const items = useContent('team_page')
+  return useMemo(() => items?.[0]?.data || {}, [items])
 }
 
 /** The home page FAQ: categories and questions published in the admin panel (Website content > FAQ entries / FAQ categories), otherwise the built-in set. */

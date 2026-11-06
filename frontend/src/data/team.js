@@ -1,10 +1,57 @@
-// Our Team: the teams shown on the page, in order. People are added in the admin panel (Website content > Team); there are no built-in
-// profiles, because names, photos and biographies must come from the real team. A team with no published profiles shows its description only.
-export const teamGroups = [
-  { value: 'leadership', label: 'Founder & Leadership', text: 'The people who set the direction of LAX360 Ventures.' },
-  { value: 'management', label: 'Management Team', text: 'Running delivery, operations and client relationships across our branches.' },
-  { value: 'heads', label: 'Department Heads', text: 'Leading each department and keeping standards consistent.' },
-  { value: 'software', label: 'Software Development Team', text: 'Building custom software, websites, web apps and mobile apps.' },
-  { value: 'ai', label: 'AI & Automation Team', text: 'Designing AI assistants and automating business workflows.' },
-  { value: 'marketing', label: 'Digital Marketing Team', text: 'Search, social media, performance campaigns and content.' },
+// Our Team: structure and default wording only. People, photographs, biographies and culture photos come from the admin panel
+// (Website content > Team) — there are no built-in profiles, because they must be real and verified.
+
+export const teamText = {
+  heroEyebrow: 'Our Team',
+  heroTitle: 'The People Behind Innovation.',
+  heroLead: 'Engineers, AI specialists, marketers and operators working as one team. The expertise, creativity and technology behind LAX360 Ventures come from the people who build it every day.',
+  leadershipTitle: 'Leadership Team',
+  leadershipLead: 'The people who set the direction of LAX360 Ventures and keep every department accountable.',
+  departmentsTitle: 'Our Departments',
+  departmentsLead: 'Four departments, one accountable team: from software and AI to marketing and client operations.',
+  directoryTitle: 'Meet Our Team',
+  directoryLead: 'The specialists who design, build, market and support what we deliver.',
+  cultureTitle: 'Our People & Culture',
+  cultureLead: 'How we work, learn and celebrate together.',
+  expertiseTitle: 'Our Expertise',
+  expertiseLead: 'The technical and professional capabilities the team brings to every project.',
+  careersTitle: 'Build Your Future With Us.',
+  careersLead: 'Join a team that works across software, AI and digital growth. Explore where you could fit, or send us your details.',
+}
+
+export const leadershipRoles = {
+  managing_director: { label: 'Managing Director', rank: 0 },
+  founder: { label: 'Founder / Co-Founder', rank: 1 },
+  technical_director: { label: 'Technical Director', rank: 2 },
+  department_head: { label: 'Department Head', rank: 3 },
+  leadership: { label: 'Leadership', rank: 4 },
+}
+
+// The four departments (used until departments are managed in the admin panel; a department created there with the same name replaces it).
+export const defaultDepartments = [
+  { slug: 'software-development', name: 'Software Development', icon: 'code', description: 'Designing and building custom software, websites, web platforms and mobile apps.', roles: ['Full Stack Developers', 'Frontend Developers', 'Backend Developers', 'Mobile Application Developers'] },
+  { slug: 'ai-automation', name: 'AI & Automation', icon: 'bot', description: 'Creating AI-powered applications and automating business workflows.', roles: ['AI Engineers', 'AI Application Developers', 'AI Agents & Automation Specialists'] },
+  { slug: 'digital-marketing', name: 'Digital Marketing', icon: 'megaphone', description: 'Growing visibility and demand through search, paid media, social and content.', roles: ['Digital Marketing Managers', 'SEO Specialists', 'Google & Meta Ads Specialists', 'Social Media Managers', 'Content Creators'] },
+  { slug: 'business-operations', name: 'Business & Operations', icon: 'briefcase', description: 'Keeping clients, projects and people supported from first conversation to delivery.', roles: ['Business Development', 'Sales & Client Relations', 'Project Managers', 'HR & Operations'] },
+]
+
+export const defaultExpertise = [
+  { title: 'React & JavaScript', icon: 'code', tags: ['React', 'JavaScript', 'Modern web interfaces'] },
+  { title: 'Python & FastAPI', icon: 'server', tags: ['Python', 'FastAPI', 'REST APIs'] },
+  { title: 'AI & Generative AI', icon: 'sparkles', tags: ['AI assistants', 'Generative AI', 'AI agents'] },
+  { title: 'Machine Learning', icon: 'brain', tags: ['Machine learning', 'Data-driven features'] },
+  { title: 'SaaS & API Development', icon: 'layers', tags: ['SaaS platforms', 'API development', 'Integrations'] },
+  { title: 'Cloud Technologies', icon: 'cloud', tags: ['Cloud hosting', 'Deployment', 'Databases'] },
+  { title: 'Business Automation', icon: 'workflow', tags: ['Workflow automation', 'Process automation'] },
+  { title: 'Digital Marketing', icon: 'megaphone', tags: ['SEO', 'Paid ads', 'Social media', 'Content'] },
+]
+
+export const cultureCategories = [
+  { value: 'activities', label: 'Team activities' },
+  { value: 'office', label: 'Office environment' },
+  { value: 'celebrations', label: 'Team celebrations' },
+  { value: 'workshops', label: 'Technical workshops' },
+  { value: 'knowledge', label: 'Knowledge-sharing sessions' },
+  { value: 'learning', label: 'Learning & development' },
+  { value: 'achievements', label: 'Employee achievements' },
 ]
