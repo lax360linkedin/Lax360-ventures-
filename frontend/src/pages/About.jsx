@@ -172,18 +172,21 @@ function StoryJourney({ steps }) {
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 70%', 'end 60%'] })
-  const draw = useTransform(scrollYProgress, [0, 1], [0, 1])
+  const drawHeight = useTransform(scrollYProgress, [0, 1], [0, 1000]) // how much of the 1000-unit-tall line is revealed
   const curve = 'M32 0C62 90 2 170 32 260S62 430 32 520S2 690 32 780S62 930 32 1000'
   return (
     <section className="border-y border-edge bg-gradient-to-b from-violet-50/60 via-transparent to-violet-50/40 dark:from-sky-400/[0.05] dark:to-sky-400/[0.04]" aria-labelledby="story-title">
       <div className="wrap section">
         <SectionHeading id="story-title" eyebrow="Our story" title="Built Around Ideas." gradient="Driven by Technology." center />
         <div ref={ref} className="relative mt-12">
-          <svg viewBox="0 0 64 1000" preserveAspectRatio="none" className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-16 -translate-x-1/2 md:block" fill="none" aria-hidden="true" focusable="false">
+          <svg viewBox="0 0 64 1000" preserveAspectRatio="none" className="pointer-events-none absolute inset-y-0 left-1/2 hidden h-full w-16 -translate-x-1/2 md:block" fill="none" aria-hidden="true" focusable="false">
             <path d={curve} stroke="var(--color-edge-strong)" strokeWidth="2" strokeDasharray="3 9" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-            <m.path d={curve} stroke="var(--color-accent)" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength: reduce ? 1 : draw }} />
+            {/* The line "draws itself" by revealing it through a clip that grows down the timeline. (Animating pathLength does not work together with
+                non-scaling-stroke: the dash is then measured in screen pixels, so only a short stub of the line was ever drawn.) */}
+            <defs><clipPath id="story-reveal"><m.rect x="-10" y="0" width="84" height={reduce ? 1000 : drawHeight} /></clipPath></defs>
+            <path d={curve} stroke="var(--color-accent)" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" clipPath="url(#story-reveal)" />
           </svg>
-          <span aria-hidden="true" className="absolute inset-y-0 left-5 w-px bg-gradient-to-b from-lav via-accent to-transparent md:hidden" />
+          <span aria-hidden="true" className="absolute inset-y-0 left-5 w-px bg-gradient-to-b from-lav to-accent md:hidden" />
           <ol className="relative space-y-12 md:space-y-20">
             {steps.map((step, i) => {
               const photoLeft = i % 2 === 0

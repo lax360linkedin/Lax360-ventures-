@@ -225,6 +225,21 @@ def test_team_departments_gallery_page_text_and_deactivated_profiles(app, db, cl
     assert client.get("/api/public/content?kind=team_page").json()["items"][0]["data"]["hero_title"] == "The People Behind Innovation."
 
 
+def test_demo_team_seed_is_valid_flagged_and_complete(app, db):
+    from app import seed_team_demo as demo
+    from app.services import content_service as cs
+
+    slugs = {d["slug"] for d in demo.DEPARTMENTS}
+    assert slugs == {o["value"] for o in cs.TEAM_DEPARTMENTS}
+    for d in demo.DEPARTMENTS:
+        cs._validate(db, "team_department", d["title"], {"description": d["description"], "overview": d["overview"], "roles": "\n".join(d["roles"]), "responsibilities": "\n".join(d["responsibilities"]), "expertise": d["expertise"]})
+        assert sum(1 for p in demo.PEOPLE if p[0] == d["slug"] and p[3]) == 1  # every department has exactly one head
+    assert len({p[1] for p in demo.PEOPLE}) == len(demo.PEOPLE)
+    for dept, name, designation, head, reports, skills, bio in demo.PEOPLE:
+        body = {"department": dept, "designation": designation, "bio": f"{bio} {demo.NOTE}", "expertise": skills, "reports_to": reports, "demo": True, **({"leadership_role": "department_head"} if head else {})}
+        cs._validate(db, "team_member", name, body)  # raises if invalid
+
+
 def test_clients_are_managed_ordered_and_removable_and_never_invented(app, db, client):
     admin, csrf, _ = staff(app, db, permissions=["content"])
     assert client.get("/api/public/content?kind=client").json()["items"] == []  # nothing is shown until an administrator adds a real client

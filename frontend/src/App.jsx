@@ -17,6 +17,7 @@ const Insights = lazy(() => import('./pages/Insights.jsx'))
 const ArticleDetail = lazy(() => import('./pages/ArticleDetail.jsx'))
 const Network = lazy(() => import('./pages/Network.jsx'))
 const Team = lazy(() => import('./pages/Team.jsx'))
+const TeamDepartment = lazy(() => import('./pages/TeamDepartment.jsx'))
 const Projects = lazy(() => import('./pages/Projects.jsx'))
 const Career = lazy(() => import('./pages/Career.jsx'))
 const Contact = lazy(() => import('./pages/Contact.jsx'))
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="insights/:slug" element={<ArticleDetail />} />
         <Route path="our-network" element={<Network />} />
         <Route path="our-team" element={<Team />} />
+        <Route path="our-team/:dept" element={<TeamDepartment />} />
         <Route path="work" element={<Projects />} />
         <Route path="career" element={<Career />} />
         <Route path="contact" element={<Contact />} />

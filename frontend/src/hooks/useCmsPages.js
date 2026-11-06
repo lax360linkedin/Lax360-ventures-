@@ -5,6 +5,7 @@ import { industries, industryVisuals } from '../data/industries.js'
 import { articles, articleCategories, categoryPhotos, legacyCategories } from '../data/articles.js'
 import { networkEntries, softwareEntries } from '../data/network.js'
 import { toParagraphs } from '../utils/cms.js'
+import { defaultDepartments } from '../data/team.js'
 
 const lines = (text) => String(text || '').split('\n').map((s) => s.trim()).filter(Boolean)
 
@@ -108,7 +109,7 @@ export function useTeam() {
     const d = i.data || {}
     return {
       slug: i.slug, name: i.title, designation: d.designation || '', bio: d.bio || '', photo: d.photo || '', photoAlt: d.photo_alt || '', group: d.group || '',
-      leadershipRole: d.leadership_role || '', department: d.department || '', expertise: csv(d.expertise), featured: d.featured === true,
+      leadershipRole: d.leadership_role || '', department: d.department || '', expertise: csv(d.expertise), featured: d.featured === true, reportsTo: d.reports_to || '', demo: d.demo === true,
       isLeader: Boolean(d.leadership_role) || ['leadership', 'management', 'heads'].includes(d.group),
       links: [['linkedin', d.linkedin_link], ['x', d.twitter_link], ['github', d.github_link], ['instagram', d.instagram_link]].filter(([, href]) => href).map(([platform, href]) => ({ platform, href })),
     }
@@ -118,7 +119,16 @@ export function useTeam() {
 /** Departments created in the admin panel (name, description, roles, image). */
 export function useTeamDepartments() {
   const items = useContent('team_department')
-  return useMemo(() => (items || []).map((i) => ({ slug: i.slug, name: i.title, description: i.data.description || '', roles: lines(i.data.roles), image: i.data.image || '', imageAlt: i.data.image_alt || '' })), [items])
+  return useMemo(() => (items || []).map((i) => ({
+    slug: i.slug, name: i.title, description: i.data.description || '', overview: i.data.overview || '', roles: lines(i.data.roles), responsibilities: lines(i.data.responsibilities),
+    expertise: csv(i.data.expertise), image: i.data.image || '', imageAlt: i.data.image_alt || '', demo: i.data.demo === true,
+  })), [items])
+}
+
+/** Departments to show: the ones published in the admin panel, otherwise the four built-in ones. */
+export function useDepartmentList() {
+  const cms = useTeamDepartments()
+  return useMemo(() => (cms.length ? cms : defaultDepartments.map((d) => ({ ...d, image: '', imageAlt: '', demo: false }))), [cms])
 }
 
 /** Genuine team & culture photographs published in the admin panel. */

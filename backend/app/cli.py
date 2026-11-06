@@ -12,7 +12,8 @@
     python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
     python -m app.cli seed-network [--remove]                   (load the Our Network starter content; designations start unverified; --remove deletes only those)
-    python -m app.cli seed-industries [--remove]                (load the 20-industry content into the CMS so it can be edited; --remove deletes only those)
+    python -m app.cli seed-team-demo [--draft|--remove]         (load FICTIONAL demonstration departments and team profiles for review; labelled on the website; --remove deletes only those)
+    python -m app.cli seed-industries [--remove]               (load the 20-industry content into the CMS so it can be edited; --remove deletes only those)
     python -m app.cli seed-products [--remove]                  (load the LAX360 product portfolio into the CMS, all as Coming soon, so it can be edited; --remove deletes only those)
     python -m app.cli seed-faqs [--remove]                      (load the home page FAQ questions and categories into the CMS so they can be edited; --remove deletes only those)
     python -m app.cli seed-sample-testimonials [--remove]       (add / remove the six fictional placeholder testimonials; never touches real ones)
@@ -502,6 +503,47 @@ def seed_network(args: argparse.Namespace) -> None:
         print(f"Added {added} network row(s). Review them in the admin panel (Website content > Network): verify each partner's designation, add official logos you are permitted to use, and adjust the text.")
 
 
+def seed_team_demo(args: argparse.Namespace) -> None:
+    """Load FICTIONAL demonstration departments and team members (flagged "demo", no photos) so the Our Team department pages can be reviewed.
+    Idempotent by slug; existing rows are never overwritten. --remove deletes only the seeded rows. --draft loads them unpublished."""
+    from app import seed_team_demo as data
+    from app.models import ContentItem
+    from app.services.content_service import _slugify
+
+    get_settings()
+    nl = chr(10)
+    dept_slugs = [d["slug"] for d in data.DEPARTMENTS]
+    people = [(p, f"demo-{_slugify(p[1])}") for p in data.PEOPLE]
+    with _factory()() as db:
+        existing = {(i.kind, i.slug): i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(["team_department", "team_member"])))}
+        if args.remove:
+            gone = [existing[k] for k in [("team_department", s) for s in dept_slugs if existing.get(("team_department", s)) and existing[("team_department", s)].data.get("demo")] + [("team_member", s) for _, s in people] if k in existing]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} demonstration row(s). Profiles you added yourself were not touched.")
+            return
+        status = "draft" if args.draft else "published"
+        added = 0
+        for n, d in enumerate(data.DEPARTMENTS, start=1):
+            if ("team_department", d["slug"]) in existing:
+                continue
+            body = {"description": d["description"], "overview": d["overview"], "roles": nl.join(d["roles"]), "responsibilities": nl.join(d["responsibilities"]), "expertise": d["expertise"]}
+            db.add(ContentItem(kind="team_department", slug=d["slug"], title=d["title"], data=body, status="published", sort_order=n * 10))
+            added += 1
+        for n, (p, slug) in enumerate(people, start=1):
+            if ("team_member", slug) in existing:
+                continue
+            dept, name, designation, head, reports, skills, bio = p
+            body = {"department": dept, "designation": designation, "bio": f"{bio} {data.NOTE}", "expertise": skills, "reports_to": reports, "demo": True, "active": True, "featured": False}
+            if head:
+                body["leadership_role"] = "department_head"
+            db.add(ContentItem(kind="team_member", slug=slug, title=name, data=body, status=status, sort_order=n * 10))
+            added += 1
+        db.commit()
+        print(f"Added {added} row(s) ({status}). These are FICTIONAL demonstration profiles (labelled on the website). Replace or delete them in the admin panel (Website content > Team).")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -544,6 +586,10 @@ def main(argv: list[str] | None = None) -> None:
     snet = sub.add_parser("seed-network", help="load the Our Network starter companies (CADPOINT, Fatcat Wealthy, Zoho, OpenAI, Marg ERP, HexBis; designations pending verification), or --remove them")
     snet.add_argument("--remove", action="store_true")
     snet.set_defaults(func=seed_network)
+    std = sub.add_parser("seed-team-demo", help="load FICTIONAL demonstration team departments and members (labelled 'Demonstration profile', no photos), or --remove them")
+    std.add_argument("--remove", action="store_true")
+    std.add_argument("--draft", action="store_true", help="load the demonstration profiles unpublished")
+    std.set_defaults(func=seed_team_demo)
     sc = sub.add_parser("seed-sample-clients", help="add (or --remove) six placeholder 'Our Clients' entries for the home page")
     sc.add_argument("--remove", action="store_true", help="delete the sample clients instead of adding them")
     sc.set_defaults(func=seed_sample_clients)

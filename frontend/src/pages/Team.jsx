@@ -5,37 +5,12 @@ import PageContainer from '../components/layout/PageContainer.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import Button from '../components/ui/Button.jsx'
-import SocialIcon from '../components/layout/SocialIcon.jsx'
+import { Avatar, DemoBadge, EmptyNote, SkillTags, Social } from '../components/team/TeamBits.jsx'
 import { useJobs } from '../components/cms/CmsJobs.jsx'
-import { cultureCategories, defaultDepartments, defaultExpertise, leadershipRoles, teamText } from '../data/team.js'
-import { useTeam, useTeamDepartments, useTeamExpertise, useTeamGallery, useTeamPageText } from '../hooks/useCmsPages.js'
+import { cultureCategories, defaultExpertise, leadershipRoles, teamText } from '../data/team.js'
+import { useTeam, useDepartmentList, useTeamExpertise, useTeamGallery, useTeamPageText } from '../hooks/useCmsPages.js'
 
 const ICONS = { code: Code2, server: Server, sparkles: Sparkles, brain: Brain, layers: Layers, cloud: Cloud, workflow: Workflow, megaphone: Megaphone, bot: Bot, briefcase: Briefcase }
-const SOCIAL_LABEL = { linkedin: 'LinkedIn', x: 'X', github: 'GitHub', instagram: 'Instagram' }
-const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
-const slugOf = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-
-function Avatar({ person, className = 'aspect-[4/5]' }) {
-  return person.photo
-    ? <img src={person.photo} alt={person.photoAlt || person.name} width="600" height="750" loading="lazy" decoding="async" className={`${className} w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]`} />
-    : <div aria-hidden="true" className={`${className} flex w-full items-center justify-center bg-gradient-to-br from-primary/30 to-accent/20 font-display text-5xl font-bold text-fg`}>{initials(person.name)}</div>
-}
-
-function Social({ person }) {
-  if (!person.links.length) return null
-  return (
-    <ul className="mt-3 flex flex-wrap gap-2">
-      {person.links.map((l) => (
-        <li key={l.platform}>
-          <a href={l.href} target="_blank" rel="noopener noreferrer" aria-label={`${person.name} on ${SOCIAL_LABEL[l.platform]} (opens in a new tab)`} className="inline-flex size-11 items-center justify-center rounded-full border border-edge-strong bg-glass text-fg transition-colors hover:border-lav hover:bg-glass-strong hover:text-lav">
-            <SocialIcon platform={l.platform} className="size-4" />
-          </a>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
 function LeaderCard({ p, i, deptName }) {
   const role = leadershipRoles[p.leadershipRole]?.label
   return (
@@ -44,6 +19,7 @@ function LeaderCard({ p, i, deptName }) {
         <div className="overflow-hidden"><Avatar person={p} /></div>
         <div className="flex flex-1 flex-col gap-1 p-6">
           {role && <p className="eyebrow text-lav">{role}</p>}
+          {p.demo && <DemoBadge />}
           <h3 className="font-display text-2xl font-semibold leading-tight">{p.name}</h3>
           <p className="text-sm font-semibold text-soft">{p.designation}{deptName ? ` · ${deptName}` : ''}</p>
           {p.bio && <p className="mt-3 text-soft">{p.bio}</p>}
@@ -65,6 +41,7 @@ function MemberCard({ p, i, deptName }) {
       <article className="glass-flat lift group flex h-full flex-col overflow-hidden">
         <div className="overflow-hidden"><Avatar person={p} className="aspect-square" /></div>
         <div className="flex flex-1 flex-col gap-1 p-5">
+          {p.demo && <DemoBadge />}
           <h3 className="font-display text-xl font-semibold leading-tight">{p.name}</h3>
           <p className="text-sm font-semibold text-lav">{p.designation}</p>
           {deptName && <p className="text-xs font-semibold uppercase tracking-wider text-soft">{deptName}</p>}
@@ -76,14 +53,10 @@ function MemberCard({ p, i, deptName }) {
   )
 }
 
-function EmptyNote({ children }) {
-  return <p role="note" className="rounded-2xl border border-dashed border-edge px-5 py-6 text-soft">{children}</p>
-}
-
 /** Our Team: hero, leadership, departments, directory, culture, expertise and careers. Everything is managed in the admin panel (Website content > Team). */
 export default function Team() {
   const people = useTeam()
-  const cmsDepartments = useTeamDepartments()
+  const departments = useDepartmentList()
   const gallery = useTeamGallery()
   const cmsExpertise = useTeamExpertise()
   const page = useTeamPageText()
@@ -93,8 +66,6 @@ export default function Team() {
   const [query, setQuery] = useState('')
   const [shot, setShot] = useState('all')
 
-  // The departments: those created in the admin panel, otherwise the four built-in ones. Members link to a department by its slug.
-  const departments = useMemo(() => (cmsDepartments.length ? cmsDepartments : defaultDepartments.map((d) => ({ ...d, image: '', imageAlt: '' }))), [cmsDepartments])
   const deptName = (slug) => departments.find((d) => d.slug === slug)?.name || ''
   const members = (slug) => people.filter((p) => p.department === slug)
 
@@ -113,7 +84,6 @@ export default function Team() {
   const shots = gallery.filter((g) => shot === 'all' || g.category === shot)
   const openings = jobs.length
 
-  const filterTo = (slug) => { setDept(slug); setQuery(''); document.getElementById('directory')?.scrollIntoView({ behavior: 'smooth' }) }
   const chip = (on) => `inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-semibold transition-colors ${on ? 'border-primary bg-primary text-white' : 'border-edge-strong bg-glass hover:border-lav hover:bg-glass-strong'}`
 
   return (
@@ -164,26 +134,19 @@ export default function Team() {
               const list = members(d.slug)
               return (
                 <Reveal as="li" key={d.slug} delay={(i % 2) * 0.06}>
-                  <article id={`dept-${d.slug}`} className="glass-flat lift group flex h-full flex-col overflow-hidden">
+                  <Link to={`/our-team/${d.slug}`} aria-label={`${d.name}: view the department and its team`} className="glass-flat lift group flex h-full flex-col overflow-hidden">
                     {d.image
-                      ? <div className="overflow-hidden"><img src={d.image} alt={d.imageAlt || d.name} width="900" height="400" loading="lazy" decoding="async" className="aspect-[16/7] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /></div>
+                      ? <div className="overflow-hidden"><img src={d.image} alt="" width="900" height="400" loading="lazy" decoding="async" className="aspect-[16/7] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /></div>
                       : <div aria-hidden="true" className="flex aspect-[16/6] items-center justify-center bg-gradient-to-br from-primary/25 via-accent/15 to-transparent"><Icon className="size-14 text-lav transition-transform duration-300 group-hover:scale-110" strokeWidth={1.4} /></div>}
                     <div className="flex flex-1 flex-col p-6">
                       <h3 className="font-display text-2xl font-semibold">{d.name}</h3>
                       <p className="mt-2 text-soft">{d.description}</p>
-                      {d.roles.length > 0 && (
-                        <ul className="mt-4 flex flex-wrap gap-2" aria-label={`Roles in ${d.name}`}>
-                          {d.roles.map((r) => <li key={r} className="rounded-full border border-edge bg-glass px-3 py-1 text-sm font-semibold">{r}</li>)}
-                        </ul>
-                      )}
-                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-edge pt-4">
-                        {list.length > 0
-                          ? <p className="text-sm text-soft"><span className="font-semibold text-fg">{list.length}</span> {list.length === 1 ? 'team member' : 'team members'}: {list.slice(0, 3).map((p) => p.name).join(', ')}{list.length > 3 ? ` +${list.length - 3} more` : ''}</p>
-                          : <p className="text-sm text-soft">Team members are being added.</p>}
-                        {list.some((p) => !p.isLeader) && <button type="button" onClick={() => filterTo(d.slug)} className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-lav hover:underline">View team <ArrowRight className="size-4" aria-hidden="true" /></button>}
+                      <div className="mt-auto flex items-center justify-between gap-3 border-t border-edge pt-4 mt-5">
+                        <p className="text-sm text-soft"><span className="font-semibold text-fg">{list.length}</span> {list.length === 1 ? 'team member' : 'team members'}</p>
+                        <span className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-lav">Explore department <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
                       </div>
                     </div>
-                  </article>
+                  </Link>
                 </Reveal>
               )
             })}
