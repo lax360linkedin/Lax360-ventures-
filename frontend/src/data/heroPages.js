@@ -3,15 +3,21 @@
 export const heroPages = {
   '/about': {
     title: 'One accountable team behind your technology.',
-    text: 'LAX360 Ventures plans, builds, automates and grows — software, AI, digital growth, CAD engineering and training under one roof.',
-    points: ['Four divisions', 'Salem · Bangalore · Mumbai', 'Clear working principles'],
+    text: 'LAX360 Ventures plans, builds, automates and grows — software, AI, digital growth and training under one roof.',
+    points: ['Six service categories', 'Salem · Bangalore · Mumbai', 'Clear working principles'],
     cta: 'Meet the team',
   },
   '/services': {
     title: 'Everything you need to build and grow.',
-    text: 'Custom software, CRM and ERP, websites and apps, AI automation, digital marketing and CAD support — each followed through the same four steps.',
-    points: ['Software & Apps', 'AI & Automation', 'Digital Growth', 'CAD & Engineering'],
+    text: 'Custom software, CRM and ERP, websites and apps, AI automation, digital marketing, APIs, workflow automation and mobile apps — each followed through the same four steps.',
+    points: ['Software & IT', 'AI & Automation', 'Digital Marketing', 'Headless SaaS & APIs', 'Workflow Automation', 'Mobile & Business Apps'],
     cta: 'Explore services',
+  },
+  '/products': {
+    title: 'Software and SaaS products built by LAX360.',
+    text: 'Reusable platforms and applications that LAX360 develops and owns, alongside the services we deliver for clients.',
+    points: ['Built and owned by LAX360', 'API and SaaS platforms', 'Enquire or request a demo'],
+    cta: 'Explore products',
   },
   '/industries': {
     title: 'Technology built around your industry.',
@@ -33,14 +39,14 @@ export const heroPages = {
   },
   '/our-team': {
     title: 'The people behind LAX360.',
-    text: 'From founder and leadership to the software, AI, digital marketing and CAD engineering teams that do the work.',
-    points: ['Leadership', 'Software', 'AI & Automation', 'Marketing', 'CAD'],
+    text: 'From founder and leadership to the software, AI, digital marketing teams that do the work.',
+    points: ['Leadership', 'Software', 'AI & Automation', 'Marketing'],
     cta: 'Meet the team',
   },
   '/career': {
     title: 'Grow your career with LAX360.',
-    text: 'Tell us about yourself and the area you want to work in. We work across software, AI, growth, engineering and training.',
-    points: ['Four areas to explore', 'Three city branches'],
+    text: 'Tell us about yourself and the area you want to work in. We work across software, AI, growth and training.',
+    points: ['Six areas to explore', 'Three city branches'],
     cta: 'Explore careers',
   },
   '/contact': {

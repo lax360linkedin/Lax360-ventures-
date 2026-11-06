@@ -31,7 +31,7 @@ export default function Career() {
       description={`Interested in working with LAX360 Ventures? We have branches in ${branchSentence}. Tell us about yourself.`}
     >
       <section className="relative overflow-hidden border-b border-edge">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-32 -top-24 size-[32rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(124,58,237,0.28), transparent)' }} />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-32 -top-24 size-[32rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow)/0.28), transparent)' }} />
         <div className="wrap relative pb-10 pt-6 md:pb-16 md:pt-10">
           <Reveal y={12} className="max-w-4xl">
             <p className="eyebrow mb-6 flex items-center gap-3 text-lav"><span aria-hidden="true" className="h-px w-10 bg-current" />Career</p>
@@ -39,7 +39,7 @@ export default function Career() {
               Build your career with <BotHighlight delay={0.4}><span className="text-gradient">LAX360.</span></BotHighlight>
             </h1>
             <p className="lead mt-7 text-soft">
-              LAX360 Ventures brings software, AI, digital growth, CAD engineering and training under one roof, with branches in {branchSentence}. If that sounds like a place you&apos;d like to work, we&apos;d like to hear from you.
+              LAX360 Ventures brings software, AI, digital growth and training under one roof, with branches in {branchSentence}. If that sounds like a place you&apos;d like to work, we&apos;d like to hear from you.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button to="/contact?type=career" arrow>Tell us about yourself</Button>
@@ -53,8 +53,8 @@ export default function Career() {
       <CmsJobs />
 
       <section className="wrap section" aria-labelledby="areas-title">
-        <SectionHeading id="areas-title" eyebrow="Where we work" title="Four areas" gradient="to explore." lead="These are the areas LAX360 Ventures works in — not a list of vacancies." />
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <SectionHeading id="areas-title" eyebrow="Where we work" title="Six areas" gradient="to explore." lead="These are the areas LAX360 Ventures works in — not a list of vacancies." />
+        <ul className="mt-12 grid gap-4 sm:grid-cols-3">
           {allDivisions.map((d, i) => {
             const Icon = divisionIcons[d.slug]
             return (

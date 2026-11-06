@@ -1,36 +1,39 @@
 @import "tailwindcss";
+/* `dark:` utilities apply whenever the site is not in light mode (dark is the default theme) */
+@custom-variant dark (&:where(:root:not([data-theme="light"]) *));
 @import "@fontsource-variable/space-grotesk";
 @import "@fontsource-variable/inter-tight";
+@import "./themes.css";
 
 /*
- * LAX360 Ventures — "Violet Glass" design system
+ * LAX360 Ventures — "Violet Glass" design system (light theme); the dark theme is graphite + sky blue
  * Deep violet base, translucent glass surfaces with restrained blur, thin lavender edges,
  * and gradients used only as supporting accents (selected headline words, ambient light).
  */
 @theme {
-  --color-night: #0b0714;
-  --color-base2: #120b20;
-  --color-deep: #24103d;
-  --color-fg: #f8f7fc;
-  --color-soft: #c4bed2;
-  --color-primary: #7c3aed;
-  --color-primary-hover: #6d28d9;
-  --color-accent: #a855f7;
-  --color-lav: #c4b5fd;
-  --color-sky: #60a5fa;
-  --color-glass: rgba(255, 255, 255, 0.055);
-  --color-glass-strong: rgba(255, 255, 255, 0.1);
-  --color-edge: rgba(196, 181, 253, 0.2);
-  --color-edge-strong: rgba(196, 181, 253, 0.4);
-  --color-violet: #a855f7;
+  --color-night: #0a0c10;
+  --color-base2: #10141b;
+  --color-deep: #17202c;
+  --color-fg: #f1f5f9;
+  --color-soft: #a9b4c4;
+  --color-primary: #0284c7;
+  --color-primary-hover: #0369a1;
+  --color-accent: #38bdf8;
+  --color-lav: #7dd3fc;
+  --color-sky: #38bdf8;
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --color-glass-strong: rgba(255, 255, 255, 0.09);
+  --color-edge: rgba(125, 211, 252, 0.16);
+  --color-edge-strong: rgba(125, 211, 252, 0.36);
+  --color-violet: #38bdf8;
   --color-success: #4ade80;
   --color-error: #fca5a5;
   --color-tint: #ffffff;
   --font-display: "Space Grotesk Variable", "Segoe UI", system-ui, sans-serif;
   --font-sans: "Inter Tight Variable", "Segoe UI", system-ui, sans-serif;
   --ease-signal: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --shadow-menu: 0 24px 60px -24px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(196, 181, 253, 0.12);
-  --shadow-lift: 0 24px 50px -20px rgba(124, 58, 237, 0.55);
+  --shadow-menu: 0 24px 60px -24px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(125, 211, 252, 0.12);
+  --shadow-lift: 0 24px 50px -20px rgba(14, 165, 233, 0.45);
 }
 
 /*
@@ -45,30 +48,36 @@
   --glass-inset: rgba(255, 255, 255, 0.1);
   --glass-shadow: rgba(0, 0, 0, 0.8);
   --shine: rgba(255, 255, 255, 0.14);
-  --grad-a: #c4b5fd;
-  --grad-b: #a855f7;
-  --grad-c: #60a5fa;
-  --amb-1: rgba(124, 58, 237, 0.28);
-  --amb-2: rgba(96, 165, 250, 0.12);
-  --amb-3: rgba(168, 85, 247, 0.16);
-  --wordmark-a: rgba(196, 181, 253, 0.35);
-  --wordmark-b: rgba(168, 85, 247, 0.08);
-  --art-line: #c4b5fd;
-  --art-glass: rgba(255, 255, 255, 0.07);
-  --art-faint: rgba(196, 181, 253, 0.28);
-  --art-grid: rgba(196, 181, 253, 0.14);
-  --art-solid: rgba(18, 11, 32, 0.9);
-  --art-vio: #a855f7;
-  --art-sky: #60a5fa;
+  --grad-a: #bae6fd;
+  --grad-b: #38bdf8;
+  --grad-c: #7dd3fc;
+  --amb-1: rgba(14, 165, 233, 0.2);
+  --amb-2: rgba(148, 163, 184, 0.08);
+  --amb-3: rgba(56, 189, 248, 0.12);
+  --wordmark-a: rgba(125, 211, 252, 0.3);
+  --wordmark-b: rgba(56, 189, 248, 0.06);
+  --art-line: #7dd3fc;
+  --art-glass: rgba(255, 255, 255, 0.06);
+  --art-faint: rgba(125, 211, 252, 0.26);
+  --art-grid: rgba(125, 211, 252, 0.12);
+  --art-solid: rgba(16, 20, 27, 0.92);
+  --art-vio: #38bdf8;
+  --art-sky: #0ea5e9;
+  --glow: 14 165 233;
+  --glow2: 56 189 248;
+  --glow3: 125 211 252;
+  --btn-hover: #0ea5e9;
+  --ring-label: #e0f2fe;
+  --img-shade: #0a0c10;
   --bot-shell: #ffffff;
-  --bot-line: rgba(196, 181, 253, 0.6);
+  --bot-line: rgba(125, 211, 252, 0.6);
   --bot-visor: #150f26;
   --bot-eye: #4da3ff;
-  --bot-violet: #7c3aed;
-  --bot-heart: #a855f7;
+  --bot-violet: #0284c7;
+  --bot-heart: #38bdf8;
   --bot-blush: #f9a8d4;
-  --bot-glow: rgba(168, 85, 247, 0.6);
-  --bot-hl: rgba(168, 85, 247, 0.2);
+  --bot-glow: rgba(56, 189, 248, 0.55);
+  --bot-hl: rgba(56, 189, 248, 0.18);
 }
 
 /* ---------- Light mode: clean white, same violet glass identity ---------- */
@@ -116,6 +125,14 @@
   --art-solid: #ffffff;
   --art-vio: #9333ea;
   --art-sky: #2563eb;
+  --glow: 124 58 237;
+  --glow2: 168 85 247;
+  --glow3: 196 181 253;
+  --btn-hover: #8b4df0;
+  --ring-label: #E9D5FF;
+  --img-shade: #0b0714;
+  --bot-violet: #7c3aed;
+  --bot-heart: #a855f7;
   --bot-line: rgba(109, 40, 217, 0.7);
   --bot-glow: rgba(124, 58, 237, 0.45);
   --bot-hl: rgba(124, 58, 237, 0.14);
@@ -149,7 +166,7 @@ html.theme-switching, html.theme-switching *, html.theme-switching *::before, ht
   h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
   :focus-visible { outline: 2px solid var(--color-lav); outline-offset: 3px; border-radius: 6px; }
   ::selection { background: var(--color-primary); color: #fff; }
-  [id] { scroll-margin-top: 96px; }
+  [id] { scroll-margin-top: calc(var(--header-bottom, 92px) + 1rem); }
 }
 
 @layer components {
@@ -350,7 +367,7 @@ html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s 
  * --page-bg is the page colour (the hero video fades into it at the bottom). While the home hero shows a video or poster, the hero
  * is drawn with the dark-theme values (dark scrim, light text) so the video looks exactly as bright and colourful as in dark mode;
  * the white "night" token is never used as a veil over media. */
-:root { --page-bg: #0b0714; }
+:root { --page-bg: #0a0c10; }
 :root[data-theme="light"] { --page-bg: #ffffff; }
 :root[data-theme="light"] .hero-media:has([data-hero-video="playing"], [data-hero-video="poster"]),
 :root[data-theme="light"] .media-dark {
@@ -383,7 +400,8 @@ html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s 
 @media (prefers-reduced-motion: reduce) { .anim-present, .anim-present-ring, .anim-testi-next, .anim-testi-prev { animation: none !important; } }
 
 /* ---- bright hero scope: draws a section with the light-theme values even when the site is in dark mode (About hero) ---- */
-.hero-light {
+:root[data-theme="light"] .hero-light,
+.hero-light-always {
   color-scheme: light;
   color: var(--color-fg);
   --color-night: #ffffff; --color-base2: #f7f3ff; --color-deep: #e9dcff; --color-fg: #1a1033; --color-soft: #4b4563;

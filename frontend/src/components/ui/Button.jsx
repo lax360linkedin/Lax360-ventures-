@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, Loader2 } from 'lucide-react'
 
-// All variants are built for the dark violet theme. `onDark*` names are kept as aliases so existing calls still work.
+// All variants use theme tokens (graphite + sky blue in dark mode, violet in light). `onDark*` names are kept as aliases so existing calls still work.
 const variants = {
-  primary: 'bg-primary text-white border border-white/10 shadow-[0_8px_24px_-10px_rgba(124,58,237,0.9)] hover:-translate-y-0.5 hover:bg-[#8b4df0] hover:shadow-[0_14px_34px_-10px_rgba(168,85,247,0.9)] active:translate-y-0',
+  primary: 'bg-primary text-white border border-white/10 shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] hover:-translate-y-0.5 hover:bg-[var(--btn-hover)] hover:shadow-[0_14px_34px_-10px_rgb(var(--glow2)/0.9)] active:translate-y-0',
   secondary: 'border border-edge-strong bg-glass text-fg hover:-translate-y-0.5 hover:border-lav hover:bg-glass-strong',
-  violet: 'bg-gradient-to-r from-primary to-accent text-white border border-white/10 shadow-[0_8px_24px_-10px_rgba(168,85,247,0.9)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-10px_rgba(168,85,247,1)]',
+  violet: 'bg-gradient-to-r from-primary to-accent text-white border border-white/10 shadow-[0_8px_24px_-10px_rgb(var(--glow2)/0.9)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-10px_rgb(var(--glow2)/1)]',
 }
 variants.onDark = variants.primary
 variants.onDarkOutline = variants.secondary

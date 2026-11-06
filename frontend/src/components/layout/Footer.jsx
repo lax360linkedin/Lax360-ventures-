@@ -45,7 +45,7 @@ export default function Footer() {
     <footer className="relative overflow-hidden border-t border-edge bg-gradient-to-b from-base2 to-deep/70 pb-24 pt-14 lg:pb-0 lg:pt-20">
       <div aria-hidden="true" className="pointer-events-none absolute -left-32 top-0 size-[28rem] rounded-full bg-primary/25 blur-3xl" />
       <div aria-hidden="true" className="pointer-events-none absolute -right-24 bottom-10 size-[24rem] rounded-full bg-sky/10 blur-3xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(rgba(168,85,247,0.25)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(180deg,#000,transparent_55%)]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(rgb(var(--glow2)/0.25)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(180deg,#000,transparent_55%)]" />
       <div className="wrap relative">
         <Reveal className="glass relative flex flex-col items-start justify-between gap-6 overflow-hidden p-6 md:flex-row md:items-center md:p-10">
           <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-16 size-56 rounded-full bg-accent/20 blur-3xl" />
@@ -53,7 +53,7 @@ export default function Footer() {
             <p className="eyebrow text-lav">Ready when you are</p>
             <p className="mt-2 font-display text-3xl font-semibold leading-tight md:text-4xl">Have a business challenge to solve?</p>
           </div>
-          <Link to="/contact?type=project" className="group relative inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 font-semibold text-white shadow-[0_8px_24px_-10px_rgba(124,58,237,0.9)] transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-10px_rgba(168,85,247,0.9)]">
+          <Link to="/contact?type=project" className="group relative inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 font-semibold text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-10px_rgb(var(--glow2)/0.9)]">
             Let&apos;s Talk <ArrowUpRight className="size-5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
           </Link>
         </Reveal>
@@ -62,13 +62,13 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-4">
             <Logo />
             <p className="mt-5 max-w-sm text-base text-soft">
-              {site.footerTagline || 'One team to build, automate and grow your business — software, AI, digital growth, CAD engineering and training.'}
+              {site.footerTagline || 'One team to build, automate and grow your business — software, AI, digital growth and training.'}
             </p>
             <ul className="mt-5 flex flex-wrap gap-2.5" aria-label="Social profiles">
               {site.social.map((s) => (
                 <li key={s.label}>
                   <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`} title={s.label}
-                    className="flex size-11 items-center justify-center rounded-full border border-edge-strong bg-glass text-soft transition-all duration-200 hover:-translate-y-1 hover:border-transparent hover:bg-gradient-to-br hover:from-primary hover:to-accent hover:text-white hover:shadow-[0_10px_24px_-10px_rgba(168,85,247,0.9)] focus-visible:text-lav">
+                    className="flex size-11 items-center justify-center rounded-full border border-edge-strong bg-glass text-soft transition-all duration-200 hover:-translate-y-1 hover:border-transparent hover:bg-gradient-to-br hover:from-primary hover:to-accent hover:text-white hover:shadow-[0_10px_24px_-10px_rgb(var(--glow2)/0.9)] focus-visible:text-lav">
                     <SocialIcon label={s.label} />
                   </a>
                 </li>

@@ -19,14 +19,14 @@ export default function Ring360({ className = '' }) {
     <svg viewBox="0 0 480 480" className={className} aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="ring-core" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#7C3AED" /><stop offset="1" stopColor="#A855F7" />
+          <stop offset="0" stopColor="rgb(var(--glow))" /><stop offset="1" stopColor="rgb(var(--glow2))" />
         </linearGradient>
       </defs>
       <circle cx="240" cy="240" r="198" fill="none" stroke="var(--art-faint)" strokeWidth="1.5" />
       {ticks}
       <circle cx="240" cy="240" r="120" fill="url(#ring-core)" opacity="0.9" />
       <text x="240" y="252" textAnchor="middle" fontSize="54" fontWeight="600" fill="#fff" fontFamily="var(--font-display)" letterSpacing="-2">360°</text>
-      <text x="240" y="282" textAnchor="middle" fontSize="11" fontWeight="700" fill="#E9D5FF" letterSpacing="3.5" fontFamily="var(--font-sans)">EXECUTION</text>
+      <text x="240" y="282" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--ring-label)" letterSpacing="3.5" fontFamily="var(--font-sans)">EXECUTION</text>
       {nodes}
     </svg>
   )

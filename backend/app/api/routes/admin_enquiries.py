@@ -25,13 +25,14 @@ read, write = permission("enquiries"), permission("enquiries", write=True)
 class Filters:
     def __init__(self, q: str | None = Query(None, max_length=100), status: str | None = Query(None, pattern="^(new|in_progress|contacted|converted|closed)$"),
                  date_from: date | None = Query(None, alias="from"), date_to: date | None = Query(None, alias="to"),
-                 archived: str = Query("no", pattern="^(no|only|all)$"), assigned_to: uuid.UUID | None = None) -> None:
-        self.kw = dict(q=q, status=status, date_from=day_start(date_from), date_to=day_after(date_to), archived=archived, assigned_to=assigned_to)
+                 archived: str = Query("no", pattern="^(no|only|all)$"), assigned_to: uuid.UUID | None = None,
+                 type: str | None = Query(None, pattern="^[a-z-]{2,30}$")) -> None:
+        self.kw = dict(q=q, status=status, enquiry_type=type, date_from=day_start(date_from), date_to=day_after(date_to), archived=archived, assigned_to=assigned_to)
 
 
 def _row(r: ContactEnquiry, names: dict) -> dict:
     return {
-        "id": str(r.id), "name": r.name, "email": r.email, "phone": r.phone, "company": r.company, "subject": r.subject, "status": r.status,
+        "id": str(r.id), "type": r.enquiry_type, "name": r.name, "email": r.email, "phone": r.phone, "company": r.company, "subject": r.subject, "status": r.status,
         "branch": r.branch.city if r.branch else None, "assigned_to": str(r.assigned_to) if r.assigned_to else None,
         "assigned_name": names.get(r.assigned_to), "archived": r.archived_at is not None,
         "created_at": r.created_at.isoformat(), "updated_at": r.updated_at.isoformat(),

@@ -11,8 +11,7 @@ import { INTRO_ICONS } from './introIcons.js'
  * effects. Nothing is redrawn or recoloured.
  *
  * Sequence: robot walks in and waves -> "WELCOME TO LAX360!" is revealed letter by letter (the robot hops with it) -> the robot hauls the
- * official logo to the centre on a rope -> the logo bounces and settles with a glow -> 26 service icons (software, AI, AI tools, marketing,
- * CAD) rain down, bounce and settle in front -> the logo flies into the header and the homepage is revealed.
+ * official logo to the centre on a rope -> the logo bounces and settles with a glow -> service icons (software, AI, AI tools and marketing) rain down, bounce and settle in front -> the logo flies into the header and the homepage is revealed.
  *
  * The animation is a pure function of time (`robotAt`, `logoAt`, `iconAt`): each frame the elapsed milliseconds become transforms written
  * straight to the DOM (no React renders per frame), so it is deterministic and easy to skip. Everything is laid out on a fixed "stage"
@@ -231,7 +230,7 @@ function WelcomeText({ size }) {
         <m.span
           key={i}
           className="inline-block"
-          style={{ color: letterColor(i, letters.length), textShadow: '0 0 28px rgba(124,58,237,0.75), 0 0 60px rgba(59,130,246,0.35)', transformOrigin: '50% 100%' }}
+          style={{ color: letterColor(i, letters.length), textShadow: '0 0 28px rgb(var(--glow)/0.75), 0 0 60px rgba(59,130,246,0.35)', transformOrigin: '50% 100%' }}
           initial={{ opacity: 0, y: 46, scale: 0.7, rotateX: -80, filter: 'blur(10px) brightness(1)' }}
           animate={{ opacity: 1, y: [46, -10, 0], scale: [0.7, 1.1, 1], rotateX: [-80, 8, 0], filter: ['blur(10px) brightness(1)', 'blur(0px) brightness(2)', 'blur(0px) brightness(1)'] }}
           transition={{ duration: 0.85, times: [0, 0.55, 1], ease: 'easeOut', delay: i * 0.045 }}
@@ -423,11 +422,11 @@ export default function WelcomeIntro() {
     <div ref={set('root')} role="dialog" aria-label="Welcome to LAX360" className="fixed inset-0 z-[1000] select-none overflow-hidden" style={{ visibility: ready ? 'visible' : 'hidden', touchAction: 'none' }}>
       <p className="sr-only" role="status">Welcome to LAX360!</p>
       {/* dark graphite backdrop with violet / electric-blue light; it fades out to reveal the homepage */}
-      <div ref={set('bg')} aria-hidden="true" className="absolute inset-0" style={{ background: 'radial-gradient(70% 55% at 22% 18%, rgba(124,58,237,0.30), transparent 70%), radial-gradient(60% 50% at 82% 80%, rgba(59,130,246,0.22), transparent 70%), linear-gradient(180deg, #121217 0%, #0b0b0f 100%)' }} />
+      <div ref={set('bg')} aria-hidden="true" className="absolute inset-0" style={{ background: 'radial-gradient(70% 55% at 22% 18%, rgb(var(--glow)/0.30), transparent 70%), radial-gradient(60% 50% at 82% 80%, rgba(59,130,246,0.22), transparent 70%), linear-gradient(180deg, #121217 0%, #0b0b0f 100%)' }} />
 
       <div aria-hidden="true" className="absolute left-1/2 top-1/2 origin-center" style={stageStyle}>
         <div className="absolute inset-x-0" style={{ top: L.ground - 2, height: 2, background: 'linear-gradient(90deg, transparent, rgba(167,139,250,0.55), rgba(96,165,250,0.45), transparent)', opacity: 0.55 }} />
-        <div ref={set('glow')} className="absolute left-0 top-0 rounded-full opacity-0" style={{ width: 520, height: 520, background: 'radial-gradient(closest-side, rgba(124,58,237,0.55), rgba(59,130,246,0.28) 55%, transparent)' }} />
+        <div ref={set('glow')} className="absolute left-0 top-0 rounded-full opacity-0" style={{ width: 520, height: 520, background: 'radial-gradient(closest-side, rgb(var(--glow)/0.55), rgba(59,130,246,0.28) 55%, transparent)' }} />
         <div ref={set('logoShadow')} className="absolute left-0 top-0 rounded-[50%] opacity-0" style={{ width: L.lw, height: 22, background: 'radial-gradient(closest-side, rgba(0,0,0,0.75), transparent)' }} />
         <div ref={set('robotShadow')} className="absolute left-0 top-0 rounded-[50%]" style={{ width: L.rw * 0.8, height: 26, background: 'radial-gradient(closest-side, rgba(0,0,0,0.7), transparent)' }} />
 
@@ -437,7 +436,7 @@ export default function WelcomeIntro() {
         </svg>
 
         {/* the exact logo file, original proportions */}
-        <img ref={set('logo')} src={LOGO_SRC} alt="" width="284" height="302" draggable="false" className="absolute left-0 top-0" style={{ width: L.lw, height: L.lh, transformOrigin: '50% 50%', filter: 'drop-shadow(0 0 22px rgba(124,58,237,0.65)) drop-shadow(0 0 40px rgba(59,130,246,0.35))' }} />
+        <img ref={set('logo')} src={LOGO_SRC} alt="" width="284" height="302" draggable="false" className="absolute left-0 top-0" style={{ width: L.lw, height: L.lh, transformOrigin: '50% 50%', filter: 'drop-shadow(0 0 22px rgb(var(--glow)/0.65)) drop-shadow(0 0 40px rgba(59,130,246,0.35))' }} />
 
         {/* the exact mascot file, unmodified; only transformed */}
         <img ref={set('robot')} src={ROBOT_SRC} alt="" width="480" height="722" draggable="false" className="absolute left-0 top-0" style={{ width: L.rw, height: L.rh, transformOrigin: '50% 100%', willChange: 'transform' }} />

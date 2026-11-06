@@ -58,7 +58,7 @@ export default function HeroCarousel({ home }) {
             {n === 0 ? home : (
               <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center [text-shadow:0_2px_24px_rgba(11,7,20,0.55)]">
                 <p className="glass-flat inline-flex items-center gap-2.5 !rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav">
-                  <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(168,85,247,0.8)]" />
+                  <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgb(var(--glow2)/0.8)]" />
                   {v.label}
                 </p>
                 <h2 className="h1 mt-6 !text-[clamp(2.1rem,5vw,4.25rem)]">{v.info?.title || v.label}</h2>

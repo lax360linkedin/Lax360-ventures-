@@ -2,18 +2,30 @@
 // They are original, evergreen explainers written by LAX360 Ventures. They are not news reports and make no claims about named
 // companies or recent events. Body text: blank line = new paragraph, a line starting with "## " = sub-heading.
 export const articleCategories = [
-  { value: 'ai', label: 'Artificial Intelligence' },
-  { value: 'software', label: 'Software Development' },
-  { value: 'transformation', label: 'Digital Transformation' },
-  { value: 'news', label: 'Technology News & Updates' },
-  { value: 'blog', label: 'Technology Blog' },
+  { value: 'ai', label: 'Artificial Intelligence & Generative AI', short: 'AI & Generative AI', icon: 'bot', text: 'Assistants, agents and generative AI for everyday business work.' },
+  { value: 'software', label: 'Software Development & Technology', short: 'Software & Technology', icon: 'code', text: 'How good software is planned, built and kept maintainable.' },
+  { value: 'automation', label: 'Business Automation', short: 'Business Automation', icon: 'workflow', text: 'Removing manual re-entry and connecting the tools you already use.' },
+  { value: 'saas', label: 'SaaS & API Innovations', short: 'SaaS & APIs', icon: 'server', text: 'Reusable backends, APIs and multi-tenant software.' },
+  { value: 'transformation', label: 'Digital Transformation', short: 'Digital Transformation', icon: 'layers', text: 'Moving a business to digital tools one practical step at a time.' },
+  { value: 'webmobile', label: 'Web & Mobile Application Development', short: 'Web & Mobile Apps', icon: 'smartphone', text: 'Choosing and building websites, web apps and mobile apps.' },
+  { value: 'marketing', label: 'Digital Marketing', short: 'Digital Marketing', icon: 'megaphone', text: 'Search, social and campaigns that support the website.' },
+  { value: 'trends', label: 'Technology Trends & Updates', short: 'Trends & Updates', icon: 'trend', text: 'What is changing in technology and what it means for businesses.' },
 ]
+
+// Categories used by earlier articles map to the current ones.
+export const legacyCategories = { news: 'trends', blog: 'webmobile' }
+
+// Photograph used for an article that has no cover image of its own (one per category).
+export const categoryPhotos = {
+  ai: '/assets/insights/ai-trends.webp', software: '/assets/insights/software-teams.webp', automation: '/assets/insights/ai-automation.webp', saas: '/assets/services/headless.webp',
+  transformation: '/assets/insights/digital-transformation.webp', webmobile: '/assets/insights/mobile-apps.webp', marketing: '/assets/services/marketing.webp', trends: '/assets/insights/tech-watch.webp',
+}
 
 export const articles = [
   {
     slug: 'ai-assistants-for-everyday-business',
     title: 'AI assistants for everyday business: where they help and where they do not',
-    category: 'ai', publishedOn: '2026-10-20', author: 'LAX360 Team', image: '/assets/insights/ai-trends.webp',
+    category: 'ai', featured: true, publishedOn: '2026-10-20', author: 'LAX360 Team', image: '/assets/insights/ai-trends.webp',
     excerpt: 'A practical look at the jobs AI assistants do well today, and the ones that still need a person.',
     body: `AI assistants are now good enough to be useful in ordinary businesses, but they are not magic. The teams that get value from them start with a narrow job and a clear measure of success.
 
@@ -31,7 +43,7 @@ Pick one question your team answers every day. Write down the approved answer, l
   {
     slug: 'automation-before-ai',
     title: 'Automate the boring work first: a simple order for AI and automation projects',
-    category: 'ai', publishedOn: '2026-10-06', author: 'LAX360 Team', image: '/assets/insights/ai-automation.webp',
+    category: 'automation', publishedOn: '2026-10-06', author: 'LAX360 Team', image: '/assets/insights/ai-automation.webp',
     excerpt: 'Most teams get faster results by removing manual re-entry before adding any AI at all.',
     body: `When a business says it wants AI, the real problem is often manual work: the same details typed into three places, follow-ups that depend on someone remembering, reports built by hand every Monday.
 
@@ -88,7 +100,7 @@ Decide how you will know it worked: hours saved, errors reduced, faster response
   {
     slug: 'what-to-watch-in-technology',
     title: 'What to watch in technology: trends business owners should keep an eye on',
-    category: 'news', publishedOn: '2026-08-25', author: 'LAX360 Team', image: '/assets/insights/tech-watch.webp',
+    category: 'trends', publishedOn: '2026-08-25', author: 'LAX360 Team', image: '/assets/insights/tech-watch.webp',
     excerpt: 'Four lasting shifts that matter more than any single headline.',
     body: `Technology news moves quickly, and most of it will not matter to your business. These four longer-running shifts are worth keeping an eye on.
 
@@ -109,7 +121,7 @@ We will keep this page updated with practical notes as these areas develop.`,
   {
     slug: 'web-and-mobile-apps-which-first',
     title: 'Website, web app or mobile app: which should you build first?',
-    category: 'blog', publishedOn: '2026-08-11', author: 'LAX360 Team', image: '/assets/insights/mobile-apps.webp',
+    category: 'webmobile', publishedOn: '2026-08-11', author: 'LAX360 Team', image: '/assets/insights/mobile-apps.webp',
     excerpt: 'A short guide to choosing the right starting point for your idea.',
     body: `Many ideas start with the question "should we build an app?" The honest answer depends on who will use it and how often.
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
-import { Bot, Code2, DraftingCompass, Globe2, MessageCircle } from 'lucide-react'
+import { Bot, Code2, Globe2, MessageCircle, Server } from 'lucide-react'
 import Button from '../ui/Button.jsx'
 import BotHighlight from '../ui/BotHighlight.jsx'
 import HeroVideo from './HeroVideo.jsx'
@@ -11,12 +11,12 @@ import { useContent } from '../../hooks/useSite.js'
 import { site } from '../../data/site.js'
 import { whatsappLink } from '../../utils/whatsapp.js'
 
-const WORDS = ['software', 'AI', 'growth', 'engineering', 'skills']
+const WORDS = ['software', 'AI', 'growth', 'skills']
 const chips = [
   { icon: Code2, label: 'Custom software' },
   { icon: Bot, label: 'AI automation' },
   { icon: Globe2, label: 'Web & mobile' },
-  { icon: DraftingCompass, label: 'CAD & engineering' },
+  { icon: Server, label: 'APIs & SaaS' },
 ]
 
 /** Button that is a router link for site paths and a normal link for full URLs (hero buttons can be edited in the admin panel). */
@@ -39,7 +39,7 @@ function RotatingWord() {
 
   return (
     <p className="font-display text-3xl font-medium md:text-5xl">
-      <span className="sr-only">for software, AI, growth, engineering and skills</span>
+      <span className="sr-only">for software, AI, growth and skills</span>
       <span aria-hidden="true" className="text-soft">for </span>
       <BotHighlight delay={1.9}>
       <span aria-hidden="true" className="relative inline-block">
@@ -88,7 +88,7 @@ export default function Hero() {
           </h1>
           <div className="a-rise mt-6" style={{ '--d': '0.8s' }}><RotatingWord /></div>
           <p className="a-rise lead mx-auto mt-8 text-fg/85" style={{ '--d': '0.95s' }}>
-            {hero.lead || 'Custom software, AI automation, websites, apps, digital marketing and CAD engineering — planned, built and supported by LAX360 Ventures.'}
+            {hero.lead || 'Custom software, AI automation, websites, apps, digital marketing and training — planned, built and supported by LAX360 Ventures.'}
           </p>
           <div className="mt-9 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
             <div className="a-rise w-full sm:w-auto" style={{ '--d': '1.1s' }}><CtaButton link={hero.cta_primary_link || '/contact?type=project'} arrow className="w-full sm:w-auto">{hero.cta_primary_label || 'Discuss Your Project'}</CtaButton></div>

@@ -37,7 +37,7 @@ export default function AccountMenu() {
     return (
       <Link
         to="/login"
-        className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-primary px-5 text-[0.9375rem] font-semibold text-white shadow-[0_8px_24px_-10px_rgba(124,58,237,0.9)] transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[#8b4df0] hover:shadow-[0_14px_34px_-10px_rgba(168,85,247,0.9)]"
+        className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-primary px-5 text-[0.9375rem] font-semibold text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[var(--btn-hover)] hover:shadow-[0_14px_34px_-10px_rgb(var(--glow2)/0.9)]"
       >
         <LogIn className="size-4" aria-hidden="true" /> Login
       </Link>
@@ -90,7 +90,7 @@ export default function AccountMenu() {
           role="menu"
           aria-label="Account"
           onKeyDown={onMenuKey}
-          className="absolute right-0 top-full mt-3 w-64 rounded-2xl border border-edge-strong bg-night/95 p-2 shadow-[0_24px_60px_-20px_rgba(124,58,237,0.6)] backdrop-blur-xl"
+          className="absolute right-0 top-full mt-3 w-64 rounded-2xl border border-edge-strong bg-night/95 p-2 shadow-[0_24px_60px_-20px_rgb(var(--glow)/0.6)] backdrop-blur-xl"
         >
           <div className="border-b border-edge px-3 pb-2 pt-1">
             <p className="truncate font-semibold text-fg">{user.full_name}</p>

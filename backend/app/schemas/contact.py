@@ -15,14 +15,19 @@ ENQUIRY_TYPES = {
     "ai": "AI consultation",
     "website-app": "Website or app",
     "marketing": "Digital marketing",
-    "cad": "CAD & engineering",
     "course": "Course enquiry",
     "workshop": "College workshop",
     "partnership": "Partnership",
     "career": "Careers",
     "general": "Something else",
+    "partner-technology": "Partnership: Technology partner",
+    "partner-reseller": "Partnership: Software reseller",
+    "partner-education": "Partnership: Education partner",
+    "partner-associate": "Partnership: Business associate",
+    "partner-implementation": "Partnership: Implementation partner",
+    "partner-other": "Partnership: Other collaboration",
 }
-EnquiryType = Literal["project", "ai", "website-app", "marketing", "cad", "course", "workshop", "partnership", "career", "general"]
+EnquiryType = Literal["project", "ai", "website-app", "marketing", "course", "workshop", "partnership", "career", "general", "partner-technology", "partner-reseller", "partner-education", "partner-associate", "partner-implementation", "partner-other"]
 _PHONE = re.compile(r"^\+?[0-9][0-9\s().-]{6,19}$")
 
 

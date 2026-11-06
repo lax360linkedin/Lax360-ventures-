@@ -84,7 +84,7 @@ export default function ProcessWorkflow() {
         {/* right: the connected timeline */}
         <div className="relative lg:col-span-8">
           <span aria-hidden="true" className="absolute bottom-7 left-[1.65rem] top-7 w-px bg-edge" />
-          <span ref={rail} aria-hidden="true" className="absolute left-[1.65rem] top-7 w-px bg-gradient-to-b from-lav via-accent to-primary shadow-[0_0_12px_rgba(168,85,247,0.7)]" style={{ height: 0 }} />
+          <span ref={rail} aria-hidden="true" className="absolute left-[1.65rem] top-7 w-px bg-gradient-to-b from-lav via-accent to-primary shadow-[0_0_12px_rgb(var(--glow2)/0.7)]" style={{ height: 0 }} />
           <ol ref={list} className="relative space-y-4">
             {steps.map((s, k) => {
               const Icon = s.icon
@@ -92,10 +92,10 @@ export default function ProcessWorkflow() {
               const done = k <= active
               return (
                 <li key={s.title} aria-current={on ? 'step' : undefined} className="relative pl-[4.5rem]">
-                  <span className={`absolute left-0 top-0 flex size-14 items-center justify-center rounded-2xl border text-white ${ease} ${done ? 'border-transparent bg-gradient-to-br from-primary to-accent' : 'border-edge-strong bg-base2 text-lav'} ${on ? 'scale-110 shadow-[0_0_28px_-4px_rgba(168,85,247,0.9)]' : ''}`}>
+                  <span className={`absolute left-0 top-0 flex size-14 items-center justify-center rounded-2xl border text-white ${ease} ${done ? 'border-transparent bg-gradient-to-br from-primary to-accent' : 'border-edge-strong bg-base2 text-lav'} ${on ? 'scale-110 shadow-[0_0_28px_-4px_rgb(var(--glow2)/0.9)]' : ''}`}>
                     <Icon className="size-6" aria-hidden="true" />
                   </span>
-                  <div className={`group glass-flat p-5 hover:-translate-y-0.5 hover:border-lav md:p-6 ${ease} ${on ? 'border-edge-strong shadow-[0_18px_40px_-24px_rgba(124,58,237,0.8)]' : 'opacity-90'}`}>
+                  <div className={`group glass-flat p-5 hover:-translate-y-0.5 hover:border-lav md:p-6 ${ease} ${on ? 'border-edge-strong shadow-[0_18px_40px_-24px_rgb(var(--glow)/0.8)]' : 'opacity-90'}`}>
                     <p className={`text-xs font-bold uppercase tracking-[0.14em] ${on ? 'text-gradient' : 'text-lav'}`}>Step {String(k + 1).padStart(2, '0')}</p>
                     <h3 className="mt-1 font-display text-xl font-semibold leading-tight md:text-2xl">{s.title}</h3>
                     <p className="mt-2 text-soft">{s.text}</p>

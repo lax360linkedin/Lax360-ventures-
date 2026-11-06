@@ -45,14 +45,14 @@ def test_production_hides_developer_hints(env, monkeypatch):
 
 # ---- happy path ----------------------------------------------------------------------------------
 def test_chat_returns_the_expected_format_and_persists(client, ai, db):
-    ai.responses.behaviour = fake_response("LAX360 Ventures offers software, AI, digital growth, CAD and training.")
+    ai.responses.behaviour = fake_response("LAX360 Ventures offers software, AI, digital growth and training.")
     r = say(client, "Tell me about AI services")
     assert r.status_code == 200
     body = r.json()
     assert set(body) == {"reply", "conversation_id", "provider", "session_id", "session_token", "message", "links", "whatsapp", "follow_ups", "meta"}
     assert body["provider"] == "openai" and body["reply"] == body["message"]["text"] and body["conversation_id"] == body["session_id"]
     assert body["message"]["text"].startswith("LAX360 Ventures offers") and body["session_token"]
-    assert {"label": "AI & Automation", "to": "/services/ai"} in body["links"] and "ai" in body["follow_ups"]
+    assert {"label": "AI & Business Automation", "to": "/services/ai"} in body["links"] and "ai" in body["follow_ups"]
     assert body["meta"]["status"] == "ok"
 
     call = ai.responses.calls[0]

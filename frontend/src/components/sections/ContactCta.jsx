@@ -8,7 +8,7 @@ export default function ContactCta({ defaultType = 'project', title = 'Tell us w
   const site = useSite()
   return (
     <section aria-labelledby="cta-title" className="relative overflow-hidden border-t border-edge bg-gradient-to-b from-base2 to-deep/50">
-      <div aria-hidden="true" className="pointer-events-none absolute -right-24 top-0 size-[30rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(124,58,237,0.3), transparent)' }} />
+      <div aria-hidden="true" className="pointer-events-none absolute -right-24 top-0 size-[30rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow)/0.3), transparent)' }} />
       <div className="wrap section relative grid gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <p className="eyebrow mb-5 flex items-center gap-3 text-soft"><span aria-hidden="true" className="h-px w-10 bg-lav" />Let&apos;s talk</p>

@@ -41,6 +41,12 @@ export function useSiteSettings() {
   return useSiteState().settings
 }
 
+/** True once the public settings request has finished (successfully or not). */
+export function useSiteLoaded() {
+  useEffect(() => { loadSite() }, [])
+  return useSiteState().loaded
+}
+
 export function useSite() {
   const settings = useSiteSettings()
   return useMemo(() => mergeSite(settings), [settings])

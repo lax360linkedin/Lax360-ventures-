@@ -20,7 +20,7 @@ export default function Logo({ className = '', aRef }) {
   }
   return (
     <Link to="/" onClick={toTop} aria-label="LAX360 Ventures home" className={`group inline-flex items-center gap-3 ${className}`}>
-      <span className="rounded-xl bg-white/95 p-1 shadow-[0_0_0_1px_rgba(196,181,253,0.35)] transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105">
+      <span className="rounded-xl bg-white/95 p-1 shadow-[0_0_0_1px_rgb(var(--glow3)/0.35)] transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105">
         <img src={site.logoUrl || '/assets/logo-shield.png'} alt="" width="40" height="42" className="h-9 w-auto" />
       </span>
       <span className="flex flex-col font-display leading-none text-fg">

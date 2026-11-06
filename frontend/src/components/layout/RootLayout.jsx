@@ -10,6 +10,7 @@ import SocialBand from '../sections/SocialBand.jsx'
 import { useScrollDirection } from '../../hooks/useScrollDirection.js'
 import PreviewBanner from '../cms/PreviewBanner.jsx'
 import { useSite, useSiteSettings } from '../../hooks/useSite.js'
+import { SiteThemeSync } from '../../hooks/useTheme.js'
 
 // Loaded after the page itself / on first use, so they never compete with first paint.
 const ChatWidget = lazy(() => import('../chatbot/ChatWidget.jsx'))
@@ -90,6 +91,7 @@ export default function RootLayout() {
         Skip to content
       </a>
       <ScrollToTop />
+      <SiteThemeSync />
       <TopBar />
       <Header onOpenMenu={() => setMenuOpen(true)} menuButtonRef={menuButtonRef} />
       <MobileMenu open={menuOpen} onClose={closeMenu} returnFocusRef={menuButtonRef} />

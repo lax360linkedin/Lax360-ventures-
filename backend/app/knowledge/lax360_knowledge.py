@@ -17,22 +17,26 @@ COMPANY_NAME = "LAX360 Ventures"
 
 COMPANY = (
     "LAX360 Ventures is a brand of LAX360 Pvt Ltd (wording as shown on the website, still to be confirmed by the business). "
-    "Tagline: '360° Execution'. One team handles software, AI, digital marketing, CAD/engineering and training."
+    "Tagline: '360° Execution'. One team handles software and IT services, AI and business automation, digital marketing, headless SaaS and API solutions, workflow automation and integration, mobile and business applications, and training. "
+    "LAX360 also publishes its own software and SaaS products on the Products page (/products); the first listed is the LAX360 API Hub, which is coming soon. Never describe third-party software as a LAX360 product and never claim a product is available unless the website says so."
 )
 
 DIVISIONS = [
-    ("Software & Apps (/services/software)",
-     "Custom business software, CRM and ERP systems, website development and Android/iOS mobile apps, built around the customer's existing workflow. "
-     "Examples of use cases: order and billing management, sales pipeline tracking, service request handling, customer portals, business websites. "
+    ("Software & IT Services (/services/software)",
+     "Custom software development, website development, web application development, mobile application development, CRM & ERP development, business management systems and e-commerce development, built around the customer's existing workflow. "
      "Technology is chosen per requirement. Engagement model (fixed scope or monthly) is agreed during discovery."),
-    ("AI & Automation (/services/ai)",
-     "AI assistants that answer from approved information and hand over to a person, business workflow automation, AI-powered applications, and help deciding where AI genuinely helps. "
+    ("AI & Business Automation (/services/ai)",
+     "AI application development, AI chatbots & virtual assistants, AI agent development, business process automation, workflow automation, RAG-based AI solutions and AI integration & consulting. "
      "People stay in the loop for decisions that matter; data handling is discussed and agreed before anything is built. Starts with an AI consultation."),
-    ("Digital Growth (/services/growth)",
-     "Digital marketing paired with the website: SEO, social media, performance advertising and content. Exact scope and reporting are agreed per business (scope is still to be confirmed)."),
-    ("CAD & Engineering (/services/engineering)",
-     "CAD support for civil and mechanical engineering: drafting and 2D/3D modelling prepared from sketches, markups or briefs. Software, deliverable formats and turnaround are confirmed per project. "
-     "Files are shared by email after the brief is reviewed; there is no file upload on the website."),
+    ("Digital Marketing (/services/growth)",
+     "Social media management, Meta Ads management, Google Ads management, search engine optimization (SEO), website & landing page optimization, content creation and digital marketing strategy. Exact scope and reporting are agreed per business (scope is still to be confirmed)."),
+    ("Headless SaaS & API Solutions (/services/headless)",
+     "Reusable backend services and ready-to-integrate APIs for developers, startups, agencies and businesses: API hub development, headless backend development, authentication APIs, billing & subscription APIs, booking & appointment APIs, CRM APIs, notification APIs, payment gateway integration, "
+     "file & media APIs, AI APIs, multi-tenant SaaS development and white-label SaaS solutions. A product page for the LAX360 API Hub will be linked from the website later; do not claim it is live."),
+    ("Workflow Automation & Integration (/services/automation)",
+     "n8n workflow automation, business process automation, WhatsApp automation, email automation, CRM automation, AI agent workflows, third-party application integration and webhook integration."),
+    ("Mobile & Business Applications (/services/mobile)",
+     "Appointment booking applications, field staff & task tracking applications, employee location tracking applications, business billing applications, inventory management applications and custom business mobile applications."),
     ("Training and workshops (enquire via /contact?type=course)",
      "Training and college workshops. Courses on the website: 'AI Tools & Prompt Engineering' (5-hour college workshop: 2 hours theory + 3 hours practicals), "
      "'3-Day Hands-on AI Workshop' (AI fundamentals, AI-assisted development, AI agents and a mini-project), and 'Python with Artificial Intelligence' (eight sessions; total length to be confirmed). "
@@ -67,7 +71,7 @@ UNCONFIRMED = [
     "course fees, schedules, certificates, placement promises",
     "client names, case studies, results or statistics (none are published yet)",
     "partnerships, certifications, awards or guarantees (do NOT claim any, and never claim an official OpenAI partnership)",
-    "the exact scope of Digital Growth and CAD & Engineering services (still being confirmed)",
+    "the exact scope of Digital Marketing services (still being confirmed)",
 ]
 
 

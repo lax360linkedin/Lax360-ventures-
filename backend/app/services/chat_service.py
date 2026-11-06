@@ -35,15 +35,18 @@ log = logging.getLogger("app.chat")
 _INTENTS: list[tuple[re.Pattern[str], ChatLink, str | None]] = [
     (re.compile(r"\b(demo|book a demo|schedule)\b", re.I), ChatLink(label="Get a Demo (login required)", to="/demo"), None),
     (re.compile(r"\b(branch|branches|office|location|address|salem|bangalore|bengaluru|mumbai)\b", re.I), ChatLink(label="Our branches", to="/contact#branches"), None),
-    (re.compile(r"\b(ai|automation|chatbot|assistant|prompt)\b", re.I), ChatLink(label="AI & Automation", to="/services/ai"), "ai"),
-    (re.compile(r"\b(software|app|crm|erp|website|web|mobile|custom)\b", re.I), ChatLink(label="Software & Apps", to="/services/software"), "software"),
+    (re.compile(r"\b(ai|automation|chatbot|assistant|prompt)\b", re.I), ChatLink(label="AI & Business Automation", to="/services/ai"), "ai"),
+    (re.compile(r"\b(software|app|crm|erp|website|web|mobile|custom)\b", re.I), ChatLink(label="Software & IT Services", to="/services/software"), "software"),
     (re.compile(r"\b(course|training|workshop|python|student|college)\b", re.I), ChatLink(label="Enquire about training", to="/contact?type=course"), "training"),
     (re.compile(r"\b(industry|industries|sector|sectors)\b", re.I), ChatLink(label="Industries we serve", to="/industries"), None),
     (re.compile(r"\b(partner|partners|network|cadpoint|collaboration)\b", re.I), ChatLink(label="Our Network", to="/our-network"), None),
     (re.compile(r"\b(founder|leadership|our team|meet the team|who works)\b", re.I), ChatLink(label="Our Team", to="/our-team"), None),
     (re.compile(r"\b(blog|blogs|article|articles|insight|insights|news)\b", re.I), ChatLink(label="Read our Insights", to="/insights"), None),
-    (re.compile(r"\b(marketing|seo|social|ads)\b", re.I), ChatLink(label="Digital Growth", to="/services/growth"), None),
-    (re.compile(r"\b(cad|civil|mechanical|drafting|3d)\b", re.I), ChatLink(label="CAD & Engineering", to="/services/engineering"), None),
+    (re.compile(r"\b(api|apis|headless|saas|webhook|webhooks|subscription|subscriptions|white-label|multi-tenant)\b", re.I), ChatLink(label="Headless SaaS & API Solutions", to="/services/headless"), None),
+    (re.compile(r"\b(n8n|integration|integrations|workflow|workflows)\b", re.I), ChatLink(label="Workflow Automation & Integration", to="/services/automation"), None),
+    (re.compile(r"\b(booking|appointment|appointments|inventory|tracking)\b", re.I), ChatLink(label="Mobile & Business Applications", to="/services/mobile"), None),
+    (re.compile(r"\b(product|products|api hub)\b", re.I), ChatLink(label="Our Products", to="/products"), None),
+    (re.compile(r"\b(marketing|seo|social|ads)\b", re.I), ChatLink(label="Digital Marketing", to="/services/growth"), None),
     (re.compile(r"\b(contact|project|price|pricing|cost|quote|enquiry|talk|call|whatsapp|reach)\b", re.I), ChatLink(label="Contact the team", to="/contact"), "project"),
 ]
 _CONTACT_LINK = ChatLink(label="Contact the team", to="/contact")

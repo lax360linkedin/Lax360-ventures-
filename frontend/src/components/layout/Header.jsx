@@ -84,6 +84,21 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
     return () => ro.disconnect()
   }, [])
 
+  // Publish where the fixed header (and the contact bar above it) ends, as --header-bottom, so sticky bars and anchor scrolling can sit exactly below it.
+  useEffect(() => {
+    const root = document.documentElement
+    const el = headerRef.current
+    if (!el) return undefined
+    const apply = () => root.style.setProperty('--header-bottom', `${Math.round(el.getBoundingClientRect().bottom)}px`)
+    apply()
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(apply)
+    ro?.observe(el)
+    const mo = new MutationObserver(apply) // the contact bar changes --topbar-offset on <html>, which moves the header
+    mo.observe(root, { attributes: true, attributeFilter: ['style'] })
+    window.addEventListener('resize', apply)
+    return () => { ro?.disconnect(); mo.disconnect(); window.removeEventListener('resize', apply) }
+  }, [])
+
   const canHover = () => window.matchMedia('(hover: hover)').matches
   const enter = (el, to) => {
     clearTimeout(leaveTimer.current)
@@ -102,7 +117,7 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
   return (
     <header
       ref={headerRef}
-      className={`a-drop fixed inset-x-0 top-[var(--topbar-offset,0px)] z-40 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${scrolled ? 'border-edge bg-night/75 shadow-[0_10px_40px_-18px_rgba(124,58,237,0.5)] backdrop-blur-xl' : 'border-edge/60 bg-night/40 backdrop-blur-md [[data-theme=light]_&]:bg-night/85' /* light mode: solid enough to read over the vivid hero video */}`}
+      className={`a-drop fixed inset-x-0 top-[var(--topbar-offset,0px)] z-40 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${scrolled ? 'border-edge bg-night/75 shadow-[0_10px_40px_-18px_rgb(var(--glow)/0.5)] backdrop-blur-xl' : 'border-edge/60 bg-night/40 backdrop-blur-md [[data-theme=light]_&]:bg-night/85' /* light mode: solid enough to read over the vivid hero video */}`}
       style={{ '--d': '0.1s' }}
     >
       <div className="wrap flex h-[72px] items-center justify-between gap-3 pt-2 lg:grid lg:h-[92px] lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-6 lg:pt-3">

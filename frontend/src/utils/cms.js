@@ -1,5 +1,5 @@
 // Small helpers for content that comes from the admin panel.
-const PAGES = { '/': 'home', '/about': 'about', '/services': 'services', '/industries': 'industries', '/insights': 'insights', '/our-network': 'network', '/our-team': 'team', '/work': 'work', '/career': 'career', '/contact': 'contact' }
+const PAGES = { '/': 'home', '/about': 'about', '/services': 'services', '/products': 'products', '/industries': 'industries', '/insights': 'insights', '/our-network': 'network', '/our-team': 'team', '/work': 'work', '/career': 'career', '/contact': 'contact' }
 
 /** Which "Page titles & SEO" entry belongs to this route (null for pages that cannot be edited there). */
 export const pagePathToKey = (path) => PAGES[path] || null

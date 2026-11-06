@@ -18,7 +18,7 @@ export default function HeroBackground() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* light pools */}
-      <div className="anim-drift absolute -left-40 top-10 size-[38rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(124,58,237,0.42), transparent)' }} />
+      <div className="anim-drift absolute -left-40 top-10 size-[38rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow)/0.42), transparent)' }} />
       <div className="anim-drift absolute -right-32 top-1/3 size-[34rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(96,165,250,0.2), transparent)', animationDelay: '-6s' }} />
 
       {/* stars */}
@@ -36,7 +36,7 @@ export default function HeroBackground() {
         ))}
         {nodes.map(([x, y], i) => (
           <g key={i}>
-            <circle cx={x} cy={y} r="14" fill="rgba(124,58,237,0.12)" stroke="var(--art-faint)" />
+            <circle cx={x} cy={y} r="14" fill="rgb(var(--glow)/0.12)" stroke="var(--art-faint)" />
             <circle cx={x} cy={y} r="4" fill="var(--art-line)" />
           </g>
         ))}

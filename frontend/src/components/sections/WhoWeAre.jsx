@@ -1,17 +1,14 @@
-import { Bot, Code2, DraftingCompass, MapPin, Megaphone } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import Button from '../ui/Button.jsx'
 import Reveal from '../ui/Reveal.jsx'
 import SectionHeading from '../ui/SectionHeading.jsx'
 import ServiceSlider from './ServiceSlider.jsx'
 import { branchCities, branchSentence } from '../../data/branches.js'
 import { site } from '../../data/site.js'
+import { allDivisions } from '../../data/services.js'
+import { divisionIcons } from '../../utils/divisionIcons.js'
 
-const divisions = [
-  { icon: Code2, label: 'Software & Apps' },
-  { icon: Bot, label: 'AI & Automation' },
-  { icon: Megaphone, label: 'Digital Growth' },
-  { icon: DraftingCompass, label: 'CAD & Engineering' },
-]
+const divisions = allDivisions.map((d) => ({ icon: divisionIcons[d.slug], label: d.name }))
 
 /** "Who We Are": introduction to LAX360 Ventures. Text and the division list on the left, a service photo slider on the right
  *  (an auto-advancing slider of the services). Stacks on small screens with the panel after the text. */
@@ -25,7 +22,7 @@ export default function WhoWeAre() {
           <Reveal delay={0.08} className="mt-6 max-w-2xl space-y-5 text-lg leading-relaxed text-soft">
             <p>
               Welcome to <strong className="font-semibold text-fg">LAX360 Ventures</strong>, one accountable team that builds, automates and grows
-              your business. We bring software, AI, digital growth, CAD engineering and training together under one roof.
+              your business. We bring software, AI, digital marketing, APIs, automation, mobile apps and training together under one roof.
             </p>
             <p>
               Our work is planned, built and supported by the same people, so every piece fits the way you already work instead of competing for

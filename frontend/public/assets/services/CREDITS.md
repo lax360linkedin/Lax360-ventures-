@@ -1,3 +1,6 @@
 Service slider photos (Who We Are section) are from Unsplash, used under the Unsplash License (free for commercial use, no attribution required).
 Photo ids (https://unsplash.com/photos/<id>): software 1498050108023-c5249f4df085, ai 1677442135703-1787eea5ce01, marketing 1460925895917-afdab827c52f,
-headless 1695668548342-c0c1ad479aee, civil 1485083269755-a7b559a4fe5e, mechanical 1581092160562-40aa08e78837, education 1531482615713-2afd69097998.
+headless 1695668548342-c0c1ad479aee, education 1531482615713-2afd69097998.
+Added for the Services page: automation 1759752393975-7ca7b302fcc6 (Bluestonex), mobile 1551650975-87deedd944c3 (Balázs Kétyi), hero-dev 1534665482403-a909d0d97c67 (Danial Igdery). All free under the Unsplash License.
+Individual-service photos (items/p01-p24, Unsplash License, free for commercial use): unsplash ids 1525547719571-a2d4ac8945e2, 1563013544-824ae1b704d3, 1698128255721-f9a9ad2da830, 1763038311036-6d18805537e5, 1516383274235-5f42d6c6426d, 1626863905121-3b0c0ed7b94c, 1766066014237-00645c74e9c6, 1629904853893-c2c8981a1dc5, 1522071820081-009f0129c71c, 1633526543814-9718c8922b7a, 1435527173128-983b87201f4d, 1764795850513-fa8a469a4600, 1612630741022-b29ec17d013d, 1659353740176-ab1d8f8c6c7a, 1599050751795-6cdaafbc2319, 1516387938699-a93567ec168e, 1543269866-487350d6fa5e (files p01, p03-p06, p09-p15, p17, p18, p21, p23, p24).
+Product photos (assets/products): clinic 1758691463203-cce9d415b2b5, hr 1758518730327-98070967caab (Unsplash License); the rest reuse photos already credited above or in assets/about.

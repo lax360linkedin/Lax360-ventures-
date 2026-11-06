@@ -16,6 +16,9 @@ export const site = {
     { display: '+91 95666 79928', tel: '+919566679928', label: 'Salem & Bangalore' },
     { display: '+91 95666 05272', tel: '+919566605272', label: 'Mumbai' },
   ],
+  // Where the Headless SaaS & API Solutions "Explore the API Hub" button goes. Set VITE_API_HUB_URL to the API Hub product page when it is live;
+  // until then it opens an enquiry about API solutions.
+  apiHubUrl: import.meta.env.VITE_API_HUB_URL || '/contact?type=project',
   whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '919566679928',
   // Handles come from the planning document; Facebook has no confirmed handle so it is omitted.
   social: [
@@ -33,7 +36,7 @@ export const needsConfirmation = [
   'Domain email for LAX360 Ventures',
   'Social URLs (Instagram, LinkedIn, X) and the Facebook handle',
   'Business hours and response-time promise',
-  'Digital marketing and CAD scope',
+  'Digital marketing scope',
   'Course mode, duration and public fees',
   'The "What you can expect" commitments and the "Where we can come in" examples',
   'Mascot ownership / commercial licence',

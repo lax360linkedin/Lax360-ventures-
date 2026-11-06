@@ -5,9 +5,10 @@ import { useTheme } from '../../hooks/useTheme.js'
  * Light / dark switch. A real button with `aria-pressed` (pressed = light mode) and a name that says what it does.
  * The sun and moon cross-fade and rotate; with `showLabel` it also shows text (used in the mobile menu).
  */
-export default function ThemeToggle({ showLabel = false, className = '' }) {
-  const { theme, toggle } = useTheme()
-  const isLight = theme === 'light'
+export default function ThemeToggle({ showLabel = false, className = '', ignoreSiteTheme = false }) {
+  const { theme, toggle, forced } = useTheme()
+  if (forced && !ignoreSiteTheme) return null // a Super Admin has set one theme for the whole website
+  const isLight = theme !== 'dark'
   const label = isLight ? 'Switch to dark mode' : 'Switch to light mode'
   return (
     <button

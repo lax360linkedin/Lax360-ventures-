@@ -8,7 +8,11 @@ import Home from './pages/Home.jsx'
 const About = lazy(() => import('./pages/About.jsx'))
 const Services = lazy(() => import('./pages/Services.jsx'))
 const ServiceDetail = lazy(() => import('./pages/ServiceDetail.jsx'))
+const ServiceItem = lazy(() => import('./pages/ServiceItem.jsx'))
+const Products = lazy(() => import('./pages/Products.jsx'))
+const ProductDetail = lazy(() => import('./pages/ProductDetail.jsx'))
 const Industries = lazy(() => import('./pages/Industries.jsx'))
+const IndustryDetail = lazy(() => import('./pages/IndustryDetail.jsx'))
 const Insights = lazy(() => import('./pages/Insights.jsx'))
 const ArticleDetail = lazy(() => import('./pages/ArticleDetail.jsx'))
 const Network = lazy(() => import('./pages/Network.jsx'))
@@ -44,7 +48,11 @@ export default function App() {
         <Route path="about" element={<About />} />
         <Route path="services" element={<Services />} />
         <Route path="services/:slug" element={<ServiceDetail />} />
+        <Route path="services/:slug/:service" element={<ServiceItem />} />
+        <Route path="products" element={<Products />} />
+        <Route path="products/:slug" element={<ProductDetail />} />
         <Route path="industries" element={<Industries />} />
+        <Route path="industries/:slug" element={<IndustryDetail />} />
         <Route path="insights" element={<Insights />} />
         <Route path="insights/:slug" element={<ArticleDetail />} />
         <Route path="our-network" element={<Network />} />

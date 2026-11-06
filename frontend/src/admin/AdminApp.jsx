@@ -83,7 +83,7 @@ function AdminShell() {
             <span className="hidden text-sm text-soft lg:block">Signed in as <strong className="text-fg">{profile.full_name}</strong></span>
             <div className="flex items-center gap-2">
               <a href="/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-soft hover:bg-glass-strong hover:text-fg">View website <ExternalLink className="size-3.5" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>
-              <ThemeToggle />
+              <ThemeToggle ignoreSiteTheme />
             </div>
           </header>
           <main id="admin-main" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-6 outline-none md:px-8 md:py-8">

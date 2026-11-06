@@ -110,18 +110,18 @@ def test_replacing_keeps_the_previous_file_unless_asked_to_delete_it(fake, boss,
 def test_deleting_needs_confirmation_and_is_blocked_while_the_file_is_in_use(fake, boss, db, client):
     c, csrf = boss
     media = upload(boss).json()
-    cat = c.post("/api/admin/content/service_category", json={"title": "Civil CAD", "data": {"icon": media["id"]}, "status": "published"}, headers=csrf)
+    cat = c.post("/api/admin/content/service_category", json={"title": "Web Design", "data": {"icon": media["id"]}, "status": "published"}, headers=csrf)
     assert cat.status_code == 201
     usage = c.get(f"/api/admin/media/{media['id']}/usage").json()
     assert usage["used_by_published"] is True and usage["items"][0]["kind"] == "service_category"
     blocked = c.delete(f"/api/admin/media/{media['id']}", headers=csrf)
-    assert blocked.status_code == 409 and blocked.json()["error"]["code"] == "media_in_use" and blocked.json()["error"]["details"]["usage"][0]["title"] == "Civil CAD"
+    assert blocked.status_code == 409 and blocked.json()["error"]["code"] == "media_in_use" and blocked.json()["error"]["details"]["usage"][0]["title"] == "Web Design"
     assert len(fake.objects) == 1 and db.scalar(select(func.count()).select_from(MediaAsset)) == 1  # nothing was removed
     assert c.delete(f"/api/admin/media/{media['id']}", headers=csrf).status_code == 409
     assert c.delete(f"/api/admin/media/{media['id']}?force=true", headers=csrf).status_code == 204  # the admin confirmed
     assert fake.objects == {} and db.scalar(select(func.count()).select_from(MediaAsset)) == 0
     public = client.get("/api/public/content?kind=service_category").json()["items"]
-    assert public[0]["title"] == "Civil CAD" and "icon" not in public[0]["data"]  # a missing file never breaks the page
+    assert public[0]["title"] == "Web Design" and "icon" not in public[0]["data"]  # a missing file never breaks the page
 
 
 def test_unused_media_deletes_cleanly_from_the_database_and_storage(fake, boss, db):
@@ -145,7 +145,7 @@ def test_older_uploads_kept_in_the_database_still_work_and_are_not_touched(fake,
 # ---- content kinds, publishing and permissions ------------------------------------------------------------------------------------
 def test_super_admin_manages_every_cms_area_and_ordinary_admins_get_none_by_default(app, db, boss):
     kinds = {k["kind"] for k in boss[0].get("/api/admin/content/kinds").json()["kinds"]}
-    assert kinds == {"hero", "section", "faq_category", "faq", "about_section", "service_category", "service", "about_block", "project", "job", "nav_item", "social_link", "seo_page", "industry", "article", "network_partner", "team_member", "client", "testimonial"}
+    assert kinds == {"hero", "section", "faq_category", "faq", "about_section", "service_category", "service", "about_block", "project", "job", "nav_item", "social_link", "seo_page", "industry", "article", "network_category", "network_partner", "software_product", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "client", "testimonial", "product"}
     bare, bcsrf, _ = staff(app, db, role="admin", email="plain@example.com", permissions=[])
     assert bare.get("/api/admin/content/kinds").status_code == 403 and bare.get("/api/admin/content/service").status_code == 403
     assert bare.post("/api/admin/content/service", json={"title": "X"}, headers=bcsrf).status_code == 403
@@ -163,12 +163,12 @@ def test_each_cms_area_has_its_own_permission(app, db):
 
 def test_services_follow_the_draft_publish_workflow_and_use_managed_categories(fake, boss, client):
     c, csrf = boss
-    cat = c.post("/api/admin/content/service_category", json={"title": "Mechanical CAD", "status": "published"}, headers=csrf).json()
-    assert cat["slug"] == "mechanical-cad"
+    cat = c.post("/api/admin/content/service_category", json={"title": "Brand Design", "status": "published"}, headers=csrf).json()
+    assert cat["slug"] == "brand-design"
     options = next(k for k in c.get("/api/admin/content/kinds").json()["kinds"] if k["kind"] == "service")["fields"][0]["options"]
-    assert {"value": "mechanical-cad", "label": "Mechanical CAD"} in options  # categories are data, not hard-coded
+    assert {"value": "brand-design", "label": "Brand Design"} in options  # categories are data, not hard-coded
     image = upload(boss).json()
-    body = {"title": "3D modelling", "data": {"category": "mechanical-cad", "summary": "Parts and assemblies", "image": image["id"], "cta_link": "/contact?type=cad"}}
+    body = {"title": "3D modelling", "data": {"category": "brand-design", "summary": "Parts and assemblies", "image": image["id"], "cta_link": "/contact?type=project"}}
     assert c.post("/api/admin/content/service", json={**body, "data": {**body["data"], "category": "ghost"}}, headers=csrf).status_code == 422
     assert c.post("/api/admin/content/service", json={**body, "data": {**body["data"], "image": "not-a-real-id"}}, headers=csrf).status_code == 422
     svc = c.post("/api/admin/content/service", json=body, headers=csrf)
@@ -177,7 +177,7 @@ def test_services_follow_the_draft_publish_workflow_and_use_managed_categories(f
     assert client.get("/api/public/content-all").json()["kinds"]["service"] == []
     assert c.patch(f"/api/admin/content/item/{svc.json()['id']}", json={"status": "published"}, headers=csrf).status_code == 200
     live = client.get("/api/public/content?kind=service").json()["items"][0]
-    assert live["title"] == "3D modelling" and live["data"]["category"] == "mechanical-cad" and live["data"]["image"].startswith(PROJECT)
+    assert live["title"] == "3D modelling" and live["data"]["category"] == "brand-design" and live["data"]["image"].startswith(PROJECT)
     assert c.get("/api/admin/media").json()["items"][0]["is_public"] is True  # publishing made the referenced picture public
     c.patch(f"/api/admin/content/item/{svc.json()['id']}", json={"status": "draft"}, headers=csrf)
     assert client.get("/api/public/content?kind=service").json()["items"] == []  # unpublish hides it again
@@ -255,3 +255,84 @@ def test_preview_shows_a_drafts_private_picture_but_the_public_api_never_does(fa
     assert preview["status"] == "draft" and preview["data"]["image"].startswith(PROJECT)  # visible to the admin
     assert client.get("/api/public/content-all").json()["kinds"]["about_block"] == []  # invisible to everyone else
     assert c.get("/api/admin/media").json()["items"][0]["is_public"] is False  # previewing did not make it public
+
+
+def test_products_are_managed_and_published_through_the_cms(boss, client):
+    """Products (LAX360's own software) are an admin-managed kind: drafts stay private, a published product is public, bad links are refused."""
+    c, csrf = boss
+    data = {"category": "business", "status": "soon", "summary": "A sample product", "features": "Fast: quick to use"}
+    assert c.post("/api/admin/content/product", json={"title": "Bad", "data": {**data, "product_link": "javascript:alert(1)"}}, headers=csrf).status_code == 422
+    made = c.post("/api/admin/content/product", json={"title": "Sample Product", "data": data}, headers=csrf)
+    assert made.status_code == 201 and made.json()["slug"] == "sample-product" and made.json()["status"] == "draft"
+    assert client.get("/api/public/content?kind=product").json()["items"] == []  # a draft is never public
+    assert c.patch(f"/api/admin/content/item/{made.json()['id']}", json={"status": "published"}, headers=csrf).status_code == 200
+    public = client.get("/api/public/content?kind=product").json()["items"]
+    assert [p["title"] for p in public] == ["Sample Product"] and public[0]["data"]["category"] == "business"
+
+
+def test_seed_products_loads_the_portfolio_as_coming_soon_and_is_idempotent(db, env):
+    from app import cli
+
+    cli.main(["seed-products"])
+    items = db.scalars(select(ContentItem).where(ContentItem.kind == "product").order_by(ContentItem.sort_order)).all()
+    assert len(items) == 11 and items[0].title == "LAX360 Business CRM"
+    assert {i.data["status"] for i in items} == {"soon"}  # nothing is marked Live automatically
+    assert len({i.slug for i in items}) == 11 and all(i.data["features"] and i.data["problems"] for i in items)
+    items[0].data = {**items[0].data, "status": "beta"}  # an administrator's edit is never overwritten by a re-run
+    db.commit()
+    cli.main(["seed-products"])
+    db.expire_all()
+    assert db.scalar(select(func.count()).select_from(ContentItem).where(ContentItem.kind == "product")) == 11
+    assert db.scalar(select(ContentItem).where(ContentItem.slug == "lax360-business-crm")).data["status"] == "beta"
+    cli.main(["seed-products", "--remove"])
+    assert db.scalar(select(func.count()).select_from(ContentItem).where(ContentItem.kind == "product")) == 0
+
+
+def test_articles_support_categories_tags_featured_seo_and_a_custom_url(boss, client):
+    c, csrf = boss
+    options = next(k for k in c.get("/api/admin/content/kinds").json()["kinds"] if k["kind"] == "article")["fields"][0]["options"]
+    assert len(options) == 8 and {"value": "saas", "label": "SaaS & API Innovations"} in options
+    data = {"category": "saas", "published_on": "2026-11-01", "excerpt": "Summary", "body": "Hello", "tags": "api, saas", "featured": True, "seo_title": "SEO title", "meta_description": "Meta", "url_slug": "My Custom URL!"}
+    made = c.post("/api/admin/content/article", json={"title": "A new article", "data": data, "status": "published"}, headers=csrf)
+    assert made.status_code == 201, made.text
+    assert made.json()["slug"] == "my-custom-url"
+    blank = c.post("/api/admin/content/article", json={"title": "Plain Title Here", "data": {**data, "url_slug": ""}}, headers=csrf)
+    assert blank.status_code == 201 and blank.json()["slug"] == "plain-title-here"
+    public = client.get("/api/public/content?kind=article").json()["items"]
+    assert [i["slug"] for i in public] == ["my-custom-url"] and public[0]["data"]["featured"] is True  # the draft is not public
+
+
+def test_seed_industries_loads_the_twenty_industries_and_is_idempotent(db, env):
+    from app import cli
+
+    cli.main(["seed-industries"])
+    items = db.scalars(select(ContentItem).where(ContentItem.kind == "industry")).all()
+    assert len(items) == 20 and len({i.slug for i in items}) == 20
+    assert all(i.data["challenges"] and i.data["problem_solution"] and i.data["ai_opportunities"] and i.data["services"] for i in items)
+    assert len({i.data["description"] for i in items}) == 20  # every industry has its own text
+    items[0].data = {**items[0].data, "featured": False}
+    db.commit()
+    cli.main(["seed-industries"])
+    db.expire_all()
+    assert db.scalar(select(func.count()).select_from(ContentItem).where(ContentItem.kind == "industry")) == 20
+    cli.main(["seed-industries", "--remove"])
+    assert db.scalar(select(func.count()).select_from(ContentItem).where(ContentItem.kind == "industry")) == 0
+
+
+def test_network_seed_publishes_the_profiles_with_designations_pending_and_the_enquiry_types_exist(db, env, client):
+    from app import cli
+
+    cli.main(["seed-network"])
+    rows = {i.slug: i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(["network_partner", "software_product"])))}
+    assert {s for s in ("cadpoint-academy-salem", "fatcat-wealthy", "zoho", "openai", "marg-erp", "hexbis")} <= set(rows)
+    assert all(rows[s].data.get("verification") in ("pending", "verified") for s in ("zoho", "openai", "marg-erp", "hexbis", "cadpoint-academy-salem"))
+    assert all(rows[s].data["verification"] == "pending" and not rows[s].data.get("designation") for s in ("zoho", "openai", "marg-erp", "hexbis"))  # no partnership claim is made
+    titles = [i["title"] for i in client.get("/api/public/content?kind=network_partner").json()["items"]]
+    assert titles[:2] == ["CADPOINT Academy – Salem", "Fatcat Wealthy"] and {"Zoho", "OpenAI", "Marg ERP", "HexBis"} <= set(titles)
+    assert any(i["title"] == "Zoho CRM" and i["data"]["vendor"] == "zoho" and i["data"]["ownership"] == "third_party" for i in client.get("/api/public/content?kind=software_product").json()["items"])
+    cli.main(["seed-network"])
+    assert db.scalar(select(func.count()).select_from(ContentItem).where(ContentItem.kind == "network_partner")) == 6  # idempotent
+    ok = client.post("/api/contact", json={"name": "Asha Rao", "email": "asha@example.com", "company": "Example Ltd", "enquiry_type": "partner-reseller", "message": "We would like to resell your software.", "extra": {"website": "https://example.com"}, "consent": True})
+    assert ok.status_code in (200, 201), ok.text
+    bad = client.post("/api/contact", json={"name": "Asha Rao", "email": "asha@example.com", "enquiry_type": "partner-unknown", "message": "We would like to resell your software.", "consent": True})
+    assert bad.status_code == 422

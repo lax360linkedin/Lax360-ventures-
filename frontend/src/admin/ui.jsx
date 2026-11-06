@@ -6,7 +6,7 @@ export const cx = (...a) => a.filter(Boolean).join(' ')
 
 const btnBase = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lav'
 const btnKinds = {
-  primary: 'bg-primary text-white hover:bg-[#8b4df0]',
+  primary: 'bg-primary text-white hover:bg-[var(--btn-hover)]',
   secondary: 'border border-edge-strong bg-glass text-fg hover:border-lav hover:bg-glass-strong',
   danger: 'bg-error/15 text-error border border-error/40 hover:bg-error/25',
   ghost: 'text-soft hover:bg-glass-strong hover:text-fg',

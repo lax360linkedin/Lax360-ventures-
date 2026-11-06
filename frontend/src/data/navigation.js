@@ -1,11 +1,12 @@
 import { site } from './site.js'
 
 // Primary header links. "Work" only appears once real projects are published (site.workIsLive).
-// Header order is fixed: About → Services → Industries → Insights → Our Network → Our Team → Careers → Contact.
+// Header order is fixed: About → Services → Products → Industries → Insights → Our Network → Our Team → Careers → Contact.
 // (Work stays reachable from Services, the footer and the home page.)
 export const primaryNav = [
   { label: 'About', to: '/about' },
   { label: 'Services', to: '/services' },
+  { label: 'Products', to: '/products' },
   { label: 'Industries', to: '/industries' },
   { label: 'Insights', to: '/insights' },
   { label: 'Our Network', to: '/our-network' },
@@ -16,12 +17,14 @@ export const primaryNav = [
 
 export const footerColumns = [
   {
-    title: 'Divisions',
+    title: 'Our Services',
     links: [
-      { label: 'Software & Apps', to: '/services/software' },
-      { label: 'AI & Automation', to: '/services/ai' },
-      { label: 'Digital Growth', to: '/services/growth' },
-      { label: 'CAD & Engineering', to: '/services/engineering' },
+      { label: 'Software & IT Services', to: '/services/software' },
+      { label: 'AI & Business Automation', to: '/services/ai' },
+      { label: 'Digital Marketing', to: '/services/growth' },
+      { label: 'Headless SaaS & API Solutions', to: '/services/headless' },
+      { label: 'Workflow Automation & Integration', to: '/services/automation' },
+      { label: 'Mobile & Business Applications', to: '/services/mobile' },
     ],
   },
   {
@@ -29,6 +32,7 @@ export const footerColumns = [
     links: [
       { label: 'About', to: '/about' },
       { label: 'Services overview', to: '/services' },
+      { label: 'Products', to: '/products' },
       { label: 'Industries', to: '/industries' },
       { label: 'Insights', to: '/insights' },
       { label: 'Our Network', to: '/our-network' },
@@ -51,7 +55,6 @@ export const enquiryTypes = [
   { id: 'ai', label: 'AI consultation' },
   { id: 'website-app', label: 'Website or app' },
   { id: 'marketing', label: 'Digital marketing' },
-  { id: 'cad', label: 'CAD & engineering' },
   { id: 'course', label: 'Course enquiry' },
   { id: 'workshop', label: 'College workshop' },
   { id: 'partnership', label: 'Partnership' },

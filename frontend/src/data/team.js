@@ -7,5 +7,4 @@ export const teamGroups = [
   { value: 'software', label: 'Software Development Team', text: 'Building custom software, websites, web apps and mobile apps.' },
   { value: 'ai', label: 'AI & Automation Team', text: 'Designing AI assistants and automating business workflows.' },
   { value: 'marketing', label: 'Digital Marketing Team', text: 'Search, social media, performance campaigns and content.' },
-  { value: 'cad', label: 'CAD Engineering Team', text: 'Civil and mechanical drafting, 2D drawings and 3D models.' },
 ]

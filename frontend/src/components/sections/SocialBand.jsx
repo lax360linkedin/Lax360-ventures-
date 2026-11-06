@@ -15,14 +15,14 @@ export default function SocialBand() {
   const robot = settings.social_robot_enabled !== false && settings.chatbot_enabled !== false
   return (
     <section aria-labelledby="social-band-title" className="wrap py-10">
-      <div className="group/bot relative overflow-hidden rounded-3xl border border-edge-strong bg-glass px-6 py-8 shadow-[0_0_60px_-30px_rgba(124,58,237,0.8)] backdrop-blur-xl sm:px-10">
+      <div className="group/bot relative overflow-hidden rounded-3xl border border-edge-strong bg-glass px-6 py-8 shadow-[0_0_60px_-30px_rgb(var(--glow)/0.8)] backdrop-blur-xl sm:px-10">
         <div className="pointer-events-none absolute -left-20 -top-24 size-72 rounded-full bg-primary/20 blur-3xl" aria-hidden="true" />
         <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:items-end sm:gap-10 sm:text-left">
           {robot && (
             <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('lax360:open-chat'))} aria-label="Chat with the LAX360 assistant"
               className="anim-bot-bob shrink-0 rounded-2xl focus-visible:outline-2 focus-visible:outline-lav">
               <span className="anim-bot-wave block">
-                <img src="/assets/mascot-welcome.webp" alt="" width="480" height="722" loading="lazy" decoding="async" className="h-auto w-20 drop-shadow-[0_10px_20px_rgba(124,58,237,0.5)] sm:w-24" />
+                <img src="/assets/mascot-welcome.webp" alt="" width="480" height="722" loading="lazy" decoding="async" className="h-auto w-20 drop-shadow-[0_10px_20px_rgb(var(--glow)/0.5)] sm:w-24" />
               </span>
             </button>
           )}

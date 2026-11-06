@@ -22,9 +22,6 @@ const typeFields = {
     { id: 'goal', label: 'Main goal', kind: 'select', options: opts(['Leads', 'Sales', 'Awareness']) },
     { id: 'websiteUrl', label: 'Current website', kind: 'text', placeholder: 'https://' },
   ],
-  cad: [
-    { id: 'discipline', label: 'Discipline', kind: 'select', required: true, options: opts(['Civil', 'Mechanical', 'Both']) },
-  ],
   course: [
     { id: 'course', label: 'Course of interest', kind: 'select', options: courses.map((c) => ({ value: c.title, label: c.title })) },
     { id: 'mode', label: 'Preferred mode', kind: 'select', options: opts(['Online', 'In person', 'No preference']) },
@@ -221,9 +218,6 @@ export default function EnquiryForm({ defaultType = 'project', tone = 'light', c
             ),
           )}
         </div>
-      )}
-      {type === 'cad' && !compact && (
-        <p className={`text-sm ${dark ? 'text-soft' : 'text-soft'}`}>We will ask for drawings and files by email after reviewing your brief — there is no file upload on this site.</p>
       )}
 
       <FormField id={fid('message')} as="textarea" label="Project description" required tone={tone} value={values.message} onChange={set('message')} error={errors.message} maxLength={2000} hint="At least 20 characters." />

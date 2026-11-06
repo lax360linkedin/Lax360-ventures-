@@ -38,13 +38,13 @@ export default function Team() {
     <PageContainer
       path="/our-team"
       title="Our Team"
-      description="Meet the people behind LAX360 Ventures: founder and leadership, management, department heads and our software, AI, digital marketing and CAD engineering teams."
+      description="Meet the people behind LAX360 Ventures: founder and leadership, management, department heads and our software, AI, and digital marketing teams."
     >
       <PageHero
         eyebrow="Our Team"
         title="The people behind LAX360."
         art={<DivisionArt id="software" className="h-auto w-full" />}
-        lead="One accountable team across software, AI, digital growth and CAD engineering — from leadership to the specialists who do the work."
+        lead="One accountable team across software, AI, digital growth — from leadership to the specialists who do the work."
       />
 
       <section className="wrap section" aria-labelledby="team-title">

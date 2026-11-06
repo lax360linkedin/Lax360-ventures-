@@ -11,6 +11,9 @@
     python -m app.cli check-ai
     python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
+    python -m app.cli seed-network [--remove]                   (load the Our Network starter content; designations start unverified; --remove deletes only those)
+    python -m app.cli seed-industries [--remove]                (load the 20-industry content into the CMS so it can be edited; --remove deletes only those)
+    python -m app.cli seed-products [--remove]                  (load the LAX360 product portfolio into the CMS, all as Coming soon, so it can be edited; --remove deletes only those)
     python -m app.cli seed-faqs [--remove]                      (load the home page FAQ questions and categories into the CMS so they can be edited; --remove deletes only those)
     python -m app.cli seed-sample-testimonials [--remove]       (add / remove the six fictional placeholder testimonials; never touches real ones)
     python -m app.cli seed-sample-clients [--remove]            (add / remove the six placeholder "Our Clients" entries; never touches real clients)
@@ -384,6 +387,121 @@ def seed_faqs(args: argparse.Namespace) -> None:
         print(f"Added {added} FAQ row(s) ({len(data['categories']) + len(data['items']) - added} already present). Edit them in the admin panel (Website content > FAQ entries / FAQ categories).")
 
 
+def seed_products(args: argparse.Namespace) -> None:
+    """Load the built-in LAX360 product portfolio (frontend/src/data/products.json) into the CMS so administrators can edit, reorder, publish and delete it.
+    Every product starts as "Coming soon" (change the status in the admin panel as each one is actually built and released). Idempotent: rows are
+    identified by slug and existing rows are never overwritten. --remove deletes only the seeded rows that still have their original slug."""
+    import json
+    from pathlib import Path
+
+    from app.models import ContentItem
+
+    src = Path(__file__).resolve().parents[2] / "frontend" / "src" / "data" / "products.json"
+    products = json.loads(src.read_text(encoding="utf8"))
+    get_settings()
+    join = lambda items: chr(10).join(items)
+    with _factory()() as db:
+        existing = {i.slug: i for i in db.scalars(select(ContentItem).where(ContentItem.kind == "product"))}
+        if args.remove:
+            gone = [existing[p["slug"]] for p in products if p["slug"] in existing]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} seeded product(s). Products you added yourself were not touched.")
+            return
+        added = 0
+        for n, p in enumerate(products, start=1):
+            if p["slug"] in existing:
+                continue
+            data = {
+                "category": p["category"], "status": p["status"], "summary": p["summary"], "overview": (chr(10) * 2).join(p["overview"]),
+                "problems": join(p["problems"]), "features": join(p["features"]), "benefits": join(p["benefits"]), "use_cases": join(p["useCases"]),
+                "users": join(p["users"]), "industries": join(p["industries"]), "cta_label": "Enquire about this product",
+            }
+            db.add(ContentItem(kind="product", slug=p["slug"], title=p["name"], data=data, status="published", sort_order=n * 10))
+            added += 1
+        db.commit()
+        print(f"Added {added} product(s) ({len(products) - added} already present). Edit them in the admin panel (Website content > Products): set each product's status, add logos and screenshots.")
+
+
+def seed_industries(args: argparse.Namespace) -> None:
+    """Load the 20-industry platform content (frontend/src/data/industries.json) into the CMS so administrators can edit, reorder, feature, unpublish and
+    delete it. Idempotent: rows are identified by slug and existing rows are never overwritten. --remove deletes only the seeded rows (by slug)."""
+    import json
+    from pathlib import Path
+
+    from app.models import ContentItem
+
+    src = Path(__file__).resolve().parents[2] / "frontend" / "src" / "data" / "industries.json"
+    industries = json.loads(src.read_text(encoding="utf8"))
+    get_settings()
+    nl = chr(10)
+    with _factory()() as db:
+        existing = {i.slug: i for i in db.scalars(select(ContentItem).where(ContentItem.kind == "industry"))}
+        if args.remove:
+            gone = [existing[p["slug"]] for p in industries if p["slug"] in existing]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} seeded industr(ies). Industries you added yourself were not touched.")
+            return
+        added = 0
+        for n, p in enumerate(industries, start=1):
+            if p["slug"] in existing:
+                continue
+            data = {
+                "group": p["group"], "featured": bool(p.get("featured")), "summary": p["summary"], "description": p["overview"], "challenges": nl.join(p["challenges"]),
+                "problem_solution": nl.join(f"{a} => {b}" for a, b in p["pairs"]), "solutions": nl.join(p["solutions"]), "ai_opportunities": nl.join(f"{a}: {b}" for a, b in p["ai"]),
+                "use_cases": nl.join(p["useCases"]), "benefits": nl.join(p["benefits"]), "services": nl.join(p["services"]), "products": nl.join(p["products"]),
+                "insight_categories": nl.join(p["insightCategories"]),
+            }
+            db.add(ContentItem(kind="industry", slug=p["slug"], title=p["name"], data=data, status="published", sort_order=n * 10))
+            added += 1
+        db.commit()
+        print(f"Added {added} industr(ies) ({len(industries) - added} already present). Edit them in the admin panel (Website content > Industries): add card and hero images, adjust text.")
+
+
+def seed_network(args: argparse.Namespace) -> None:
+    """Load the Our Network starter content (frontend/src/data/network.json) into the CMS: CADPOINT Academy, Fatcat Wealthy, Zoho, OpenAI, Marg ERP and HexBis
+    (with their software products). Partnership designations start as "pending verification" and are not shown publicly until an administrator verifies them. Idempotent by slug; existing rows are
+    never overwritten. --remove deletes only the seeded rows."""
+    import json
+    from pathlib import Path
+
+    from app.models import ContentItem
+
+    src = Path(__file__).resolve().parents[2] / "frontend" / "src" / "data" / "network.json"
+    data = json.loads(src.read_text(encoding="utf8"))
+    get_settings()
+    nl = chr(10)
+    with _factory()() as db:
+        existing = {(i.kind, i.slug): i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(["network_partner", "software_product"])))}
+        if args.remove:
+            gone = [existing[k] for k in [("network_partner", c["slug"]) for c in data["companies"]] + [("software_product", p["slug"]) for p in data["software"]] if k in existing]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} seeded network row(s). Entries you added yourself were not touched.")
+            return
+        added = 0
+        for n, c in enumerate(data["companies"], start=1):
+            if ("network_partner", c["slug"]) in existing:
+                continue
+            body = {k: v for k, v in c.items() if k not in ("slug", "name", "status", "products", "featured")}
+            body["products"] = nl.join(c["products"])
+            body["featured"] = bool(c.get("featured"))
+            db.add(ContentItem(kind="network_partner", slug=c["slug"], title=c["name"], data={k: v for k, v in body.items() if v not in ("", None)}, status=c["status"], sort_order=n * 10))
+            added += 1
+        for n, p in enumerate(data["software"], start=1):
+            if ("software_product", p["slug"]) in existing:
+                continue
+            body = {k: v for k, v in p.items() if k not in ("slug", "name", "status") and v}
+            db.add(ContentItem(kind="software_product", slug=p["slug"], title=p["name"], data=body, status=p["status"], sort_order=n * 10))
+            added += 1
+        db.commit()
+        print(f"Added {added} network row(s). Review them in the admin panel (Website content > Network): verify each partner's designation, add official logos you are permitted to use, and adjust the text.")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -417,6 +535,15 @@ def main(argv: list[str] | None = None) -> None:
     hm = sub.add_parser("hero-videos-migrate", help="copy videos held on the server disk to Supabase Storage (verified; never deletes)")
     hm.add_argument("--apply", action="store_true", help="actually copy (default is a dry run)")
     hm.set_defaults(func=hero_videos_migrate)
+    sprod = sub.add_parser("seed-products", help="load the LAX360 product portfolio into the CMS (all as Coming soon), or --remove those rows")
+    sprod.add_argument("--remove", action="store_true")
+    sprod.set_defaults(func=seed_products)
+    sind = sub.add_parser("seed-industries", help="load the 20-industry content into the CMS, or --remove those rows")
+    sind.add_argument("--remove", action="store_true")
+    sind.set_defaults(func=seed_industries)
+    snet = sub.add_parser("seed-network", help="load the Our Network starter companies (CADPOINT, Fatcat Wealthy, Zoho, OpenAI, Marg ERP, HexBis; designations pending verification), or --remove them")
+    snet.add_argument("--remove", action="store_true")
+    snet.set_defaults(func=seed_network)
     sc = sub.add_parser("seed-sample-clients", help="add (or --remove) six placeholder 'Our Clients' entries for the home page")
     sc.add_argument("--remove", action="store_true", help="delete the sample clients instead of adding them")
     sc.set_defaults(func=seed_sample_clients)

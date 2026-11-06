@@ -1,4 +1,8 @@
 import { articles } from './data/articles.js'
+import { divisions } from './data/services.js'
+import portfolio from './data/products.json' with { type: 'json' }
+import industryPortfolio from './data/industries.json' with { type: 'json' }
+import { slugify } from './utils/slugify.js'
 
 // Single list of indexable routes. Used by the prerender script and the sitemap generator.
 // Keep in sync with src/App.jsx. Redirect aliases (/projects) are excluded.
@@ -9,8 +13,14 @@ export const routes = [
   '/services/software',
   '/services/ai',
   '/services/growth',
-  '/services/engineering',
+  '/services/headless',
+  '/services/automation',
+  '/services/mobile',
+  ...divisions.flatMap((d) => d.offerings.map((o) => `/services/${d.slug}/${slugify(o.name)}`)), // one page per individual service
+  '/products',
+  ...portfolio.map((p) => `/products/${p.slug}`), // built-in products (products published in the admin panel are rendered in the browser)
   '/industries',
+  ...industryPortfolio.map((i) => `/industries/${i.slug}`), // built-in industries (industries published in the admin panel are rendered in the browser)
   '/insights',
   ...articles.map((a) => `/insights/${a.slug}`), // built-in starter articles (articles published in the admin panel are rendered in the browser)
   '/our-network',

@@ -31,9 +31,9 @@ npm run preview    # serve the production build
 
 ## Routes
 
-`/`, `/about`, `/services`, `/services/{software,ai,growth,engineering}`, `/work`, `/career`, `/contact`, `/privacy`, `/terms`, 404.
+`/`, `/about`, `/services`, `/services/{software,ai,growth}`, `/work`, `/career`, `/contact`, `/privacy`, `/terms`, 404.
 `/projects` redirects to `/work` (the planning document's canonical URL).
-Contact accepts `?type=` (project, ai, website-app, marketing, cad, course, workshop, partnership, general) and `?course=<slug>`.
+Contact accepts `?type=` (project, ai, website-app, marketing, course, workshop, partnership, general) and `?course=<slug>`.
 
 ## Demo behaviour (important)
 

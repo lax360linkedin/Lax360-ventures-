@@ -1,0 +1,206 @@
+{
+  "companies": [
+    {
+      "slug": "cadpoint-academy-salem",
+      "name": "CADPOINT Academy – Salem",
+      "status": "published",
+      "category": "group",
+      "relationship": "operated",
+      "business_category": "Training & Education",
+      "description": "CADPOINT Academy in Salem is operated by LAX360 Ventures and provides training and education. Its official website lists IT, AI, CAD & Engineering courses.",
+      "designation": "CADPOINT authorized partnership",
+      "verification": "pending",
+      "products": [
+        "IT, AI, CAD & Engineering courses",
+        "CAD and technical training-related education",
+        "Training and educational services"
+      ],
+      "location_type": "same",
+      "location": "Salem",
+      "website_link": "https://www.cadpoint.co.in/",
+      "cta_label": "Visit CADPOINT",
+      "featured": true
+    },
+    {
+      "slug": "fatcat-wealthy",
+      "name": "Fatcat Wealthy",
+      "status": "published",
+      "category": "group",
+      "relationship": "associated",
+      "business_category": "Financial Services",
+      "description": "Fatcat Wealthy is an associated finance company, a separate business operating at the same location as LAX360 Ventures in Salem. Its official website describes financial education and investment services.",
+      "designation": "",
+      "verification": "verified",
+      "products": [
+        "Mutual funds",
+        "Insurance services",
+        "Investment broking",
+        "Financial academy"
+      ],
+      "location_type": "same",
+      "location": "Salem",
+      "website_link": "https://www.fatcatwealthy.com/",
+      "cta_label": "Visit Fatcat Wealthy",
+      "featured": false
+    },
+    {
+      "slug": "zoho",
+      "name": "Zoho",
+      "status": "published",
+      "category": "technology",
+      "relationship": "technology_provider",
+      "business_category": "Business Software & SaaS",
+      "description": "Zoho is a software company whose cloud applications cover CRM, accounting, HR, customer support and workplace productivity.",
+      "designation": "",
+      "verification": "pending",
+      "products": [
+        "Zoho CRM",
+        "Zoho Books",
+        "Zoho People",
+        "Zoho Desk",
+        "Zoho Workplace",
+        "Other Zoho business applications"
+      ],
+      "location_type": "separate",
+      "location": "",
+      "website_link": "https://www.zoho.com/",
+      "cta_label": "Contact for enquiry",
+      "featured": false
+    },
+    {
+      "slug": "openai",
+      "name": "OpenAI",
+      "status": "published",
+      "category": "technology",
+      "relationship": "technology_provider",
+      "business_category": "Artificial Intelligence Technology",
+      "description": "OpenAI is an artificial intelligence company that provides AI models and an API used to build assistants, agents and AI-powered applications.",
+      "designation": "",
+      "verification": "pending",
+      "products": [
+        "AI platforms and capabilities",
+        "OpenAI API-based solutions",
+        "AI-powered business applications",
+        "AI assistants and agents",
+        "Business automation"
+      ],
+      "location_type": "separate",
+      "location": "",
+      "website_link": "https://openai.com/",
+      "cta_label": "Contact for enquiry",
+      "featured": false
+    },
+    {
+      "slug": "marg-erp",
+      "name": "Marg ERP",
+      "status": "published",
+      "category": "technology",
+      "relationship": "technology_provider",
+      "business_category": "ERP, Billing & Business Management Software",
+      "description": "Marg ERP is business software for billing, accounting and inventory management, with versions for different industries.",
+      "designation": "",
+      "verification": "pending",
+      "products": [
+        "Billing and invoicing",
+        "Accounting",
+        "Inventory management",
+        "Business management software",
+        "Industry-specific ERP solutions"
+      ],
+      "location_type": "separate",
+      "location": "",
+      "website_link": "https://margcompusoft.com/",
+      "cta_label": "Contact for enquiry",
+      "featured": false
+    },
+    {
+      "slug": "hexbis",
+      "name": "HexBis",
+      "status": "published",
+      "category": "technology",
+      "relationship": "technology_provider",
+      "business_category": "Software & Business Solutions",
+      "description": "Software and business solutions company. Its official website, software products and relationship details are being confirmed and will be added here once verified.",
+      "designation": "",
+      "verification": "pending",
+      "products": [],
+      "location_type": "separate",
+      "location": "",
+      "website_link": "",
+      "cta_label": "Contact for enquiry",
+      "featured": false
+    }
+  ],
+  "software": [
+    {
+      "slug": "zoho-crm",
+      "name": "Zoho CRM",
+      "status": "published",
+      "vendor": "zoho",
+      "software_category": "crm_erp",
+      "ownership": "third_party",
+      "description": "Customer relationship management software from Zoho.",
+      "product_link": "https://www.zoho.com/crm/"
+    },
+    {
+      "slug": "zoho-books",
+      "name": "Zoho Books",
+      "status": "published",
+      "vendor": "zoho",
+      "software_category": "accounting",
+      "ownership": "third_party",
+      "description": "Online accounting and billing software from Zoho.",
+      "product_link": "https://www.zoho.com/books/"
+    },
+    {
+      "slug": "zoho-people",
+      "name": "Zoho People",
+      "status": "published",
+      "vendor": "zoho",
+      "software_category": "hr",
+      "ownership": "third_party",
+      "description": "HR management software from Zoho.",
+      "product_link": "https://www.zoho.com/people/"
+    },
+    {
+      "slug": "zoho-desk",
+      "name": "Zoho Desk",
+      "status": "published",
+      "vendor": "zoho",
+      "software_category": "crm_erp",
+      "ownership": "third_party",
+      "description": "Customer support and help-desk software from Zoho.",
+      "product_link": "https://www.zoho.com/desk/"
+    },
+    {
+      "slug": "zoho-workplace",
+      "name": "Zoho Workplace",
+      "status": "published",
+      "vendor": "zoho",
+      "software_category": "productivity",
+      "ownership": "third_party",
+      "description": "Email and office productivity suite from Zoho.",
+      "product_link": "https://www.zoho.com/workplace/"
+    },
+    {
+      "slug": "openai-api-platform",
+      "name": "OpenAI API platform",
+      "status": "published",
+      "vendor": "openai",
+      "software_category": "ai",
+      "ownership": "third_party",
+      "description": "AI models and an API from OpenAI that applications can build on.",
+      "product_link": "https://openai.com/"
+    },
+    {
+      "slug": "marg-erp-software",
+      "name": "Marg ERP software",
+      "status": "published",
+      "vendor": "marg-erp",
+      "software_category": "accounting",
+      "ownership": "third_party",
+      "description": "Billing, accounting and inventory software from Marg.",
+      "product_link": "https://margcompusoft.com/"
+    }
+  ]
+}

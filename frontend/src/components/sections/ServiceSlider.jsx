@@ -6,12 +6,12 @@ const SWIPE_MIN = 40
 
 // One slide per service. Photos are free-licence images from Unsplash (see public/assets/services/CREDITS.md), cropped to 1000x800 WebP.
 const slides = [
-  { id: 'software', title: 'Software Development & IT Services', text: 'Custom software, CRM, ERP, websites and apps.', photo: '/assets/services/software.webp' },
-  { id: 'ai', title: 'AI & Business Automation', text: 'Assistants and workflows that remove manual work.', photo: '/assets/services/ai.webp' },
-  { id: 'marketing', title: 'Digital Marketing', text: 'Search, social and performance campaigns.', photo: '/assets/services/marketing.webp' },
-  { id: 'headless', title: 'Headless SaaS', text: 'One API powering web, mobile and more.', photo: '/assets/services/headless.webp' },
-  { id: 'civil', title: 'Civil Engineering CAD', text: 'Drafting and drawing support for construction work.', photo: '/assets/services/civil.webp' },
-  { id: 'mechanical', title: 'Mechanical Engineering CAD', text: '2D drawings and 3D models for parts and assemblies.', photo: '/assets/services/mechanical.webp' },
+  { id: 'software', title: 'Software & IT Services', text: 'Custom software, websites, web and mobile apps, CRM and ERP.', photo: '/assets/services/software.webp' },
+  { id: 'ai', title: 'AI & Business Automation', text: 'AI applications, chatbots, agents and automated workflows.', photo: '/assets/services/ai.webp' },
+  { id: 'marketing', title: 'Digital Marketing', text: 'Social media, ads, SEO and content.', photo: '/assets/services/marketing.webp' },
+  { id: 'headless', title: 'Headless SaaS & API Solutions', text: 'Reusable backend services and ready-to-integrate APIs.', photo: '/assets/services/headless.webp' },
+  { id: 'automation', title: 'Workflow Automation & Integration', text: 'n8n, WhatsApp, email and CRM automation, and integrations.', photo: '/assets/services/automation.webp' },
+  { id: 'mobile', title: 'Mobile & Business Applications', text: 'Booking, field staff, billing and inventory apps.', photo: '/assets/services/mobile.webp' },
   { id: 'education', title: 'Technology Education & Training', text: 'Courses and workshops for students and professionals.', photo: '/assets/services/education.webp' },
 ]
 
@@ -54,13 +54,13 @@ export default function ServiceSlider() {
       tabIndex={0}
     >
       <div
-        className="relative aspect-[4/3.4] w-full select-none overflow-hidden rounded-[2rem] border border-edge-strong bg-glass shadow-[0_0_70px_-28px_rgba(124,58,237,0.9)] backdrop-blur-xl focus-visible:outline-2 focus-visible:outline-lav"
+        className="relative aspect-[4/3.4] w-full select-none overflow-hidden rounded-[2rem] border border-edge-strong bg-glass shadow-[0_0_70px_-28px_rgb(var(--glow)/0.9)] backdrop-blur-xl focus-visible:outline-2 focus-visible:outline-lav"
         style={{ touchAction: 'pan-y' }}
         onPointerDown={down}
         onPointerUp={up}
         onPointerCancel={() => { touch.current = null }}
       >
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(124,58,237,0.28),transparent_60%),radial-gradient(circle_at_80%_90%,rgba(59,130,246,0.18),transparent_55%)]" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgb(var(--glow)/0.28),transparent_60%),radial-gradient(circle_at_80%_90%,rgba(59,130,246,0.18),transparent_55%)]" />
         {slides.map((s, k) => (
           <figure
             key={s.id}
@@ -71,7 +71,7 @@ export default function ServiceSlider() {
             className={`absolute inset-0 m-0 flex flex-col transition-[opacity,transform] duration-[900ms] ease-signal motion-reduce:transition-none ${k === i ? 'translate-x-0 scale-100 opacity-100' : `pointer-events-none opacity-0 ${k < i ? '-translate-x-6' : 'translate-x-6'} scale-[1.03]`}`}
           >
             <img src={s.photo} alt="" width="1000" height="800" loading={k === 0 ? 'eager' : 'lazy'} decoding="async" draggable="false" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b0714] via-[#0b0714]/55 to-[#0b0714]/10" />
+            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-(--img-shade) via-(--img-shade)/55 to-(--img-shade)/10" />
             <figcaption className="relative mt-auto px-6 pb-16 text-center sm:px-8 sm:pb-[4.5rem]">
               <p className="font-display text-lg font-semibold text-white sm:text-xl">{s.title}</p>
               <p className="mt-1 text-sm text-white/80">{s.text}</p>

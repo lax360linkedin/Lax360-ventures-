@@ -12,7 +12,7 @@ from tests.admin_helpers import staff, submit_enquiry
 def make_set(client):
     return {
         "ada": submit_enquiry(client, name="Ada Lovelace", email="ada@example.com", phone="+919000000001", message="Looking for an ERP system for our factory, please call."),
-        "bob": submit_enquiry(client, name="Bob Builder", email="bob@acme.io", phone="+919000000002", enquiry_type="cad", message="Need CAD drawings prepared from sketches, urgent request."),
+        "bob": submit_enquiry(client, name="Bob Builder", email="bob@acme.io", phone="+919000000002", enquiry_type="general", message="Need drawings prepared from sketches, urgent request."),
         "cy": submit_enquiry(client, name="Cy 100%_Real", email="cy@example.com", phone="+919000000003", enquiry_type="course", message="Interested in the Python with AI course for students."),
     }
 

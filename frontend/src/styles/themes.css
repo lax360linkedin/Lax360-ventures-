@@ -1,0 +1,85 @@
+/*
+ * Extra website themes: Snow White + Slate Grey, White + Dusty Rose, White + Sage Green.
+ * Light-family palettes. <html> keeps data-theme="light" (so every light-mode rule still applies) and adds data-palette="snow|rose|sage";
+ * each block only re-colours the shared tokens defined for light mode in index.css. Text/background pairs keep at least WCAG AA contrast (4.5:1).
+ * Chosen by the Super Admin under Website settings > Appearance. The hero video scope (.media-dark) keeps its dark scrim and only takes the accent.
+ */
+:root[data-theme="light"][data-palette="snow"] {
+  --color-night: #fafafa; --color-base2: #f1f2f4; --color-deep: #e2e5ea; --color-fg: #1d2330; --color-soft: #475467;
+  --color-primary: #475569; --color-primary-hover: #334155; --color-accent: #334155; --color-lav: #475569; --color-sky: #64748b;
+  --color-glass: rgba(71, 85, 105, 0.05); --color-glass-strong: rgba(71, 85, 105, 0.1);
+  --color-edge: rgba(71, 85, 105, 0.2); --color-edge-strong: rgba(71, 85, 105, 0.42);
+  --color-violet: #475569; --color-tint: #475569;
+  --shadow-menu: 0 24px 60px -24px rgba(30, 41, 59, 0.22), 0 0 0 1px rgba(71, 85, 105, 0.12);
+  --shadow-lift: 0 24px 50px -22px rgba(51, 65, 85, 0.35);
+  --glass-a: rgba(255, 255, 255, 0.94); --glass-b: rgba(244, 245, 247, 0.78); --glass-flat-a: rgba(255, 255, 255, 0.92); --glass-flat-b: rgba(244, 245, 247, 0.75);
+  --glass-inset: rgba(255, 255, 255, 0.95); --glass-shadow: rgba(30, 41, 59, 0.24); --shine: rgba(71, 85, 105, 0.1);
+  --grad-a: #1e293b; --grad-b: #475569; --grad-c: #64748b;
+  --amb-1: rgba(100, 116, 139, 0.1); --amb-2: rgba(148, 163, 184, 0.1); --amb-3: rgba(71, 85, 105, 0.07);
+  --wordmark-a: rgba(71, 85, 105, 0.2); --wordmark-b: rgba(100, 116, 139, 0.05);
+  --art-line: #475569; --art-glass: rgba(71, 85, 105, 0.08); --art-faint: rgba(71, 85, 105, 0.22); --art-grid: rgba(71, 85, 105, 0.1);
+  --art-solid: #ffffff; --art-vio: #64748b; --art-sky: #475569;
+  --glow: 71 85 105; --glow2: 100 116 139; --glow3: 148 163 184; --btn-hover: #334155;
+  --bot-violet: #475569; --bot-heart: #64748b; --bot-line: rgba(71, 85, 105, 0.7); --bot-glow: rgba(71, 85, 105, 0.4); --bot-hl: rgba(71, 85, 105, 0.14);
+  --page-bg: #fafafa;
+}
+:root[data-theme="light"][data-palette="rose"] {
+  --color-night: #fffbfb; --color-base2: #fbf1f2; --color-deep: #f3dde0; --color-fg: #3a2328; --color-soft: #6b4f55;
+  --color-primary: #a8556a; --color-primary-hover: #8f4457; --color-accent: #9d4e63; --color-lav: #9d4e63; --color-sky: #b76e79;
+  --color-glass: rgba(168, 85, 106, 0.05); --color-glass-strong: rgba(168, 85, 106, 0.1);
+  --color-edge: rgba(157, 78, 99, 0.2); --color-edge-strong: rgba(157, 78, 99, 0.42);
+  --color-violet: #9d4e63; --color-tint: #a8556a;
+  --shadow-menu: 0 24px 60px -24px rgba(110, 50, 66, 0.25), 0 0 0 1px rgba(157, 78, 99, 0.12);
+  --shadow-lift: 0 24px 50px -22px rgba(168, 85, 106, 0.38);
+  --glass-a: rgba(255, 255, 255, 0.93); --glass-b: rgba(253, 243, 244, 0.76); --glass-flat-a: rgba(255, 255, 255, 0.91); --glass-flat-b: rgba(253, 243, 244, 0.74);
+  --glass-inset: rgba(255, 255, 255, 0.92); --glass-shadow: rgba(110, 50, 66, 0.26); --shine: rgba(168, 85, 106, 0.11);
+  --grad-a: #8f4457; --grad-b: #b76e79; --grad-c: #c98a93;
+  --amb-1: rgba(201, 138, 147, 0.14); --amb-2: rgba(232, 184, 190, 0.12); --amb-3: rgba(183, 110, 121, 0.09);
+  --wordmark-a: rgba(157, 78, 99, 0.2); --wordmark-b: rgba(183, 110, 121, 0.05);
+  --art-line: #9d4e63; --art-glass: rgba(168, 85, 106, 0.08); --art-faint: rgba(157, 78, 99, 0.22); --art-grid: rgba(157, 78, 99, 0.1);
+  --art-solid: #ffffff; --art-vio: #b76e79; --art-sky: #9d4e63;
+  --glow: 168 85 106; --glow2: 201 138 147; --glow3: 232 184 190; --btn-hover: #b4647a;
+  --bot-violet: #a8556a; --bot-heart: #c98a93; --bot-line: rgba(157, 78, 99, 0.7); --bot-glow: rgba(168, 85, 106, 0.42); --bot-hl: rgba(168, 85, 106, 0.14);
+  --page-bg: #fffbfb;
+}
+:root[data-theme="light"][data-palette="sage"] {
+  --color-night: #fbfdfa; --color-base2: #f1f6ef; --color-deep: #dfe9dc; --color-fg: #1f2d24; --color-soft: #4a5d50;
+  --color-primary: #4a7c59; --color-primary-hover: #3a6347; --color-accent: #3f6e4e; --color-lav: #3f6e4e; --color-sky: #6b8f71;
+  --color-glass: rgba(74, 124, 89, 0.05); --color-glass-strong: rgba(74, 124, 89, 0.1);
+  --color-edge: rgba(63, 110, 78, 0.2); --color-edge-strong: rgba(63, 110, 78, 0.42);
+  --color-violet: #3f6e4e; --color-tint: #4a7c59;
+  --shadow-menu: 0 24px 60px -24px rgba(31, 61, 42, 0.24), 0 0 0 1px rgba(63, 110, 78, 0.12);
+  --shadow-lift: 0 24px 50px -22px rgba(74, 124, 89, 0.38);
+  --glass-a: rgba(255, 255, 255, 0.93); --glass-b: rgba(241, 247, 239, 0.76); --glass-flat-a: rgba(255, 255, 255, 0.91); --glass-flat-b: rgba(241, 247, 239, 0.74);
+  --glass-inset: rgba(255, 255, 255, 0.92); --glass-shadow: rgba(31, 61, 42, 0.26); --shine: rgba(74, 124, 89, 0.11);
+  --grad-a: #2f5a3d; --grad-b: #4a7c59; --grad-c: #6b8f71;
+  --amb-1: rgba(107, 143, 113, 0.13); --amb-2: rgba(163, 190, 160, 0.12); --amb-3: rgba(74, 124, 89, 0.08);
+  --wordmark-a: rgba(63, 110, 78, 0.2); --wordmark-b: rgba(107, 143, 113, 0.05);
+  --art-line: #3f6e4e; --art-glass: rgba(74, 124, 89, 0.08); --art-faint: rgba(63, 110, 78, 0.22); --art-grid: rgba(63, 110, 78, 0.1);
+  --art-solid: #ffffff; --art-vio: #6b8f71; --art-sky: #3f6e4e;
+  --glow: 74 124 89; --glow2: 107 143 113; --glow3: 163 190 160; --btn-hover: #5a8c69;
+  --bot-violet: #4a7c59; --bot-heart: #6b8f71; --bot-line: rgba(63, 110, 78, 0.7); --bot-glow: rgba(74, 124, 89, 0.4); --bot-hl: rgba(74, 124, 89, 0.14);
+  --page-bg: #fbfdfa;
+}
+
+/* hero video / always-dark media scope: keeps its dark scrim, takes the palette accent instead of violet */
+:root[data-theme="light"][data-palette="snow"] .media-dark, :root[data-theme="light"][data-palette="snow"] .hero-media:has([data-hero-video="playing"], [data-hero-video="poster"]) {
+  --color-primary: #475569; --color-primary-hover: #334155; --color-accent: #94a3b8; --color-lav: #cbd5e1; --color-sky: #94a3b8; --color-violet: #94a3b8;
+  --color-edge: rgba(203, 213, 225, 0.22); --color-edge-strong: rgba(203, 213, 225, 0.42); --grad-a: #e2e8f0; --grad-b: #94a3b8; --grad-c: #cbd5e1;
+  --bot-line: rgba(203, 213, 225, 0.6); --bot-glow: rgba(148, 163, 184, 0.55); --bot-hl: rgba(148, 163, 184, 0.2);
+}
+:root[data-theme="light"][data-palette="rose"] .media-dark, :root[data-theme="light"][data-palette="rose"] .hero-media:has([data-hero-video="playing"], [data-hero-video="poster"]) {
+  --color-primary: #a8556a; --color-primary-hover: #8f4457; --color-accent: #d99aa5; --color-lav: #f2c9cf; --color-sky: #d99aa5; --color-violet: #d99aa5;
+  --color-edge: rgba(242, 201, 207, 0.22); --color-edge-strong: rgba(242, 201, 207, 0.42); --grad-a: #fbe3e6; --grad-b: #d99aa5; --grad-c: #f2c9cf;
+  --bot-line: rgba(242, 201, 207, 0.6); --bot-glow: rgba(217, 154, 165, 0.55); --bot-hl: rgba(217, 154, 165, 0.2);
+}
+:root[data-theme="light"][data-palette="sage"] .media-dark, :root[data-theme="light"][data-palette="sage"] .hero-media:has([data-hero-video="playing"], [data-hero-video="poster"]) {
+  --color-primary: #4a7c59; --color-primary-hover: #3a6347; --color-accent: #9bbd9f; --color-lav: #cfe3d1; --color-sky: #9bbd9f; --color-violet: #9bbd9f;
+  --color-edge: rgba(207, 227, 209, 0.22); --color-edge-strong: rgba(207, 227, 209, 0.42); --grad-a: #e3f0e4; --grad-b: #9bbd9f; --grad-c: #cfe3d1;
+  --bot-line: rgba(207, 227, 209, 0.6); --bot-glow: rgba(155, 189, 159, 0.55); --bot-hl: rgba(155, 189, 159, 0.2);
+}
+
+/* always-bright scope (About hero) takes the palette values */
+:root[data-theme="light"][data-palette="snow"] .hero-light { --color-night: #fafafa; --color-base2: #f1f2f4; --color-deep: #e2e5ea; --color-fg: #1d2330; --color-soft: #475467; --color-primary: #475569; --color-primary-hover: #334155; --color-accent: #334155; --color-lav: #475569; --color-sky: #64748b; --color-glass: rgba(71, 85, 105, 0.05); --color-glass-strong: rgba(71, 85, 105, 0.1); --color-edge: rgba(71, 85, 105, 0.2); --color-edge-strong: rgba(71, 85, 105, 0.42); --color-violet: #475569; --color-tint: #475569; --grad-a: #1e293b; --grad-b: #475569; --grad-c: #64748b; }
+:root[data-theme="light"][data-palette="rose"] .hero-light { --color-night: #fffbfb; --color-base2: #fbf1f2; --color-deep: #f3dde0; --color-fg: #3a2328; --color-soft: #6b4f55; --color-primary: #a8556a; --color-primary-hover: #8f4457; --color-accent: #9d4e63; --color-lav: #9d4e63; --color-sky: #b76e79; --color-glass: rgba(168, 85, 106, 0.05); --color-glass-strong: rgba(168, 85, 106, 0.1); --color-edge: rgba(157, 78, 99, 0.2); --color-edge-strong: rgba(157, 78, 99, 0.42); --color-violet: #9d4e63; --color-tint: #a8556a; --grad-a: #8f4457; --grad-b: #b76e79; --grad-c: #c98a93; }
+:root[data-theme="light"][data-palette="sage"] .hero-light { --color-night: #fbfdfa; --color-base2: #f1f6ef; --color-deep: #dfe9dc; --color-fg: #1f2d24; --color-soft: #4a5d50; --color-primary: #4a7c59; --color-primary-hover: #3a6347; --color-accent: #3f6e4e; --color-lav: #3f6e4e; --color-sky: #6b8f71; --color-glass: rgba(74, 124, 89, 0.05); --color-glass-strong: rgba(74, 124, 89, 0.1); --color-edge: rgba(63, 110, 78, 0.2); --color-edge-strong: rgba(63, 110, 78, 0.42); --color-violet: #3f6e4e; --color-tint: #4a7c59; --grad-a: #2f5a3d; --grad-b: #4a7c59; --grad-c: #6b8f71; }

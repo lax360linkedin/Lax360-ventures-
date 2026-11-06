@@ -21,11 +21,17 @@ _PHONE = re.compile(r"^\+?[0-9][0-9\s().-]{5,24}$")
 _URL = re.compile(r"^https?://[^\s]{3,300}$")
 
 
-def S(label, group, kind="str", public=True, max_len=200, help=""):
-    return {"label": label, "group": group, "type": kind, "public": public, "max": max_len, "help": help}
+def S(label, group, kind="str", public=True, max_len=200, help="", options=None):
+    return {"label": label, "group": group, "type": kind, "public": public, "max": max_len, "help": help, "options": options}
 
+
+# Website colour themes the Super Admin can apply to the whole public site ("visitor" = each visitor picks Dark or Light, the original behaviour).
+THEMES = ("visitor", "dark", "light", "snow", "rose", "sage")
 
 SPEC: dict[str, dict] = {
+    # appearance (Super Admin only: enforced in the route)
+    "site_theme": S("Website theme", "appearance", "choice", options=list(THEMES),
+                    help="Applies to the whole public website for every visitor. “visitor” keeps the Dark / Light switch in the menu."),
     # general (shown as the About page's tagline)
     "tagline": S("Tagline (About page)", "general", max_len=160),
     # contact
@@ -70,6 +76,7 @@ SPEC: dict[str, dict] = {
 }
 CHATBOT_KEYS = tuple(k for k, v in SPEC.items() if v["group"] == "chatbot")
 SITE_KEYS = tuple(k for k in SPEC if k not in CHATBOT_KEYS)
+SUPER_ONLY_KEYS = ("site_theme",)
 
 
 def _validate(key: str, value, db: Session | None = None):
@@ -86,6 +93,8 @@ def _validate(key: str, value, db: Session | None = None):
         raise ValueError(f"Keep it under {spec['max']} characters.")
     if value == "":
         return None  # empty = remove the override and fall back to the website default
+    if kind == "choice" and value not in (spec["options"] or ()):
+        raise ValueError("Choose one of the available options.")
     if kind == "email" and not EMAIL.match(value):
         raise ValueError("Enter a valid email address.")
     if kind == "phone" and not _PHONE.match(value):

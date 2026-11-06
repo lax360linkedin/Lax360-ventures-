@@ -18,7 +18,7 @@ export default function ProcessTimeline({ eyebrow = 'Process', title = 'How a pr
               {s.n}
             </p>
             <div className="mt-5 flex items-center gap-3">
-              <span aria-hidden="true" className={`size-2.5 rounded-full ${i === processSteps.length - 1 ? 'bg-accent shadow-[0_0_10px_2px_rgba(168,85,247,0.8)]' : 'bg-lav'}`} />
+              <span aria-hidden="true" className={`size-2.5 rounded-full ${i === processSteps.length - 1 ? 'bg-accent shadow-[0_0_10px_2px_rgb(var(--glow2)/0.8)]' : 'bg-lav'}`} />
               <h3 className="font-display text-2xl font-semibold">
                 <span className="sr-only">{s.n} — </span>{s.title}
               </h3>

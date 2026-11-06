@@ -1,4 +1,4 @@
-import { Bot, Code2, DraftingCompass, GraduationCap, Smartphone, TrendingUp, Workflow, Boxes, Globe2, PenTool, Cpu, BookOpen } from 'lucide-react'
+import { Bot, Code2, GraduationCap, Smartphone, TrendingUp, Workflow, Boxes, Globe2, PenTool, Cpu, BookOpen } from 'lucide-react'
 
 // Capability labels only — no partner or customer logos, no partnership claims.
 const rowA = [
@@ -11,7 +11,6 @@ const rowA = [
 ]
 const rowB = [
   { icon: TrendingUp, label: 'Digital Marketing' },
-  { icon: DraftingCompass, label: 'CAD Drafting' },
   { icon: PenTool, label: '2D & 3D Modelling' },
   { icon: Cpu, label: 'Prompt Engineering' },
   { icon: GraduationCap, label: 'College Workshops' },
@@ -43,7 +42,7 @@ export default function Marquee() {
   return (
     <section aria-label="Capabilities" className="space-y-3 border-y border-edge bg-base2/60 py-6 md:py-8">
       <Row items={rowA} label="Software and AI capabilities" />
-      <Row items={rowB} reverse label="Growth, engineering and training capabilities" />
+      <Row items={rowB} reverse label="Growth and training capabilities" />
     </section>
   )
 }

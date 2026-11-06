@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import permission
 from app.api.paging import Paging, day_after, day_start
 from app.core.config import Settings, get_settings
+from app.core.errors import ApiError
 from app.db.session import get_db
 from app.models import User
 from app.schemas.admin import SettingsUpdate
@@ -29,17 +30,21 @@ def _changed_detail(changed: list[str]) -> dict:
 
 
 @router.get("/settings")
-def get_site_settings(_: User = Depends(permission("settings")), db: Session = Depends(get_db)) -> dict:
-    return _settings_payload(db, svc.SITE_KEYS)
+def get_site_settings(user: User = Depends(permission("settings")), db: Session = Depends(get_db)) -> dict:
+    keys = svc.SITE_KEYS if user.role == "super_admin" else tuple(k for k in svc.SITE_KEYS if k not in svc.SUPER_ONLY_KEYS)  # the theme picker is for Super Admins only
+    return _settings_payload(db, keys)
 
 
 @router.put("/settings")
 def put_site_settings(body: SettingsUpdate, user: User = Depends(permission("settings", write=True)), db: Session = Depends(get_db)) -> dict:
+    if user.role != "super_admin" and any(k in svc.SUPER_ONLY_KEYS for k in body.values):
+        raise ApiError(403, "forbidden", "Only a Super Admin can change the website theme.")
     changed = svc.update(db, user, body.values, allowed=svc.SITE_KEYS)
     if changed:
         audit_service.record(db, user, "settings.update", resource_type="settings", detail=_changed_detail(changed))
     db.commit()
-    return _settings_payload(db, svc.SITE_KEYS)
+    keys = svc.SITE_KEYS if user.role == "super_admin" else tuple(k for k in svc.SITE_KEYS if k not in svc.SUPER_ONLY_KEYS)
+    return _settings_payload(db, keys)
 
 
 @router.get("/chatbot/settings")

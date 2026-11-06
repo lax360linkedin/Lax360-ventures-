@@ -6,5 +6,5 @@ export const slugify = (text) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
 
-/** Link to an offering row on its division page. */
-export const offeringHref = (divisionSlug, offeringName) => `/services/${divisionSlug}#${slugify(offeringName)}`
+/** Link to an individual service's own page: /services/<category>/<service>. */
+export const offeringHref = (divisionSlug, offeringName) => `/services/${divisionSlug}/${slugify(offeringName)}`

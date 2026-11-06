@@ -77,7 +77,7 @@ export default function Testimonials() {
               <span key={`ring-${i}`} className="anim-present-ring absolute bottom-4 size-28 rounded-full sm:bottom-6 sm:size-40 border border-lav/60 lg:size-52" />
               <div key={`m-${i}`} className="anim-present origin-bottom">
                 <div className="anim-bot-bob">
-                  <img src="/assets/mascot-welcome.webp" alt="" width="480" height="722" decoding="async" draggable="false" className="h-28 w-auto drop-shadow-[0_12px_24px_rgba(124,58,237,0.55)] sm:h-44 lg:h-64" />
+                  <img src="/assets/mascot-welcome.webp" alt="" width="480" height="722" decoding="async" draggable="false" className="h-28 w-auto drop-shadow-[0_12px_24px_rgb(var(--glow)/0.55)] sm:h-44 lg:h-64" />
                 </div>
               </div>
             </div>

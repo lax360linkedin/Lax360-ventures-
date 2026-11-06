@@ -8,8 +8,8 @@
     { "slug": "partnerships", "title": "Partnerships & Collaboration", "description": "Working with other businesses." }
   ],
   "items": [
-    { "category": "company", "q": "What is LAX360 Ventures?", "a": "LAX360 Ventures is a technology company with branches in Salem, Bangalore and Mumbai. One team plans, builds, automates and supports software, AI solutions, digital marketing and CAD engineering work, so you deal with a single point of contact instead of several vendors." },
-    { "category": "company", "q": "What services does LAX360 Ventures offer?", "a": "We offer custom software (including CRM and ERP), websites and mobile apps, AI assistants and business automation, digital marketing, and CAD drafting and modelling for civil and mechanical work. We also run training workshops. The Services page describes each area in more detail." },
+    { "category": "company", "q": "What is LAX360 Ventures?", "a": "LAX360 Ventures is a technology company with branches in Salem, Bangalore and Mumbai. One team plans, builds, automates and supports software, AI solutions and digital marketing work, so you deal with a single point of contact instead of several vendors." },
+    { "category": "company", "q": "What services does LAX360 Ventures offer?", "a": "We offer custom software (including CRM and ERP), websites and mobile apps, AI assistants and business automation and digital marketing. We also run training workshops. The Services page describes each area in more detail." },
     { "category": "company", "q": "Which industries does LAX360 Ventures serve?", "a": "Our Industries page lists the sectors we build technology for, such as manufacturing, retail, healthcare, education, logistics, construction, finance and hospitality. If your business is in a different field, tell us about it: most business problems are similar across industries." },
     { "category": "company", "q": "Do you provide customised solutions based on business requirements?", "a": "Yes. We start by listening to your requirements and the problem you want to solve, and we recommend only what your business needs. We do not push services you do not need." },
 

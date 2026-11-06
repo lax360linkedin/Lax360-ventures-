@@ -1,11 +1,11 @@
-// The 26 service icons that rain down in the welcome intro (decorative; the tiles are aria-hidden).
+// The service icons that rain down in the welcome intro (decorative; the tiles are aria-hidden).
 //
 // - Generic concepts use the project's existing Lucide icon set.
 // - Product logos (Claude, Google Gemini, Cursor, GitHub Copilot, Google Ads, Meta) use the official vector paths from the `simple-icons`
 //   package (CC0 data; the marks remain trademarks of their owners and are used here only to depict the tools/platforms we work with).
 // - OpenAI / ChatGPT has no mark in that package, so it gets a generic Lucide chat icon rather than a redrawn logo.
 import {
-  BarChart3, Bot, BrainCircuit, Box, Building2, Cloud, Code2, Cog, Database, DraftingCompass, Globe, Megaphone, MessageSquareText, MessagesSquare,
+  BarChart3, Bot, BrainCircuit,  Cloud, Code2, Database, Globe, Megaphone, MessageSquareText, MessagesSquare,
   PenTool, Search, Share2, Smartphone, Sparkles, Workflow,
 } from 'lucide-react'
 import { siClaude, siCursor, siGithubcopilot, siGoogleads, siGooglegemini, siMeta } from 'simple-icons'
@@ -40,9 +40,4 @@ export const INTRO_ICONS = [
   brand('marketing', siMeta),
   lucide('marketing', Share2, '#ec4899'), // social media marketing
   lucide('marketing', BarChart3, '#f59e0b'), // analytics
-  // CAD & engineering
-  lucide('cad', Cog, '#0d9488'), // mechanical CAD
-  lucide('cad', Building2, '#0891b2'), // civil CAD
-  lucide('cad', DraftingCompass, '#14b8a6'), // 2D drafting
-  lucide('cad', Box, '#0284c7'), // 3D modelling
 ]

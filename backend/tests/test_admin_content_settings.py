@@ -10,7 +10,7 @@ def test_content_kinds_describe_only_what_the_site_actually_uses(app, db):
     admin, _, _ = staff(app, db, permissions=["content"])
     body = admin.get("/api/admin/content/kinds").json()
     # an admin who only holds the `content` module sees the homepage / about / portfolio kinds; services, careers and navigation are separate modules
-    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_partner", "team_member", "article", "client", "testimonial", "project"]
+    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_category", "network_partner", "software_product", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "article", "client", "testimonial", "project", "product"]
     assert all(f["name"] for k in body["kinds"] for f in k["fields"])
     assert admin.get("/api/admin/content/pricing_table").status_code == 404  # not a managed section
 
@@ -105,6 +105,21 @@ def test_settings_validation_and_blank_resets(app, db):
     assert "tagline" not in admin.get("/api/admin/settings").json()["values"]
 
 
+def test_website_theme_is_super_admin_only_validated_and_public(app, db, client):
+    plain, csrf1, _ = staff(app, db, permissions=["settings"], email="plain@example.com")
+    assert "site_theme" not in {f["key"] for f in plain.get("/api/admin/settings").json()["fields"]}
+    assert plain.put("/api/admin/settings", json={"values": {"site_theme": "rose"}}, headers=csrf1).status_code == 403
+    boss, csrf2, _ = staff(app, db, role="super_admin", email="boss@example.com")
+    field = next(f for f in boss.get("/api/admin/settings").json()["fields"] if f["key"] == "site_theme")
+    assert {"dark", "light", "snow", "rose", "sage", "visitor"} <= set(field["options"])
+    assert boss.put("/api/admin/settings", json={"values": {"site_theme": "neon"}}, headers=csrf2).status_code == 422
+    for theme in ("snow", "rose", "sage"):
+        assert boss.put("/api/admin/settings", json={"values": {"site_theme": theme}}, headers=csrf2).status_code == 200
+        assert client.get("/api/public/site").json()["settings"]["site_theme"] == theme  # every visitor gets it
+    boss.put("/api/admin/settings", json={"values": {"site_theme": ""}}, headers=csrf2)
+    assert "site_theme" not in client.get("/api/public/site").json()["settings"]
+
+
 def test_settings_and_chatbot_permissions_are_independent(app, db):
     only_settings, csrf1, _ = staff(app, db, permissions=["settings"], email="s@example.com")
     only_chatbot, csrf2, _ = staff(app, db, permissions=["chatbot"], email="c@example.com")
@@ -189,6 +204,25 @@ def test_network_partners_and_team_members_are_managed_validated_ordered_and_rem
     assert "Asha" not in names and "Ravi" in names  # unpublished profiles are not public
     assert admin.delete(f"/api/admin/content/item/{ids[1]}", headers=csrf).status_code in (200, 204)
     assert "Ravi" not in [i["title"] for i in client.get("/api/public/content?kind=team_member").json()["items"]]
+
+
+def test_team_departments_gallery_page_text_and_deactivated_profiles(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    post = lambda kind, body: admin.post(f"/api/admin/content/{kind}", json=body, headers=csrf)  # noqa: E731
+    assert post("team_department", {"title": "AI & Automation", "data": {"description": "Builds AI features."}, "status": "published", "sort_order": 1}).status_code == 201
+    slug = client.get("/api/public/content?kind=team_department").json()["items"][0]["slug"]
+    base = {"designation": "Engineer", "leadership_role": "founder", "department": slug, "expertise": "Python, FastAPI", "twitter_link": "https://x.com/a"}
+    ok = post("team_member", {"title": "Asha", "data": base, "status": "published", "sort_order": 1})
+    assert ok.status_code == 201
+    for bad in ({"department": "nope"}, {"leadership_role": "ceo"}, {"github_link": "javascript:alert(1)"}):
+        assert post("team_member", {"title": "Bad", "data": {**base, **bad}, "status": "published", "sort_order": 1}).status_code == 422, bad
+    shown = lambda: [i["title"] for i in client.get("/api/public/content?kind=team_member").json()["items"]]  # noqa: E731
+    assert shown() == ["Asha"]
+    assert admin.patch(f"/api/admin/content/item/{ok.json()['id']}", json={"data": {**base, "active": False}}, headers=csrf).status_code == 200
+    assert shown() == []  # deactivated: kept in the admin panel, never public
+    assert post("team_gallery", {"title": "Workshop", "data": {"category": "workshops"}, "status": "published", "sort_order": 1}).status_code == 422  # a photo is required
+    assert post("team_page", {"title": "Our Team page text", "data": {"hero_title": "The People Behind Innovation."}, "status": "published", "sort_order": 1}).status_code in (200, 201)
+    assert client.get("/api/public/content?kind=team_page").json()["items"][0]["data"]["hero_title"] == "The People Behind Innovation."
 
 
 def test_clients_are_managed_ordered_and_removable_and_never_invented(app, db, client):

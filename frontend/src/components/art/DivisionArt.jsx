@@ -3,7 +3,7 @@
 // yet — they illustrate capabilities and never depict clients or results.
 const LAV = 'var(--art-line)'
 const VIO = 'var(--art-vio)'
-const PRI = '#7C3AED'
+const PRI = 'rgb(var(--glow))'
 const SKY = 'var(--art-sky)'
 const GLASS = 'var(--art-glass)'
 const FAINT = 'var(--art-faint)'
@@ -59,22 +59,6 @@ function Growth() {
   )
 }
 
-function Engineering() {
-  return (
-    <>
-      <path d="M30 40h340M30 100h340M30 160h340M30 220h340M70 20v260M150 20v260M230 20v260M310 20v260" stroke="var(--art-grid)" strokeWidth="1.5" />
-      <circle cx="170" cy="140" r="64" {...sw} stroke={SKY} />
-      <circle cx="170" cy="140" r="22" {...sw} stroke={SKY} />
-      <path d="M170 60v160M90 140h160" stroke={SKY} strokeWidth="1.5" strokeDasharray="10 5 2 5" />
-      <rect x="250" y="90" width="110" height="100" rx="4" {...sw} fill={GLASS} />
-      <path d="M250 214h110M250 206v16M360 206v16" {...sw} stroke={VIO} />
-      <path d="M376 90v100M368 90h16M368 190h16" {...sw} stroke={VIO} />
-      <path d="M170 140l45 45" {...sw} />
-      <text x="292" y="236" fontSize="12" fontWeight="700" fill={VIO} fontFamily="var(--font-sans)">110</text>
-    </>
-  )
-}
-
 function Training() {
   return (
     <>
@@ -90,9 +74,9 @@ function Training() {
   )
 }
 
-const art = { software: Software, ai: Ai, growth: Growth, engineering: Engineering, training: Training }
+const art = { software: Software, ai: Ai, growth: Growth, training: Training }
 
-/** `id` is a division slug (software, ai, growth, engineering, training). Decorative by default. */
+/** `id` is a division slug (software, ai, growth, training). Decorative by default. */
 export default function DivisionArt({ id, className = '', label }) {
   const Art = art[id] || Software
   return (

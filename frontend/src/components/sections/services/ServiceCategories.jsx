@@ -1,116 +1,259 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { m, AnimatePresence } from 'framer-motion'
 import {
-  ArrowRight, ArrowUpRight, Bot, Boxes, Building2, Cog, Code2, Cpu, DraftingCompass, Globe2, GraduationCap,
-  Layers, LayoutDashboard, Megaphone, MessagesSquare, PenLine, Search, Share2, Smartphone, Sparkles, Workflow,
+  ArrowRight, ArrowUpRight, Boxes, BrainCircuit, CalendarCheck, Check, ClipboardList, CreditCard, FileText, Globe2, LayoutDashboard, Mail, MapPin,
+  Megaphone, MessageCircle, MessagesSquare, Package, PenLine, Receipt, Search, Share2, ShoppingCart, Sparkles, Users, Webhook, Wrench, KeyRound,
 } from 'lucide-react'
 import Reveal from '../../ui/Reveal.jsx'
-import Button from '../../ui/Button.jsx'
-import DivisionArt from '../../art/DivisionArt.jsx'
-import { getDivision } from '../../../data/services.js'
-import { courses } from '../../../data/courses.js'
+import { getDivision, offeringsByGroup } from '../../../data/services.js'
+import { divisionIcons } from '../../../utils/divisionIcons.js'
 import { offeringHref } from '../../../utils/slugify.js'
+import { useSite } from '../../../hooks/useSite.js'
 
 const sw = getDivision('software')
 const ai = getDivision('ai')
 const growth = getDivision('growth')
-const eng = getDivision('engineering')
+const headless = getDivision('headless')
+const automation = getDivision('automation')
+const mobile = getDivision('mobile')
 
-/** Shared heading for each category: number, icon, title, summary and the two links every category gets. */
-function CategoryHead({ n, Icon, title, text, to, linkLabel, enquiry, className = '' }) {
+const img = (src, className = '') => <img src={src} alt="" width="1000" height="800" loading="lazy" decoding="async" className={`h-full w-full object-cover ${className}`} />
+
+/** The text block every category opens with: number, icon, name, summary, the problems it addresses and the two standard links. */
+function Head({ d, className = '' }) {
+  const Icon = divisionIcons[d.slug]
   return (
     <Reveal className={className}>
       <div className="flex items-center gap-4">
         <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white shadow-lg"><Icon className="size-6" aria-hidden="true" /></span>
-        <span className="font-display text-sm font-semibold tracking-wider text-lav">{n}</span>
+        <span className="font-display text-sm font-semibold tracking-wider text-lav">CATEGORY {d.number}</span>
       </div>
-      <h2 className="h2 mt-5">{title}</h2>
-      <p className="lead mt-4 text-soft">{text}</p>
+      <h2 className="h2 mt-5">{d.name}</h2>
+      <p className="lead mt-4 text-soft">{d.overview}</p>
+      <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-lav">Helps when</p>
+      <ul className="mt-2 space-y-1.5">
+        {d.challenges.slice(0, 3).map((c) => (
+          <li key={c} className="flex gap-2.5 text-soft"><Check className="mt-1 size-4 shrink-0 text-lav" aria-hidden="true" />{c}</li>
+        ))}
+      </ul>
       <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1">
-        <Link to={to} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">{linkLabel} <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
-        <Link to={enquiry} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold">Enquire <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
+        <Link to={`/services/${d.slug}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
+        <Link to={`/contact?type=${d.enquiryType}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold">Enquire <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
       </div>
     </Reveal>
   )
 }
 
-/** A single offering as one link to its row on the division detail page. */
-function OfferingLink({ division, offering, Icon, delay = 0, className = '' }) {
-  return (
-    <Reveal as="li" delay={delay} className={className}>
-      <Link to={offeringHref(division, offering.name)} className="glass-flat lift group flex h-full items-start gap-4 p-5 md:p-6">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-edge bg-primary/20 text-lav transition-[transform,background-color,color] duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-white">
-          <Icon className="size-5" aria-hidden="true" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-display text-xl font-semibold leading-tight transition-colors group-hover:text-lav">{offering.name}</span>
-          <span className="mt-1.5 block text-base text-soft">{offering.text}</span>
-        </span>
-        <ArrowRight className="mt-1 size-5 shrink-0 text-soft transition-all duration-200 group-hover:translate-x-1.5 group-hover:text-lav" aria-hidden="true" />
-      </Link>
-    </Reveal>
-  )
-}
-
-const bySoftware = (i) => sw.offerings[i]
-
-/** 01 — Software Development: sticky intro + illustration on the left, offerings stacked on the right. */
+/** 01 — photo beside the text; services as open lists grouped under their heading. */
 function Software() {
-  const icons = [Code2, LayoutDashboard, Boxes]
+  const icons = [Boxes, Globe2, LayoutDashboard, Wrench, Users, ClipboardList, ShoppingCart]
+  let n = -1
   return (
-    <section id="software" aria-label="Software Development" className="scroll-mt-32 wrap section">
-      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5">
-          <div className="lg:sticky lg:top-40">
-            <CategoryHead n="01" Icon={Code2} title="Software Development" text="Custom applications, CRM and ERP systems built around your processes, so your team spends less time working around the software." to="/services/software" linkLabel="Software & Apps" enquiry="/contact?type=project" />
-            <Reveal delay={0.1} className="glass mt-8 hidden p-5 lg:block"><DivisionArt id="software" className="h-auto w-full" /></Reveal>
+    <section id="software" aria-label={sw.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] wrap section">
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+        <Reveal x={-24} y={0} className="lg:col-span-5">
+          <div className="relative lg:sticky lg:top-40">
+            <div className="overflow-hidden rounded-[2rem] border border-edge-strong shadow-[0_30px_70px_-30px_rgb(var(--glow)/0.55)]">{img(sw.photo, 'aspect-[4/4.4]')}</div>
+            <span aria-hidden="true" className="absolute -bottom-4 -right-3 -z-10 h-full w-full rounded-[2rem] border-2 border-dashed border-lav/40" />
+          </div>
+        </Reveal>
+        <div className="lg:col-span-7">
+          <Head d={sw} />
+          <div className="mt-10 space-y-8">
+            {offeringsByGroup(sw).map((g) => (
+              <div key={g.title}>
+                <p className="eyebrow text-lav">{g.title}</p>
+                <ul className="mt-3 grid gap-x-8 sm:grid-cols-2">
+                  {g.items.map((o) => {
+                    n += 1
+                    const Icon = icons[n]
+                    return (
+                      <li key={o.name} className="border-t border-edge">
+                        <Link to={offeringHref('software', o.name)} className="group flex gap-3 py-4">
+                          <Icon className="mt-0.5 size-5 shrink-0 text-lav transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+                          <span><span className="block font-display text-lg font-semibold transition-colors group-hover:text-lav">{o.name}</span><span className="mt-1 block text-soft">{o.text}</span></span>
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
-        <ul className="space-y-4 lg:col-span-7">
-          {[0, 1, 2].map((i, k) => <OfferingLink key={i} division="software" offering={bySoftware(i)} Icon={icons[k]} delay={k * 0.1} />)}
-        </ul>
       </div>
     </section>
   )
 }
 
-/** 02 — AI Solutions & Business Automation: one wide violet-lit glass panel with the example workflow. */
+/** 02 — wide photo banner on top, then numbered cards. */
 function Ai() {
-  const icons = [Sparkles, Workflow, Cpu, Bot]
+  const icons = [Sparkles, MessagesSquare, BrainCircuit, Search, Webhook, Boxes, ClipboardList]
+  const Icon = divisionIcons.ai
   return (
-    <section id="ai" aria-label="AI Solutions and Business Automation" className="scroll-mt-32 wrap section !pt-0">
-      <Reveal className="glass relative overflow-hidden p-6 md:p-10 lg:p-12">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-32 -top-32 size-[28rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(168,85,247,0.35), transparent)' }} />
-        <div className="relative grid gap-10 lg:grid-cols-12 lg:gap-14">
-          <div className="lg:col-span-6">
-            <CategoryHead n="02" Icon={Bot} title="AI Solutions & Business Automation" text="Assistants, automated workflows and AI-powered applications that take repetitive work off your team, with a person approving what matters." to="/services/ai" linkLabel="AI & Automation" enquiry="/contact?type=ai" />
-            <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-              {ai.offerings.map((o, i) => {
-                const Icon = icons[i]
-                return (
-                  <Reveal as="li" key={o.name} delay={i * 0.08} y={10}>
-                    <Link to={offeringHref('ai', o.name)} className="group flex min-h-14 items-center gap-3 rounded-2xl border border-edge bg-tint/5 px-4 py-3 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-lav hover:bg-primary/20">
-                      <Icon className="size-5 shrink-0 text-violet transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" aria-hidden="true" />
-                      <span className="font-semibold">{o.name}</span>
-                    </Link>
-                  </Reveal>
-                )
-              })}
-            </ul>
-            <div className="mt-8"><Button to="/contact?type=ai" variant="violet" arrow>Book an AI consultation</Button></div>
+    <section id="ai" aria-label={ai.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] border-y border-edge bg-glass">
+      <div className="wrap section">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-[2rem] border border-edge-strong">
+            {img(ai.photo, 'aspect-[16/8] sm:aspect-[21/8]')}
+            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-transparent" />
+            <div className="absolute inset-0 flex flex-col justify-end p-6 text-white sm:p-10">
+              <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg"><Icon className="size-6" aria-hidden="true" /></span>
+              <p className="mt-3 font-display text-sm font-semibold tracking-wider text-white/80">CATEGORY {ai.number}</p>
+              <h2 className="h2 mt-1 !text-white">{ai.name}</h2>
+            </div>
           </div>
-          <div className="lg:col-span-6">
-            <p className="eyebrow text-violet">{ai.workflowLabel}</p>
-            <ol className="mt-5 space-y-3">
-              {ai.workflow.map((step, i) => (
-                <Reveal as="li" key={step} delay={0.1 + i * 0.12} y={10} className="relative">
-                  <div className="flex items-center gap-4 rounded-2xl border border-edge bg-night/50 p-4">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent font-display font-semibold text-white">{i + 1}</span>
-                    <span className="font-display text-lg font-semibold md:text-xl">{step}</span>
-                  </div>
-                  {i < ai.workflow.length - 1 && <span aria-hidden="true" className="absolute -bottom-3 left-9 h-3 w-px bg-edge-strong" />}
+        </Reveal>
+        <div className="mt-10 grid gap-8 lg:grid-cols-12">
+          <Reveal className="lg:col-span-5">
+            <p className="lead text-soft">{ai.overview}</p>
+            <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-lav">Helps when</p>
+            <ul className="mt-2 space-y-1.5">{ai.challenges.slice(0, 3).map((c) => <li key={c} className="flex gap-2.5 text-soft"><Check className="mt-1 size-4 shrink-0 text-lav" aria-hidden="true" />{c}</li>)}</ul>
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1">
+              <Link to={`/services/${ai.slug}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
+              <Link to="/contact?type=ai" className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold">Book an AI consultation <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
+            </div>
+          </Reveal>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:col-span-7">
+            {ai.offerings.map((o, i) => {
+              const OIcon = icons[i]
+              return (
+                <Reveal as="li" key={o.name} delay={(i % 2) * 0.07} className={i === ai.offerings.length - 1 && ai.offerings.length % 2 ? 'sm:col-span-2' : ''}>
+                  <Link to={offeringHref('ai', o.name)} className="glass-flat lift group flex h-full gap-4 p-5">
+                    <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-lav transition-colors duration-300 group-hover:bg-primary group-hover:text-white"><OIcon className="size-5" aria-hidden="true" /></span>
+                    <span><span className="block font-display text-lg font-semibold leading-tight">{o.name}</span><span className="mt-1.5 block text-soft">{o.text}</span></span>
+                  </Link>
                 </Reveal>
+              )
+            })}
+          </ul>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const GROWTH_ICONS = { 'Social Media Management': Share2, 'Meta Ads Management': Megaphone, 'Google Ads Management': Search, 'Search Engine Optimization (SEO)': Search, 'Website & Landing Page Optimization': LayoutDashboard, 'Content Creation': PenLine, 'Digital Marketing Strategy': ClipboardList }
+
+/** 03 — services as selectable pills; the chosen one is explained in a panel over the photo. */
+function Growth() {
+  const [pick, setPick] = useState(growth.offerings[0].name)
+  const cur = growth.offerings.find((o) => o.name === pick)
+  const CurIcon = GROWTH_ICONS[pick] || Megaphone
+  return (
+    <section id="growth" aria-label={growth.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] wrap section">
+      <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
+        <Head d={growth} className="lg:col-span-6" />
+        <Reveal x={24} y={0} className="lg:col-span-6">
+          <div className="relative overflow-hidden rounded-[2rem] border border-edge-strong">
+            {img(growth.photo, 'aspect-[4/3]')}
+            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute inset-x-4 bottom-4 rounded-2xl border border-white/20 bg-black/45 p-4 text-white backdrop-blur-md sm:inset-x-6 sm:bottom-6 sm:p-5" aria-live="polite">
+              <AnimatePresence mode="wait">
+                <m.div key={pick} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+                  <p className="flex items-center gap-2 font-display text-lg font-semibold"><CurIcon className="size-5 text-sky" aria-hidden="true" />{cur.name}</p>
+                  <p className="mt-1 text-white/85">{cur.text}</p>
+                </m.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {offeringsByGroup(growth).map((g, i) => (
+          <Reveal key={g.title} delay={i * 0.06} className="rounded-3xl border border-edge bg-glass p-5">
+            <p className="eyebrow text-lav">{g.title}</p>
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {g.items.map((o) => (
+                <li key={o.name}>
+                  <button type="button" onClick={() => setPick(o.name)} onMouseEnter={() => setPick(o.name)} onFocus={() => setPick(o.name)} aria-pressed={pick === o.name}
+                    className={`rounded-full border px-3.5 py-1.5 text-left text-sm font-semibold transition-all duration-200 ${pick === o.name ? 'border-transparent bg-primary text-white shadow-lg' : 'border-edge-strong bg-glass hover:border-lav'}`}>
+                    {o.name}
+                  </button>
+                </li>
               ))}
-            </ol>
+            </ul>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+const HEADLESS_ICONS = { 'Authentication APIs': KeyRound, 'Billing & Subscription APIs': CreditCard, 'Payment Gateway Integration': CreditCard, 'Booking & Appointment APIs': CalendarCheck, 'CRM APIs': Users, 'Notification APIs': Mail, 'File & Media APIs': FileText, 'AI APIs': BrainCircuit }
+
+/** 04 — the featured category: a full-width gradient panel presenting reusable backend services and APIs, with an API Hub call to action. */
+function Headless() {
+  const site = useSite()
+  const hubExternal = /^https?:/.test(site.apiHubUrl)
+  const hubCls = 'group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-violet-800 shadow-xl transition-transform duration-200 hover:-translate-y-0.5 dark:bg-sky dark:text-night'
+  return (
+    <section id="headless" aria-label={headless.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] wrap section">
+      <Reveal>
+        <div className="relative overflow-hidden rounded-[2.5rem] border border-edge-strong bg-gradient-to-br from-primary via-primary to-accent p-6 text-white shadow-[0_40px_90px_-40px_rgb(var(--glow)/0.8)] sm:p-10 lg:p-14 dark:from-base2 dark:via-night dark:to-deep">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-white/15 blur-3xl dark:bg-sky/15" />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.35)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:linear-gradient(180deg,#000,transparent_70%)]" />
+          <div className="relative grid gap-10 lg:grid-cols-12 lg:gap-12">
+            <div className="lg:col-span-7">
+              <p className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.14em]"><Sparkles className="size-3.5" aria-hidden="true" />Featured · Category {headless.number}</p>
+              <h2 className="h2 mt-5 !text-white">{headless.name}</h2>
+              <p className="lead mt-4 text-white/90">
+                LAX360 provides reusable backend services, APIs and SaaS infrastructure, so developers, startups, agencies and businesses can add proven building blocks to their products instead of building each one from scratch.
+              </p>
+              <p className="mt-4 text-white/85">{headless.overview}</p>
+              <ul className="mt-5 flex flex-wrap gap-2" aria-label="Who it is for">
+                {headless.audiences.map((a) => <li key={a} className="rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-sm font-semibold">{a}</li>)}
+              </ul>
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                {hubExternal
+                  ? <a href={site.apiHubUrl} target="_blank" rel="noopener noreferrer" className={hubCls}>Explore the API Hub <ArrowUpRight className="size-5" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>
+                  : <Link to={site.apiHubUrl} className={hubCls}>Explore the API Hub <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" aria-hidden="true" /></Link>}
+                <Link to="/contact?type=project" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3 font-semibold transition-colors hover:bg-white/10">Discuss your requirements</Link>
+              </div>
+              <p className="mt-3 text-sm text-white/80"><Link to={`/services/${headless.slug}`} className="underline underline-offset-4">Category details</Link></p>
+            </div>
+
+            <div className="lg:col-span-5">
+              <div className="overflow-hidden rounded-3xl border border-white/20 bg-black/35 shadow-2xl backdrop-blur-md">
+                <div className="flex items-center gap-1.5 border-b border-white/10 px-4 py-3"><span className="size-2.5 rounded-full bg-white/40" /><span className="size-2.5 rounded-full bg-white/40" /><span className="size-2.5 rounded-full bg-white/40" /><span className="ml-2 text-xs text-white/70">Illustrative endpoints</span></div>
+                <pre className="overflow-x-auto p-4 font-mono text-[0.8rem] leading-7 text-white/90 sm:text-sm" aria-label="Example API endpoints"><code>{`POST  /v1/auth/login
+GET   /v1/subscriptions/{id}
+POST  /v1/bookings
+POST  /v1/notifications
+POST  /v1/files`}</code></pre>
+              </div>
+              <div className="mt-4 overflow-hidden rounded-3xl border border-white/20">{img(headless.photo, 'aspect-[16/8]')}</div>
+            </div>
+          </div>
+
+          <ul className="relative mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="What this category provides">
+            {headless.highlights.map((h, i) => (
+              <Reveal as="li" key={h.title} delay={(i % 3) * 0.06} className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm transition-colors duration-300 hover:bg-white/15">
+                <p className="font-display text-lg font-semibold">{h.title}</p>
+                <p className="mt-1 text-white/85">{h.text}</p>
+              </Reveal>
+            ))}
+          </ul>
+
+          <div className="relative mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {offeringsByGroup(headless).map((g) => (
+              <div key={g.title}>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/75">{g.title}</p>
+                <ul className="mt-3 space-y-1.5">
+                  {g.items.map((o) => {
+                    const Icon = HEADLESS_ICONS[o.name] || Package
+                    return (
+                      <li key={o.name}>
+                        <Link to={offeringHref('headless', o.name)} title={o.text} className="group flex items-start gap-2.5 rounded-lg py-1 font-semibold text-white transition-transform duration-200 hover:translate-x-1">
+                          <Icon className="mt-0.5 size-4 shrink-0 text-white/75" aria-hidden="true" />{o.name}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </Reveal>
@@ -118,63 +261,48 @@ function Ai() {
   )
 }
 
-/** 03 — Website & Mobile: two device-style panels, the second offset so the pair feels staggered. */
-function WebMobile() {
-  const web = sw.offerings[3]
-  const mobile = sw.offerings[4]
+/** 05 — an illustrated trigger → workflow → action strip over the photo, then the list of automation services. */
+function Automation() {
+  const icons = [Webhook, ClipboardList, MessageCircle, Mail, Users, BrainCircuit, Boxes, Webhook]
+  const nodes = [
+    { label: 'Trigger', items: 'Form · WhatsApp · Email' },
+    { label: 'Workflow', items: 'n8n automation' },
+    { label: 'Actions', items: 'CRM · Notifications · Records' },
+  ]
   return (
-    <section id="web-mobile" aria-label="Website and Mobile Application Development" className="scroll-mt-32 wrap section">
-      <div className="grid gap-12 lg:grid-cols-12">
-        <CategoryHead className="lg:col-span-5" n="03" Icon={Globe2} title="Website & Mobile Application Development" text="Fast, accessible, search-friendly business websites and Android and iOS apps, planned together with your web platform." to="/services/software" linkLabel="Software & Apps" enquiry="/contact?type=website-app" />
-        <ul className="grid gap-5 sm:grid-cols-2 lg:col-span-7">
-          <Reveal as="li">
-            <Link to={offeringHref('software', web.name)} className="glass-flat lift group flex h-full flex-col p-5 md:p-6">
-              <div className="rounded-xl border border-edge bg-night/60 p-3 transition-transform duration-500 group-hover:-translate-y-1">
-                <div className="flex gap-1.5"><span className="size-2 rounded-full bg-accent" /><span className="size-2 rounded-full bg-lav" /><span className="size-2 rounded-full bg-sky" /></div>
-                <div className="mt-3 h-16 rounded-lg bg-gradient-to-br from-primary/70 to-accent/40" />
-                <div className="mt-2 grid grid-cols-3 gap-2"><span className="h-8 rounded-md bg-tint/10" /><span className="h-8 rounded-md bg-tint/10" /><span className="h-8 rounded-md bg-tint/10" /></div>
-              </div>
-              <span className="mt-5 flex items-center gap-2 font-display text-xl font-semibold transition-colors group-hover:text-lav"><Globe2 className="size-5 text-lav" aria-hidden="true" />{web.name}</span>
-              <span className="mt-1.5 text-base text-soft">{web.text}</span>
-              <span className="mt-auto inline-flex items-center gap-1.5 pt-4 font-semibold text-lav">Details <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
-            </Link>
-          </Reveal>
-          <Reveal as="li" delay={0.12} className="sm:mt-12">
-            <Link to={offeringHref('software', mobile.name)} className="glass-flat lift group flex h-full flex-col p-5 md:p-6">
-              <div className="mx-auto w-28 rounded-[1.4rem] border-[3px] border-edge-strong bg-night/60 p-2 transition-transform duration-500 group-hover:-translate-y-1 group-hover:rotate-2">
-                <div className="mx-auto mb-2 h-1 w-8 rounded-full bg-tint/20" />
-                <div className="h-14 rounded-lg bg-gradient-to-br from-accent/70 to-primary/50" />
-                {[0, 1, 2].map((i) => <div key={i} className="mt-2 flex items-center gap-1.5"><span className="size-4 rounded bg-tint/15" /><span className="h-1.5 flex-1 rounded-full bg-white/12" /></div>)}
-              </div>
-              <span className="mt-5 flex items-center gap-2 font-display text-xl font-semibold transition-colors group-hover:text-lav"><Smartphone className="size-5 text-lav" aria-hidden="true" />{mobile.name}</span>
-              <span className="mt-1.5 text-base text-soft">{mobile.text}</span>
-              <span className="mt-auto inline-flex items-center gap-1.5 pt-4 font-semibold text-lav">Details <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
-            </Link>
-          </Reveal>
-        </ul>
-      </div>
-    </section>
-  )
-}
-
-/** 04 — Digital Marketing: four offerings as a rising staircase on desktop, a plain stack on mobile. */
-function Growth() {
-  const icons = [Search, Share2, Megaphone, PenLine]
-  const rise = ['lg:mt-24', 'lg:mt-16', 'lg:mt-8', 'lg:mt-0']
-  return (
-    <section id="growth" aria-label="Digital Marketing" className="scroll-mt-32 border-y border-edge bg-base2/50">
+    <section id="automation" aria-label={automation.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] border-y border-edge bg-glass">
       <div className="wrap section">
-        <CategoryHead className="max-w-2xl" n="04" Icon={Megaphone} title="Digital Marketing" text="Marketing that pairs with the website and software we build, so visitors become enquiries. Exact scope is agreed per business." to="/services/growth" linkLabel="Digital Growth" enquiry="/contact?type=marketing" />
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-start">
-          {growth.offerings.map((o, i) => {
+        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
+          <Head d={automation} className="lg:col-span-5" />
+          <Reveal x={24} y={0} className="lg:col-span-7">
+            <div className="relative overflow-hidden rounded-[2rem] border border-edge-strong">
+              {img(automation.photo, 'aspect-[16/10]')}
+              <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+            </div>
+            <div className="glass relative z-10 -mt-12 mx-3 p-4 sm:mx-8" role="img" aria-label="Illustration: a trigger starts a workflow, which performs actions in your tools">
+              <div className="flex items-stretch justify-between gap-1.5 sm:gap-3">
+                {nodes.map((n, i) => (
+                  <div key={n.label} className="flex flex-1 items-center gap-1.5 sm:gap-3">
+                    <div className={`flex-1 rounded-2xl border p-3 text-center ${i === 1 ? 'border-transparent bg-gradient-to-br from-primary to-accent text-white' : 'border-edge-strong bg-glass'}`}>
+                      <p className="font-display text-sm font-semibold sm:text-base">{n.label}</p>
+                      <p className={`mt-0.5 text-[0.7rem] sm:text-xs ${i === 1 ? 'text-white/85' : 'text-soft'}`}>{n.items}</p>
+                    </div>
+                    {i < nodes.length - 1 && <ArrowRight className="size-4 shrink-0 text-lav motion-safe:animate-pulse sm:size-5" aria-hidden="true" />}
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-center text-xs text-soft">Illustrative example</p>
+            </div>
+          </Reveal>
+        </div>
+        <ul className="mt-12 grid gap-x-10 sm:grid-cols-2">
+          {automation.offerings.map((o, i) => {
             const Icon = icons[i]
             return (
-              <Reveal as="li" key={o.name} delay={i * 0.1} className={rise[i]}>
-                <Link to={offeringHref('growth', o.name)} className="glass-flat lift group block h-full p-6">
-                  <span className="font-display text-5xl font-semibold leading-none text-transparent" style={{ WebkitTextStroke: '1.5px var(--color-lav)' }} aria-hidden="true">0{i + 1}</span>
-                  <span className="mt-5 flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-sky to-primary text-white transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110"><Icon className="size-5" aria-hidden="true" /></span>
-                  <span className="mt-4 block font-display text-xl font-semibold transition-colors group-hover:text-lav">{o.name}</span>
-                  <span className="mt-1.5 block text-base text-soft">{o.text}</span>
+              <Reveal as="li" key={o.name} delay={(i % 2) * 0.06} className="border-t border-edge">
+                <Link to={offeringHref('automation', o.name)} className="group flex gap-4 py-5">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-glass text-lav ring-1 ring-edge-strong transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:ring-transparent"><Icon className="size-5" aria-hidden="true" /></span>
+                  <span><span className="block font-display text-lg font-semibold transition-colors group-hover:text-lav">{o.name}</span><span className="mt-1 block text-soft">{o.text}</span></span>
                 </Link>
               </Reveal>
             )
@@ -185,58 +313,34 @@ function Growth() {
   )
 }
 
-/** 05 — CAD & Engineering: a blueprint-style panel with dimension marks. */
-function Engineering() {
-  const icons = [Building2, Cog, Layers]
+/** 06 — the phone photo first, then a card per application. */
+function Mobile() {
+  const icons = [CalendarCheck, ClipboardList, MapPin, Receipt, Package, Boxes]
   return (
-    <section id="engineering" aria-label="CAD and Engineering Services" className="scroll-mt-32 wrap section">
-      <Reveal className="glass relative overflow-hidden p-6 md:p-10 lg:p-12">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.12]" style={{ backgroundImage: 'linear-gradient(var(--color-lav) 1px, transparent 1px), linear-gradient(90deg, var(--color-lav) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        <div className="relative grid gap-10 lg:grid-cols-12 lg:gap-14">
-          <div className="lg:col-span-5">
-            <CategoryHead n="05" Icon={DraftingCompass} title="CAD & Engineering Services" text="Drafting and 2D/3D modelling support for civil and mechanical engineering work, prepared to your brief." to="/services/engineering" linkLabel="CAD & Engineering" enquiry="/contact?type=cad" />
-            <p className="mt-6 text-sm text-soft">Software used, deliverable formats and turnaround are confirmed per project. Files are shared by email after we review your brief.</p>
-            <div className="mt-6"><Button to="/contact?type=cad" arrow>Send your drawing brief</Button></div>
-          </div>
-          <ul className="space-y-4 lg:col-span-7">
-            {eng.offerings.map((o, i) => {
-              const Icon = icons[i]
-              return (
-                <Reveal as="li" key={o.name} delay={i * 0.1}>
-                  <Link to={offeringHref('engineering', o.name)} className="group relative flex items-start gap-4 rounded-2xl border border-edge bg-night/60 p-5 transition-[border-color,transform] duration-200 hover:-translate-y-1 hover:border-lav md:p-6">
-                    <span className="absolute -left-px top-4 h-8 w-px bg-sky" aria-hidden="true" />
-                    <Icon className="mt-1 size-6 shrink-0 text-sky transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" aria-hidden="true" />
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-display text-xl font-semibold transition-colors group-hover:text-lav">{o.name}</span>
-                      <span className="mt-1 block text-base text-soft">{o.text}</span>
-                    </span>
-                    <ArrowRight className="mt-1 size-5 shrink-0 text-soft transition-all group-hover:translate-x-1.5 group-hover:text-lav" aria-hidden="true" />
-                  </Link>
-                </Reveal>
-              )
-            })}
-          </ul>
-        </div>
-      </Reveal>
-    </section>
-  )
-}
-
-/** Consulting is the first step of every engagement (not a standalone division), so it gets a closing band. */
-function Consulting() {
-  return (
-    <section aria-label="Technology consulting" className="wrap pb-4">
-      <Reveal className="glass flex flex-col items-start justify-between gap-6 p-6 md:flex-row md:items-center md:p-10">
-        <div className="flex items-start gap-5">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/30 text-lav"><MessagesSquare className="size-6" aria-hidden="true" /></span>
-          <div>
-            <p className="eyebrow text-lav">Technology consulting</p>
-            <h2 className="mt-1 font-display text-2xl font-semibold md:text-3xl">Not sure where to start?</h2>
-            <p className="mt-2 max-w-xl text-soft">Consulting is the first step of every engagement. Tell us the problem and we&apos;ll help you work out which service — or combination — fits.</p>
-          </div>
-        </div>
-        <Button to="/contact?type=general" arrow className="shrink-0">Talk to us about your problem</Button>
-      </Reveal>
+    <section id="mobile" aria-label={mobile.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] wrap section">
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+        <Reveal x={-24} y={0} className="lg:col-span-5">
+          <div className="overflow-hidden rounded-[2rem] border border-edge-strong shadow-[0_30px_70px_-30px_rgb(var(--glow)/0.55)]">{img(mobile.photo, 'aspect-[4/4.2]')}</div>
+        </Reveal>
+        <Head d={mobile} className="lg:col-span-7" />
+      </div>
+      <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {mobile.offerings.map((o, i) => {
+          const Icon = icons[i]
+          return (
+            <Reveal as="li" key={o.name} delay={(i % 3) * 0.07}>
+              <Link to={offeringHref('mobile', o.name)} className="glass-flat lift group flex h-full flex-col gap-3 p-6">
+                <span className="flex items-center justify-between">
+                  <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110"><Icon className="size-6" aria-hidden="true" /></span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-soft">{o.group}</span>
+                </span>
+                <span className="font-display text-xl font-semibold leading-tight">{o.name}</span>
+                <span className="text-soft">{o.text}</span>
+              </Link>
+            </Reveal>
+          )
+        })}
+      </ul>
     </section>
   )
 }
@@ -246,10 +350,10 @@ export default function ServiceCategories() {
     <>
       <Software />
       <Ai />
-      <WebMobile />
       <Growth />
-      <Engineering />
-      <Consulting />
+      <Headless />
+      <Automation />
+      <Mobile />
     </>
   )
 }

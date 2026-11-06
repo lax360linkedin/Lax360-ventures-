@@ -1,0 +1,434 @@
+[
+  {
+    "slug": "lax360-business-crm",
+    "name": "LAX360 Business CRM",
+    "category": "business",
+    "status": "soon",
+    "icon": "users",
+    "photo": "/assets/products/crm.webp",
+    "summary": "A CRM for managing leads, customers, sales pipelines, teams and follow-ups from one place.",
+    "overview": [
+      "LAX360 Business CRM brings the work of selling into one system: enquiries as they arrive, the customers behind them, the stage each opportunity has reached and the follow-ups that keep it moving.",
+      "It is designed for growing businesses with more than one branch or team, so that managers can see who is responsible for what, and owners can see the overall picture through reports and AI-powered insights."
+    ],
+    "problems": [
+      "Leads arrive by phone, messages and forms and are tracked in different places",
+      "Follow-ups depend on individuals remembering them",
+      "Managers cannot easily see the state of the pipeline or each branch"
+    ],
+    "features": [
+      "Lead and enquiry management",
+      "Customer management",
+      "Sales pipeline management",
+      "Employee and branch management",
+      "Task and follow-up tracking",
+      "Reports and analytics",
+      "AI-powered business insights"
+    ],
+    "benefits": [
+      "One record for every customer and enquiry",
+      "Clear ownership of each follow-up",
+      "A shared view of sales activity across branches"
+    ],
+    "useCases": [
+      "A service business tracking enquiries from first contact to order",
+      "A multi-branch company comparing activity between branches",
+      "A sales team planning daily follow-up calls"
+    ],
+    "users": ["Business owners", "Sales and customer-service teams", "Branch managers"],
+    "industries": ["Retail and distribution", "Professional services", "Training and education", "Local service businesses"]
+  },
+  {
+    "slug": "lax360-clinic-management",
+    "name": "LAX360 Clinic Management",
+    "category": "industry",
+    "status": "soon",
+    "icon": "stethoscope",
+    "photo": "/assets/products/clinic.webp",
+    "summary": "A clinic management system covering patients, doctors, appointments, records and billing.",
+    "overview": [
+      "LAX360 Clinic Management is planned as a single system for the day-to-day running of a clinic: registering patients, scheduling appointments with doctors, keeping medical records and billing for visits.",
+      "It is intended to replace paper registers and disconnected spreadsheets, so reception, doctors and administrators all work from the same information."
+    ],
+    "problems": [
+      "Patient details and visit history are kept in paper files or separate sheets",
+      "Appointments clash or are hard to see across doctors",
+      "Billing is prepared separately from the visit record"
+    ],
+    "features": [
+      "Patient management",
+      "Doctor management",
+      "Appointment scheduling",
+      "Medical records management",
+      "Billing and payments",
+      "Clinic operations management",
+      "Reports and analytics"
+    ],
+    "benefits": [
+      "Patient information available in one place",
+      "A clearer appointment schedule for each doctor",
+      "Billing that follows the visit record"
+    ],
+    "useCases": [
+      "A single-doctor clinic moving from paper registers",
+      "A multi-doctor clinic scheduling consultations",
+      "A clinic administrator reviewing visits and collections"
+    ],
+    "users": ["Clinic administrators", "Doctors", "Reception and billing staff"],
+    "industries": ["Clinics and polyclinics", "Specialist practices", "Diagnostic and wellness centres"]
+  },
+  {
+    "slug": "lax360-learning-platform",
+    "name": "LAX360 Learning Platform",
+    "category": "education",
+    "status": "soon",
+    "icon": "graduation",
+    "photo": "/assets/products/learning.webp",
+    "summary": "An online learning platform for courses, student progress, quizzes and assessments.",
+    "overview": [
+      "LAX360 Learning Platform is planned for institutions and trainers who want to deliver courses online: publishing course content, letting students work through it, and tracking how each student is progressing.",
+      "Quizzes and assessments check understanding along the way, while reports show how students are performing, and an AI learning assistant is planned to help learners with their questions."
+    ],
+    "problems": [
+      "Course material and results are spread across several tools",
+      "Trainers cannot easily see where students are falling behind",
+      "Assessments are marked and recorded by hand"
+    ],
+    "features": [
+      "Online course management",
+      "Student dashboard",
+      "Course progress tracking",
+      "Quizzes and assessments",
+      "Learning management",
+      "Student performance reports",
+      "AI learning assistant"
+    ],
+    "benefits": [
+      "Course content, progress and results in one place",
+      "Students can see their own progress",
+      "Trainers can identify students who need help earlier"
+    ],
+    "useCases": [
+      "A training institute running short courses online",
+      "A college adding a digital layer to workshops",
+      "A corporate trainer assessing a cohort after a programme"
+    ],
+    "users": ["Training institutes", "Colleges and schools", "Corporate trainers", "Students"],
+    "industries": ["Education", "Professional training", "Corporate learning"]
+  },
+  {
+    "slug": "lax360-smart-billing-pos",
+    "name": "LAX360 Smart Billing & POS",
+    "category": "business",
+    "status": "soon",
+    "icon": "receipt",
+    "photo": "/assets/products/billing.webp",
+    "summary": "Billing and point-of-sale software with GST invoices, sales and purchases, stock and payment tracking.",
+    "overview": [
+      "LAX360 Smart Billing & POS is planned as a billing system that adapts to different kinds of business, so a shop counter, a service desk or a wholesale office can each issue bills the way they need to.",
+      "It handles GST invoices, records sales and purchases, connects to inventory and keeps customer, supplier and payment records together, with reports for the owner."
+    ],
+    "problems": [
+      "Bills are written by hand or prepared in spreadsheets",
+      "Sales, purchases and stock are recorded separately",
+      "Pending payments are hard to track by customer or supplier"
+    ],
+    "features": [
+      "Multi-business-category billing",
+      "GST invoice generation",
+      "Sales and purchase management",
+      "Inventory integration",
+      "Customer and supplier management",
+      "Payment tracking",
+      "Business reports"
+    ],
+    "benefits": [
+      "Faster, more consistent bills",
+      "Sales, purchases and stock kept in step",
+      "A clear view of what has been paid and what is due"
+    ],
+    "useCases": [
+      "A retail shop billing customers at the counter",
+      "A wholesaler issuing GST invoices and tracking dues",
+      "A service business invoicing after each job"
+    ],
+    "users": ["Shop owners", "Accounts and billing staff", "Small and mid-sized businesses"],
+    "industries": ["Retail", "Wholesale and distribution", "Service businesses", "Restaurants and food outlets"]
+  },
+  {
+    "slug": "lax360-api-hub",
+    "name": "LAX360 API Hub",
+    "category": "developer",
+    "status": "soon",
+    "icon": "server",
+    "photo": "/assets/products/api-hub.webp",
+    "summary": "A hub of ready-to-integrate APIs for authentication, billing, bookings, CRM, notifications and AI, with a developer dashboard.",
+    "overview": [
+      "The LAX360 API Hub is planned as one place where developers, startups and agencies can find and use reusable backend services, and connect them to their own web and mobile applications instead of building each one from scratch.",
+      "It grows out of our Headless SaaS & API Solutions work. A developer dashboard with API key and usage management is part of the plan, so teams can see and control how the APIs are being used."
+    ],
+    "problems": [
+      "Sign-in, billing and notifications are rebuilt for every new product",
+      "Several front ends need one shared backend",
+      "There is no single place to manage API keys and usage"
+    ],
+    "features": [
+      "Ready-to-integrate APIs",
+      "Authentication APIs",
+      "Billing and subscription APIs",
+      "Booking APIs",
+      "CRM APIs",
+      "Notification APIs",
+      "AI APIs",
+      "Developer dashboard",
+      "API key and usage management"
+    ],
+    "benefits": [
+      "Add common backend features without building them from scratch",
+      "One set of services for web, mobile and partner apps",
+      "Visibility and control of API keys and usage"
+    ],
+    "useCases": [
+      "A startup adding sign-in and subscriptions to its first product",
+      "An agency reusing one backend across several client projects",
+      "A business exposing booking or CRM data to its own apps"
+    ],
+    "users": ["Developers", "Startups", "Agencies", "Businesses with in-house engineering teams"],
+    "industries": ["Software and SaaS", "Digital agencies", "Any business building its own applications"]
+  },
+  {
+    "slug": "lax360-field-operations",
+    "name": "LAX360 Field Operations",
+    "category": "workforce",
+    "status": "soon",
+    "icon": "map",
+    "photo": "/assets/products/field.webp",
+    "summary": "Field team management with task assignment, location tracking, attendance and activity reports.",
+    "overview": [
+      "LAX360 Field Operations is planned for businesses whose people work away from the office: it lets managers assign tasks, follow progress, record attendance and review what each field employee has done.",
+      "GPS-based location tracking is designed around agreed purposes and working hours, with the privacy and consent rules settled with the business before use."
+    ],
+    "problems": [
+      "The office learns what happened in the field only after the fact",
+      "Attendance and visits are reported by phone or paper",
+      "It is hard to compare performance across field staff"
+    ],
+    "features": [
+      "Field employee management",
+      "GPS-based location tracking",
+      "Task assignment",
+      "Work progress tracking",
+      "Attendance management",
+      "Field activity reports",
+      "Employee performance monitoring"
+    ],
+    "benefits": [
+      "Up-to-date visibility of field work",
+      "Less manual attendance and visit reporting",
+      "A consistent basis for reviewing performance"
+    ],
+    "useCases": [
+      "A service company dispatching technicians to customer sites",
+      "A sales team recording daily customer visits",
+      "A distribution business tracking delivery rounds"
+    ],
+    "users": ["Operations managers", "Field supervisors", "Field employees"],
+    "industries": ["Field services", "Sales and distribution", "Utilities and maintenance", "Logistics"]
+  },
+  {
+    "slug": "lax360-bookings",
+    "name": "LAX360 Bookings",
+    "category": "booking",
+    "status": "soon",
+    "icon": "calendar",
+    "photo": "/assets/products/bookings.webp",
+    "summary": "Online appointment booking and reservation management with staff availability and notifications.",
+    "overview": [
+      "LAX360 Bookings is planned for businesses that run on appointments and reservations. Customers choose a time online, and the business sees every booking on one calendar.",
+      "Staff availability is managed centrally so only free slots can be booked, and booking notifications keep customers and teams informed."
+    ],
+    "problems": [
+      "Bookings taken by phone clash or are forgotten",
+      "Staff availability is not visible when a booking is made",
+      "Customers are not reminded of upcoming appointments"
+    ],
+    "features": [
+      "Online appointment booking",
+      "Reservation management",
+      "Staff availability management",
+      "Calendar management",
+      "Booking notifications",
+      "Customer management",
+      "Booking reports"
+    ],
+    "benefits": [
+      "Fewer scheduling clashes",
+      "Customers can book at any time",
+      "A clear view of upcoming bookings and busy periods"
+    ],
+    "useCases": [
+      "A salon booking customers by service and stylist",
+      "A consultant offering time slots for meetings",
+      "A venue managing table or room reservations"
+    ],
+    "users": ["Appointment-based businesses", "Reception and operations staff", "Customers booking online"],
+    "industries": ["Salons and wellness", "Consulting and professional services", "Hospitality", "Training centres"]
+  },
+  {
+    "slug": "lax360-inventory-management",
+    "name": "LAX360 Inventory Management",
+    "category": "business",
+    "status": "soon",
+    "icon": "boxes",
+    "photo": "/assets/products/inventory.webp",
+    "summary": "Stock, purchase, sales and supplier management across warehouses, with alerts and reports.",
+    "overview": [
+      "LAX360 Inventory Management is planned as a system for keeping stock records accurate: items received from suppliers, items sold, and the quantities held in each warehouse.",
+      "Stock alerts prompt reordering before items run out, and reports show how stock is moving, so purchasing decisions rest on current records."
+    ],
+    "problems": [
+      "Stock counts differ from the records",
+      "Reordering happens only after an item has run out",
+      "Purchases, sales and warehouse stock are tracked separately"
+    ],
+    "features": [
+      "Stock management",
+      "Purchase management",
+      "Sales tracking",
+      "Supplier management",
+      "Warehouse management",
+      "Stock alerts",
+      "Inventory reports"
+    ],
+    "benefits": [
+      "More accurate stock records",
+      "Earlier warning when items run low",
+      "Purchasing based on actual movement of stock"
+    ],
+    "useCases": [
+      "A shop tracking its range and reorder levels",
+      "A distributor managing stock across several warehouses",
+      "A workshop monitoring spare parts and suppliers"
+    ],
+    "users": ["Store and warehouse managers", "Purchasing teams", "Business owners"],
+    "industries": ["Retail", "Wholesale and distribution", "Manufacturing", "Service and maintenance businesses"]
+  },
+  {
+    "slug": "lax360-hr-employee-management",
+    "name": "LAX360 HR & Employee Management",
+    "category": "workforce",
+    "status": "soon",
+    "icon": "idcard",
+    "photo": "/assets/products/hr.webp",
+    "summary": "HR software for employee records, attendance, leave, shifts, payroll and performance.",
+    "overview": [
+      "LAX360 HR & Employee Management is planned to bring routine HR work into one system: keeping employee records, recording attendance and leave, scheduling shifts and preparing payroll.",
+      "Performance tracking and HR reports give managers and owners a consistent view of their team, without assembling data from several spreadsheets each month."
+    ],
+    "problems": [
+      "Employee details, leave and attendance live in separate files",
+      "Shift plans are shared informally and change often",
+      "Payroll preparation takes manual effort each month"
+    ],
+    "features": [
+      "Employee records",
+      "Attendance management",
+      "Leave management",
+      "Shift scheduling",
+      "Payroll management",
+      "Employee performance tracking",
+      "HR reports"
+    ],
+    "benefits": [
+      "One record per employee",
+      "Leave and attendance visible to the right people",
+      "Less manual work preparing payroll and reports"
+    ],
+    "useCases": [
+      "A growing company replacing spreadsheet-based HR records",
+      "A retail or service business planning weekly shifts",
+      "An HR manager reviewing attendance and leave for payroll"
+    ],
+    "users": ["HR managers", "Business owners", "Team leads", "Employees"],
+    "industries": ["Retail", "Healthcare", "Services", "Education", "Any business with a growing team"]
+  },
+  {
+    "slug": "lax360-project-management",
+    "name": "LAX360 Project Management",
+    "category": "productivity",
+    "status": "soon",
+    "icon": "kanban",
+    "photo": "/assets/products/project.webp",
+    "summary": "Project and task management with team collaboration, deadlines, file sharing and progress reports.",
+    "overview": [
+      "LAX360 Project Management is planned as a workspace where teams create projects, assign tasks, track deadlines and keep their files and discussions together.",
+      "Progress is visible at project and task level, and project reports help managers see what is on track and what needs attention."
+    ],
+    "problems": [
+      "Tasks and deadlines are scattered across chats, email and notes",
+      "It is unclear who is responsible for what",
+      "Project files are hard to find when needed"
+    ],
+    "features": [
+      "Project creation and management",
+      "Task assignment",
+      "Team collaboration",
+      "Deadline management",
+      "Project progress tracking",
+      "File and document sharing",
+      "Project reports"
+    ],
+    "benefits": [
+      "Clear ownership and deadlines for every task",
+      "Project files kept with the work they belong to",
+      "An up-to-date view of progress for managers"
+    ],
+    "useCases": [
+      "A software team planning and tracking a release",
+      "An agency managing several client projects at once",
+      "An operations team coordinating a multi-step rollout"
+    ],
+    "users": ["Project managers", "Team members", "Agencies and consultancies"],
+    "industries": ["Software and IT", "Agencies", "Construction and operations", "Professional services"]
+  },
+  {
+    "slug": "lax360-workflow-automation",
+    "name": "LAX360 Workflow Automation",
+    "category": "automation",
+    "status": "soon",
+    "icon": "workflow",
+    "photo": "/assets/products/workflow.webp",
+    "summary": "A visual workflow automation product with n8n and application integrations, WhatsApp and email automation, webhooks and AI.",
+    "overview": [
+      "LAX360 Workflow Automation is planned as a product for connecting business applications and automating routine steps, with workflows that can be seen and managed visually.",
+      "It builds on our workflow automation and integration services: n8n integration, application integrations, WhatsApp and email automation, webhooks and event triggers, and AI-powered steps for work that needs reading or drafting."
+    ],
+    "problems": [
+      "Data is copied by hand between business applications",
+      "Follow-up messages depend on someone remembering to send them",
+      "Systems learn about changes only after a delay"
+    ],
+    "features": [
+      "Business workflow automation",
+      "Visual workflow management",
+      "n8n integration",
+      "Application integrations",
+      "WhatsApp automation",
+      "Email automation",
+      "Webhooks and event triggers",
+      "AI-powered workflow automation"
+    ],
+    "benefits": [
+      "Routine steps handled automatically",
+      "Workflows that can be seen and adjusted",
+      "Systems that stay in step with each other"
+    ],
+    "useCases": [
+      "A new enquiry saved to the CRM and acknowledged by message",
+      "Appointment reminders sent by email or WhatsApp",
+      "An incoming email classified and routed to the right person"
+    ],
+    "users": ["Operations teams", "Business owners", "Developers and integrators"],
+    "industries": ["Any business with repeated manual processes", "Agencies", "E-commerce", "Service businesses"]
+  }
+]

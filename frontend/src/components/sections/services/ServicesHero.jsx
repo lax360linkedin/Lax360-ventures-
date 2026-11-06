@@ -1,88 +1,81 @@
-import { Bot, Check, Code2, DraftingCompass, Globe2, GraduationCap, MessagesSquare, Smartphone, TrendingUp } from 'lucide-react'
-import Button from '../../ui/Button.jsx'
+import { useRef } from 'react'
+import { Link } from 'react-router-dom'
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { ArrowDown } from 'lucide-react'
 import BotHighlight from '../../ui/BotHighlight.jsx'
+import Button from '../../ui/Button.jsx'
+import { allDivisions } from '../../../data/services.js'
+import { divisionIcons } from '../../../utils/divisionIcons.js'
 import { scrollToSection } from './CategoryNav.jsx'
 
-const rings = [
-  { size: 38, dur: 48, rev: false, items: [{ Icon: Bot, deg: 30 }, { Icon: Code2, deg: 210 }] },
-  { size: 66, dur: 72, rev: true, items: [{ Icon: Globe2, deg: 50 }, { Icon: Smartphone, deg: 170 }, { Icon: TrendingUp, deg: 290 }] },
-  { size: 94, dur: 100, rev: false, items: [{ Icon: DraftingCompass, deg: 10 }, { Icon: GraduationCap, deg: 130 }, { Icon: MessagesSquare, deg: 250 }] },
-]
+const EASE = [0.2, 0.8, 0.2, 1]
+const photo = (src, className, alt = '') => (
+  <img src={src} alt={alt} width="1000" height="800" decoding="async" fetchPriority="high" className={`h-full w-full object-cover ${className}`} />
+)
 
-const points = [
-  'Every project starts with discovery — we listen before we build.',
-  'Work moves in small steps, with feedback along the way.',
-  'Technology consulting is the first step of every engagement.',
-]
-
-/** Decorative orbit: the service icons circle a glass "360°" core on three rings. Icons stay upright. */
-function Orbit() {
-  return (
-    <div aria-hidden="true" className="relative mx-auto aspect-square w-full max-w-[34rem]">
-      <div className="absolute inset-[8%] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(124,58,237,0.35), transparent)' }} />
-      {rings.map((r) => (
-        <div
-          key={r.size}
-          className={`anim-orbit absolute left-1/2 top-1/2 aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full border border-edge ${r.rev ? '[animation-direction:reverse]' : ''}`}
-          style={{ width: `${r.size}%`, '--dur': `${r.dur}s` }}
-        >
-          {r.items.map(({ Icon, deg }) => {
-            const rad = (deg * Math.PI) / 180
-            return (
-              <span
-                key={deg}
-                className={`anim-orbit-rev glass absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center !rounded-full text-lav md:size-14 ${r.rev ? '[animation-direction:reverse]' : ''}`}
-                style={{ left: `${50 + 50 * Math.cos(rad)}%`, top: `${50 + 50 * Math.sin(rad)}%`, '--dur': `${r.dur}s` }}
-              >
-                <Icon className="size-5 md:size-6" />
-              </span>
-            )
-          })}
-        </div>
-      ))}
-      <div className="anim-float glass absolute left-1/2 top-1/2 flex aspect-square w-[26%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center !rounded-full bg-gradient-to-br from-primary to-accent">
-        <span className="font-display text-2xl font-semibold leading-none text-white md:text-4xl">360°</span>
-        <span className="mt-1 text-[0.55rem] font-bold uppercase tracking-[0.2em] text-lav md:text-[0.65rem]">Execution</span>
-      </div>
-    </div>
-  )
-}
-
-/** Services hero: headline, honest process points, CTAs and the orbit. Entrance is CSS-staggered. */
+/**
+ * Services hero: headline, lead and two buttons on the left; a mosaic of three real photographs on the right that drift at different speeds as the
+ * page scrolls, with a glass card listing the six categories (each links to its section). Uses the page theme (light or graphite).
+ */
 export default function ServicesHero() {
+  const ref = useRef(null)
+  const reduce = useReducedMotion()
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
+  const up = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -50])
+  const down = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 40])
+  const rise = (delay) => (reduce ? {} : { initial: { opacity: 0, y: 22 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay, ease: EASE } })
   return (
-    <section className="relative overflow-hidden border-b border-edge" aria-labelledby="services-title">
-      <div aria-hidden="true" className="pointer-events-none absolute -left-40 top-0 size-[36rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgba(124,58,237,0.3), transparent)' }} />
-      <div className="wrap relative grid items-center gap-12 pb-10 pt-6 md:pb-16 md:pt-10 lg:grid-cols-12 lg:gap-8">
-        <div className="lg:col-span-7">
-          <p className="a-rise glass-flat inline-flex items-center gap-2.5 !rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav" style={{ '--d': '0.2s' }}>
-            <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(168,85,247,0.8)]" />
-            Services
-          </p>
-          <h1 id="services-title" className="h1 mt-6 !text-[clamp(2.6rem,5.4vw,5.5rem)]">
-            <span className="a-rise block" style={{ '--d': '0.3s' }}>Practical technology,</span>
-            <span className="a-rise block" style={{ '--d': '0.42s' }}><BotHighlight delay={1.6}><span className="text-gradient">built around how</span></BotHighlight></span>
-            <span className="a-rise block" style={{ '--d': '0.54s' }}>you work.</span>
-          </h1>
-          <p className="a-rise lead mt-7 text-soft" style={{ '--d': '0.75s' }}>
-            Software, AI automation, websites and mobile apps, digital marketing, CAD engineering and training — planned, built and supported by one team.
-          </p>
-          <ul className="mt-7 space-y-3">
-            {points.map((p, i) => (
-              <li key={p} className="a-rise flex items-start gap-3 text-base text-fg" style={{ '--d': `${0.9 + i * 0.1}s` }}>
-                <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/30 text-lav"><Check className="size-3.5" aria-hidden="true" /></span>
-                {p}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <div className="a-rise" style={{ '--d': '1.25s' }}><Button to="/contact?type=project" arrow className="w-full sm:w-auto">Discuss Your Project</Button></div>
-            <div className="a-rise" style={{ '--d': '1.35s' }}><Button href="#software" variant="secondary" className="w-full sm:w-auto" onClick={(e) => { e.preventDefault(); scrollToSection('software') }}>Explore our services</Button></div>
+    <section ref={ref} aria-labelledby="services-title" className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">
+      <div aria-hidden="true" className="absolute -left-32 top-8 -z-10 size-[26rem] rounded-full bg-primary/20 blur-3xl" />
+      <div aria-hidden="true" className="absolute -right-24 top-0 -z-10 size-[28rem] rounded-full bg-sky/15 blur-3xl" />
+      <div aria-hidden="true" className="absolute inset-0 -z-10 opacity-40 [background-image:radial-gradient(rgb(var(--glow)/0.28)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(ellipse_at_75%_35%,#000,transparent_62%)]" />
+
+      <div className="wrap grid items-center gap-12 pb-16 pt-10 md:pt-14 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-16">
+        <div className="lg:col-span-6">
+          <m.nav {...rise(0.05)} aria-label="Breadcrumb" className="text-sm text-soft">
+            <ol className="flex items-center gap-2">
+              <li><Link to="/" className="transition-colors hover:text-lav">Home</Link></li>
+              <li aria-hidden="true" className="text-lav">›</li>
+              <li aria-current="page" className="font-semibold text-fg">Services</li>
+            </ol>
+          </m.nav>
+          <m.p {...rise(0.12)} className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-edge-strong bg-glass px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav backdrop-blur-md">
+            <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgb(var(--glow2)/0.6)]" />Our services
+          </m.p>
+          <m.h1 {...rise(0.2)} id="services-title" className="h1 mt-5 !text-[clamp(2.4rem,5vw,4.5rem)]">
+            Technology and Digital Capabilities, <BotHighlight delay={0.9}><span className="text-gradient">Under One Roof.</span></BotHighlight>
+          </m.h1>
+          <m.p {...rise(0.3)} className="lead mt-7 max-w-xl text-soft">
+            From custom software and AI to digital marketing, backend APIs, workflow automation and mobile apps, LAX360 brings six areas of expertise together to turn your requirements into practical solutions.
+          </m.p>
+          <m.div {...rise(0.4)} className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button to="/contact?type=project" arrow>Start a Project</Button>
+            <Button href="#software" variant="secondary" onClick={(e) => { e.preventDefault(); scrollToSection('software') }}>
+              Explore Services <ArrowDown className="size-4" aria-hidden="true" />
+            </Button>
+          </m.div>
+        </div>
+
+        <m.div {...rise(0.3)} className="lg:col-span-6">
+          <div className="relative mx-auto grid max-w-md grid-cols-5 gap-3 sm:max-w-xl sm:gap-4">
+            <m.div style={{ y: up }} className="col-span-3 row-span-2 overflow-hidden rounded-[2rem] border border-edge-strong shadow-[0_30px_70px_-30px_rgb(var(--glow)/0.55)]">{photo('/assets/services/hero-dev.webp', 'aspect-[4/5]')}</m.div>
+            <m.div style={{ y: down }} className="col-span-2 overflow-hidden rounded-3xl border border-edge-strong">{photo('/assets/services/mobile.webp', 'aspect-square')}</m.div>
+            <m.div style={{ y: down }} className="col-span-2 overflow-hidden rounded-3xl border border-edge-strong">{photo('/assets/services/automation.webp', 'aspect-square')}</m.div>
+            <ul aria-label="Six service categories" className="glass absolute -bottom-6 left-0 right-0 z-10 mx-2 grid grid-cols-6 gap-1 p-2 sm:mx-6">
+              {allDivisions.map((d) => {
+                const Icon = divisionIcons[d.slug]
+                return (
+                  <li key={d.slug}>
+                    <a href={`#${d.slug}`} onClick={(e) => { e.preventDefault(); scrollToSection(d.slug) }} title={d.name} aria-label={d.name}
+                      className="flex aspect-square items-center justify-center rounded-xl text-lav transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary hover:text-white focus-visible:bg-primary focus-visible:text-white">
+                      <Icon className="size-5" aria-hidden="true" />
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
           </div>
-        </div>
-        <div className="a-fade lg:col-span-5" style={{ '--d': '0.6s' }}>
-          <Orbit />
-        </div>
+        </m.div>
       </div>
     </section>
   )

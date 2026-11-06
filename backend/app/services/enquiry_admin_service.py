@@ -20,13 +20,15 @@ SORTS = {"created_at": ContactEnquiry.created_at, "updated_at": ContactEnquiry.u
 EXPORT_LIMIT = 5000
 
 
-def _filtered(*, q, status, date_from, date_to, archived, assigned_to):
+def _filtered(*, q, status, date_from, date_to, archived, assigned_to, enquiry_type=None):
     stmt = select(ContactEnquiry)
     if q:
         p = like_pattern(q.strip())
         stmt = stmt.where(or_(*(col.ilike(p, escape=LIKE_ESCAPE) for col in (ContactEnquiry.name, ContactEnquiry.email, ContactEnquiry.phone, ContactEnquiry.subject, ContactEnquiry.company))))
     if status:
         stmt = stmt.where(ContactEnquiry.status == status)
+    if enquiry_type:
+        stmt = stmt.where(ContactEnquiry.enquiry_type == enquiry_type) if enquiry_type != "partner" else stmt.where(ContactEnquiry.enquiry_type.like("partner-%"))
     if date_from:
         stmt = stmt.where(ContactEnquiry.created_at >= date_from)
     if date_to:

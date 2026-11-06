@@ -86,7 +86,7 @@ const ChatLauncher = forwardRef(function ChatLauncher({ open, onOpen, raised }, 
         aria-haspopup="dialog"
         aria-expanded={open}
         title="Chat with LAX360 AI Assistant"
-        className="a-pop group relative flex items-center gap-3 rounded-full border border-edge-strong bg-night/70 p-1.5 pr-1.5 shadow-[0_10px_40px_-10px_rgba(124,58,237,0.8)] backdrop-blur-xl transition-[transform,border-color] duration-300 hover:scale-[1.04] hover:border-lav lg:pr-6"
+        className="a-pop group relative flex items-center gap-3 rounded-full border border-edge-strong bg-night/70 p-1.5 pr-1.5 shadow-[0_10px_40px_-10px_rgb(var(--glow)/0.8)] backdrop-blur-xl transition-[transform,border-color] duration-300 hover:scale-[1.04] hover:border-lav lg:pr-6"
         style={{ '--d': '1.6s' }}
       >
         <span aria-hidden="true" className="anim-breathe pointer-events-none absolute left-1.5 top-1.5 size-14 rounded-full bg-accent/50 md:size-[60px]" />

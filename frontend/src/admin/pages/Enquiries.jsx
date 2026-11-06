@@ -86,7 +86,7 @@ function Detail({ id, onClose, onChanged }) {
 
 export default function Enquiries() {
   const toast = useToast()
-  const [f, setF] = useState({ q: '', status: '', from: '', to: '', archived: 'no' })
+  const [f, setF] = useState({ q: '', status: '', type: '', from: '', to: '', archived: 'no' })
   const [sort, setSort] = useState({ key: 'created_at', order: 'desc' })
   const [page, setPage] = useState(1)
   const [openId, setOpenId] = useState(null)
@@ -96,11 +96,12 @@ export default function Enquiries() {
     const p = new URLSearchParams()
     if (q.trim()) p.set('q', q.trim())
     if (f.status) p.set('status', f.status)
+    if (f.type) p.set('type', f.type)
     if (f.from) p.set('from', f.from)
     if (f.to) p.set('to', f.to)
     p.set('archived', f.archived)
     return `${p}${extra}`
-  }, [q, f.status, f.from, f.to, f.archived])
+  }, [q, f.status, f.type, f.from, f.to, f.archived])
   const { data, error, loading, reload } = useFetch(() => api(`/api/admin/enquiries?${qs(`&sort=${sort.key}&order=${sort.order}&page=${page}&page_size=20`)}`), [qs, sort.key, sort.order, page])
   const set = (k) => (e) => { setF({ ...f, [k]: e.target.value }); setPage(1) }
   const onSort = (key) => { setSort((s) => (s.key === key ? { key, order: s.order === 'asc' ? 'desc' : 'asc' } : { key, order: key === 'name' ? 'asc' : 'desc' })); setPage(1) }
@@ -124,9 +125,10 @@ export default function Enquiries() {
       <PageHeader title="Customer enquiries" lead="Messages sent through the website's contact form."
         actions={<Btn loading={exporting} onClick={exportCsv}><Download className="size-4" aria-hidden="true" /> Export CSV</Btn>} />
       <Card className="mb-4">
-        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5" role="search" aria-label="Filter enquiries" onSubmit={(e) => e.preventDefault()}>
+        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6" role="search" aria-label="Filter enquiries" onSubmit={(e) => e.preventDefault()}>
           <Field label="Search" className="lg:col-span-2">{(p) => <div className="relative"><Search className="pointer-events-none absolute left-3 top-3 size-4 text-soft" aria-hidden="true" /><Input {...p} className="pl-9" placeholder="Name, email, phone or type" value={f.q} onChange={set('q')} /></div>}</Field>
           <Field label="Status">{(p) => <Select {...p} value={f.status} onChange={set('status')}><option value="">All</option>{STATUSES.map((s) => <option key={s} value={s}>{label(s)}</option>)}</Select>}</Field>
+          <Field label="Type">{(p) => <Select {...p} value={f.type} onChange={set('type')}><option value="">All types</option><option value="partner">All partnership enquiries</option><option value="partner-technology">Partnership: Technology partner</option><option value="partner-reseller">Partnership: Software reseller</option><option value="partner-education">Partnership: Education partner</option><option value="partner-associate">Partnership: Business associate</option><option value="partner-implementation">Partnership: Implementation partner</option><option value="partner-other">Partnership: Other</option><option value="project">Software project</option><option value="general">Something else</option></Select>}</Field>
           <Field label="From">{(p) => <Input {...p} type="date" value={f.from} max={f.to || undefined} onChange={set('from')} />}</Field>
           <Field label="To">{(p) => <Input {...p} type="date" value={f.to} min={f.from || undefined} onChange={set('to')} />}</Field>
           <Field label="Archive">{(p) => <Select {...p} value={f.archived} onChange={set('archived')}><option value="no">Active</option><option value="only">Archived only</option><option value="all">All</option></Select>}</Field>

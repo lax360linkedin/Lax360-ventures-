@@ -28,7 +28,7 @@ def F(name, label, kind="text", required=False, max_len=300, options=None, help=
     return {"name": name, "label": label, "type": kind, "required": required, "max": max_len, "options": options or [], "help": help, "options_from": options_from, "default": default}
 
 
-DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & Apps"), ("ai", "AI & Automation"), ("growth", "Digital Growth"), ("engineering", "CAD & Engineering"))]
+DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("ai", "AI & Business Automation"), ("growth", "Digital Marketing"), ("headless", "Headless SaaS & API Solutions"), ("automation", "Workflow Automation & Integration"), ("mobile", "Mobile & Business Applications"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
     ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
     ("process", "How we work"),
@@ -37,12 +37,32 @@ ABOUT_SECTIONS = [{"value": v, "label": l} for v, l in (
     ("story", "Our story"), ("motto", "Our motto"), ("purpose", "Mission & vision"), ("expertise", "Core expertise"), ("features", "Our features"),
     ("values", "Our values"), ("technology", "Our approach to technology"), ("cta", "Final call to action"))]
 PAGES = [{"value": v, "label": l} for v, l in (("home", "Home"), ("about", "About"), ("services", "Services"), ("industries", "Industries"), ("insights", "Insights"), ("network", "Our Network"), ("team", "Our Team"),
-                                              ("work", "Work"), ("career", "Career"), ("contact", "Contact"))]
-NETWORK_CATEGORIES = [{"value": v, "label": l} for v, l in (("authorized", "Authorized Partners"), ("technology", "Technology Partners"), ("associated", "Associated Companies"), ("collaboration", "Strategic Collaborations"))]
+                                              ("products", "Products"), ("work", "Work"), ("career", "Career"), ("contact", "Contact"))]
+PRODUCT_CATEGORIES = [{"value": v, "label": l} for v, l in (("business", "Business Management"), ("industry", "Industry Solutions"), ("education", "Education & Learning"), ("developer", "Developer Solutions"),
+                                                           ("workforce", "Workforce Management"), ("booking", "Booking & Scheduling"), ("productivity", "Productivity & Collaboration"), ("automation", "Automation & Integration"))]
+PRODUCT_STATUSES = [{"value": v, "label": l} for v, l in (("live", "Live — available for customers"), ("beta", "Beta — available for testing or limited access"), ("in_development", "In Development"), ("soon", "Coming Soon"))]
+INDUSTRY_GROUPS = [{"value": v, "label": l} for v, l in (("health", "Health, Education & Wellness"), ("commerce", "Commerce, Hospitality & Travel"), ("finance", "Finance, Property & Professional Services"),
+                                                         ("industry", "Industry, Infrastructure & Utilities"))]
+NETWORK_CATEGORIES = [{"value": v, "label": l} for v, l in (
+    ("group", "LAX360 Group Companies"), ("authorized", "Authorized Partners"), ("technology", "Technology Partners"), ("associated", "Associated Companies"), ("collaboration", "Strategic Collaborations"),
+    ("education", "Education & Academic Network"), ("associate", "Business Associates"), ("reseller", "Reseller & Distribution Partners"), ("implementation", "Implementation Partners"),
+    ("startup", "Startup & Innovation Ecosystem"), ("industry", "Industry Collaborations"), ("professional", "Professional Network"))]
+NETWORK_RELATIONSHIPS = [{"value": v, "label": l} for v, l in (
+    ("group_company", "Group company of LAX360 Ventures"), ("operated", "Operated by LAX360 Ventures"), ("associated", "Associated company (separate business)"), ("authorized", "Authorized partner"),
+    ("technology_provider", "Technology provider"), ("reseller", "Reseller / distribution partner"), ("associate", "Business associate"), ("implementation", "Implementation partner"),
+    ("collaboration", "Strategic collaboration"), ("other", "Other"))]
+SOFTWARE_CATEGORIES = [{"value": v, "label": l} for v, l in (
+    ("crm_erp", "CRM & ERP"), ("accounting", "Accounting & Billing"), ("hr", "HR & Payroll"), ("productivity", "Business Productivity"), ("ai", "AI Platforms & Subscriptions"),
+    ("cloud", "Cloud & Business Applications"), ("other", "Other"))]
+SOFTWARE_OWNERSHIP = [{"value": v, "label": l} for v, l in (("lax360", "Developed by LAX360"), ("third_party", "Third-party partner product"), ("resold", "Resold / distributed software"), ("integrated", "Integrated technology solution"))]
 TEAM_GROUPS = [{"value": v, "label": l} for v, l in (("leadership", "Founder & Leadership"), ("management", "Management Team"), ("heads", "Department Heads"), ("software", "Software Development Team"),
-                                                    ("ai", "AI & Automation Team"), ("marketing", "Digital Marketing Team"), ("cad", "CAD Engineering Team"))]
-ARTICLE_CATEGORIES = [{"value": v, "label": l} for v, l in (("ai", "Artificial Intelligence"), ("software", "Software Development"), ("transformation", "Digital Transformation"),
-                                                          ("news", "Technology News & Updates"), ("blog", "Technology Blog"))]
+                                                    ("ai", "AI & Automation Team"), ("marketing", "Digital Marketing Team"))]
+TEAM_LEADERSHIP_ROLES = [{"value": v, "label": l} for v, l in (("managing_director", "Managing Director"), ("founder", "Founder / Co-Founder"), ("technical_director", "Technical Director"), ("department_head", "Department Head"), ("leadership", "Other leadership"))]
+TEAM_GALLERY_CATEGORIES = [{"value": v, "label": l} for v, l in (("activities", "Team activities"), ("office", "Office environment"), ("celebrations", "Team celebrations"), ("workshops", "Technical workshops"),
+                                                                ("knowledge", "Knowledge-sharing sessions"), ("learning", "Learning & development"), ("achievements", "Employee achievements"))]
+ARTICLE_CATEGORIES =[{"value": v, "label": l} for v, l in (("ai", "Artificial Intelligence & Generative AI"), ("software", "Software Development & Technology"), ("automation", "Business Automation"),
+                                                          ("saas", "SaaS & API Innovations"), ("transformation", "Digital Transformation"), ("webmobile", "Web & Mobile Application Development"),
+                                                          ("marketing", "Digital Marketing"), ("trends", "Technology Trends & Updates"))]
 NAV_PLACES = [{"value": "header", "label": "Header menu"}, {"value": "footer_divisions", "label": "Footer: Divisions column"}, {"value": "footer_company", "label": "Footer: Company column"}]
 
 SOCIAL_PLATFORMS = [{"value": v, "label": l} for v, l in (("instagram", "Instagram"), ("facebook", "Facebook"), ("linkedin", "LinkedIn"), ("youtube", "YouTube"), ("x", "X (Twitter)"))]
@@ -94,7 +114,7 @@ KINDS: dict[str, dict] = {
     # ---- Services -------------------------------------------------------------------------------------------------------------------
     "service_category": {
         "label": "Service categories", "group": "Services", "module": "services", "single": False, "preview_path": "/services",
-        "help": "The groups your services are listed under (for example Software & IT Services, AI & Automation, Digital Marketing, Civil CAD, Mechanical CAD). Add, rename or remove them freely.",
+        "help": "The groups your services are listed under (for example Software & IT Services, AI & Automation, Digital Marketing, Training). Add, rename or remove them freely.",
         "title_label": "Category name",
         "fields": [F("description", "Short description", "textarea", max_len=400), F("icon", "Icon / image", "image")],
     },
@@ -126,45 +146,131 @@ KINDS: dict[str, dict] = {
     # ---- Industries -----------------------------------------------------------------------------------------------------------------
     "industry": {
         "label": "Industries", "group": "Industries", "module": "content", "single": False, "preview_path": "/industries",
-        "help": "The industries LAX360 Ventures builds technology for. When at least one is published, the Industries page lists these in place of its built-in industries.",
+        "help": "The industries LAX360 Ventures builds technology for. Each published industry appears on the Industries page and gets its own details page (/industries/<name>). "
+                "Save as a draft to hide it. When at least one is published, these replace the built-in industries. Do not describe delivered projects unless they are verified.",
         "title_label": "Industry name",
         "fields": [
+            F("group", "Group", "select", False, options=INDUSTRY_GROUPS),
+            F("featured", "Featured industry", "bool", default=False, help="Featured industries are highlighted at the top of the Industries page."),
             F("summary", "Short description (card text)", "textarea", True, max_len=300),
-            F("description", "Longer description", "textarea", max_len=2000, help="Plain paragraphs. A blank line starts a new paragraph."),
-            F("solutions", "Technology solutions we provide", "textarea", max_len=2000, help="One solution per line."),
-            F("image", "Image", "image"),
+            F("description", "Overview", "textarea", max_len=3000, help="Plain paragraphs. A blank line starts a new paragraph."),
+            F("challenges", "Major challenges", "textarea", max_len=2000, help="One challenge per line."),
+            F("problem_solution", "Problem to solution pairs", "textarea", max_len=2000, help="One pair per line: Problem => Solution"),
+            F("solutions", "Software and application solutions", "textarea", max_len=2000, help="One solution per line."),
+            F("ai_opportunities", "AI and automation opportunities", "textarea", max_len=2500, help="One per line. Optional: Title: description"),
+            F("use_cases", "Use cases", "textarea", max_len=2000, help="One use case per line."),
+            F("benefits", "Benefits of digital transformation", "textarea", max_len=2000, help="One benefit per line."),
+            F("services", "Related LAX360 services", "textarea", max_len=500, help="One service category per line: software, ai, growth, headless, automation, mobile"),
+            F("products", "Related LAX360 products", "textarea", max_len=800, help="One product address per line (the last part of /products/<address>), only where the product genuinely applies."),
+            F("insight_categories", "Related Insights categories", "textarea", max_len=300, help="One per line: ai, software, automation, saas, transformation, webmobile, marketing, trends"),
+            F("image", "Card image", "image"), F("hero_image", "Hero image", "image"), F("image_alt", "Image description", max_len=160),
+            F("seo_title", "SEO title", max_len=70), F("meta_description", "SEO description", "textarea", max_len=300),
         ],
     },
     # ---- Our Network ----------------------------------------------------------------------------------------------------------------
+    "network_category": {
+        "label": "Network categories", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
+        "help": "Extra categories for the Our Network page (the standard ones already exist). A category appears publicly only when it has at least one published company or partner. "
+                "Use the name as the heading and write a one-line description.",
+        "title_label": "Category name",
+        "fields": [F("description", "Short description", "textarea", False, max_len=300)],
+    },
     "network_partner": {
-        "label": "Network partners & companies", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
-        "help": "Companies LAX360 Ventures works with. Pick the category that matches the real relationship: only mark someone an Authorized Partner when that authorization is confirmed. "
-                "Published entries appear on the Our Network page.",
+        "label": "Network companies & partners", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
+        "help": "Companies in the LAX360 Ventures network. New entries start as drafts: check the company's identity, website and the exact relationship, set Verification, then publish. "
+                "A partnership designation (for example \"Authorized Partner\") is shown publicly only when Verification is \"Verified\" and the expiry date has not passed. "
+                "Never describe another company as owned by LAX360 unless that is verified.",
         "title_label": "Company name",
         "fields": [
-            F("category", "Relationship", "select", True, options=NETWORK_CATEGORIES),
-            F("location", "Location (optional)", max_len=80, help="e.g. Salem"),
-            F("description", "Description", "textarea", True, max_len=600),
+            F("category", "Network category", "select", True, options=NETWORK_CATEGORIES, options_from="network_category"),
+            F("relationship", "Relationship type", "select", False, options=NETWORK_RELATIONSHIPS),
+            F("business_category", "Business category", max_len=80, help="e.g. Training & Education, Financial Services, Business Software & SaaS"),
+            F("description", "Description", "textarea", True, max_len=800),
+            F("designation", "Partnership designation", max_len=80, help="The exact verified wording only, e.g. \"Authorized Partner\". Leave blank if there is none."),
+            F("verification", "Verification", "select", False, options=[{"value": "pending", "label": "Pending verification"}, {"value": "verified", "label": "Verified"}], default="pending"),
+            F("verified_on", "Verified on (YYYY-MM-DD)", max_len=10), F("expires_on", "Authorization expires on (YYYY-MM-DD)", max_len=10),
+            F("products", "Products and services", "textarea", False, max_len=1500, help="One per line. Only what the company's own website confirms."),
+            F("location_type", "Location", "select", False, options=[{"value": "separate", "label": "Separate location"}, {"value": "same", "label": "Same location as LAX360 (Salem)"}], default="separate"),
+            F("location", "Location text (optional)", max_len=120, help="e.g. Salem"),
+            F("contact_email", "Contact email (optional)", max_len=120), F("contact_phone", "Contact phone (optional)", max_len=40),
             F("website_link", "Official website (optional)", max_len=300, help="The full https:// address of the company's own website"),
-            F("logo", "Logo (optional)", "image"),
+            F("cta_label", "Button text", max_len=40, help="e.g. Visit CADPOINT"), F("featured", "Featured", "bool", default=False),
+            F("logo", "Official logo (optional)", "image", help="Only a logo you are permitted to use. Do not edit or redraw a company's logo."),
+        ],
+    },
+    "software_product": {
+        "label": "Software distribution", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
+        "help": "Software LAX360 helps customers choose, buy, implement and use. Link each product to its real vendor and state clearly whether it is third-party, resold, integrated or developed by LAX360. "
+                "Do not present third-party software as LAX360's own.",
+        "title_label": "Product name",
+        "fields": [
+            F("vendor", "Vendor (network company)", "select", False, options_from="network_partner"),
+            F("software_category", "Software category", "select", True, options=SOFTWARE_CATEGORIES),
+            F("ownership", "Type", "select", True, options=SOFTWARE_OWNERSHIP, default="third_party"),
+            F("description", "Description", "textarea", True, max_len=500, help="What the vendor's product is, in neutral terms."),
+            F("product_link", "Vendor product page (optional)", max_len=300), F("cta_link", "Enquiry link (optional)", max_len=300, help="e.g. /contact?type=project"),
         ],
     },
     # ---- Our Team -------------------------------------------------------------------------------------------------------------------
     "team_member": {
         "label": "Team members", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team",
         "help": "The people behind LAX360 Ventures. Choose the team each person belongs to; use the order number to arrange people within a team. Publish to show a profile, unpublish to hide it.",
-        "title_label": "Name",
+        "title_label": "Name", "public_filter": ("active", False, "exclude"),
         "fields": [
-            F("group", "Team", "select", True, options=TEAM_GROUPS),
+            F("leadership_role", "Leadership role", "select", False, options=TEAM_LEADERSHIP_ROLES, help="Set this to show the person in the Leadership section. Leave empty for a regular team member."),
+            F("department", "Department", "select", False, options_from="team_department", help="Departments are managed under Team > Departments."),
+            F("group", "Team group (optional)", "select", False, options=TEAM_GROUPS, help="Older grouping, kept for existing profiles."),
             F("designation", "Designation", "text", True, max_len=120),
             F("bio", "Short biography", "textarea", max_len=800),
-            F("photo", "Photo", "image"),
+            F("expertise", "Skills & areas of expertise", "textarea", max_len=400, help="Comma-separated, e.g. React, FastAPI, SEO."),
+            F("photo", "Photo", "image"), F("photo_alt", "Photo description", max_len=160, help="Short description for screen readers."),
             F("linkedin_link", "LinkedIn profile (optional)", max_len=300, help="The person's full LinkedIn address, e.g. https://www.linkedin.com/in/name"),
+            F("twitter_link", "X (Twitter) profile (optional)", max_len=300), F("github_link", "GitHub profile (optional)", max_len=300), F("instagram_link", "Instagram profile (optional)", max_len=300),
+            F("featured", "Featured profile", "bool", default=False, help="Featured people are shown first in the team directory."),
+            F("active", "Active", "bool", default=True, help="Untick to hide the profile from the website without deleting it."),
+        ],
+    },
+    "team_department": {
+        "label": "Team departments", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team#departments",
+        "help": "The departments shown on the Our Team page. Add the roles that exist in each one; team members are linked to a department from their own profile.",
+        "title_label": "Department name",
+        "fields": [
+            F("description", "Description", "textarea", True, max_len=500), F("roles", "Roles in this department", "textarea", max_len=800, help="One role per line, e.g. Frontend Developers."),
+            F("image", "Department image", "image"), F("image_alt", "Image description", max_len=160),
+        ],
+    },
+    "team_gallery": {
+        "label": "Team & culture gallery", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team#culture",
+        "help": "Genuine LAX360 photographs only (team activities, office, celebrations, workshops, learning, achievements). Nothing is shown until you publish photos.",
+        "title_label": "Caption",
+        "fields": [
+            F("category", "Category", "select", True, options=TEAM_GALLERY_CATEGORIES), F("image", "Photograph", "image", True),
+            F("image_alt", "Photo description", max_len=160, help="Short description for screen readers."), F("description", "Details (optional)", "textarea", max_len=300),
+        ],
+    },
+    "team_expertise": {
+        "label": "Team expertise", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team#expertise",
+        "help": "Capability groups shown in the Expertise section. When none are published, the built-in list is shown.",
+        "title_label": "Expertise area",
+        "fields": [F("description", "Short description", "textarea", max_len=300), F("tags", "Technologies / skills", "textarea", max_len=400, help="Comma-separated.")],
+    },
+    "team_page": {
+        "label": "Our Team page text", "group": "Team", "module": "content", "single": True, "slug": "team", "preview_path": "/our-team",
+        "help": "The hero and the section headings of the Our Team page. Leave a field empty to keep the built-in text.",
+        "fields": [
+            F("hero_eyebrow", "Hero small label", max_len=60), F("hero_title", "Hero headline", max_len=120), F("hero_lead", "Hero introduction", "textarea", max_len=500),
+            F("hero_image", "Hero background image (a real LAX360 team photograph)", "image"), F("hero_image_alt", "Hero image description", max_len=160),
+            F("leadership_title", "Leadership heading", max_len=100), F("leadership_lead", "Leadership description", "textarea", max_len=300),
+            F("departments_title", "Departments heading", max_len=100), F("departments_lead", "Departments description", "textarea", max_len=300),
+            F("directory_title", "Team directory heading", max_len=100), F("directory_lead", "Team directory description", "textarea", max_len=300),
+            F("culture_title", "People & culture heading", max_len=100), F("culture_lead", "People & culture description", "textarea", max_len=300),
+            F("expertise_title", "Expertise heading", max_len=100), F("expertise_lead", "Expertise description", "textarea", max_len=300),
+            F("careers_title", "Careers heading", max_len=100), F("careers_lead", "Careers description", "textarea", max_len=300),
         ],
     },
     # ---- Insights -------------------------------------------------------------------------------------------------------------------
     "article": {
-        "label": "Insights articles", "group": "Insights", "module": "content", "single": False, "preview_path": "/insights",
+        "label": "Insights articles", "group": "Insights", "module": "content", "single": False, "slug_field": "url_slug", "preview_path": "/insights",
         "help": "Blog posts, AI updates, software and digital transformation insights and technology news. Publish to list an article on the Insights page; "
                 "unpublish to take it down. When at least one article is published, the Insights page shows these in place of the built-in starter articles.",
         "title_label": "Article title",
@@ -172,9 +278,15 @@ KINDS: dict[str, dict] = {
             F("category", "Category", "select", True, options=ARTICLE_CATEGORIES),
             F("published_on", "Publication date", "text", True, max_len=10, help="YYYY-MM-DD, e.g. 2026-11-03"),
             F("excerpt", "Short summary", "textarea", True, max_len=300),
-            F("body", "Article text", "textarea", True, max_len=20000, help="Plain paragraphs; a blank line starts a new paragraph. A line starting with \"## \" becomes a sub-heading."),
-            F("image", "Cover image", "image"),
+            F("body", "Article text", "textarea", True, max_len=20000, help="Plain text. A blank line starts a new paragraph; \"## \" starts a sub-heading; lines starting with \"- \" make a bullet list, \"1. \" a numbered list and \"> \" a quote; \"[[image 1]]\" or \"[[image 2]]\" places an inline image."),
+            F("image", "Cover image", "image"), F("image_alt", "Cover image description", max_len=160, help="Short description for screen readers."),
             F("author", "Author", max_len=80, help="Defaults to the LAX360 team."),
+            F("tags", "Tags", max_len=200, help="Comma-separated, e.g. AI, chatbots, automation."),
+            F("featured", "Featured article", "bool", default=False, help="Featured articles are highlighted at the top of the Insights page."),
+            F("inline_image_1", "Inline image 1", "image"), F("inline_image_2", "Inline image 2", "image"),
+            F("url_slug", "Page URL", max_len=80, help="The address of the article: /insights/<this text>. Leave blank to use the title. Changing it later changes the article's link."),
+            F("seo_title", "SEO title", max_len=70, help="Shown in search results and the browser tab. Defaults to the article title."),
+            F("meta_description", "SEO description", "textarea", max_len=300, help="Shown in search results. Defaults to the short summary."),
         ],
     },
     # ---- Clients --------------------------------------------------------------------------------------------------------------------
@@ -219,6 +331,30 @@ KINDS: dict[str, dict] = {
             F("link", "Case study link (optional)", max_len=300),
         ],
         "title_label": "Project title",
+    },
+    # ---- Products -------------------------------------------------------------------------------------------------------------------
+    "product": {
+        "label": "Products", "group": "Products", "module": "content", "single": False, "preview_path": "/products",
+        "help": "LAX360's own software products and SaaS platforms (never third-party products). Each published product appears on the Products page and gets its own details page. "
+                "When at least one product is published, these replace the built-in list. Add screenshots of the real product, and keep the status accurate: the demo and access buttons only appear for Live and Beta products.",
+        "title_label": "Product name",
+        "fields": [
+            F("category", "Category", "select", True, options=PRODUCT_CATEGORIES),
+            F("status", "Availability", "select", True, options=PRODUCT_STATUSES, default="soon"),
+            F("summary", "Short description (card text)", "textarea", True, max_len=300),
+            F("overview", "Overview", "textarea", max_len=4000, help="Plain paragraphs. A blank line starts a new paragraph."),
+            F("problems", "Business problems addressed", "textarea", max_len=2000, help="One problem per line."),
+            F("features", "Key features and modules", "textarea", max_len=3000, help="One feature per line. Optional: write \"Title: description\"."),
+            F("benefits", "Benefits", "textarea", max_len=2000, help="One benefit per line."),
+            F("use_cases", "Use cases", "textarea", max_len=2000, help="One use case per line."),
+            F("users", "Target users", "textarea", max_len=1000, help="One group per line, e.g. Startups."),
+            F("industries", "Industries", "textarea", max_len=1000, help="One industry per line."),
+            F("logo", "Logo", "image"), F("image", "Cover image", "image"),
+            F("screenshot_1", "Screenshot 1", "image"), F("screenshot_2", "Screenshot 2", "image"), F("screenshot_3", "Screenshot 3", "image"), F("screenshot_4", "Screenshot 4", "image"),
+            F("product_link", "Product / access link", max_len=300, help="Where visitors open or sign up for the product (https:// URL or a page like /contact)."),
+            F("demo_link", "Demo link", max_len=300, help="Optional: a demo or documentation page."),
+            F("cta_label", "Main button text", max_len=40, help="Defaults to \"Enquire about this product\"."),
+        ],
     },
     # ---- Careers --------------------------------------------------------------------------------------------------------------------
     "job": {
@@ -273,7 +409,8 @@ def kinds_for_ui(db: Session, user=None) -> list[dict]:
                 src = f["options_from"]
                 if src not in dynamic:
                     dynamic[src] = [{"value": i.slug, "label": i.title} for i in list_items(db, src)]
-                f["options"] = dynamic[src]
+                static = list(f["options"])
+                f["options"] = static + [o for o in dynamic[src] if o["value"] not in {x["value"] for x in static}]
             fields.append(f)
         out.append({"kind": kind, **spec, "fields": fields})
     return out
@@ -284,9 +421,10 @@ def _slugify(text: str) -> str:
 
 
 def _options(db: Session, f: dict) -> set[str]:
+    static = {o["value"] for o in f["options"]}
     if f.get("options_from"):
-        return {i.slug for i in list_items(db, f["options_from"])}
-    return {o["value"] for o in f["options"]}
+        return static | {i.slug for i in list_items(db, f["options_from"])}
+    return static
 
 
 def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict]:
@@ -391,7 +529,7 @@ def _slug_for(db: Session, spec: dict, title: str, clean: dict, current: Content
     if spec["single"]:
         return spec["slug"]
     if spec.get("slug_field"):
-        slug = clean.get(spec["slug_field"]) or _slugify(title)
+        slug = (_slugify(clean[spec["slug_field"]]) if spec["slug_field"] == "url_slug" and clean.get(spec["slug_field"]) else clean.get(spec["slug_field"])) or _slugify(title)
         taken = db.scalar(select(ContentItem.id).where(ContentItem.kind == kind, ContentItem.slug == slug, ContentItem.id != (current.id if current else uuid.uuid4())))
         if taken:
             raise ApiError(409, "already_exists", "An item for this already exists: edit it instead.", fields={spec["slug_field"]: "Already in use."})
@@ -436,7 +574,7 @@ def update(db: Session, user: User, item: ContentItem, *, title: str | None, dat
             item.data = clean
             changed.append("data")
             spec = KINDS[item.kind]
-            if spec.get("slug_field") and clean.get(spec["slug_field"]) and clean[spec["slug_field"]] != item.slug:
+            if spec.get("slug_field") and clean.get(spec["slug_field"]) and (_slugify(clean[spec["slug_field"]]) if spec["slug_field"] == "url_slug" else clean[spec["slug_field"]]) != item.slug:
                 item.slug = _slug_for(db, spec, new_title, clean, item, item.kind)
     if status is not None and status != item.status:
         item.status = status
@@ -487,8 +625,8 @@ def public_items(db: Session, settings: Settings, kind: str, *, include_drafts: 
     flt = KINDS[kind].get("public_filter")
     out = []
     for i in list_items(db, kind, status=None if include_drafts else "published"):
-        if flt and not include_drafts and (i.data or {}).get(flt[0]) != flt[1]:
-            continue  # e.g. a closed job opening
+        if flt and not include_drafts and (((i.data or {}).get(flt[0]) == flt[1]) if len(flt) > 2 else ((i.data or {}).get(flt[0]) != flt[1])):
+            continue  # e.g. a closed job opening, or a deactivated team profile (("active", False, "exclude"))
         out.append({"id": str(i.id), "slug": i.slug, "title": i.title, "data": _resolve(db, settings, kind, i.data, preview=include_drafts), "sort_order": i.sort_order,
                     **({"status": i.status} if include_drafts else {})})
     return out

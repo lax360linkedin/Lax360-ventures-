@@ -11,11 +11,13 @@ const PHOTO = {
   software: '/assets/services/software.webp',
   ai: '/assets/services/ai.webp',
   growth: '/assets/services/marketing.webp',
-  engineering: '/assets/services/mechanical.webp',
+  headless: '/assets/services/headless.webp',
+  automation: '/assets/services/automation.webp',
+  mobile: '/assets/services/mobile.webp',
 }
 
 /** Home "Our Services": heading, short introduction and a card per major service (photo, icon, short description), then a button to the Services page. */
-export default function OurServices({ eyebrow = 'What we do', title = 'Our', gradient = 'Services', lead = 'Software, AI, digital growth and CAD engineering from one accountable team — planned, built and supported around how your business works.' }) {
+export default function OurServices({ eyebrow = 'What we do', title = 'Our', gradient = 'Services', lead = 'Six areas of expertise — software, AI, marketing, APIs, automation and mobile apps — from one accountable team — planned, built and supported around how your business works.' }) {
   return (
     <section aria-labelledby="our-services-title" className="wrap section">
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -29,7 +31,7 @@ export default function OurServices({ eyebrow = 'What we do', title = 'Our', gra
         />
         <Reveal delay={0.1} className="shrink-0"><Button to="/services" arrow>View All Services</Button></Reveal>
       </div>
-      <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {allDivisions.map((d, i) => {
           const Icon = divisionIcons[d.slug]
           return (
@@ -37,7 +39,7 @@ export default function OurServices({ eyebrow = 'What we do', title = 'Our', gra
               <Link to={d.to} className="glass-flat lift group flex h-full flex-col overflow-hidden">
                 <span className="relative block">
                   <img src={PHOTO[d.slug]} alt="" width="1000" height="800" loading="lazy" decoding="async" className="aspect-[16/8] w-full object-cover sm:aspect-[16/10] transition-transform duration-500 group-hover:scale-[1.04]" />
-                  <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0b0714]/70 to-transparent" />
+                  <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-(--img-shade)/70 to-transparent" />
                   <span className="absolute bottom-3 left-4 flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white shadow-lg transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
