@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date
 from typing import Literal
 
 from pydantic import Field
@@ -8,12 +9,25 @@ from pydantic import Field
 from app.models.contact_enquiry import ENQUIRY_STATUSES  # noqa: F401 (documented set)
 from app.schemas.common import ApiModel, EmailStr, OneLine
 
-EnquiryStatus = Literal["new", "in_progress", "contacted", "converted", "closed"]
+EnquiryStatus = Literal["new", "in_progress", "contacted", "qualified", "proposal_sent", "negotiation", "converted", "not_interested", "closed"]
 
 
 class EnquiryUpdate(ApiModel):
     status: EnquiryStatus | None = None
     assigned_to: uuid.UUID | None = None  # explicit null un-assigns; omit the field to leave it unchanged
+
+
+class FollowupCreate(ApiModel):
+    kind: Literal["call", "email", "whatsapp", "meeting", "other"] = "call"
+    summary: str = Field(min_length=1, max_length=1000)
+    due_on: date | None = None
+    done: bool = False
+
+
+class FollowupUpdate(ApiModel):
+    done: bool | None = None
+    summary: str | None = Field(default=None, min_length=1, max_length=1000)
+    due_on: date | None = None
 
 
 class NoteCreate(ApiModel):

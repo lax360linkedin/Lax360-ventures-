@@ -13,7 +13,7 @@ export default function CmsServiceDetail({ service, categoryTitle }) {
   const link = d.cta_link || '/contact?type=project'
   return (
     <PageContainer path={`/services/${service.slug}`} title={service.title} description={d.summary}
-      jsonLd={{ '@context': 'https://schema.org', '@type': 'Service', name: service.title, description: d.summary, provider: { '@type': 'Organization', name: 'LAX360 Ventures' } }}>
+      jsonLd={{ '@context': 'https://schema.org', '@type': 'Service', name: service.title, description: d.summary, provider: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' } }}>
       <PageHero eyebrow={categoryTitle || 'Service'} title={service.title} lead={d.summary}
         art={d.image ? <img src={d.image} alt={d.image_alt || ''} className="h-auto w-full rounded-xl object-cover" /> : null}>
         <Button to={/^https?:/.test(link) ? undefined : link} href={/^https?:/.test(link) ? link : undefined} arrow>{d.cta_label || 'Discuss Your Project'}</Button>

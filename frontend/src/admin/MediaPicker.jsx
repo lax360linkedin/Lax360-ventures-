@@ -4,7 +4,7 @@ import { api, upload } from '../services/apiClient.js'
 import { Btn, EmptyState, ErrorState, Input, Modal, Select, Spinner, cx, useDebounced, useFetch, useToast } from './ui.jsx'
 
 export const fmtSize = (b) => (b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`)
-export const ACCEPT = { image: 'image/png,image/jpeg,image/gif,image/webp', video: 'video/mp4,video/webm,.mp4,.webm', all: 'image/png,image/jpeg,image/gif,image/webp,application/pdf,video/mp4,video/webm,.mp4,.webm' }
+export const ACCEPT = { document: 'application/pdf', image: 'image/png,image/jpeg,image/gif,image/webp', video: 'video/mp4,video/webm,.mp4,.webm', all: 'image/png,image/jpeg,image/gif,image/webp,application/pdf,video/mp4,video/webm,.mp4,.webm' }
 
 /** Thumbnail of a library item. Public files load straight from their address; private ones are fetched with the admin session. */
 export function MediaThumb({ asset, className = '' }) {

@@ -4,8 +4,8 @@ import portfolio from './network.json'
 // (Website content > Network companies & partners / Software distribution). Unverified partners (Zoho, OpenAI, Marg ERP, HexBis) are drafts there and in
 // `python -m app.cli seed-network`, so no partnership claim appears publicly until an administrator verifies and publishes it.
 export const networkCategories = {
-  group: { label: 'Our Group Companies', text: 'LAX360 Ventures and the businesses connected to it. Each is a separate business unless its profile says otherwise.' },
-  authorized: { label: 'Authorized Partners & Business Alliances', text: 'Companies whose partnership with LAX360 Ventures has been verified.' },
+  group: { label: 'Our Group Companies', text: 'LAX360 Pvt Ltd and the businesses connected to it. Each is a separate business unless its profile says otherwise.' },
+  authorized: { label: 'Authorized Partners & Business Alliances', text: 'Companies whose partnership with LAX360 Pvt Ltd has been verified.' },
   technology: { label: 'Technology Partners', text: 'Cloud platforms, AI providers, software companies, infrastructure providers and technology vendors.' },
   education: { label: 'Education & Academic Network', text: 'Training and education relationships and collaborations.' },
   associate: { label: 'Business Associates', text: 'Strategic business relationships, consultants and business collaborators.' },
@@ -14,12 +14,12 @@ export const networkCategories = {
   startup: { label: 'Startup & Innovation Ecosystem', text: 'Startup collaborations, innovation initiatives and entrepreneurial ecosystem connections.' },
   industry: { label: 'Industry Collaborations', text: 'Healthcare, retail, education, manufacturing and other industry-specific relationships.' },
   professional: { label: 'Professional Network', text: 'Consultants, trainers, specialists and domain experts.' },
-  associated: { label: 'Associated Companies', text: 'Companies connected to LAX360 Ventures through close working ties.' },
+  associated: { label: 'Associated Companies', text: 'Companies connected to LAX360 Pvt Ltd through close working ties.' },
   collaboration: { label: 'Strategic Collaborations', text: 'Joint initiatives and working relationships on specific programmes or projects.' },
 }
 
 export const relationshipLabels = {
-  group_company: 'Group company of LAX360 Ventures', operated: 'Operated by LAX360 Ventures', associated: 'Associated company (separate business)', authorized: 'Authorized partner',
+  group_company: 'Group company of LAX360 Pvt Ltd', operated: 'Operated by LAX360 Pvt Ltd', associated: 'Associated company (separate business)', authorized: 'Authorized partner',
   technology_provider: 'Technology provider', reseller: 'Reseller / distribution partner', associate: 'Business associate', implementation: 'Implementation partner', collaboration: 'Strategic collaboration', other: 'Other',
 }
 
@@ -53,6 +53,11 @@ export const softwareEntries = portfolio.software.filter((p) => p.status === 'pu
 // CADPOINT and Fatcat Wealthy exactly as they first appeared on the page (original wording and card design). They are shown first on the Our Network page.
 // If the admin panel has published entries with these slugs, those entries are shown instead, so an administrator can still edit them.
 export const pinnedProfiles = [
-  { key: 'authorized', slugs: ['cadpoint-salem', 'cadpoint-academy-salem'], fallback: { slug: 'cadpoint-salem', name: 'CADPOINT', location: 'Salem', description: 'Authorized partner of LAX360 Ventures in Salem.', website: 'https://www.cadpoint.co.in/', logo: '', logoAlt: '' } },
-  { key: 'associated', slugs: ['fatcat-wealthy'], fallback: { slug: 'fatcat-wealthy', name: 'Fatcat Wealthy', location: '', description: 'Associated with LAX360 Ventures.', website: 'https://www.fatcatwealthy.com/', logo: '', logoAlt: '' } },
+  { key: 'authorized', slugs: ['cadpoint-salem', 'cadpoint-academy-salem'], fallback: { slug: 'cadpoint-salem', name: 'CADPOINT', location: 'Salem', description: 'Authorized partner of LAX360 Pvt Ltd in Salem.', website: 'https://www.cadpoint.co.in/', logo: '', logoAlt: '' } },
+  { key: 'associated', slugs: ['fatcat-wealthy'], fallback: { slug: 'fatcat-wealthy', name: 'Fatcat Wealthy', location: '', description: 'Associated with LAX360 Pvt Ltd.', website: 'https://www.fatcatwealthy.com/', logo: '', logoAlt: '' } },
 ]
+
+/** A pinned profile (name, location, description, website) in the shape of a network company card / details page. An admin-panel entry already has this shape. */
+export const asCompany = (e) => ({ products: [], designation: '', claim: '', verified: false, verification: 'pending', businessCategory: '', relationship: '', ctaLabel: 'Visit website', sameLocation: false, email: '', phone: '', logo: '', logoAlt: '',
+  overview: [], partnershipType: '', partnershipNature: [], collaboration: [], weReceive: [], weContribute: [], weOffer: [], solutions: [], implementationServices: [], supportServices: [], softwareCategories: [], features: [], adoptionHelp: [],
+  relatedServices: [], customerBenefits: [], journey: [], images: [], documentLink: '', documentLabel: 'Document', extraLinks: [], ...e })

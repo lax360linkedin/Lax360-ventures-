@@ -102,6 +102,8 @@ class Settings(BaseSettings):
     register_rate_limit_window_seconds: int = 3600
     contact_rate_limit_max: int = 5
     contact_rate_limit_window_seconds: int = 3600
+    contact_upload_rate_limit_max: int = 12  # project documents attached to an enquiry
+    contact_upload_rate_limit_window_seconds: int = 3600
     demo_rate_limit_max: int = 10
     demo_rate_limit_window_seconds: int = 3600
     chat_rate_limit_max: int = 10

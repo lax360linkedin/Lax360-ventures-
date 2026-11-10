@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useSeo, useSiteSettings } from './useSite.js'
 
 const SITE_URL = (import.meta.env.VITE_SITE_URL || '').replace(/\/$/, '')
-const DEFAULT_TITLE = 'LAX360 Ventures — Software, AI, Digital Growth & Training'
+const DEFAULT_TITLE = 'LAX360 Pvt Ltd — Software, AI, Digital Growth & Training'
 
 function upsert(selector, tag, attrs) {
   let el = document.head.querySelector(selector)
@@ -23,7 +23,7 @@ function upsert(selector, tag, attrs) {
 export function useDocumentHead({ title, description, path = '/', jsonLd = null, noindex = false }) {
   const seo = useSeo(path) // "Page titles & SEO" set in the admin panel override the built-in text
   const settings = useSiteSettings()
-  const fullTitle = seo?.title || (title ? `${title} | LAX360 Ventures` : DEFAULT_TITLE)
+  const fullTitle = seo?.title || (title ? `${title} | LAX360 Pvt Ltd` : DEFAULT_TITLE)
   description = seo?.description || description
   const image = seo?.image || settings.default_og_image_url || null
 

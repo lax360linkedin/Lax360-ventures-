@@ -9,7 +9,8 @@ import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { CategoryBadge, ProductCard, ProductMark, ProductVisual, StatusBadge } from '../components/products/ProductBits.jsx'
 import { isAvailable, productStatuses } from '../data/products.js'
-import { useProducts } from '../hooks/useProducts.js'
+import ProductDownloads from '../components/products/ProductDownloads.jsx'
+import { useProductModules, useProductResources, useProducts } from '../hooks/useProducts.js'
 import { useContentReady } from '../hooks/useSite.js'
 import { isExternal } from '../utils/cms.js'
 import NotFound from './NotFound.jsx'
@@ -36,7 +37,10 @@ export default function ProductDetail() {
   const products = useProducts()
   const ready = useContentReady()
   const [shot, setShot] = useState(0)
+  const [preview, setPreview] = useState(false)
   const p = products.find((x) => x.slug === slug)
+  const modules = useProductModules(slug)
+  const resources = useProductResources(slug)
   if (!p) return ready ? <NotFound /> : <div className="wrap section min-h-[50vh]" role="status"><p className="text-soft">Loading…</p></div>
   const live = isAvailable(p.status)
   const related = [...products.filter((x) => x.slug !== p.slug && x.category === p.category), ...products.filter((x) => x.slug !== p.slug && x.category !== p.category)].slice(0, 3)
@@ -46,7 +50,7 @@ export default function ProductDetail() {
       path={`/products/${p.slug}`}
       title={p.name}
       description={p.summary}
-      jsonLd={{ '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: p.name, description: p.summary, applicationCategory: 'BusinessApplication', publisher: { '@type': 'Organization', name: 'LAX360 Ventures' } }}
+      jsonLd={{ '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: p.name, description: p.summary, applicationCategory: 'BusinessApplication', publisher: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' } }}
     >
       {/* hero */}
       <section className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">
@@ -70,6 +74,7 @@ export default function ProductDetail() {
               <p className="lead mt-5 text-soft">{p.summary}</p>
               {!live && <p className="mt-5 flex gap-2.5 rounded-2xl border border-edge bg-glass p-4 text-soft"><AlertCircle className="mt-0.5 size-5 shrink-0 text-lav" aria-hidden="true" />{STATUS_NOTE[p.status] || STATUS_NOTE.soon}</p>}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                {p.demoSiteLink && <LinkButton to={p.demoSiteLink} arrow>View live demo</LinkButton>}
                 {live && p.productLink && <LinkButton to={p.productLink} arrow>{p.status === 'beta' ? 'Access the beta' : 'Access the product'}</LinkButton>}
                 {live && p.demoLink && <LinkButton to={p.demoLink} variant="secondary">Request a demo</LinkButton>}
                 <Button href="#enquire" variant={live && (p.productLink || p.demoLink) ? 'secondary' : 'primary'} arrow={!(live && (p.productLink || p.demoLink))} onClick={(e) => { e.preventDefault(); document.getElementById('enquire')?.scrollIntoView({ behavior: 'smooth' }) }}>{p.ctaLabel}</Button>
@@ -85,6 +90,8 @@ export default function ProductDetail() {
           </div>
         </div>
       </section>
+
+      {p.banner && <div className="wrap -mt-4 pb-4"><img src={p.banner} alt="" width="1600" height="600" loading="lazy" decoding="async" className="aspect-[8/3] w-full rounded-3xl border border-edge-strong object-cover" /></div>}
 
       {/* introduction */}
       {p.overview.length > 0 && (
@@ -123,6 +130,76 @@ export default function ProductDetail() {
         </section>
       )}
 
+      {/* modules: each with its own explanation and picture */}
+      {modules.length > 0 && (
+        <section className="wrap section" aria-labelledby="modules-title">
+          <SectionHeading id="modules-title" eyebrow="Software modules" title="What is inside" gradient={`${p.name.replace('LAX360 ', '')}.`} lead="Each module of the software, explained." />
+          <ul className="mt-10 space-y-8">
+            {modules.map((mod, i) => (
+              <Reveal as="li" key={mod.id} delay={0.04} className="glass-flat overflow-hidden">
+                <div className={`grid items-center gap-0 md:grid-cols-12 ${i % 2 ? 'md:[&>*:first-child]:order-2' : ''}`}>
+                  <div className="p-6 md:col-span-6 md:p-10">
+                    <p className="eyebrow text-lav">Module {i + 1}</p>
+                    <h3 className="mt-2 font-display text-2xl font-semibold leading-tight">{mod.name}</h3>
+                    <p className="mt-3 text-lg text-soft">{mod.summary}</p>
+                    {mod.description.map((t) => <p key={t} className="mt-3 text-soft">{t}</p>)}
+                    {mod.points.length > 0 && <ul className="mt-4 space-y-2">{mod.points.map((x) => <li key={x} className="flex gap-2.5"><Check className="mt-1 size-4 shrink-0 text-lav" aria-hidden="true" />{x}</li>)}</ul>}
+                  </div>
+                  <div className="md:col-span-6">
+                    {mod.image
+                      ? <img src={mod.image} alt={mod.imageAlt || `${mod.name} screenshot`} width="1200" height="800" loading="lazy" decoding="async" className="aspect-[3/2] w-full object-cover" />
+                      : <div aria-hidden="true" className="flex aspect-[3/2] items-center justify-center bg-gradient-to-br from-primary/25 via-accent/15 to-transparent"><Sparkles className="size-14 text-lav" strokeWidth={1.4} /></div>}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* workflow and capabilities */}
+      {p.workflow.length > 0 && (
+        <section className="border-y border-edge bg-glass" aria-labelledby="workflow-title">
+          <div className="wrap section">
+            <SectionHeading id="workflow-title" eyebrow="How it works" title="Workflow and" gradient="capabilities." />
+            <ol className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {p.workflow.map((s, i) => (
+                <Reveal as="li" key={s.title} delay={(i % 3) * 0.06} className="glass-flat p-5">
+                  <span className="flex size-10 items-center justify-center rounded-full border-2 border-accent font-display text-base font-bold text-lav">{i + 1}</span>
+                  <p className="mt-4 font-display text-lg font-semibold leading-tight">{s.title}</p>
+                  {s.text && <p className="mt-1 text-soft">{s.text}</p>}
+                </Reveal>
+              ))}
+            </ol>
+          </div>
+        </section>
+      )}
+
+      {/* live demo: open without logging in */}
+      {p.demoSiteLink && (
+        <section className="wrap section" aria-labelledby="demo-title">
+          <div className="glass p-6 md:p-10">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="max-w-2xl">
+                <p className="eyebrow text-lav">Demo website</p>
+                <h2 id="demo-title" className="h2 mt-2">Try {p.name.replace('LAX360 ', '')} <span className="text-gradient">live.</span></h2>
+                <p className="mt-3 text-soft">Open the demo website to explore the software yourself. No login is needed.</p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <LinkButton to={p.demoSiteLink} arrow>Open demo website</LinkButton>
+                <button type="button" onClick={() => setPreview((v) => !v)} aria-expanded={preview} className="inline-flex min-h-12 items-center justify-center rounded-full border border-edge-strong px-6 font-semibold transition-colors hover:border-lav">{preview ? 'Hide live preview' : 'Show live preview here'}</button>
+              </div>
+            </div>
+            {preview && (
+              <div className="mt-6">
+                <iframe src={p.demoSiteLink} title={`${p.name} live preview`} loading="lazy" sandbox="allow-scripts allow-forms allow-same-origin allow-popups" referrerPolicy="no-referrer" className="h-[34rem] w-full rounded-2xl border border-edge-strong bg-white" />
+                <p className="mt-2 text-sm text-soft">If the preview stays blank, the demo site does not allow embedding: use “Open demo website” instead.</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* screenshots and previews */}
       <section className="wrap section" aria-labelledby="shots-title">
         <SectionHeading id="shots-title" eyebrow="Previews" title="Screenshots and" gradient="dashboard previews." />
@@ -151,6 +228,8 @@ export default function ProductDetail() {
           </div>
         )}
       </section>
+
+      <ProductDownloads resources={resources} />
 
       {/* benefits and use cases */}
       {(p.benefits.length > 0 || p.useCases.length > 0) && (

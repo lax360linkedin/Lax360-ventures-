@@ -3,7 +3,7 @@ import Reveal from '../ui/Reveal.jsx'
 import { branches } from '../../data/branches.js'
 
 /**
- * The three LAX360 Ventures branches as glass cards. Data comes from `data/branches.js`.
+ * The three LAX360 Pvt Ltd branches as glass cards. Data comes from `data/branches.js`.
  * Each card shows the official address, a tap-to-call phone number and a Google Maps link for that branch.
  */
 export default function BranchCards({ className = '' }) {

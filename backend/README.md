@@ -1,4 +1,4 @@
-# LAX360 Ventures — backend
+# LAX360 Pvt Ltd — backend
 
 FastAPI + PostgreSQL + SQLAlchemy 2 + Alembic. Real login (HttpOnly cookie sessions), profile, branches, demo requests,
 contact enquiries, and an AI assistant that calls the **OpenAI Responses API** from the server.

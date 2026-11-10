@@ -96,7 +96,7 @@ export default function ArticleDetail() {
       path={`/insights/${a.slug}`}
       title={a.seoTitle || a.title}
       description={a.metaDescription || a.excerpt}
-      jsonLd={{ '@context': 'https://schema.org', '@type': 'Article', headline: a.title, datePublished: a.publishedOn, author: { '@type': person ? 'Person' : 'Organization', name: a.author }, description: a.metaDescription || a.excerpt, image: a.image || undefined, publisher: { '@type': 'Organization', name: 'LAX360 Ventures' } }}
+      jsonLd={{ '@context': 'https://schema.org', '@type': 'Article', headline: a.title, datePublished: a.publishedOn, author: { '@type': person ? 'Person' : 'Organization', name: a.author }, description: a.metaDescription || a.excerpt, image: a.image || undefined, publisher: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' } }}
     >
       <article>
         <header className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">

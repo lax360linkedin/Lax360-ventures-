@@ -10,7 +10,7 @@ def test_content_kinds_describe_only_what_the_site_actually_uses(app, db):
     admin, _, _ = staff(app, db, permissions=["content"])
     body = admin.get("/api/admin/content/kinds").json()
     # an admin who only holds the `content` module sees the homepage / about / portfolio kinds; services, careers and navigation are separate modules
-    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_category", "network_partner", "software_product", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "article", "client", "testimonial", "project", "product"]
+    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "article", "client", "testimonial", "project", "product", "product_module", "product_resource", "website", "contact_page"]
     assert all(f["name"] for k in body["kinds"] for f in k["fields"])
     assert admin.get("/api/admin/content/pricing_table").status_code == 404  # not a managed section
 
@@ -120,6 +120,22 @@ def test_website_theme_is_super_admin_only_validated_and_public(app, db, client)
     assert "site_theme" not in client.get("/api/public/site").json()["settings"]
 
 
+def test_theme_ids_match_the_frontend_theme_list_and_all_can_be_applied(app, db, client):
+    import re
+    from pathlib import Path
+
+    from app.services.settings_service import THEMES
+
+    js = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "data" / "themes.js").read_text(encoding="utf8")
+    frontend = set(re.findall(r"\{ id: '([a-z-]+)', category:", js))  # built-in + palette entries
+    assert frontend == set(THEMES), frontend ^ set(THEMES)
+    assert len(THEMES) == 6 + 22
+    boss, csrf, _ = staff(app, db, role="super_admin", email="theme-boss@example.com")
+    for theme in THEMES:  # every theme can be saved by a Super Admin and is then public
+        assert boss.put("/api/admin/settings", json={"values": {"site_theme": theme}}, headers=csrf).status_code == 200, theme
+        assert client.get("/api/public/site").json()["settings"]["site_theme"] == theme
+
+
 def test_settings_and_chatbot_permissions_are_independent(app, db):
     only_settings, csrf1, _ = staff(app, db, permissions=["settings"], email="s@example.com")
     only_chatbot, csrf2, _ = staff(app, db, permissions=["chatbot"], email="c@example.com")
@@ -183,7 +199,7 @@ def test_network_partners_and_team_members_are_managed_validated_ordered_and_rem
     assert admin.post("/api/admin/content/network_partner", json=partner, headers=csrf).status_code == 201
     for bad in ({"category": "friend"}, {"website_link": "javascript:alert(1)"}, {"website_link": "ftp://x.example"}, {"description": ""}):
         assert admin.post("/api/admin/content/network_partner", json={**partner, "data": {**partner["data"], **bad}}, headers=csrf).status_code == 422, bad
-    ok = admin.post("/api/admin/content/network_partner", json={**partner, "title": "Second", "data": {**partner["data"], "category": "technology", "website_link": "https://example.com"}}, headers=csrf)
+    ok = admin.post("/api/admin/content/network_partner", json={**partner, "title": "Second", "data": {**partner["data"], "category": "authorized", "website_link": "https://example.com", "partnership_type": "Authorized reseller", "collaboration": "Joint work.", "related_services": "automation/crm-automation,ai/*"}}, headers=csrf)
     assert ok.status_code == 201
     assert [i["title"] for i in client.get("/api/public/content?kind=network_partner").json()["items"]] == ["Example Partner", "Second"]
 
@@ -238,6 +254,116 @@ def test_demo_team_seed_is_valid_flagged_and_complete(app, db):
     for dept, name, designation, head, reports, skills, bio in demo.PEOPLE:
         body = {"department": dept, "designation": designation, "bio": f"{bio} {demo.NOTE}", "expertise": skills, "reports_to": reports, "demo": True, **({"leadership_role": "department_head"} if head else {})}
         cs._validate(db, "team_member", name, body)  # raises if invalid
+
+
+def test_testimonials_can_be_assigned_to_a_service_page_with_a_rating(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    base = {"person_type": "client", "role": "Manager", "quote": "Great work."}
+    post = lambda title, **extra: admin.post("/api/admin/content/testimonial", json={"title": title, "data": {**base, **extra}, "status": "published", "sort_order": 1}, headers=csrf)  # noqa: E731
+    assert post("General").status_code == 201
+    assert post("Web client", service="software/website-development", rating="5").status_code == 201
+    assert post("Bad", service="software/not-a-service").status_code == 422
+    assert post("Bad rating", rating="9").status_code == 422
+    items = client.get("/api/public/content?kind=testimonial").json()["items"]
+    assert {i["title"]: i["data"].get("service") for i in items} == {"General": None, "Web client": "software/website-development"}  # the home page source: every published entry
+    from app.service_pages import SERVICE_PAGES, SERVICE_SCOPES
+    assert len(SERVICE_PAGES) == len({v for v, _ in SERVICE_PAGES}) >= 40
+    for n, (value, _) in enumerate(SERVICE_PAGES):  # a testimonial can be added for EVERY individual service page
+        assert post(f"Everyone {n}", service=value).status_code == 201, value
+    saved = client.get("/api/public/content?kind=testimonial").json()["items"]
+    assert {i["data"].get("service") for i in saved} >= {v for v, _ in SERVICE_PAGES}
+
+    # clients: assigned to one or more services (or a whole category), validated, and kept off the home-only list by the front end via `services`
+    cpost = lambda title, **extra: admin.post("/api/admin/content/client", json={"title": title, "data": extra, "status": "published", "sort_order": 1}, headers=csrf)  # noqa: E731
+    assert cpost("Acme", description="A client.", services="software/website-development,growth/*").status_code == 201
+    assert cpost("Bad", services="software/website-development,nope/x").status_code == 422
+    assert any(v == "growth/*" for v, _ in SERVICE_SCOPES)
+    acme = next(i for i in client.get("/api/public/content?kind=client").json()["items"] if i["title"] == "Acme")
+    assert acme["data"]["services"] == "software/website-development,growth/*" and acme["data"]["description"] == "A client."
+
+
+def test_service_demo_seed_is_valid_flagged_and_covers_every_service_page(app, db):
+    from app import seed_service_demo as demo
+    from app.service_pages import SERVICE_PAGES
+    from app.services import content_service as cs
+
+    clients, tests = demo.client_rows(), demo.testimonial_rows()
+    for kind, rows in (("client", clients), ("testimonial", tests)):
+        assert len({r["slug"] for r in rows}) == len(rows)
+        for r in rows:
+            assert r["data"]["is_sample"] is True  # always labelled as fictional
+            cs._validate(db, kind, r["title"], dict(r["data"]))  # raises if the row would be rejected by the admin API
+    assert set(demo.SERVICES) == {v for v, _ in SERVICE_PAGES}  # exactly the individual service pages
+    by_service = {v: [c["title"] for c in clients if v in c["data"]["services"].split(",")] for v, _ in SERVICE_PAGES}
+    for value, _ in SERVICE_PAGES:
+        assert len(by_service[value]) >= 3, value  # clients assigned to this exact service, never a whole category
+        mine = [t for t in tests if t["data"]["service"] == value]
+        assert len(mine) >= 2, value
+        for t in mine:  # every speaker's company is one of this service's own clients
+            assert t["data"]["organization"].removesuffix(" (sample)") in by_service[value], (value, t["data"]["organization"])
+    assert not any("*" in c["data"]["services"] for c in clients)
+    import os
+    for c in clients:  # every placeholder logo file exists
+        assert os.path.exists(os.path.join("..", "frontend", "public", c["data"]["logo_url"].lstrip("/"))), c["data"]["logo_url"]
+
+
+def test_service_hierarchy_workflow_for_testimonials_and_clients(app, db, client):
+    """Add once, choose main service + sub-service, and it shows on the sub-service page, its main service page and the home page (and nowhere else)."""
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    sub = lambda cat, svc: client.get(f"/api/public/services/{cat}/{svc}/content").json()  # noqa: E731
+    main = lambda cat: client.get(f"/api/public/services/{cat}/content").json()  # noqa: E731
+    names = lambda payload, key: sorted(i["title"] for i in payload[key])  # noqa: E731
+
+    t = admin.post("/api/admin/content/testimonial", json={"title": "Rita", "data": {"person_type": "client", "role": "CEO", "quote": "Great RAG work.", "service": "ai/rag-based-ai-solutions"}, "status": "published", "sort_order": 1}, headers=csrf)
+    c = admin.post("/api/admin/content/client", json={"title": "Acme AI", "data": {"services": "ai/rag-based-ai-solutions,ai/ai-agent-development", "description": "d"}, "status": "published", "sort_order": 1}, headers=csrf)
+    assert t.status_code == 201 and c.status_code == 201
+    home_t = [i["title"] for i in client.get("/api/public/content?kind=testimonial").json()["items"]]
+    home_c = [i["title"] for i in client.get("/api/public/content?kind=client").json()["items"]]
+    assert "Rita" in home_t and "Acme AI" in home_c  # the home page shows every published entry
+    assert names(sub("ai", "rag-based-ai-solutions"), "testimonials") == ["Rita"] and names(sub("ai", "rag-based-ai-solutions"), "clients") == ["Acme AI"]
+    assert names(sub("ai", "ai-agent-development"), "clients") == ["Acme AI"] and names(sub("ai", "ai-agent-development"), "testimonials") == []  # only the sub-services it was assigned
+    assert names(main("ai"), "testimonials") == ["Rita"] and names(main("ai"), "clients") == ["Acme AI"]  # the main page includes its sub-services
+    for other in (("ai", "workflow-automation"), ("software", "website-development"), ("growth", "google-ads-management")):
+        assert sub(*other) == {"clients": [], "testimonials": []}, other  # unrelated pages never show it
+    assert main("software") == {"clients": [], "testimonials": []}
+
+    # an entry assigned to the main service as a whole shows on the main page and on every one of its sub-service pages
+    admin.post("/api/admin/content/testimonial", json={"title": "Whole AI", "data": {"person_type": "client", "role": "CTO", "quote": "All AI.", "service": "ai/*"}, "status": "published", "sort_order": 2}, headers=csrf)
+    assert "Whole AI" in names(sub("ai", "workflow-automation"), "testimonials") and "Whole AI" in names(main("ai"), "testimonials")
+    assert "Whole AI" not in names(sub("software", "website-development"), "testimonials")
+
+    # editing moves it, unpublishing removes it everywhere
+    tid = t.json()["id"]
+    admin.patch(f"/api/admin/content/item/{tid}", json={"data": {"person_type": "client", "role": "CEO", "quote": "Great RAG work.", "service": "software/website-development"}}, headers=csrf)
+    assert "Rita" not in names(sub("ai", "rag-based-ai-solutions"), "testimonials") and "Rita" in names(sub("software", "website-development"), "testimonials") and "Rita" in names(main("software"), "testimonials")
+    admin.patch(f"/api/admin/content/item/{tid}", json={"status": "draft"}, headers=csrf)
+    assert "Rita" not in names(sub("software", "website-development"), "testimonials") and "Rita" not in [i["title"] for i in client.get("/api/public/content?kind=testimonial").json()["items"]]
+    # a hidden-from-home entry still shows on its service pages
+    admin.post("/api/admin/content/client", json={"title": "Quiet", "data": {"services": "growth/*", "hide_on_home": True}, "status": "published", "sort_order": 3}, headers=csrf)
+    assert "Quiet" in names(sub("growth", "google-ads-management"), "clients") and "Quiet" in names(main("growth"), "clients")
+
+
+def test_careers_jobs_perks_page_text_and_applications(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["careers"])
+    post = lambda kind, body: admin.post(f"/api/admin/content/{kind}", json=body, headers=csrf)  # noqa: E731
+    job = {"title": "Frontend Developer", "status": "published", "sort_order": 1, "data": {"department": "Software", "employment_type": "full-time", "work_mode": "hybrid", "experience": "Freshers welcome", "summary": "Build interfaces.",
+                                                                                          "description": "Work on React apps.", "responsibilities": "Build UI" + chr(10) + "Write tests", "skills": "React, CSS", "closing_date": "2030-01-31", "featured": True, "open": True}}
+    assert post("job", job).status_code == 201
+    bad = {**job, "title": "Bad", "data": {**job["data"], "closing_date": "31/01/2030"}}
+    assert post("job", bad).status_code == 422 and post("job", {**job, "title": "Bad2", "data": {**job["data"], "work_mode": "teleport"}}).status_code == 422
+    closed = {**job, "title": "Closed role", "data": {**job["data"], "open": False}}
+    assert post("job", closed).status_code == 201
+    titles = [i["title"] for i in client.get("/api/public/content?kind=job").json()["items"]]
+    assert titles == ["Frontend Developer"]  # closed openings are never public
+    assert post("career_perk", {"title": "Learning time", "data": {"icon": "graduation", "description": "Time set aside to learn."}, "status": "published", "sort_order": 1}).status_code == 201
+    assert post("career_perk", {"title": "x", "data": {"icon": "bomb", "description": "d"}, "status": "published", "sort_order": 1}).status_code == 422
+    assert post("career_page", {"title": "Career page text", "data": {"hero_title": "Grow here."}, "status": "published", "sort_order": 1}).status_code in (200, 201)
+    assert client.get("/api/public/content?kind=career_page").json()["items"][0]["data"]["hero_title"] == "Grow here."
+    # an application goes through the existing enquiry API (type "career") with the role and links in `extra`
+    body = {"name": "Asha K", "email": "asha@example.com", "phone": "+919566679928", "enquiry_type": "career", "message": "I would like to apply for the role.", "consent": True,
+            "extra": {"position": "Frontend Developer", "experience": "2 years", "profile_link": "https://www.linkedin.com/in/asha"}, "source": "career"}
+    r = client.post("/api/contact", json=body)
+    assert r.status_code in (200, 201), r.text
 
 
 def test_clients_are_managed_ordered_and_removable_and_never_invented(app, db, client):

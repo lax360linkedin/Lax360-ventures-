@@ -4,7 +4,7 @@
 import { api } from './apiClient.js'
 
 export const WELCOME_MESSAGE =
-  "Hi there! I'm the LAX360 Ventures AI Assistant. I can help you explore our services, AI solutions, branches and how to request a demo. What would you like to know?"
+  "Hi there! I'm the LAX360 Pvt Ltd AI Assistant. I can help you explore our services, AI solutions, branches and how to request a demo. What would you like to know?"
 
 export const SUGGESTED_QUESTIONS = [
   { id: 'services', label: 'Explore Our Services' },

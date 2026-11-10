@@ -2,7 +2,7 @@ import Reveal from '../ui/Reveal.jsx'
 import SectionHeading from '../ui/SectionHeading.jsx'
 import { useContent } from '../../hooks/useSite.js'
 
-function Tile({ c }) {
+export function Tile({ c }) {
   const body = (
     <>
       <span className="flex h-24 w-56 items-center justify-center rounded-2xl border border-edge bg-white p-3 shadow-[0_8px_24px_-14px_rgba(0,0,0,0.6)]">
@@ -24,7 +24,9 @@ function Tile({ c }) {
  * static under reduced motion); fewer are shown as a centred row.
  */
 export default function OurClients() {
-  const items = useContent('client')
+  // Every published entry appears here, whichever service it was assigned to; an administrator can hide one ("Hide from the home page").
+  const homeItems = useContent('client')?.filter((x) => x.data.hide_on_home !== true)
+  const items = homeItems?.length ? homeItems : null
   if (!items) return null
   const clients = items.map((i) => ({ id: i.id, name: i.title, logo: i.data.logo || i.data.logo_url, alt: i.data.logo_alt || (i.data.is_sample ? `${i.title} (sample logo)` : undefined), website: i.data.website_link }))
   const slide = clients.length >= 4

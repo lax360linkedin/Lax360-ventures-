@@ -90,7 +90,7 @@ export default function Team() {
     <PageContainer
       path="/our-team"
       title="Our Team"
-      description="Meet the people behind LAX360 Ventures: leadership, departments and the software, AI and digital marketing specialists who build and grow our clients' businesses."
+      description="Meet the people behind LAX360 Pvt Ltd: leadership, departments and the software, AI and digital marketing specialists who build and grow our clients' businesses."
     >
       {/* 1. Hero */}
       <section className={`relative overflow-hidden border-b border-edge ${page.hero_image ? 'media-dark' : ''}`}>
@@ -120,7 +120,7 @@ export default function Team() {
         <div className="mt-10">
           {leaders.length
             ? <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{leaders.map((p, i) => <LeaderCard key={p.slug} p={p} i={i} deptName={deptName(p.department)} />)}</ul>
-            : <EmptyNote>Leadership profiles are being added. Check back soon to meet the people who lead LAX360 Ventures.</EmptyNote>}
+            : <EmptyNote>Leadership profiles are being added. Check back soon to meet the people who lead LAX360 Pvt Ltd.</EmptyNote>}
         </div>
       </section>
 

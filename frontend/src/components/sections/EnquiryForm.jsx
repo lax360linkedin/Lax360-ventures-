@@ -142,7 +142,7 @@ export default function EnquiryForm({ defaultType = 'project', tone = 'light', c
           Thanks, {values.name.trim() || 'there'}. <strong className="text-fg">Your enquiry has been saved and the team will follow up.</strong> We don&apos;t send an automatic confirmation email — for anything urgent, use WhatsApp or phone.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button href={whatsappLink(`Hi LAX360 Ventures, I would like to discuss: ${values.message.trim().slice(0, 200)}`)}>
+          <Button href={whatsappLink(`Hi LAX360 Pvt Ltd, I would like to discuss: ${values.message.trim().slice(0, 200)}`)}>
             <MessageCircle className="size-5" aria-hidden="true" /> Continue on WhatsApp
           </Button>
           <Button variant="secondary" onClick={reset}>Edit enquiry</Button>

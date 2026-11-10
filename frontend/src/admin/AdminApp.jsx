@@ -1,6 +1,6 @@
-import { createContext, lazy, Suspense, useContext, useEffect, useState } from 'react'
+import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, Bot, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, Bot, Globe, Package, Search, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -15,23 +15,72 @@ const Chatbot = lazy(() => import('./pages/Chatbot.jsx'))
 const Media = lazy(() => import('./pages/Media.jsx'))
 const HeroVideos = lazy(() => import('./pages/HeroVideos.jsx'))
 const SiteSettings = lazy(() => import('./pages/SiteSettings.jsx'))
+const Products = lazy(() => import('./pages/Products.jsx'))
+const WebsitesAdmin = lazy(() => import('./pages/Websites.jsx'))
 const Staff = lazy(() => import('./pages/Staff.jsx'))
 const Audit = lazy(() => import('./pages/Audit.jsx'))
 const System = lazy(() => import('./pages/System.jsx'))
 
 const NAV = [
-  { to: '/company-admin/dashboard', end: true, label: 'Dashboard', icon: LayoutDashboard, module: null },
-  { to: '/company-admin/enquiries', label: 'Enquiries', icon: Inbox, module: 'enquiries' },
-  { to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests' },
-  { to: '/company-admin/content', label: 'Website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'] },
-  { to: '/company-admin/chatbot', label: 'AI chatbot', icon: Bot, module: 'chatbot' },
-  { to: '/company-admin/media', label: 'Media', icon: ImageIcon, module: 'media' },
-  { to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos' },
-  { to: '/company-admin/settings', label: 'Settings', icon: SettingsIcon, module: 'settings' },
-  { to: '/company-admin/users', label: 'Administrators', icon: Users, module: 'users' },
-  { to: '/company-admin/audit', label: 'Audit log', icon: ScrollText, module: 'audit' },
-  { to: '/company-admin/system', label: 'System status', icon: Activity, module: 'system' },
+  { section: 'Overview', to: '/company-admin/dashboard', end: true, label: 'Dashboard', icon: LayoutDashboard, module: null, hint: 'Numbers, shortcuts and your website at a glance' },
+  { section: 'Leads & customers', to: '/company-admin/enquiries', label: 'Enquiries & leads', icon: Inbox, module: 'enquiries', hint: 'Contact forms, quotes, partnership and career enquiries' },
+  { section: 'Leads & customers', to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests', hint: 'Requests for a product demonstration' },
+  { section: 'Website', to: '/company-admin/content', label: 'Website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'], hint: 'Edit every page, section, list and text of the public website' },
+  { section: 'Website', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
+  { section: 'Website', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
+  { section: 'Website', to: '/company-admin/media', label: 'Media library', icon: ImageIcon, module: 'media', hint: 'Images, PDFs and videos used on the website' },
+  { section: 'Website', to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos', hint: 'The scheduled background videos of the home page' },
+  { section: 'Website', to: '/company-admin/settings', label: 'Settings & theme', icon: SettingsIcon, module: 'settings', hint: 'Contact details, logo, footer, maintenance mode and the website theme' },
+  { section: 'Assistant', to: '/company-admin/chatbot', label: 'AI chatbot', icon: Bot, module: 'chatbot', hint: 'Chatbot settings, conversations and usage' },
+  { section: 'Administration', to: '/company-admin/users', label: 'Administrators', icon: Users, module: 'users', hint: 'Staff accounts and what each person may manage' },
+  { section: 'Administration', to: '/company-admin/audit', label: 'Audit log', icon: ScrollText, module: 'audit', hint: 'Who changed what, and when' },
+  { section: 'Administration', to: '/company-admin/system', label: 'System status', icon: Activity, module: 'system', hint: 'Database, storage and service health' },
 ]
+
+
+/** Quick find (Ctrl/Cmd + K): jump to any admin section or any kind of website content by typing a few letters. */
+function QuickFind({ open, onClose, items }) {
+  const navigate = useNavigate()
+  const [q, setQ] = useState('')
+  const [i, setI] = useState(0)
+  const ref = useRef(null)
+  useEffect(() => { if (open) { setQ(''); setI(0); setTimeout(() => ref.current?.focus(), 30) } }, [open])
+  const shown = useMemo(() => {
+    const t = q.trim().toLowerCase()
+    return (t ? items.filter((x) => `${x.label} ${x.group} ${x.hint || ''}`.toLowerCase().includes(t)) : items).slice(0, 12)
+  }, [q, items])
+  useEffect(() => setI(0), [q])
+  if (!open) return null
+  const go = (x) => { onClose(); navigate(x.to) }
+  const key = (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setI((n) => Math.min(n + 1, shown.length - 1)) }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setI((n) => Math.max(n - 1, 0)) }
+    else if (e.key === 'Enter' && shown[i]) { e.preventDefault(); go(shown[i]) }
+    else if (e.key === 'Escape') onClose()
+  }
+  return (
+    <div className="fixed inset-0 z-[80] flex items-start justify-center bg-black/60 p-4 pt-[12vh]" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <div role="dialog" aria-modal="true" aria-label="Quick find" className="w-full max-w-xl overflow-hidden rounded-2xl border border-edge-strong bg-night shadow-menu">
+        <div className="flex items-center gap-3 border-b border-edge px-4">
+          <Search className="size-5 shrink-0 text-soft" aria-hidden="true" />
+          <input ref={ref} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={key} placeholder="Jump to… (e.g. team, testimonials, theme, enquiries)" aria-label="Search the admin panel" role="combobox" aria-expanded="true" aria-controls="quickfind-list" className="h-14 w-full bg-transparent text-base text-fg placeholder:text-soft/70 focus:outline-none" />
+          <kbd className="hidden rounded border border-edge px-1.5 py-0.5 text-xs text-soft sm:block">Esc</kbd>
+        </div>
+        <ul id="quickfind-list" role="listbox" className="max-h-[50vh] overflow-y-auto p-2">
+          {shown.length === 0 && <li className="px-3 py-6 text-center text-sm text-soft">Nothing matches “{q}”.</li>}
+          {shown.map((x, n) => (
+            <li key={x.to} role="option" aria-selected={n === i}>
+              <button type="button" onMouseEnter={() => setI(n)} onClick={() => go(x)} className={cx('flex min-h-12 w-full items-center justify-between gap-3 rounded-lg px-3 text-left', n === i ? 'bg-primary/20' : 'hover:bg-glass')}>
+                <span className="min-w-0"><span className="block truncate text-sm font-semibold">{x.label}</span><span className="block truncate text-xs text-soft">{x.hint}</span></span>
+                <span className="shrink-0 rounded-full border border-edge px-2 py-0.5 text-xs text-soft">{x.group}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
 
 const AdminCtx = createContext(null)
 export const useAdmin = () => useContext(AdminCtx)
@@ -42,7 +91,15 @@ function AdminShell() {
   const location = useLocation()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [find, setFind] = useState(false)
+  const [kinds, setKinds] = useState([])
   useEffect(() => setOpen(false), [location.pathname])
+  useEffect(() => {
+    const onKey = (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setFind((f) => !f) } }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+  useEffect(() => { if (find && !kinds.length) api('/api/admin/content/kinds').then((r) => setKinds(r.kinds || [])).catch(() => {}) }, [find, kinds.length])
 
   if (loading) return <div className="grid min-h-dvh place-items-center bg-night"><Spinner label="Checking your session…" /></div>
   if (!identity) return <Navigate to="/company-admin/login" replace state={{ from: location.pathname }} />
@@ -64,11 +121,18 @@ function AdminShell() {
             </Link>
             <button type="button" className="rounded-lg p-1.5 text-soft hover:bg-glass-strong lg:hidden" aria-label="Close menu" onClick={() => setOpen(false)}><X className="size-5" aria-hidden="true" /></button>
           </div>
-          <nav aria-label="Admin" className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
-            {NAV.filter((n) => can(n.module)).map(({ to, end, label, icon: Icon }) => (
-              <NavLink key={to} to={to} end={end} className={({ isActive }) => cx('flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors', isActive ? 'bg-primary/25 text-fg ring-1 ring-edge-strong' : 'text-soft hover:bg-glass-strong hover:text-fg')}>
-                <Icon className="size-[1.1rem] shrink-0" aria-hidden="true" /> {label}
-              </NavLink>
+          <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-2">
+            {[...new Set(NAV.filter((n) => can(n.module)).map((n) => n.section))].map((section) => (
+              <div key={section} className="mb-3">
+                <p className="px-3 pb-1 pt-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-soft/80">{section}</p>
+                <div className="space-y-0.5">
+                  {NAV.filter((n) => n.section === section && can(n.module)).map(({ to, end, label, icon: Icon }) => (
+                    <NavLink key={to} to={to} end={end} className={({ isActive }) => cx('flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors', isActive ? 'bg-primary/25 text-fg ring-1 ring-edge-strong' : 'text-soft hover:bg-glass-strong hover:text-fg')}>
+                      <Icon className="size-[1.1rem] shrink-0" aria-hidden="true" /> {label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
           <div className="border-t border-edge p-3">
@@ -80,7 +144,13 @@ function AdminShell() {
         <div className="min-w-0">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-edge bg-night/85 px-4 backdrop-blur-xl md:px-8">
             <button type="button" className="rounded-lg p-2 text-soft hover:bg-glass-strong lg:hidden" aria-label="Open menu" aria-expanded={open} onClick={() => setOpen(true)}><Menu className="size-5" aria-hidden="true" /></button>
-            <span className="hidden text-sm text-soft lg:block">Signed in as <strong className="text-fg">{profile.full_name}</strong></span>
+            <div className="hidden min-w-0 lg:block">
+              <p className="truncate text-sm font-semibold">{NAV.find((n) => location.pathname.startsWith(n.to))?.label || 'Admin'}</p>
+              <p className="truncate text-xs text-soft">{NAV.find((n) => location.pathname.startsWith(n.to))?.hint}</p>
+            </div>
+            <button type="button" onClick={() => setFind(true)} className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-edge bg-glass px-3 text-sm text-soft hover:text-fg lg:ml-0 lg:min-w-64" aria-label="Quick find: jump to any section or content (Ctrl K)">
+              <Search className="size-4" aria-hidden="true" /><span className="hidden sm:inline">Jump to…</span><kbd className="ml-auto hidden rounded border border-edge px-1.5 text-xs sm:block">Ctrl K</kbd>
+            </button>
             <div className="flex items-center gap-2">
               <a href="/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-soft hover:bg-glass-strong hover:text-fg">View website <ExternalLink className="size-3.5" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>
               <ThemeToggle ignoreSiteTheme />
@@ -91,6 +161,7 @@ function AdminShell() {
           </main>
         </div>
       </div>
+      <QuickFind open={find} onClose={() => setFind(false)} items={[...NAV.filter((n) => can(n.module)).map((n) => ({ to: n.to, label: n.label, group: n.section, hint: n.hint })), ...kinds.map((k) => ({ to: `/company-admin/content?kind=${k.kind}`, label: k.label, group: `Content · ${k.group}`, hint: k.preview_path ? `Public page: ${k.preview_path}` : 'Website content' }))]} />
     </AdminCtx.Provider>
   )
 }
@@ -156,7 +227,7 @@ function AdminLogin() {
 }
 
 export default function AdminApp() {
-  useDocumentHead({ title: 'Company Admin', description: 'LAX360 Ventures administration.', path: '/company-admin', noindex: true })
+  useDocumentHead({ title: 'Company Admin', description: 'LAX360 Pvt Ltd administration.', path: '/company-admin', noindex: true })
   return (
     <ToastProvider>
       <Routes>
@@ -168,6 +239,8 @@ export default function AdminApp() {
           <Route path="demos" element={<Guard module="demo_requests"><Demos /></Guard>} />
           <Route path="content" element={<Guard module={['content', 'services', 'careers', 'navigation']}><Content /></Guard>} />
           <Route path="chatbot" element={<Guard module="chatbot"><Chatbot /></Guard>} />
+          <Route path="products" element={<Guard module="content"><Products /></Guard>} />
+          <Route path="websites" element={<Guard module="content"><WebsitesAdmin /></Guard>} />
           <Route path="media" element={<Guard module="media"><Media /></Guard>} />
           <Route path="homepage-videos" element={<Guard module="hero_videos"><HeroVideos /></Guard>} />
           <Route path="hero-videos" element={<Navigate to="/company-admin/homepage-videos" replace />} />

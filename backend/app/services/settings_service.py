@@ -26,7 +26,9 @@ def S(label, group, kind="str", public=True, max_len=200, help="", options=None)
 
 
 # Website colour themes the Super Admin can apply to the whole public site ("visitor" = each visitor picks Dark or Light, the original behaviour).
-THEMES = ("visitor", "dark", "light", "snow", "rose", "sage")
+EXTRA_THEMES = ("ivory-gold", "deep-teal", "copper", "mocha", "burgundy", "violet", "cobalt", "aqua", "lime", "coral", "cyan", "indigo", "ocean",
+                "slate-grey", "dusty-rose", "sage-green", "sky-blue", "terracotta", "plum", "mustard", "navy-beige", "royal-crimson")  # keep in step with frontend/src/data/themes.js (a test checks)
+THEMES = ("visitor", "dark", "light", "snow", "rose", "sage", *EXTRA_THEMES)
 
 SPEC: dict[str, dict] = {
     # appearance (Super Admin only: enforced in the route)
@@ -43,6 +45,7 @@ SPEC: dict[str, dict] = {
     "contact_description": S("Contact page introduction", "contact", "text", max_len=500),
     "map_link": S("Google Maps / location link", "contact", "url"),
     "whatsapp_number": S("WhatsApp number", "contact", "phone", help="Digits with country code, e.g. 919876543210"),
+    "business_hours": S("Business hours", "contact", "text", max_len=300, help="Shown on the Contact page, e.g. Monday to Saturday, 9:30 am to 6:30 pm. Leave empty to show none (nothing is assumed)."),
     "contact_form_enabled": S("Contact form enabled", "contact", "bool"),
     "contact_form_notice": S("Notice above the contact form", "contact", "text", max_len=300, help="Optional message shown above the enquiry form."),
     # social

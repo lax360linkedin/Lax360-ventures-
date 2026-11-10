@@ -12,6 +12,7 @@
     python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
     python -m app.cli seed-network [--remove]                   (load the Our Network starter content; designations start unverified; --remove deletes only those)
+    python -m app.cli seed-service-demo [--remove]               (load FICTIONAL demo clients and testimonials for every service page; labelled Sample; --remove deletes only those)
     python -m app.cli seed-team-demo [--draft|--remove]         (load FICTIONAL demonstration departments and team profiles for review; labelled on the website; --remove deletes only those)
     python -m app.cli seed-industries [--remove]               (load the 20-industry content into the CMS so it can be edited; --remove deletes only those)
     python -m app.cli seed-products [--remove]                  (load the LAX360 product portfolio into the CMS, all as Coming soon, so it can be edited; --remove deletes only those)
@@ -544,6 +545,85 @@ def seed_team_demo(args: argparse.Namespace) -> None:
         print(f"Added {added} row(s) ({status}). These are FICTIONAL demonstration profiles (labelled on the website). Replace or delete them in the admin panel (Website content > Team).")
 
 
+def seed_service_demo(args: argparse.Namespace) -> None:
+    """Load FICTIONAL demonstration clients and testimonials assigned to the individual service pages (flagged "sample", placeholder logos, no photos).
+    The home page's own rows are never touched. Idempotent by slug; existing rows are not overwritten. --remove deletes only the rows this command added."""
+    from app import seed_service_demo as data
+    from app.models import ContentItem
+
+    get_settings()
+    with _factory()() as db:
+        existing = {(i.kind, i.slug): i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(["client", "testimonial"]), ContentItem.slug.like(data.PREFIX + "%")))}
+        if args.remove:
+            for item in existing.values():
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(existing)} service-page demonstration row(s). Home page rows and real entries were not touched.")
+            return
+        added = 0
+        for kind, rows in (("client", data.client_rows()), ("testimonial", data.testimonial_rows())):
+            for r in rows:
+                if (kind, r["slug"]) in existing:
+                    continue
+                db.add(ContentItem(kind=kind, slug=r["slug"], title=r["title"], data=r["data"], status="published", sort_order=r["sort_order"]))
+                added += 1
+        db.commit()
+        print(f"Added {added} row(s). These are FICTIONAL demonstration clients and testimonials for the service pages (labelled 'Sample'). Replace or delete them in the admin panel (Website content > Clients / Testimonials).")
+
+
+def seed_websites(args: argparse.Namespace) -> None:
+    """Load the website portfolio ("Explore Our Websites": 21 entries from app/seed_websites.py) into the CMS so it can be managed in the admin panel.
+    Idempotent by slug; existing entries are never overwritten. --remove deletes only the entries this command added."""
+    from app import seed_websites as data
+    from app.models import ContentItem
+
+    get_settings()
+    rows = data.rows()
+    with _factory()() as db:
+        existing = {i.slug: i for i in db.scalars(select(ContentItem).where(ContentItem.kind == "website"))}
+        if args.remove:
+            gone = [existing[r["slug"]] for r in rows if r["slug"] in existing]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} website portfolio entr{'y' if len(gone) == 1 else 'ies'}. Entries you added yourself were not touched.")
+            return
+        added = 0
+        for r in rows:
+            if r["slug"] in existing:
+                continue
+            db.add(ContentItem(kind="website", slug=r["slug"], title=r["title"], data=r["data"], status="published", sort_order=r["sort_order"]))
+            added += 1
+        db.commit()
+        print(f"Added {added} website entr{'y' if added == 1 else 'ies'} ({len(rows) - added} already present). Review them in the admin panel (Website portfolio): add the live address for the entries that have none yet.")
+
+
+def purge_enquiries(args: argparse.Namespace) -> None:
+    """Data retention: delete enquiries (with their notes, follow-ups and attached documents) that are older than --days AND finished
+    (converted, not interested or closed), or archived. Active leads are never touched. --dry-run only counts."""
+    from datetime import datetime, timedelta, timezone
+
+    from sqlalchemy import or_
+
+    from app.models import ContactEnquiry
+    from app.services import enquiry_admin_service as svc
+
+    if args.days < 30:
+        raise SystemExit("Refusing to purge enquiries newer than 30 days.")
+    cutoff = datetime.now(timezone.utc) - timedelta(days=args.days)
+    get_settings()
+    with _factory()() as db:
+        rows = list(db.scalars(select(ContactEnquiry).where(ContactEnquiry.created_at < cutoff, or_(ContactEnquiry.status.in_(("converted", "not_interested", "closed")), ContactEnquiry.archived_at.is_not(None)))))
+        if args.dry_run:
+            print(f"{len(rows)} finished or archived enquiry(ies) older than {args.days} days would be deleted. Nothing was changed.")
+            return
+        for r in rows:
+            svc.delete_attachments(db, r)
+            db.delete(r)
+        db.commit()
+        print(f"Deleted {len(rows)} enquiry(ies) older than {args.days} days, with their notes, follow-ups and attached documents.")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -590,6 +670,16 @@ def main(argv: list[str] | None = None) -> None:
     std.add_argument("--remove", action="store_true")
     std.add_argument("--draft", action="store_true", help="load the demonstration profiles unpublished")
     std.set_defaults(func=seed_team_demo)
+    ssd = sub.add_parser("seed-service-demo", help="load FICTIONAL demonstration clients and testimonials for every individual service page (labelled 'Sample'), or --remove them")
+    ssd.add_argument("--remove", action="store_true")
+    ssd.set_defaults(func=seed_service_demo)
+    sw = sub.add_parser("seed-websites", help="load the website portfolio (Explore Our Websites: 21 entries) into the CMS, or --remove them")
+    sw.add_argument("--remove", action="store_true")
+    sw.set_defaults(func=seed_websites)
+    pe = sub.add_parser("purge-enquiries", help="data retention: delete finished (converted / not interested / closed) or archived enquiries older than --days, with their documents")
+    pe.add_argument("--days", type=int, required=True, help="minimum age in days (at least 30)")
+    pe.add_argument("--dry-run", action="store_true", help="only count what would be deleted")
+    pe.set_defaults(func=purge_enquiries)
     sc = sub.add_parser("seed-sample-clients", help="add (or --remove) six placeholder 'Our Clients' entries for the home page")
     sc.add_argument("--remove", action="store_true", help="delete the sample clients instead of adding them")
     sc.set_defaults(func=seed_sample_clients)

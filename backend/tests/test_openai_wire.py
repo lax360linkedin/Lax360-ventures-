@@ -19,7 +19,7 @@ from app.providers.base import AIServiceError
 from app.providers.openai_provider import OpenAIProvider
 
 
-def response_json(text="Hi! I'm the LAX360 Ventures AI Assistant."):
+def response_json(text="Hi! I'm the LAX360 Pvt Ltd AI Assistant."):
     return {
         "id": "resp_wire_1", "object": "response", "created_at": 1, "status": "completed", "model": "test-model-id",
         "output": [{"type": "message", "id": "msg_1", "role": "assistant", "status": "completed",

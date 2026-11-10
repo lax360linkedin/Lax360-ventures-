@@ -32,7 +32,7 @@ def test_admin_written_business_information_reaches_the_assistant_prompt(app, db
     say(client)
     prompt = ai.responses.calls[0]["instructions"]
     assert "Our Salem office is closed on Sundays." in prompt and "ADDITIONAL BUSINESS INFORMATION" in prompt
-    assert "LAX360 Ventures AI Assistant" in prompt  # the built-in safety rules are still there
+    assert "LAX360 Pvt Ltd AI Assistant" in prompt  # the built-in safety rules are still there
 
 
 def test_custom_fallback_message_replaces_the_default_when_the_provider_fails(app, db, client, ai):

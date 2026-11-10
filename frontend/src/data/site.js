@@ -3,14 +3,14 @@
 import { branches, branchLine } from './branches.js'
 
 export const site = {
-  name: 'LAX360 Ventures',
+  name: 'LAX360 Pvt Ltd',
   legalEntity: 'LAX360 Pvt Ltd',
   // [Confirm] exact footer wording
-  legalLine: 'LAX360 Ventures is a brand of LAX360 Pvt Ltd.',
+  legalLine: 'LAX360 Pvt Ltd.',
   tagline: '360° Execution',
   locations: branchLine, // Salem · Bangalore · Mumbai (see data/branches.js)
   branches,
-  email: 'lax360tech@gmail.com', // [Confirm] a domain email for Ventures is recommended
+  email: 'lax360tech@gmail.com', // [Confirm] a domain email for LAX360 Pvt Ltd is recommended
   // Official branch phone numbers (see data/branches.js for the full address of each branch).
   phones: [
     { display: '+91 95666 79928', tel: '+919566679928', label: 'Salem & Bangalore' },
@@ -32,8 +32,8 @@ export const site = {
 }
 
 export const needsConfirmation = [
-  'Footer legal wording (brand of LAX360 Pvt Ltd)',
-  'Domain email for LAX360 Ventures',
+  'Footer legal wording (company name)',
+  'Domain email for LAX360 Pvt Ltd',
   'Social URLs (Instagram, LinkedIn, X) and the Facebook handle',
   'Business hours and response-time promise',
   'Digital marketing scope',

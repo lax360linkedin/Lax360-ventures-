@@ -45,19 +45,19 @@ def test_production_hides_developer_hints(env, monkeypatch):
 
 # ---- happy path ----------------------------------------------------------------------------------
 def test_chat_returns_the_expected_format_and_persists(client, ai, db):
-    ai.responses.behaviour = fake_response("LAX360 Ventures offers software, AI, digital growth and training.")
+    ai.responses.behaviour = fake_response("LAX360 Pvt Ltd offers software, AI, digital growth and training.")
     r = say(client, "Tell me about AI services")
     assert r.status_code == 200
     body = r.json()
     assert set(body) == {"reply", "conversation_id", "provider", "session_id", "session_token", "message", "links", "whatsapp", "follow_ups", "meta"}
     assert body["provider"] == "openai" and body["reply"] == body["message"]["text"] and body["conversation_id"] == body["session_id"]
-    assert body["message"]["text"].startswith("LAX360 Ventures offers") and body["session_token"]
+    assert body["message"]["text"].startswith("LAX360 Pvt Ltd offers") and body["session_token"]
     assert {"label": "AI & Business Automation", "to": "/services/ai"} in body["links"] and "ai" in body["follow_ups"]
     assert body["meta"]["status"] == "ok"
 
     call = ai.responses.calls[0]
     assert call["model"] == "test-model-id" and call["store"] is False and call["max_output_tokens"] == 500
-    assert "LAX360 Ventures AI Assistant" in call["instructions"] and "Salem" in call["instructions"]
+    assert "LAX360 Pvt Ltd AI Assistant" in call["instructions"] and "Salem" in call["instructions"]
     assert "Bangalore" in call["instructions"] and "Mumbai" in call["instructions"]
     assert call["input"] == [{"role": "user", "content": "Tell me about AI services"}]
     assert "api_key" not in call and KEY not in str(call)
@@ -72,7 +72,7 @@ def test_chat_returns_the_expected_format_and_persists(client, ai, db):
 def test_company_knowledge_is_verified_and_does_not_invent(client, ai):
     say(client)
     text = ai.responses.calls[0]["instructions"]
-    assert "Never claim LAX360 Ventures is an official OpenAI partner" in text
+    assert "Never claim LAX360 Pvt Ltd is an official OpenAI partner" in text
     assert "Dynasty Business Park" in text and "+91 95666 05272" in text and "CPS Tower" in text  # the assistant is told the official branch addresses and phones (from the database)
     assert "not yet published" not in text
     assert "Tamil" in text and "Thanglish" in text

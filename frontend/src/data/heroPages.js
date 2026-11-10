@@ -3,7 +3,7 @@
 export const heroPages = {
   '/about': {
     title: 'One accountable team behind your technology.',
-    text: 'LAX360 Ventures plans, builds, automates and grows — software, AI, digital growth and training under one roof.',
+    text: 'LAX360 Pvt Ltd plans, builds, automates and grows — software, AI, digital growth and training under one roof.',
     points: ['Six service categories', 'Salem · Bangalore · Mumbai', 'Clear working principles'],
     cta: 'Meet the team',
   },

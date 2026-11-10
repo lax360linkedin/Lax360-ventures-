@@ -39,6 +39,26 @@ def content_all(db: Session = Depends(get_db), settings: Settings = Depends(get_
     return JSONResponse({"kinds": content_service.public_bundle(db, settings)}, headers=CACHE)
 
 
+@router.get("/public/contact-options")
+def contact_options() -> JSONResponse:
+    """The choices on the enquiry form (services and sub-services, industries, budgets, ...). Static, public information."""
+    from app import contact_catalog
+
+    return JSONResponse(contact_catalog.public_options(), headers=CACHE)
+
+
+@router.get("/public/services/{category}/content")
+def service_content(category: str, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
+    """Clients and testimonials for a MAIN service page: everything assigned to the main service or any of its sub-services."""
+    return JSONResponse(content_service.service_content(db, settings, category), headers=CACHE)
+
+
+@router.get("/public/services/{category}/{sub}/content")
+def sub_service_content(category: str, sub: str, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
+    """Clients and testimonials for ONE sub-service page: what is assigned to it, plus what is assigned to its main service as a whole."""
+    return JSONResponse(content_service.service_content(db, settings, category, sub), headers=CACHE)
+
+
 @router.get("/media/{asset_id}")
 def media(asset_id: uuid.UUID, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> Response:
     """Public files only. A private file looks exactly like a missing one."""

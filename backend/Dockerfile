@@ -1,4 +1,4 @@
-# LAX360 Ventures API image. NOT built or run in this project's development environment (Docker was not available):
+# LAX360 Pvt Ltd API image. NOT built or run in this project's development environment (Docker was not available):
 # build and test it yourself before relying on it.
 #
 #   docker build -t lax360-api backend

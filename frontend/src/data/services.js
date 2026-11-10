@@ -26,7 +26,7 @@ export const divisions = [
     photo: '/assets/services/software.webp',
     metaTitle: 'Software & IT Services — Custom Software, Web, Mobile, CRM, ERP and E-commerce',
     metaDescription:
-      'Custom software, website, web application, mobile app, CRM, ERP, business management and e-commerce development from LAX360 Ventures.',
+      'Custom software, website, web application, mobile app, CRM, ERP, business management and e-commerce development from LAX360 Pvt Ltd.',
     heroLine: 'Software that fits how you work.',
     overview:
       'Off-the-shelf tools rarely match the way a growing business actually runs. We design and build custom software, websites, applications and business systems around your processes, so your team spends less time working around the tools.',
@@ -68,7 +68,7 @@ export const divisions = [
     photo: '/assets/services/ai.webp',
     metaTitle: 'AI & Business Automation — AI Applications, Chatbots, Agents and RAG',
     metaDescription:
-      'AI application development, chatbots and virtual assistants, AI agents, business process and workflow automation, RAG-based solutions and AI consulting from LAX360 Ventures.',
+      'AI application development, chatbots and virtual assistants, AI agents, business process and workflow automation, RAG-based solutions and AI consulting from LAX360 Pvt Ltd.',
     heroLine: 'Let AI handle the repetitive work.',
     overview:
       'Many teams spend hours every week answering the same questions, moving data between tools and drafting routine replies. We design AI applications and automated workflows that sit alongside your people, with a person approving what matters.',
@@ -115,7 +115,7 @@ export const divisions = [
     photo: '/assets/services/marketing.webp',
     metaTitle: 'Digital Marketing — Social Media, Meta Ads, Google Ads, SEO and Content',
     metaDescription:
-      'Social media management, Meta and Google Ads, SEO, website and landing page optimisation, content creation and digital marketing strategy from LAX360 Ventures.',
+      'Social media management, Meta and Google Ads, SEO, website and landing page optimisation, content creation and digital marketing strategy from LAX360 Pvt Ltd.',
     heroLine: 'Be found. Be remembered. Be contacted.',
     overview:
       'A good website needs visitors, and visitors need a reason to get in touch. Our digital marketing work pairs with the website and software we build, so the pieces work together. Exact scope is agreed per business.',
@@ -153,7 +153,7 @@ export const divisions = [
     photo: '/assets/services/headless.webp',
     metaTitle: 'Headless SaaS & API Solutions — API Hub, Headless Backend, Multi-Tenant and White-Label SaaS',
     metaDescription:
-      'Reusable backend services and ready-to-integrate APIs from LAX360 Ventures: authentication, billing, bookings, CRM, notifications, payments, files, AI APIs, multi-tenant and white-label SaaS.',
+      'Reusable backend services and ready-to-integrate APIs from LAX360 Pvt Ltd: authentication, billing, bookings, CRM, notifications, payments, files, AI APIs, multi-tenant and white-label SaaS.',
     heroLine: 'Backend services you can plug in.',
     overview:
       'Most products need the same backend building blocks: sign-in, subscriptions, bookings, notifications, payments and file handling. We build these as reusable, API-first services that developers, startups, agencies and businesses can connect to their own web and mobile front ends — and we can build multi-tenant and white-label SaaS on the same foundation.',
@@ -209,7 +209,7 @@ export const divisions = [
     photo: '/assets/services/automation.webp',
     metaTitle: 'Workflow Automation & Integration — n8n, WhatsApp, Email, CRM and Webhooks',
     metaDescription:
-      'n8n workflow automation, business process, WhatsApp, email and CRM automation, AI agent workflows, third-party application and webhook integration from LAX360 Ventures.',
+      'n8n workflow automation, business process, WhatsApp, email and CRM automation, AI agent workflows, third-party application and webhook integration from LAX360 Pvt Ltd.',
     heroLine: 'Let your tools work together.',
     overview:
       'Most businesses already use several tools that do not talk to each other, so people copy data by hand and follow-ups get missed. We build automations and integrations that connect those tools and handle the routine steps, with people stepping in where judgement is needed.',
@@ -248,7 +248,7 @@ export const divisions = [
     photo: '/assets/services/mobile.webp',
     metaTitle: 'Mobile & Business Applications — Booking, Field Staff, Tracking, Billing and Inventory Apps',
     metaDescription:
-      'Appointment booking, field staff and task tracking, employee location tracking, billing, inventory and custom business mobile applications from LAX360 Ventures.',
+      'Appointment booking, field staff and task tracking, employee location tracking, billing, inventory and custom business mobile applications from LAX360 Pvt Ltd.',
     heroLine: 'Business tools, built for the phone.',
     overview:
       'Many businesses run on people who are away from a desk — visiting customers, serving them or managing stock. We build mobile and business applications that give those teams the information and tools they need in one place, and that connect back to your central systems.',

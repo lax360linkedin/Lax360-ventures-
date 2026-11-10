@@ -140,7 +140,7 @@ export default function IndustryDetail() {
       path={`/industries/${ind.slug}`}
       title={ind.seoTitle || `${ind.name} technology solutions`}
       description={ind.metaDescription || ind.summary}
-      jsonLd={{ '@context': 'https://schema.org', '@type': 'WebPage', name: ind.name, description: ind.summary, about: ind.name, publisher: { '@type': 'Organization', name: 'LAX360 Ventures' } }}
+      jsonLd={{ '@context': 'https://schema.org', '@type': 'WebPage', name: ind.name, description: ind.summary, about: ind.name, publisher: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' } }}
     >
       <Hero ind={ind} />
 

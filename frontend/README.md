@@ -1,4 +1,4 @@
-# LAX360 Ventures — frontend
+# LAX360 Pvt Ltd — frontend
 
 React + Vite (JavaScript/JSX), Tailwind CSS v4, React Router, Lucide, Framer Motion.
 The website talks to the FastAPI backend in `../backend` through `/api/...` (login, profile, demo requests, contact form, AI assistant). It holds no secrets: the OpenAI key, database and auth secret live only in `backend/.env`.

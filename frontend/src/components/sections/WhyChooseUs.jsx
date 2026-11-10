@@ -1,7 +1,7 @@
 import { BadgeCheck, Gem, HeartHandshake, ShieldCheck, Target } from 'lucide-react'
 import Reveal from '../ui/Reveal.jsx'
 
-// The five principles behind how LAX360 Ventures works. Plain statements about our approach; no figures or claims about past results.
+// The five principles behind how LAX360 Pvt Ltd works. Plain statements about our approach; no figures or claims about past results.
 const principles = [
   { icon: HeartHandshake, title: 'Your Needs Come First', text: 'We prioritize your requirements over unnecessary sales.', span: 'lg:col-span-2' },
   { icon: ShieldCheck, title: 'Honest Recommendations', text: 'We suggest solutions based on what your business genuinely needs.', span: 'lg:col-span-2' },
@@ -34,7 +34,7 @@ export default function WhyChooseUs() {
 
         <Reveal delay={0.1} className="mx-auto mt-8 max-w-3xl space-y-4 text-center text-base text-soft md:text-lg">
           <p>
-            At LAX360 Ventures, we don&apos;t try to convince clients to purchase services they don&apos;t need. We first listen to their requirements, understand their
+            At LAX360 Pvt Ltd, we don&apos;t try to convince clients to purchase services they don&apos;t need. We first listen to their requirements, understand their
             business challenges, and then work towards delivering solutions that genuinely meet their expectations.
           </p>
           <p>

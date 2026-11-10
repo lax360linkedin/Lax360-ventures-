@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import JSON, Boolean, CheckConstraint, DateTime, ForeignKey, Index, Integer, LargeBinary, String, Text, UniqueConstraint, Uuid, func
+from sqlalchemy import JSON, Boolean, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, LargeBinary, String, Text, UniqueConstraint, Uuid, func
 from sqlalchemy.orm import Mapped, deferred, mapped_column
 
 from app.db.base import Base, Timestamps, UUIDPk
@@ -19,6 +19,26 @@ class EnquiryNote(UUIDPk, Base):
     author_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
     author_name: Mapped[str] = mapped_column(String(120))  # snapshot, so the note stays attributed if the account changes
     body: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class EnquiryFollowup(UUIDPk, Base):
+    """A follow-up on an enquiry: a call, email, WhatsApp message or meeting that happened or is planned (`due_on`), with a summary and a done flag."""
+
+    __tablename__ = "enquiry_followups"
+    __table_args__ = (
+        CheckConstraint("kind in ('call','email','whatsapp','meeting','other')", name="kind"),
+        Index("ix_enquiry_followups_enquiry_id_created_at", "enquiry_id", "created_at"),
+        Index("ix_enquiry_followups_due_on", "due_on"),
+    )
+
+    enquiry_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("contact_enquiries.id", ondelete="CASCADE"))
+    author_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    author_name: Mapped[str] = mapped_column(String(120))
+    kind: Mapped[str] = mapped_column(String(12), default="call")
+    summary: Mapped[str] = mapped_column(Text)
+    due_on: Mapped[date | None] = mapped_column(Date)
+    done: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

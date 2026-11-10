@@ -196,7 +196,7 @@ def test_successful_gemini_chat_with_mocked_provider(client, gemini, db):
     assert body["provider"] == "gemini" and body["reply"] == "Hello from fake Gemini." and body["conversation_id"] == body["session_id"]
     assert body["message"]["text"] == body["reply"] and body["session_token"]
     assert "GEMINI" not in r.text and GKEY not in r.text
-    assert "LAX360 Ventures AI Assistant" in gemini.calls[0]["config"].system_instruction
+    assert "LAX360 Pvt Ltd AI Assistant" in gemini.calls[0]["config"].system_instruction
     assert db.scalars(select(ChatMessage.role)).all() in (["user", "assistant"], ["assistant", "user"])
 
 

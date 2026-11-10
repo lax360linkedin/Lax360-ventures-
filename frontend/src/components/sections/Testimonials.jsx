@@ -17,7 +17,9 @@ const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w)
  * published the section is hidden. Auto-advances every 7 s; pauses on hover / focus / the pause button and never auto-plays under reduced motion.
  */
 export default function Testimonials() {
-  const items = useContent('testimonial')
+  // Every published entry appears here, whichever service it was assigned to; an administrator can hide one ("Hide from the home page").
+  const homeItems = useContent('testimonial')?.filter((x) => x.data.hide_on_home !== true)
+  const items = homeItems?.length ? homeItems : null
   const reduce = useReducedMotion()
   const [i, setI] = useState(0)
   const [dir, setDir] = useState('next')

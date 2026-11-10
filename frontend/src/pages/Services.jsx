@@ -21,7 +21,7 @@ export default function Services() {
     <PageContainer
       path="/services"
       title="Services"
-      description="Six service categories from LAX360 Ventures: software and IT services, AI and business automation, digital marketing, headless SaaS and API solutions, workflow automation and integration, and mobile and business applications."
+      description="Six service categories from LAX360 Pvt Ltd: software and IT services, AI and business automation, digital marketing, headless SaaS and API solutions, workflow automation and integration, and mobile and business applications."
     >
       <ServicesHero />
       <CategoryNav />

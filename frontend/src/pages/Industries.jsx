@@ -54,7 +54,7 @@ export default function Industries() {
   const mosaic = industries.slice(0, 5)
 
   return (
-    <PageContainer path="/industries" title="Industries" description="Technology solutions for every industry: how LAX360 Ventures software, AI and automation can support healthcare, retail, education, manufacturing, finance, real estate, logistics, hospitality and more.">
+    <PageContainer path="/industries" title="Industries" description="Technology solutions for every industry: how LAX360 Pvt Ltd software, AI and automation can support healthcare, retail, education, manufacturing, finance, real estate, logistics, hospitality and more.">
       <section ref={ref} aria-labelledby="industries-title" className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">
         <div aria-hidden="true" className="absolute -left-28 top-8 -z-10 size-[26rem] rounded-full bg-primary/20 blur-3xl" />
         <div aria-hidden="true" className="absolute -right-24 top-0 -z-10 size-[28rem] rounded-full bg-sky/15 blur-3xl" />

@@ -6,7 +6,7 @@ import { api } from './apiClient.js'
  * @param {object} payload { type, name, phone, email, company, message, extra, consent, branchId, website, source }
  * @returns {Promise<{ id: string|null, duplicate: boolean }>} rejects with ApiError (message safe to show; `fields` per field)
  */
-export async function submitEnquiry({ type, name, phone, email, company, message, extra, consent, branchId, website, source }) {
+export async function submitEnquiry({ type, name, phone, email, company, message, extra, consent, branchId, website, source, attachments }) {
   const res = await api('/api/contact', {
     method: 'POST',
     body: {
@@ -18,6 +18,7 @@ export async function submitEnquiry({ type, name, phone, email, company, message
       extra: extra || {},
       source: source || null,
       website: website || '',
+      ...(attachments?.length ? { attachments } : {}),
     },
   })
   return { id: res.id, duplicate: res.duplicate }

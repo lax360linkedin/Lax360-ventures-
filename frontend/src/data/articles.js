@@ -1,5 +1,5 @@
 // Starter articles for the Insights page (shown until articles are published in the admin panel: Website content > Insights).
-// They are original, evergreen explainers written by LAX360 Ventures. They are not news reports and make no claims about named
+// They are original, evergreen explainers written by LAX360 Pvt Ltd. They are not news reports and make no claims about named
 // companies or recent events. Body text: blank line = new paragraph, a line starting with "## " = sub-heading.
 export const articleCategories = [
   { value: 'ai', label: 'Artificial Intelligence & Generative AI', short: 'AI & Generative AI', icon: 'bot', text: 'Assistants, agents and generative AI for everyday business work.' },

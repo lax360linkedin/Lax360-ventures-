@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Boxes, Calendar, Check, GraduationCap, IdCard, Kanban, Map, Package, Receipt, Server, Stethoscope, Users, Workflow } from 'lucide-react'
+import { ArrowRight, Boxes, MonitorPlay, Calendar, Check, GraduationCap, IdCard, Kanban, Map, Package, Receipt, Server, Stethoscope, Users, Workflow } from 'lucide-react'
 import Reveal from '../ui/Reveal.jsx'
 import { productCategories, productStatuses } from '../../data/products.js'
 
@@ -52,7 +52,7 @@ export function ProductCard({ product, delay = 0 }) {
           <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
         </Link>
         <div className="flex flex-1 flex-col gap-4 p-6">
-          <div className="flex flex-wrap items-center gap-2"><CategoryBadge category={product.category} /><StatusBadge status={product.status} /></div>
+          <div className="flex flex-wrap items-center gap-2"><CategoryBadge category={product.category} /><StatusBadge status={product.status} />{product.demoSiteLink && <span className="inline-flex items-center gap-1.5 rounded-full border border-lav/50 bg-glass px-3 py-1 text-xs font-bold uppercase tracking-wider text-lav"><MonitorPlay className="size-3.5" aria-hidden="true" />Live demo</span>}</div>
           <div className="flex items-center gap-3">
             <ProductMark product={product} className="size-12" />
             <h3 className="font-display text-2xl font-semibold leading-tight"><Link to={`/products/${product.slug}`} className="transition-colors hover:text-lav">{product.name}</Link></h3>

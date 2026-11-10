@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "themes": "node scripts/generate-themes.mjs",
     "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-server && node scripts/prerender.js && node scripts/generate-sitemap.js",
     "preview": "vite preview",
     "sitemap": "node scripts/generate-sitemap.js"

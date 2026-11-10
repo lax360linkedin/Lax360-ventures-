@@ -99,7 +99,7 @@ export default function DemoRequest() {
   }
 
   return (
-    <PageContainer path="/demo" title="Get a Demo" description="Request a demo of the LAX360 Ventures software, AI and digital services." noindex>
+    <PageContainer path="/demo" title="Get a Demo" description="Request a demo of the LAX360 Pvt Ltd software, AI and digital services." noindex>
       <div className="wrap section flex flex-col items-center gap-8">
         <div className="glass w-full max-w-2xl p-6 md:p-8">
           <h1 className="h2">Get a demo</h1>
@@ -113,7 +113,7 @@ export default function DemoRequest() {
                 Thanks, {values.name.trim()}. Your request is saved as <strong className="text-fg">pending</strong>. <strong className="text-fg">No date is booked yet</strong> — a member of the team will contact you to confirm. We don&apos;t send a confirmation email.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button href={whatsappLink(`Hi LAX360 Ventures, I have requested a demo${values.date ? ` around ${values.date}` : ''}.`)}>
+                <Button href={whatsappLink(`Hi LAX360 Pvt Ltd, I have requested a demo${values.date ? ` around ${values.date}` : ''}.`)}>
                   <MessageCircle className="size-5" aria-hidden="true" /> Message us on WhatsApp
                 </Button>
                 <Button variant="secondary" onClick={() => { setValues((v) => ({ ...v, company: '', date: '', interest: '', branch: '', message: '' })); setStatus('idle') }}>Make another request</Button>

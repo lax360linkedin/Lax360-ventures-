@@ -30,7 +30,7 @@ export default function Profile() {
   }
 
   return (
-    <PageContainer path="/user/dashboard" title="My Dashboard" description="Your LAX360 Ventures account." noindex>
+    <PageContainer path="/user/dashboard" title="My Dashboard" description="Your LAX360 Pvt Ltd account." noindex>
       <div className="wrap section flex justify-center">
         <div className="glass w-full max-w-xl p-6 md:p-8">
           <div className="flex items-center gap-4">

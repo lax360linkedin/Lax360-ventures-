@@ -1,7 +1,7 @@
 """Official branch addresses and phone numbers.
 
 Data only: no table or column changes, no rows added or removed. The three existing branch rows (Salem, Bangalore, Mumbai) get the official
-address (newline-separated lines) and phone number supplied by LAX360 Ventures. Contact enquiries and demo requests that point at a branch
+address (newline-separated lines) and phone number supplied by LAX360 Pvt Ltd. Contact enquiries and demo requests that point at a branch
 keep their link, because the rows are updated in place by slug.
 
 Downgrade restores the values the rows had before this migration (the earlier Salem address; no address or phone for the other two).

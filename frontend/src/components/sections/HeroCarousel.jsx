@@ -37,7 +37,7 @@ export default function HeroCarousel({ home }) {
 
   const arrow = 'absolute top-1/2 z-10 hidden size-11 -translate-y-1/2 place-items-center rounded-full border border-edge-strong bg-glass text-fg backdrop-blur-md transition-[opacity,border-color,transform] hover:border-lav disabled:pointer-events-none disabled:opacity-0 md:grid'
   return (
-    <div className="relative" role="region" aria-roledescription="carousel" aria-label="LAX360 Ventures — main pages" onKeyDown={key}>
+    <div className="relative" role="region" aria-roledescription="carousel" aria-label="LAX360 Pvt Ltd — main pages" onKeyDown={key}>
       <div
         className="wrap relative grid min-h-[min(100svh,58rem)] items-center overflow-x-clip pb-16 pt-[116px] md:pt-[140px] lg:pb-24"
         style={{ touchAction: 'pan-y' }}

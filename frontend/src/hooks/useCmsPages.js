@@ -79,6 +79,13 @@ export function normaliseCompany(i) {
     slug: i.slug, name: i.title, category: d.category || 'associated', relationship: d.relationship || '', businessCategory: d.business_category || '', description: d.description || '',
     designation: verified ? d.designation || '' : '', claim: d.designation || '', verified, verification: d.verification || 'pending', products: toList(d.products), sameLocation: d.location_type === 'same', location: d.location || '', email: d.contact_email || '', phone: d.contact_phone || '',
     website: d.website_link || '', ctaLabel: d.cta_label || 'Visit website', featured: d.featured === true, logo: d.logo || '', logoAlt: d.logo_alt || '',
+    // details page (/our-network/<partner>): all optional, shown only when entered in the admin panel
+    overview: toParagraphs(d.overview), partnershipType: d.partnership_type || '', partnershipNature: toParagraphs(d.partnership_nature), collaboration: toParagraphs(d.collaboration),
+    weReceive: toParagraphs(d.we_receive), weContribute: toParagraphs(d.we_contribute), weOffer: toList(d.we_offer), solutions: toList(d.solutions), implementationServices: toList(d.implementation_services),
+    supportServices: toList(d.support_services), softwareCategories: String(d.software_categories || '').split(',').map((x) => x.trim()).filter(Boolean), features: toList(d.features),
+    adoptionHelp: toParagraphs(d.adoption_help), relatedServices: String(d.related_services || '').split(',').map((x) => x.trim()).filter(Boolean), customerBenefits: toList(d.customer_benefits),
+    journey: titled(d.customer_journey), images: [[d.image_1, d.image_1_alt], [d.image_2, d.image_2_alt]].filter(([src]) => src).map(([src, alt]) => ({ src, alt: alt || '' })),
+    documentLink: d.document_link || '', documentLabel: d.document_label || 'Document', extraLinks: toList(d.extra_links).map((l) => { const [label, ...rest] = l.split('|'); return { label: label.trim(), href: rest.join('|').trim() } }).filter((x) => x.label && /^https?:\/\//.test(x.href)),
   }
 }
 
@@ -163,6 +170,47 @@ export function useHomeFaq() {
     const withCat = source.map((q) => ({ ...q, category: q.category && known.has(q.category) ? q.category : '' }))
     return { categories, items: withCat }
   }, [cats, items])
+}
+
+/** Open positions published in the admin panel: closed openings never arrive, and an opening past its "apply by" date is hidden. Featured openings come first. */
+export function useCareerJobs() {
+  const items = useContent('job')
+  return useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    const list = (items || []).filter((j) => !j.data.closing_date || j.data.closing_date >= today).map((j) => {
+      const d = j.data || {}
+      return {
+        id: j.id, slug: j.slug, title: j.title, department: d.department || '', location: d.location || '', type: d.employment_type || '', mode: d.work_mode || '', experience: d.experience || '',
+        summary: d.summary || '', description: toParagraphs(d.description), responsibilities: toList(d.responsibilities), requirements: toList(d.requirements), eligibility: d.eligibility || '',
+        skills: csv(d.skills), applyLink: d.apply_link || '', closing: d.closing_date || '', featured: d.featured === true,
+      }
+    })
+    return [...list.filter((j) => j.featured), ...list.filter((j) => !j.featured)]
+  }, [items])
+}
+
+/** Hero and section text of the Career page (admin panel > Careers > Career page text); every field is optional. */
+export function useCareerPageText() {
+  const items = useContent('career_page')
+  return useMemo(() => items?.[0]?.data || {}, [items])
+}
+
+/** "Why join us" items published in the admin panel, or an empty list (the built-in working principles are shown then). */
+export function useCareerPerks() {
+  const items = useContent('career_perk')
+  return useMemo(() => (items || []).map((i) => ({ id: i.id, title: i.title, text: i.data.description || '', icon: i.data.icon || 'sparkles' })), [items])
+}
+
+/** Text of the Our Network page managed in the admin panel (Website content > Network > Our Network page text); every field is optional. */
+export function useNetworkPageText() {
+  const items = useContent('network_page')
+  return useMemo(() => items?.[0]?.data || {}, [items])
+}
+
+/** Text of the Contact page managed in the admin panel (Website content > Contact > Contact page text); every field is optional. */
+export function useContactPageText() {
+  const items = useContent('contact_page')
+  return useMemo(() => items?.[0]?.data || {}, [items])
 }
 
 /** About page section switches managed in the admin panel (Website content > About page sections): a section is shown unless switched off there. */

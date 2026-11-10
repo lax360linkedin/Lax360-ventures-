@@ -129,7 +129,7 @@ def create_app() -> FastAPI:
         yield
 
     app = FastAPI(
-        title="LAX360 Ventures API",
+        title="LAX360 Pvt Ltd API",
         version="1.0.0",
         lifespan=lifespan,
         docs_url="/api/docs" if settings.docs_on else None,

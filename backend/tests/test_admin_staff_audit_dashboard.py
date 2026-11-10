@@ -171,7 +171,7 @@ def test_dashboard_numbers_come_from_the_database(app, db, client):
     d = admin.get("/api/admin/dashboard").json()
     e = d["enquiries"]
     assert e["total"] == 3 and e["new"] == 1 and e["open"] == 2 and e["in_range"] == 3
-    assert e["by_status"] == {"new": 1, "in_progress": 1, "contacted": 0, "converted": 1, "closed": 0}
+    assert e["by_status"] == {"new": 1, "in_progress": 1, "contacted": 0, "qualified": 0, "proposal_sent": 0, "negotiation": 0, "converted": 1, "not_interested": 0, "closed": 0}
     assert len(d["days"]) == 30 and len(e["series"]) == 30 and e["series"][-1] == 3 and len(e["recent"]) == 3
     assert d["demos"]["total"] == 0 and d["chatbot"]["conversations_total"] == 0 and "customers" in d
     admin.post(f"/api/admin/enquiries/{ids[2]}/archive", headers=csrf)

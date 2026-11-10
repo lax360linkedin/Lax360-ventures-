@@ -1,6 +1,6 @@
 import portfolio from './industries.json'
 
-// The industries LAX360 Ventures builds technology for. `industries.json` is the built-in set of 20: it is shown until industries are published in the admin panel
+// The industries LAX360 Pvt Ltd builds technology for. `industries.json` is the built-in set of 20: it is shown until industries are published in the admin panel
 // (Website content > Industries), and it is also what `python -m app.cli seed-industries` loads into the CMS so each one can be edited there.
 // Everything describes what technology CAN do for a sector and what LAX360 can build. Nothing here claims delivered projects, clients or results.
 export const industryGroups = {

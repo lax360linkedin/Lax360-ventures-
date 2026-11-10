@@ -118,6 +118,20 @@ def delete(settings: Settings, bucket: str, key: str, where: str) -> bool:
         return False
 
 
+def read(settings: Settings, bucket: str, key: str, where: str) -> bytes | None:
+    """The bytes of a stored object (for downloads that must go through the server, e.g. login-only files). None if it is gone."""
+    try:
+        if where == "local":
+            target = local_dir(settings) / key
+            return target.read_bytes() if target.is_file() else None
+        with _client() as http:
+            r = http.get(f"{_base(settings)}/object/{bucket}/{key}", headers=_headers(settings))
+        return r.content if r.status_code == 200 else None
+    except (httpx.HTTPError, OSError) as exc:
+        log.warning("Storage read failed: %s (object %s/%s)", type(exc).__name__, bucket, key)
+        return None
+
+
 def exists_local(settings: Settings, key: str) -> bool:
     try:
         return (local_dir(settings) / key).is_file()

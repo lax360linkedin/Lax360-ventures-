@@ -7,6 +7,8 @@ import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { heroes, serviceSections } from '../components/sections/services/CategoryLayouts.jsx'
+import ServiceTestimonials from '../components/sections/ServiceTestimonials.jsx'
+import ServiceClients from '../components/sections/ServiceClients.jsx'
 import CmsServiceDetail from '../components/cms/CmsServiceDetail.jsx'
 import { getDivision, divisions } from '../data/services.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
@@ -46,7 +48,7 @@ export default function ServiceDetail() {
         '@type': 'Service',
         name: d.name,
         description: d.metaDescription,
-        provider: { '@type': 'Organization', name: 'LAX360 Ventures' },
+        provider: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' },
         hasOfferCatalog: { '@type': 'OfferCatalog', name: d.name, itemListElement: d.offerings.map((o) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: o.name, description: o.text } })) },
       }}
     >
@@ -111,6 +113,9 @@ export default function ServiceDetail() {
           <div className="lg:col-span-8"><Accordion items={d.faqs} /></div>
         </div>
       </section>
+
+      <ServiceTestimonials category={d.slug} serviceName={d.name} />
+      <ServiceClients category={d.slug} serviceName={d.name} />
 
       {/* related categories */}
       <section className="border-t border-edge bg-glass" aria-labelledby="related-title">

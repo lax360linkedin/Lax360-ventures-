@@ -32,7 +32,7 @@ const postal = (b) => ({
 const organization = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'LAX360 Ventures',
+  name: 'LAX360 Pvt Ltd',
   legalName: site.legalEntity,
   url: SITE,
   logo: `${SITE}/assets/logo-shield.png`,
@@ -53,7 +53,7 @@ function headTags(head, route) {
     `<link rel="canonical" href="${esc(url)}" />`,
     head.noindex ? '<meta name="robots" content="noindex" />' : '',
     '<meta property="og:type" content="website" />',
-    '<meta property="og:site_name" content="LAX360 Ventures" />',
+    '<meta property="og:site_name" content="LAX360 Pvt Ltd" />',
     `<meta property="og:title" content="${esc(head.title)}" />`,
     `<meta property="og:description" content="${esc(head.description)}" />`,
     `<meta property="og:url" content="${esc(url)}" />`,

@@ -30,6 +30,7 @@ export function mergeSite(s = {}) {
     mapLink: s.map_link || '',
     email2: s.contact_email_2 || '',
     footerTagline: s.footer_tagline || '',
+    businessHours: s.business_hours || '',
   }
 }
 

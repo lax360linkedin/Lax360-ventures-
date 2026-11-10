@@ -71,6 +71,7 @@ const BADGES = {
   published: 'bg-success/15 text-success', draft: 'bg-glass-strong text-soft', success: 'bg-success/15 text-success', failure: 'bg-error/15 text-error',
   connected: 'bg-success/15 text-success', unavailable: 'bg-error/15 text-error', configuration_missing: 'bg-amber-500/15 text-amber-500', not_tested: 'bg-glass-strong text-soft', not_implemented: 'bg-glass-strong text-soft',
   playing: 'bg-success/15 text-success', next: 'bg-sky/15 text-sky', scheduled: 'bg-lav/20 text-lav', missing_file: 'bg-error/15 text-error',
+  qualified: 'bg-lav/20 text-lav', proposal_sent: 'bg-sky/15 text-sky', negotiation: 'bg-amber-500/15 text-amber-500', not_interested: 'bg-error/15 text-error',
   super_admin: 'bg-accent/20 text-lav', admin: 'bg-sky/15 text-sky', active: 'bg-success/15 text-success', inactive: 'bg-error/15 text-error',
 }
 export const label = (s) => String(s || '').replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase())

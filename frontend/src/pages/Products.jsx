@@ -10,6 +10,8 @@ import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { ProductCard, ProductMark, ProductVisual } from '../components/products/ProductBits.jsx'
 import { productCategories } from '../data/products.js'
 import { useProducts } from '../hooks/useProducts.js'
+import { useWebsites } from '../hooks/useWebsites.js'
+import { WebsiteCard } from '../components/websites/WebsiteBits.jsx'
 
 const EASE = [0.2, 0.8, 0.2, 1]
 const scrollToList = (e) => { e.preventDefault(); document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }) }
@@ -21,6 +23,7 @@ const scrollToList = (e) => { e.preventDefault(); document.getElementById('produ
  */
 export default function Products() {
   const products = useProducts()
+  const websites = useWebsites()
   const [cat, setCat] = useState('all')
   const [query, setQuery] = useState('')
   const ref = useRef(null)
@@ -34,7 +37,7 @@ export default function Products() {
   const rise = (delay) => (reduce ? {} : { initial: { opacity: 0, y: 22 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay, ease: EASE } })
   const mosaic = products.slice(0, 4)
   return (
-    <PageContainer path="/products" title="Products" description="Software products and SaaS platforms from LAX360 Ventures: CRM, clinic, learning, billing, API, field operations, bookings, inventory, HR, project management and workflow automation.">
+    <PageContainer path="/products" title="Products" description="Software products and SaaS platforms from LAX360 Pvt Ltd: CRM, clinic, learning, billing, API, field operations, bookings, inventory, HR, project management and workflow automation.">
       <section ref={ref} aria-labelledby="products-title" className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">
         <div aria-hidden="true" className="absolute -left-28 top-8 -z-10 size-[26rem] rounded-full bg-primary/20 blur-3xl" />
         <div aria-hidden="true" className="absolute -right-24 top-0 -z-10 size-[28rem] rounded-full bg-sky/15 blur-3xl" />
@@ -74,7 +77,7 @@ export default function Products() {
       </section>
 
       <section id="products" aria-labelledby="list-title" className="wrap section scroll-mt-[calc(var(--header-bottom,92px)+1rem)]">
-        <SectionHeading id="list-title" eyebrow="Our products" title="The LAX360" gradient="product portfolio." lead="Software and SaaS platforms developed and owned by LAX360 Ventures. Each product shows its current development status." />
+        <SectionHeading id="list-title" eyebrow="Our products" title="The LAX360" gradient="product portfolio." lead="Software and SaaS platforms developed and owned by LAX360 Pvt Ltd. Each product shows its current development status." />
         <div className="mt-10 flex flex-col gap-4">
           <div className="relative max-w-xl">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-soft" aria-hidden="true" />
@@ -103,6 +106,17 @@ export default function Products() {
             <button type="button" onClick={() => { setCat('all'); setQuery('') }} className="link-underline mt-3 inline-flex min-h-11 items-center font-semibold text-lav">Show all products</button>
           </div>
         )}
+      </section>
+
+      {/* Explore Our Websites: the portfolio teaser (managed in the admin panel under Website portfolio) */}
+      <section id="websites" className="wrap section scroll-mt-[calc(var(--header-bottom,92px)+1rem)]" aria-labelledby="websites-teaser-title">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <SectionHeading id="websites-teaser-title" eyebrow="Explore our websites" title="Our Websites" gradient="& Live Demos." lead="Company websites, client websites and industry demos built by LAX360. Open the live website, or view its features and modules." />
+          <Button to="/websites" variant="secondary" arrow className="shrink-0">View all {websites.length > 0 ? websites.length : ''} websites</Button>
+        </div>
+        {websites.length > 0
+          ? <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{websites.slice(0, 6).map((w, i) => <WebsiteCard key={w.slug} site={w} delay={(i % 3) * 0.06} />)}</ul>
+          : <div className="glass mt-10 p-8 text-center"><p className="font-display text-xl font-semibold">Websites will appear here soon.</p></div>}
       </section>
 
       <section className="border-y border-edge bg-glass" aria-labelledby="diff-title">

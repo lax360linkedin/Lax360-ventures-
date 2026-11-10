@@ -4,9 +4,9 @@
 export const teamText = {
   heroEyebrow: 'Our Team',
   heroTitle: 'The People Behind Innovation.',
-  heroLead: 'Engineers, AI specialists, marketers and operators working as one team. The expertise, creativity and technology behind LAX360 Ventures come from the people who build it every day.',
+  heroLead: 'Engineers, AI specialists, marketers and operators working as one team. The expertise, creativity and technology behind LAX360 Pvt Ltd come from the people who build it every day.',
   leadershipTitle: 'Leadership Team',
-  leadershipLead: 'The people who set the direction of LAX360 Ventures and keep every department accountable.',
+  leadershipLead: 'The people who set the direction of LAX360 Pvt Ltd and keep every department accountable.',
   departmentsTitle: 'Our Departments',
   departmentsLead: 'Four departments, one accountable team: from software and AI to marketing and client operations.',
   directoryTitle: 'Meet Our Team',

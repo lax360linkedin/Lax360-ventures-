@@ -10,13 +10,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, Timestamps, UUIDPk
 from app.models.branch import Branch
 
-ENQUIRY_STATUSES = ("new", "in_progress", "contacted", "converted", "closed")
+# "in_progress" is kept for enquiries handled before the fuller pipeline existed; new work uses the stages from "contacted" to "closed".
+ENQUIRY_STATUSES = ("new", "in_progress", "contacted", "qualified", "proposal_sent", "negotiation", "converted", "not_interested", "closed")
 
 
 class ContactEnquiry(UUIDPk, Timestamps, Base):
     __tablename__ = "contact_enquiries"
     __table_args__ = (
-        CheckConstraint("status in ('new','in_progress','contacted','converted','closed')", name="status"),
+        CheckConstraint("status in ('new','in_progress','contacted','qualified','proposal_sent','negotiation','converted','not_interested','closed')", name="status"),
         Index("ix_contact_enquiries_status_created_at", "status", "created_at"),
         Index("ix_contact_enquiries_fingerprint", "fingerprint"),
     )

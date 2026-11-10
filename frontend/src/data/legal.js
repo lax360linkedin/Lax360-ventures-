@@ -6,7 +6,7 @@ export const legal = {
   updated: 'Draft — not yet in force',
   privacy: {
     title: 'Privacy Policy',
-    intro: 'This draft outlines how LAX360 Ventures, a brand of LAX360 Pvt Ltd, intends to handle personal data submitted through this website. It is a structural outline and must be reviewed before publication.',
+    intro: 'This draft outlines how LAX360 Pvt Ltd intends to handle personal data submitted through this website. It is a structural outline and must be reviewed before publication.',
     sections: [
       { h: 'What we collect', p: 'Details you choose to submit through the enquiry form: name, phone or WhatsApp number, email address, company, enquiry type and your message.' },
       { h: 'Why we collect it', p: 'To respond to your enquiry and to route it to the right team.' },
@@ -21,12 +21,12 @@ export const legal = {
     title: 'Terms of Use',
     intro: 'This draft outlines the intended terms for using this website. It is a structural outline and must be reviewed before publication.',
     sections: [
-      { h: 'Use of this website', p: 'Content is provided for general information about LAX360 Ventures and its services.' },
+      { h: 'Use of this website', p: 'Content is provided for general information about LAX360 Pvt Ltd and its services.' },
       { h: 'Intellectual property', p: 'Ownership of site content, logos and designs will be stated here after review.' },
       { h: 'No guarantees', p: 'Descriptions of services are not offers or guarantees. Scope, pricing and timelines are agreed in writing for each project.' },
       { h: 'Limitation of liability', p: 'Liability wording will be added after legal review. [Confirm]' },
       { h: 'Governing law', p: 'Governing law and jurisdiction will be stated here after legal review. [Confirm]' },
-      { h: 'Legal entity', p: 'LAX360 Ventures is a brand of LAX360 Pvt Ltd. [Confirm wording]' },
+      { h: 'Legal entity', p: 'The company is LAX360 Pvt Ltd. [Confirm wording]' },
     ],
   },
 }

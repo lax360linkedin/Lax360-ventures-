@@ -10,7 +10,7 @@ import { divisionIcons } from '../../utils/divisionIcons.js'
 
 const divisions = allDivisions.map((d) => ({ icon: divisionIcons[d.slug], label: d.name }))
 
-/** "Who We Are": introduction to LAX360 Ventures. Text and the division list on the left, a service photo slider on the right
+/** "Who We Are": introduction to LAX360 Pvt Ltd. Text and the division list on the left, a service photo slider on the right
  *  (an auto-advancing slider of the services). Stacks on small screens with the panel after the text. */
 export default function WhoWeAre() {
   return (
@@ -18,10 +18,10 @@ export default function WhoWeAre() {
       <div aria-hidden="true" className="pointer-events-none absolute -right-24 top-10 size-96 rounded-full bg-primary/15 blur-3xl" />
       <div className="wrap section relative grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-7">
-          <SectionHeading id="who-title" eyebrow="Who We Are" title="About" gradient="LAX360 Ventures" />
+          <SectionHeading id="who-title" eyebrow="Who We Are" title="About" gradient="LAX360 Pvt Ltd" />
           <Reveal delay={0.08} className="mt-6 max-w-2xl space-y-5 text-lg leading-relaxed text-soft">
             <p>
-              Welcome to <strong className="font-semibold text-fg">LAX360 Ventures</strong>, one accountable team that builds, automates and grows
+              Welcome to <strong className="font-semibold text-fg">LAX360 Pvt Ltd</strong>, one accountable team that builds, automates and grows
               your business. We bring software, AI, digital marketing, APIs, automation, mobile apps and training together under one roof.
             </p>
             <p>

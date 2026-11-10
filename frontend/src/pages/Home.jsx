@@ -30,7 +30,7 @@ export default function Home() {
     <PageContainer
       path="/"
       title={null}
-      description="One team to build, automate and grow your business. Custom software, AI automation, digital marketing and training from LAX360 Ventures."
+      description="One team to build, automate and grow your business. Custom software, AI automation, digital marketing and training from LAX360 Pvt Ltd."
     >
       {(intro === 'pending' || intro === 'playing' || intro === 'revealing') && <Suspense fallback={null}><WelcomeIntro /></Suspense>}
       <Hero />

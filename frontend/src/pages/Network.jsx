@@ -3,22 +3,26 @@ import { Link } from 'react-router-dom'
 import { m, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight, ArrowUpRight, BadgeCheck, BriefcaseBusiness, ChevronRight, ClipboardList, Cloud, Code2, Compass, FileText, GraduationCap, Handshake, HeartHandshake, Layers, LifeBuoy, MapPin, MessagesSquare,
-  Network as NetworkIcon, PackageCheck, Plug, Rocket, Search, ShoppingCart, Sparkles, Users, Wrench,
+  Network as NetworkIcon, PackageCheck, Plug, Rocket, Search, ShoppingCart, Sparkles, Users, Wrench, Store, Cpu, Building2, Megaphone, TrendingUp, SlidersHorizontal, Check,
 } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import PartnerForm from '../components/network/PartnerForm.jsx'
+import PartnershipModal from '../components/network/PartnershipModal.jsx'
 import BotHighlight from '../components/ui/BotHighlight.jsx'
 import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { branches } from '../data/branches.js'
-import { networkCategories, ownershipLabels, partnerTypes, pinnedProfiles, relationshipLabels, softwareCategories } from '../data/network.js'
+import { networkCta, networkIntro, partnershipCategories, partnershipProcess, whyPartner } from '../data/partnerships.js'
+import { asCompany, networkCategories, ownershipLabels, partnerTypes, pinnedProfiles, relationshipLabels, softwareCategories } from '../data/network.js'
 import { allDivisions, getDivision } from '../data/services.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
-import { normaliseCompany, useNetwork, useNetworkCategories, useSoftware } from '../hooks/useCmsPages.js'
+import { normaliseCompany, useNetwork, useNetworkCategories, useNetworkPageText, useSoftware } from '../hooks/useCmsPages.js'
 import { useContent } from '../hooks/useSite.js'
 
 const EASE = [0.2, 0.8, 0.2, 1]
+const CAT_ICONS = { store: Store, handshake: Handshake, badge: BadgeCheck, cpu: Cpu, network: NetworkIcon }
+const WHY_ICONS = { building: Building2, layers: Layers, wrench: Wrench, briefcase: BriefcaseBusiness, megaphone: Megaphone, trending: TrendingUp, sliders: SlidersHorizontal }
 const salem = branches.find((b) => b.id === 'salem') || branches[0]
 const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
 const isHttp = (u) => /^https?:\/\//.test(u || '')
@@ -26,10 +30,10 @@ const go = (id) => { document.getElementById(id)?.scrollIntoView({ behavior: win
 
 // The eight sections of the page, in order. `id` is the anchor used by the tab bar.
 const SECTIONS = [
-  { id: 'technology-partners', n: 1, label: 'Technology Partners' },
+  { id: 'authorized-partners', n: 1, label: 'Authorized Partners' },
   { id: 'software-distribution', n: 2, label: 'Software Distribution Network' },
   { id: 'education-network', n: 3, label: 'Education & Academic Network' },
-  { id: 'business-associates', n: 4, label: 'Business Associates & Collaborations' },
+  { id: 'business-associates', n: 4, label: 'Business Collaborations' },
   { id: 'future-partners', n: 5, label: 'Future Partner Opportunities' },
   { id: 'group-companies', n: 6, label: 'Group Companies' },
   { id: 'reseller-partners', n: 7, label: 'Reseller & Distribution Partners' },
@@ -75,19 +79,20 @@ function Designation({ c }) {
 }
 
 /** A company or partner profile card: logo or monogram, name, business category, designation status, description, products, location and official website. */
-function CompanyCard({ c, label, cta }) {
+function CompanyCard({ c, label, cta, to }) {
   return (
-    <article className="glass-flat lift flex h-full flex-col gap-4 p-6">
+    <article className="glass-flat lift relative flex h-full flex-col gap-4 p-6">
       <div className="flex items-center gap-4">
         {c.logo ? <img src={c.logo} alt={c.logoAlt || `${c.name} logo`} width="64" height="64" loading="lazy" decoding="async" className="size-16 shrink-0 rounded-2xl border border-edge bg-white object-contain p-2" />
           : <span aria-hidden="true" className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent font-display text-xl font-bold text-white">{initials(c.name)}</span>}
-        <div className="min-w-0"><h3 className="font-display text-xl font-semibold leading-tight">{c.name}</h3>{c.businessCategory && <p className="mt-1 text-xs font-semibold uppercase tracking-[0.1em] text-lav">{c.businessCategory}</p>}</div>
+        <div className="min-w-0"><h3 className="font-display text-xl font-semibold leading-tight">{to ? <Link to={to} className="after:absolute after:inset-0 after:content-['']">{c.name}<span className="sr-only"> — view partnership details</span></Link> : c.name}</h3>{c.businessCategory && <p className="mt-1 text-xs font-semibold uppercase tracking-[0.1em] text-lav">{c.businessCategory}</p>}</div>
       </div>
       <div className="flex flex-wrap gap-2">{label && <span className="rounded-full border border-edge-strong bg-glass px-3 py-1 text-xs font-semibold">{label}</span>}<Designation c={c} /></div>
       <p className="text-soft">{c.description}</p>
       {c.products.length > 0 && <ul className="flex flex-wrap gap-1.5" aria-label="Products and services">{c.products.map((p) => <li key={p} className="rounded-full border border-edge bg-glass px-2.5 py-1 text-xs font-semibold text-lav">{p}</li>)}</ul>}
-      {(c.sameLocation || c.location) && <p className="flex items-start gap-1.5 text-sm text-soft"><MapPin className="mt-0.5 size-4 shrink-0 text-lav" aria-hidden="true" />{c.sameLocation ? `${c.location || salem.city} — same location as LAX360 Ventures (${salem.address[0]}, ${salem.address[1]})` : c.location}</p>}
-      <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-1">
+      {(c.sameLocation || c.location) && <p className="flex items-start gap-1.5 text-sm text-soft"><MapPin className="mt-0.5 size-4 shrink-0 text-lav" aria-hidden="true" />{c.sameLocation ? `${c.location || salem.city} — same location as LAX360 Pvt Ltd (${salem.address[0]}, ${salem.address[1]})` : c.location}</p>}
+      {to && <p aria-hidden="true" className="inline-flex items-center gap-1 text-sm font-semibold text-lav">View partnership details <ArrowRight className="size-4" /></p>}
+      <div className="relative z-10 mt-auto flex flex-wrap items-center gap-x-5 gap-y-1">
         {isHttp(c.website) && <a href={c.website} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-5 font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[var(--btn-hover)]">{cta || c.ctaLabel} <ArrowUpRight className="size-4" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>}
         {!isHttp(c.website) && <Link to="/contact?type=project" className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-edge-strong px-5 font-semibold transition-colors hover:border-lav">Contact for enquiry</Link>}
         {isHttp(c.website) && c.category !== 'group' && c.category !== 'associated' && <Link to="/contact?type=project" className="link-underline inline-flex min-h-11 items-center font-semibold text-lav">Contact for enquiry</Link>}
@@ -122,13 +127,14 @@ function Section({ s, children, tone = '', eyebrow, title, gradient, lead }) {
 
 /**
  * /our-network — the LAX360 business ecosystem platform. Eight sections, ALWAYS present (a category with no published entries shows its introduction and an
- * invitation instead of disappearing): 1 Technology Partners, 2 Technology & Software Distribution Network, 3 Education & Academic Network, 4 Business
+ * invitation instead of disappearing): 1 Authorized Partners (technology partners included), 2 Technology & Software Distribution Network, 3 Education & Academic Network, 4 Business
  * Associates & Strategic Collaborations, 5 Future Partner Opportunities (with the partnership form), 6 Group Companies & Associated Businesses,
  * 7 Reseller & Software Distribution Partners, 8 Implementation & Technology Ecosystem. Companies and products come from the admin panel
  * (Website content > Network); the built-in starter entries show until entries are published there. A partnership designation is shown only when verified.
  */
 export default function Network() {
   const companies = useNetwork()
+  const np = useNetworkPageText()
   const software = useSoftware()
   const extra = useNetworkCategories()
   const cmsCompanies = useContent('network_partner')
@@ -136,6 +142,7 @@ export default function Network() {
   const pinned = pinnedProfiles.map((p) => { const hit = cmsCompanies?.find((i) => p.slugs.includes(i.slug)); return { key: p.key, entry: hit ? normaliseCompany(hit) : p.fallback } })
   const reduce = useReducedMotion()
   const [step, setStep] = useState(0)
+  const [enquiry, setEnquiry] = useState(() => { try { const k = new URLSearchParams(window.location.search).get('enquire'); return partnershipCategories.some((c) => c.id === k) ? k : null } catch { return null } })
   const [type, setType] = useState(partnerTypes[0].value)
   const [active, setActive] = useState(SECTIONS[0].id)
   const label = (k) => extra[k]?.label || networkCategories[k]?.label || k
@@ -155,7 +162,12 @@ export default function Network() {
   }, [])
   useEffect(() => { document.querySelector('[data-net-tab][aria-current="true"]')?.scrollIntoView({ block: 'nearest', inline: 'center' }) }, [active])
 
-  const tech = companies.filter((c) => ['technology', 'authorized'].includes(c.category))
+  // Authorized Partners: CADPOINT first, then every authorized partner (technology partners are listed here too: there is no separate Technology Partners category any more).
+  const pinnedSlugs = new Set(pinnedProfiles.flatMap((p) => p.slugs))
+  const cadpoint = pinned.find((p) => p.key === 'authorized')?.entry
+  const authorized = [...(cadpoint ? [{ ...asCompany(cadpoint), category: 'authorized', relationship: cadpoint.relationship || 'authorized' }] : []), ...companies.filter((c) => ['technology', 'authorized'].includes(c.category) && !pinnedSlugs.has(c.slug))]
+  const authorisedList = authorized.filter((c) => c.relationship !== 'technology_provider')
+  const techList = authorized.filter((c) => c.relationship === 'technology_provider')
   const education = companies.filter((c) => c.category === 'education' || /education|training/i.test(c.businessCategory))
   const associates = companies.filter((c) => ['associate', 'collaboration', 'professional', 'industry', 'startup'].includes(c.category))
   const group = companies.filter((c) => ['group', 'associated'].includes(c.category))
@@ -174,8 +186,8 @@ export default function Network() {
     <PageContainer
       path="/our-network"
       title="Our Network"
-      description="The LAX360 Ventures business ecosystem: technology partners, software distribution, education network, business associates, group companies, resellers and implementation."
-      jsonLd={{ '@context': 'https://schema.org', '@type': 'Organization', name: 'LAX360 Ventures', location: { '@type': 'Place', address: salem.address.join(', ') }, subOrganization: group.filter((g) => isHttp(g.website)).map((g) => ({ '@type': 'Organization', name: g.name, url: g.website })) }}
+      description="The LAX360 Pvt Ltd business ecosystem: authorized partners, software distribution, education network, business associates, group companies, resellers and implementation."
+      jsonLd={{ '@context': 'https://schema.org', '@type': 'Organization', name: 'LAX360 Pvt Ltd', location: { '@type': 'Place', address: salem.address.join(', ') }, subOrganization: group.filter((g) => isHttp(g.website)).map((g) => ({ '@type': 'Organization', name: g.name, url: g.website })) }}
     >
       <section aria-labelledby="network-title" className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">
         <div aria-hidden="true" className="absolute -left-28 top-8 -z-10 size-[26rem] rounded-full bg-primary/20 blur-3xl" />
@@ -183,33 +195,85 @@ export default function Network() {
         <div className="wrap grid items-center gap-12 pb-14 pt-10 md:pt-14 lg:grid-cols-12 lg:gap-8 lg:pb-20 lg:pt-16">
           <div className="lg:col-span-6">
             <m.nav {...rise(0.05)} aria-label="Breadcrumb" className="text-sm text-soft"><ol className="flex items-center gap-2"><li><Link to="/" className="transition-colors hover:text-lav">Home</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" /><li aria-current="page" className="font-semibold text-fg">Our Network</li></ol></m.nav>
-            <m.p {...rise(0.12)} className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-edge-strong bg-glass px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav backdrop-blur-md"><NetworkIcon className="size-4" aria-hidden="true" />Our Network</m.p>
-            <m.h1 {...rise(0.2)} id="network-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.3rem)]">Connected by Technology. <BotHighlight delay={0.9}><span className="text-gradient">Strengthened by Partnerships.</span></BotHighlight></m.h1>
-            <m.p {...rise(0.3)} className="lead mt-7 max-w-xl text-soft">Discover the companies, technology providers, educational institutions, and strategic relationships that expand our business ecosystem.</m.p>
-            <m.div {...rise(0.4)} className="mt-8 flex flex-col gap-3 sm:flex-row"><Button href="#technology-partners" arrow onClick={(e) => { e.preventDefault(); go('technology-partners') }}>Explore Our Network</Button><Button href="#future-partners" variant="secondary" onClick={(e) => { e.preventDefault(); go('future-partners') }}>Become a Partner</Button></m.div>
+            <m.p {...rise(0.12)} className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-edge-strong bg-glass px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav backdrop-blur-md"><NetworkIcon className="size-4" aria-hidden="true" />Partnerships &amp; business network</m.p>
+            <m.h1 {...rise(0.2)} id="network-title" className="h1 mt-5 !text-[clamp(2.6rem,5.2vw,4.6rem)]">{np.heading || networkIntro.heading}</m.h1>
+            <m.p {...rise(0.26)} className="mt-3 font-display text-xl font-semibold leading-snug text-lav md:text-2xl"><BotHighlight delay={0.9}>{np.subheading || networkIntro.sub}</BotHighlight></m.p>
+            {[np.intro_1 || networkIntro.paragraphs[0], np.intro_2 || networkIntro.paragraphs[1]].map((p, n) => <m.p key={p} {...rise(0.32 + n * 0.06)} className="mt-5 max-w-xl text-lg text-soft">{p}</m.p>)}
+            <m.div {...rise(0.45)} className="mt-8 flex flex-col gap-3 sm:flex-row"><Button href="#partnership-opportunities" arrow onClick={(e) => { e.preventDefault(); go('partnership-opportunities') }}>Explore Partnership Opportunities</Button><Button to="/contact" variant="secondary">Contact LAX360</Button></m.div>
           </div>
           <m.div {...rise(0.3)} className="lg:col-span-6">
-            <svg viewBox="0 0 480 400" className="mx-auto h-auto w-full max-w-md" role="img" aria-label="Diagram: LAX360 Ventures at the centre, connected to technology, education, finance, software and business partners">
+            <svg viewBox="0 0 480 400" className="mx-auto h-auto w-full max-w-md" role="img" aria-label="Diagram: LAX360 Pvt Ltd at the centre, connected to technology, education, finance, software and business partners">
               {[[90, 80], [390, 80], [60, 250], [420, 250], [240, 360], [240, 40]].map(([x, y], i) => <line key={i} x1="240" y1="200" x2={x} y2={y} stroke="var(--color-edge-strong)" strokeWidth="1.5" strokeDasharray="4 6" />)}
               {[[90, 80, 'Technology'], [390, 80, 'Education'], [60, 250, 'Finance'], [420, 250, 'Software'], [240, 360, 'Associates'], [240, 40, 'Industry']].map(([x, y, l], i) => (
                 <g key={l}><circle cx={x} cy={y} r="30" fill="var(--color-glass-strong)" stroke="var(--color-edge-strong)" /><text x={x} y={y + 4} textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--color-fg)">{l}</text>
                   {!reduce && <circle r="3" fill="var(--color-accent)"><animateMotion dur={`${3 + i * 0.5}s`} repeatCount="indefinite" path={`M240 200 L${x} ${y}`} /></circle>}</g>
               ))}
-              <circle cx="240" cy="200" r="56" fill="var(--color-primary)" /><text x="240" y="196" textAnchor="middle" fontSize="16" fontWeight="700" fill="#fff">LAX360</text><text x="240" y="216" textAnchor="middle" fontSize="11" fill="#fff" opacity="0.85">Ventures</text>
+              <circle cx="240" cy="200" r="56" fill="var(--color-primary)" /><text x="240" y="196" textAnchor="middle" fontSize="16" fontWeight="700" fill="#fff">LAX360</text><text x="240" y="216" textAnchor="middle" fontSize="11" fill="#fff" opacity="0.85">Pvt Ltd</text>
             </svg>
           </m.div>
         </div>
       </section>
 
-      <section className="wrap section" aria-labelledby="network-first-title">
-        <h2 id="network-first-title" className="sr-only">Our network by relationship</h2>
-        <div className="space-y-16">
-          {pinned.map(({ key, entry: e }) => (
-            <div key={key} id={`first-${key}`} className="scroll-mt-32">
-              <Reveal>
-                <h3 className="font-display text-2xl font-semibold md:text-3xl">{key === 'authorized' ? 'Authorized Partners' : 'Associated Companies'}</h3>
-                <p className="mt-2 max-w-2xl text-soft">{key === 'authorized' ? 'Companies authorized to represent or deliver LAX360 Ventures services in their region.' : 'Companies connected to LAX360 Ventures through ownership, shared leadership or close working ties.'}</p>
+      {/* Partnership opportunities: five categories, each with its own enquiry */}
+      <section id="partnership-opportunities" className="wrap section scroll-mt-[calc(var(--header-bottom,92px)+1rem)]" aria-labelledby="opps-title">
+        <SectionHeading id="opps-title" eyebrow="New partnership opportunities" title="Five ways to" gradient="partner with us." lead={np.opportunities_title || 'Choose the category that fits you. Each has its own enquiry, and our team replies personally.'} />
+        <ul className="mt-12 grid gap-6 lg:grid-cols-2">
+          {partnershipCategories.map((c, i) => {
+            const Icon = CAT_ICONS[c.icon]
+            return (
+              <Reveal as="li" key={c.id} delay={(i % 2) * 0.06} className={i === partnershipCategories.length - 1 ? 'lg:col-span-2' : ''}>
+                <article id={`cat-${c.id}`} className="glass-flat lift group relative flex h-full flex-col gap-5 overflow-hidden p-6 md:p-8">
+                  <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary to-accent opacity-80 transition-opacity group-hover:opacity-100" />
+                  <div className="flex items-start gap-4">
+                    <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"><Icon className="size-7" aria-hidden="true" /></span>
+                    <div className="min-w-0">
+                      <p className="eyebrow text-lav">{c.letter} · {c.label}</p>
+                      <h3 className="mt-1 font-display text-2xl font-semibold leading-tight">{c.title}</h3>
+                    </div>
+                  </div>
+                  <p className="text-soft">{c.description}</p>
+                  <div>
+                    <h4 className="text-sm font-bold uppercase tracking-[0.12em] text-fg">{c.listTitle}</h4>
+                    <ul className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2">{c.items.map((t) => <li key={t} className="flex items-start gap-2.5 text-soft"><Check className="mt-1 size-4 shrink-0 text-lav" aria-hidden="true" />{t}</li>)}</ul>
+                  </div>
+                  <div className="mt-auto flex flex-col gap-3 border-t border-edge pt-5 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="font-semibold">{c.cta}</p>
+                    <Button onClick={() => setEnquiry(c.id)} arrow className="shrink-0">{c.button}</Button>
+                  </div>
+                </article>
               </Reveal>
+            )
+          })}
+        </ul>
+      </section>
+
+      <section className="wrap section border-t border-edge" aria-labelledby="network-first-title">
+        <SectionHeading id="network-first-title" eyebrow="Existing partners & business network" title="Who is already" gradient="part of our network." lead="Companies LAX360 already works with, kept apart by the kind of relationship. Authorisation is shown only where it has been confirmed." />
+        <div className="mt-12 space-y-16">
+          {pinned.map(({ key, entry: e }) => (
+            <div key={key} id={key === 'authorized' ? 'authorized-partners' : `first-${key}`} className="scroll-mt-[calc(var(--header-bottom,92px)+1rem)]">
+              <Reveal>
+                <h3 className="font-display text-2xl font-semibold md:text-3xl">{key === 'authorized' ? 'Existing Authorised Partners' : 'Associated Companies'}</h3>
+                <p className="mt-2 max-w-2xl text-soft">{key === 'authorized' ? 'Companies authorised to represent or deliver LAX360 Pvt Ltd services in their region. A partner is listed here only where the authorisation has been confirmed.' : 'Companies connected to LAX360 Pvt Ltd through ownership, shared leadership or close working ties.'}</p>
+              </Reveal>
+              {key === 'authorized' ? (
+                <>
+                  <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {authorisedList.map((c, i) => <Reveal as="li" key={c.slug} delay={(i % 3) * 0.06}><CompanyCard c={c} label={relationshipLabels[c.relationship]} cta="Official website" to={`/our-network/${c.slug}`} /></Reveal>)}
+                  </ul>
+                  {techList.length > 0 && (
+                    <div id="technology-partners" className="mt-16 scroll-mt-[calc(var(--header-bottom,92px)+1rem)]">
+                      <Reveal>
+                        <h3 className="font-display text-2xl font-semibold md:text-3xl">Existing Technology Partners</h3>
+                        <p className="mt-2 max-w-2xl text-soft">Technology companies and software providers whose products LAX360 works with. This is a technology relationship; no authorisation or partnership level is stated unless the partner&apos;s profile confirms it.</p>
+                      </Reveal>
+                      <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {techList.map((c, i) => <Reveal as="li" key={c.slug} delay={(i % 3) * 0.06}><CompanyCard c={c} label={relationshipLabels[c.relationship]} cta="Official website" to={`/our-network/${c.slug}`} /></Reveal>)}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              ) : (
               <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <Reveal as="li">
                   <article className="glass-flat lift flex h-full flex-col gap-4 p-6">
@@ -232,6 +296,7 @@ export default function Network() {
                   </article>
                 </Reveal>
               </ul>
+              )}
             </div>
           ))}
         </div>
@@ -245,13 +310,6 @@ export default function Network() {
           ))}
         </ul>
       </nav>
-
-      {/* 1 Technology Partners */}
-      <Section s={SECTIONS[0]} title="Technology" gradient="Partners." lead={networkCategories.technology.text + ' A partnership designation is shown only where it has been verified.'}>
-        {tech.length > 0
-          ? <ul className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">{tech.map((c, i) => <Reveal as="li" key={c.slug} delay={(i % 4) * 0.06}><CompanyCard c={c} label={relationshipLabels[c.relationship]} cta="Official website" /></Reveal>)}</ul>
-          : <Empty title="Technology partners will be listed here." text="Cloud platforms, AI providers, software companies and infrastructure vendors appear in this section once the relationship has been confirmed." />}
-      </Section>
 
       {/* 2 Technology & Software Distribution Network */}
       <Section s={SECTIONS[1]} tone="border-y border-edge bg-glass" title="Technology & Software" gradient="Distribution Network." lead="LAX360’s software sales and distribution ecosystem: how we help customers discover, choose, buy, implement and use business software.">
@@ -311,8 +369,8 @@ export default function Network() {
               <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/20 blur-3xl" />
               <div className="relative grid gap-8 lg:grid-cols-12">
                 <div className="lg:col-span-5">
-                  <div className="flex items-center gap-4"><img src="/assets/logo-shield.png" alt="" width="64" height="64" className="size-16 rounded-2xl bg-white object-contain p-1.5" /><div><h3 className="font-display text-2xl font-semibold">LAX360 Ventures</h3><p className="mt-1 text-xs font-semibold uppercase tracking-[0.1em] text-lav">Technology & Digital Solutions</p></div></div>
-                  <p className="mt-4 text-soft">LAX360 Ventures plans, builds and supports software, AI, digital marketing, APIs, automation and mobile applications, and develops its own software products.</p>
+                  <div className="flex items-center gap-4"><img src="/assets/logo-shield.png" alt="" width="64" height="64" className="size-16 rounded-2xl bg-white object-contain p-1.5" /><div><h3 className="font-display text-2xl font-semibold">LAX360 Pvt Ltd</h3><p className="mt-1 text-xs font-semibold uppercase tracking-[0.1em] text-lav">Technology & Digital Solutions</p></div></div>
+                  <p className="mt-4 text-soft">LAX360 Pvt Ltd plans, builds and supports software, AI, digital marketing, APIs, automation and mobile applications, and develops its own software products.</p>
                   <p className="mt-3 flex items-start gap-1.5 text-sm text-soft"><MapPin className="mt-0.5 size-4 shrink-0 text-lav" aria-hidden="true" />{salem.address.join(', ')}</p>
                   <div className="mt-5 flex flex-wrap gap-3"><Button to="/services" arrow>Our Services</Button><Button to="/products" variant="secondary">Our Products</Button></div>
                 </div>
@@ -327,7 +385,7 @@ export default function Network() {
           {group.map((c, i) => <Reveal key={c.slug} delay={0.08 + i * 0.06} className="lg:col-span-6"><CompanyCard c={c} label={relationshipLabels[c.relationship] || label(c.category)} /></Reveal>)}
         </div>
         {group.length === 0 && <Empty title="Associated businesses will be listed here." text="Group companies and associated businesses appear once their details are published." />}
-        <p className="mt-6 text-sm text-soft">Each profile is a separate business. A company is described as owned by LAX360 Ventures only where its profile says so. Fatcat Wealthy’s services are provided by Fatcat Wealthy, not by LAX360 Ventures, and nothing here is financial advice or an offer; see its website for details.</p>
+        <p className="mt-6 text-sm text-soft">Each profile is a separate business. A company is described as owned by LAX360 Pvt Ltd only where its profile says so. Fatcat Wealthy’s services are provided by Fatcat Wealthy, not by LAX360 Pvt Ltd, and nothing here is financial advice or an offer; see its website for details.</p>
       </Section>
 
       {/* 7 Reseller & Software Distribution Partners */}
@@ -387,6 +445,57 @@ export default function Network() {
           ? <ul className="mt-5 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{implementation.map((c, i) => <Reveal as="li" key={c.slug} delay={(i % 3) * 0.07}><CompanyCard c={c} label={relationshipLabels[c.relationship]} /></Reveal>)}</ul>
           : <Empty title="No implementation partners are listed yet." text="Teams that deploy, integrate and support business software appear here once the relationship is confirmed. LAX360 also delivers implementation itself." />}
       </Section>
+
+      {/* Why partner with LAX360 */}
+      <section id="why-partner" className="border-y border-edge bg-base2/50 scroll-mt-[calc(var(--header-bottom,92px)+1rem)]" aria-labelledby="why-partner-title">
+        <div className="wrap section">
+          <SectionHeading id="why-partner-title" eyebrow="Why partner with us" title="Why partner with" gradient="LAX360?" lead="What a partnership with LAX360 Pvt Ltd brings." />
+          <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {whyPartner.map((w, i) => {
+              const Icon = WHY_ICONS[w.icon]
+              return (
+                <Reveal as="li" key={w.title} delay={(i % 4) * 0.05} className={`glass-flat lift p-6 ${i === whyPartner.length - 1 ? 'sm:col-span-2 lg:col-span-1' : ''}`}>
+                  <span className="flex size-11 items-center justify-center rounded-xl bg-primary/15 text-lav"><Icon className="size-5" aria-hidden="true" /></span>
+                  <h3 className="mt-4 font-display text-lg font-semibold leading-tight">{w.title}</h3>
+                  <p className="mt-2 text-soft">{w.text}</p>
+                </Reveal>
+              )
+            })}
+          </ul>
+        </div>
+      </section>
+
+      {/* Partnership process */}
+      <section id="partnership-process" className="wrap section scroll-mt-[calc(var(--header-bottom,92px)+1rem)]" aria-labelledby="process-title">
+        <SectionHeading id="process-title" eyebrow="Partnership process" title="From enquiry to" gradient="onboarding." lead="Every enquiry is reviewed. Submitting one does not guarantee a partnership: terms are agreed together." />
+        <ol className="mt-12 grid gap-4 md:grid-cols-5">
+          {partnershipProcess.map((p, i) => (
+            <Reveal as="li" key={p.title} delay={i * 0.06} className="glass-flat relative p-5">
+              <span className="flex size-10 items-center justify-center rounded-full border-2 border-accent font-display text-base font-bold text-lav">{i + 1}</span>
+              <h3 className="mt-4 font-display text-lg font-semibold leading-tight">{p.title}</h3>
+              <p className="mt-2 text-sm text-soft">{p.text}</p>
+              {i < partnershipProcess.length - 1 && <ChevronRight aria-hidden="true" className="absolute -right-3 top-8 hidden size-6 text-lav md:block" />}
+            </Reveal>
+          ))}
+        </ol>
+      </section>
+
+      {/* Final call to action */}
+      <section className="relative overflow-hidden border-t border-edge bg-gradient-to-b from-base2 to-deep/50" aria-labelledby="network-cta-title">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-24 top-0 size-[30rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow)/0.28), transparent)' }} />
+        <div className="wrap section relative text-center">
+          <Reveal className="mx-auto max-w-3xl">
+            <h2 id="network-cta-title" className="h1 !text-[clamp(2.2rem,4.6vw,4rem)]"><span className="text-gradient">{np.cta_heading || networkCta.heading}</span></h2>
+            {(np.cta_text ? [np.cta_text] : networkCta.paragraphs).map((p) => <p key={p} className="lead mt-5 text-soft">{p}</p>)}
+            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+              <Button href="#partnership-opportunities" arrow onClick={(e) => { e.preventDefault(); go('partnership-opportunities') }}>Explore Partnership Opportunities</Button>
+              <Button to="/contact" variant="secondary">Contact LAX360</Button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {enquiry && <PartnershipModal category={enquiry} onClose={() => setEnquiry(null)} />}
     </PageContainer>
   )
 }

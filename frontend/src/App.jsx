@@ -16,8 +16,11 @@ const IndustryDetail = lazy(() => import('./pages/IndustryDetail.jsx'))
 const Insights = lazy(() => import('./pages/Insights.jsx'))
 const ArticleDetail = lazy(() => import('./pages/ArticleDetail.jsx'))
 const Network = lazy(() => import('./pages/Network.jsx'))
+const Websites = lazy(() => import('./pages/Websites.jsx'))
+const WebsiteDetail = lazy(() => import('./pages/WebsiteDetail.jsx'))
 const Team = lazy(() => import('./pages/Team.jsx'))
 const TeamDepartment = lazy(() => import('./pages/TeamDepartment.jsx'))
+const NetworkPartner = lazy(() => import('./pages/NetworkPartner.jsx'))
 const Projects = lazy(() => import('./pages/Projects.jsx'))
 const Career = lazy(() => import('./pages/Career.jsx'))
 const Contact = lazy(() => import('./pages/Contact.jsx'))
@@ -57,6 +60,9 @@ export default function App() {
         <Route path="insights" element={<Insights />} />
         <Route path="insights/:slug" element={<ArticleDetail />} />
         <Route path="our-network" element={<Network />} />
+        <Route path="our-network/:slug" element={<NetworkPartner />} />
+        <Route path="websites" element={<Websites />} />
+        <Route path="websites/:slug" element={<WebsiteDetail />} />
         <Route path="our-team" element={<Team />} />
         <Route path="our-team/:dept" element={<TeamDepartment />} />
         <Route path="work" element={<Projects />} />

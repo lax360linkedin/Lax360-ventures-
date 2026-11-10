@@ -8,6 +8,8 @@ import { getOffering } from '../data/services.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 import { serviceIcons } from '../utils/serviceIcons.js'
 import { offeringHref } from '../utils/slugify.js'
+import ServiceTestimonials from '../components/sections/ServiceTestimonials.jsx'
+import ServiceClients from '../components/sections/ServiceClients.jsx'
 import NotFound from './NotFound.jsx'
 
 const crumb = 'inline-flex min-h-9 items-center transition-colors hover:text-lav'
@@ -35,7 +37,7 @@ export default function ServiceItem() {
       path={path}
       title={`${s.name} — ${d.name}`}
       description={`${s.intro} ${s.about?.[0] || ''}`.slice(0, 300)}
-      jsonLd={{ '@context': 'https://schema.org', '@type': 'Service', name: s.name, description: s.intro, provider: { '@type': 'Organization', name: 'LAX360 Ventures' }, category: d.name }}
+      jsonLd={{ '@context': 'https://schema.org', '@type': 'Service', name: s.name, description: s.intro, provider: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' }, category: d.name }}
     >
       {/* hero */}
       <section className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">
@@ -144,6 +146,10 @@ export default function ServiceItem() {
           </div>
         </div>
       </section>
+
+      <ServiceTestimonials category={d.slug} sub={s.slug} serviceName={s.name} />
+
+      <ServiceClients category={d.slug} sub={s.slug} serviceName={s.name} />
 
       {/* related */}
       <section className="wrap section" aria-labelledby="related-title">

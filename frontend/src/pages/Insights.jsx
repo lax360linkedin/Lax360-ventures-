@@ -79,7 +79,7 @@ export default function Insights() {
   const [lead, ...side] = featured
 
   return (
-    <PageContainer path="/insights" title="Insights" description="Technology insights from LAX360 Ventures: AI and generative AI, software development, business automation, SaaS and APIs, digital transformation, web and mobile apps, digital marketing and technology trends.">
+    <PageContainer path="/insights" title="Insights" description="Technology insights from LAX360 Pvt Ltd: AI and generative AI, software development, business automation, SaaS and APIs, digital transformation, web and mobile apps, digital marketing and technology trends.">
       <section ref={ref} aria-labelledby="insights-title" className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">
         <div aria-hidden="true" className="absolute -left-28 top-8 -z-10 size-[26rem] rounded-full bg-primary/20 blur-3xl" />
         <div aria-hidden="true" className="absolute -right-24 top-0 -z-10 size-[28rem] rounded-full bg-sky/15 blur-3xl" />

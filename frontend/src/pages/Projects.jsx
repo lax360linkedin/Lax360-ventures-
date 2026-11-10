@@ -27,7 +27,7 @@ export default function Projects() {
     <PageContainer
       path="/work"
       title="Work"
-      description="Projects and capability concepts from LAX360 Ventures. Verified client case studies will be published here with permission."
+      description="Projects and capability concepts from LAX360 Pvt Ltd. Verified client case studies will be published here with permission."
     >
       <PageHero
         eyebrow="Work"

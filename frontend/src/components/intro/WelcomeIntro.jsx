@@ -336,7 +336,7 @@ export default function WelcomeIntro() {
   // where the real header logo is, so the intro logo can land exactly on it
   const measureHeaderLogo = useCallback(() => {
     const s = live.current
-    const img = document.querySelector('header a[aria-label="LAX360 Ventures home"] img')
+    const img = document.querySelector('header a[aria-label="LAX360 Pvt Ltd home"] img')
     const rect = img?.getBoundingClientRect()
     const { w, h } = s.view
     const ox = (w - s.L.w * s.scale) / 2

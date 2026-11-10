@@ -1,4 +1,4 @@
--- LAX360 Ventures database schema (generated from backend/alembic/versions by scripts/export_sql.py).
+-- LAX360 Pvt Ltd database schema (generated from backend/alembic/versions by scripts/export_sql.py).
 -- Run ONCE on an EMPTY database in the Supabase dashboard: SQL Editor -> New query -> paste -> Run.
 -- It creates 8 tables, seeds the branches Salem / Bangalore / Mumbai, and enables row-level security on every table.
 -- Do not run it together with `alembic upgrade head` on the same database. Regenerate after any schema change.
@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('c39a3454-4c8c-4707-a411-f3dccaa4f462', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('7fc290a0-fafd-4364-a5fc-d8324003e819', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('fdf73253-5545-4ffa-a792-09a1e2b51412', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('b701ea02-0d93-4c1e-a6b7-138dd6b69d9f', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('0d55a04c-9b2f-43b0-9104-906888f92314', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('09ca7785-bb0c-4df6-b88b-ff400cceee3b', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -513,6 +513,73 @@ Andheri–Kurla Road, A-Wing, J. B. Nagar
 Andheri East, Mumbai, Maharashtra – 400059', phone='+91 95666 05272' WHERE branches.slug = 'mumbai';
 
 UPDATE alembic_version SET version_num='0010' WHERE alembic_version.version_num = '0009';
+
+-- Running upgrade 0010 -> 0011
+
+UPDATE content_items SET data = replace(data::text, NULL, NULL)::json WHERE kind = 'faq' AND data::text LIKE NULL;
+
+UPDATE content_items SET data = replace(data::text, NULL, NULL)::json WHERE kind = 'faq' AND data::text LIKE NULL;
+
+DELETE FROM content_items WHERE (title ~* '\mcad\M' OR data::text ~* '\mcad\M' OR data::text ~* '(division|group).: ?.(engineering|cad)' OR title ~* '(civil|mechanical) (cad|engineering)') AND kind IN ('service_category','service','project','team_member','article','faq','about_block','about_section');
+
+UPDATE alembic_version SET version_num='0011' WHERE alembic_version.version_num = '0010';
+
+-- Running upgrade 0011 -> 0012
+
+ALTER TABLE contact_enquiries DROP CONSTRAINT ck_contact_enquiries_ck_contact_enquiries_status;
+
+ALTER TABLE contact_enquiries ADD CONSTRAINT ck_contact_enquiries_ck_contact_enquiries_status CHECK (status in ('new','in_progress','contacted','qualified','proposal_sent','negotiation','converted','not_interested','closed'));
+
+CREATE TABLE enquiry_followups (
+    id UUID NOT NULL, 
+    enquiry_id UUID NOT NULL, 
+    author_id UUID, 
+    author_name VARCHAR(120) NOT NULL, 
+    kind VARCHAR(12) DEFAULT 'call' NOT NULL, 
+    summary TEXT NOT NULL, 
+    due_on DATE, 
+    done BOOLEAN DEFAULT false NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_enquiry_followups PRIMARY KEY (id), 
+    CONSTRAINT ck_enquiry_followups_ck_enquiry_followups_kind CHECK (kind in ('call','email','whatsapp','meeting','other')), 
+    CONSTRAINT fk_enquiry_followups_enquiry_id_contact_enquiries FOREIGN KEY(enquiry_id) REFERENCES contact_enquiries (id) ON DELETE CASCADE, 
+    CONSTRAINT fk_enquiry_followups_author_id_users FOREIGN KEY(author_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_enquiry_followups_enquiry_id_created_at ON enquiry_followups (enquiry_id, created_at);
+
+CREATE INDEX ix_enquiry_followups_due_on ON enquiry_followups (due_on);
+
+ALTER TABLE public."enquiry_followups" ENABLE ROW LEVEL SECURITY;
+
+DO $$
+DECLARE r text;
+BEGIN
+  FOREACH r IN ARRAY ARRAY['anon', 'authenticated']
+  LOOP
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
+      EXECUTE format('REVOKE ALL ON public.enquiry_followups FROM %%I', r);
+    END IF;
+  END LOOP;
+END $$;;
+
+UPDATE alembic_version SET version_num='0012' WHERE alembic_version.version_num = '0011';
+
+-- Running upgrade 0012 -> 0013
+
+UPDATE branches SET name = replace(name, 'LAX360 Ventures', 'LAX360 Pvt Ltd') WHERE strpos(name, 'LAX360 Ventures') > 0;
+
+UPDATE content_items SET title = replace(title, 'LAX360 Ventures', 'LAX360 Pvt Ltd') WHERE strpos(title, 'LAX360 Ventures') > 0;
+
+UPDATE content_items SET data = replace(data::text, 'LAX360 Ventures', 'LAX360 Pvt Ltd')::json WHERE strpos(data::text, 'LAX360 Ventures') > 0;
+
+UPDATE site_settings SET value = replace(value::text, 'LAX360 Ventures', 'LAX360 Pvt Ltd')::json WHERE strpos(value::text, 'LAX360 Ventures') > 0;
+
+UPDATE content_items SET data = replace(data::text, 'LAX360 Pvt Ltd is a brand of LAX360 Pvt Ltd', 'LAX360 Pvt Ltd')::json WHERE strpos(data::text, 'LAX360 Pvt Ltd is a brand of LAX360 Pvt Ltd') > 0;
+
+UPDATE site_settings SET value = replace(value::text, 'LAX360 Pvt Ltd is a brand of LAX360 Pvt Ltd', 'LAX360 Pvt Ltd')::json WHERE strpos(value::text, 'LAX360 Pvt Ltd is a brand of LAX360 Pvt Ltd') > 0;
+
+UPDATE alembic_version SET version_num='0013' WHERE alembic_version.version_num = '0012';
 
 COMMIT;
 

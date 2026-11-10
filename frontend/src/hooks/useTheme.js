@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useSyncExternalStore } from 'react'
 import { useSiteLoaded, useSiteSettings } from './useSite.js'
+import { ALL_THEME_IDS, PALETTE_IDS, PALETTE_THEMES } from '../data/themes.js'
 
 // Themes: "dark" (default), "light", and the light-family palettes "snow", "rose" and "sage".
 // On <html>, `data-theme` is "light" or "dark" (so every existing light/dark rule keeps working) and the three palettes add
@@ -9,9 +10,9 @@ import { useSiteLoaded, useSiteSettings } from './useSite.js'
 // at once. The inline script in index.html applies the cached theme before first paint, so there is no flash.
 export const THEME_KEY = 'lax360-theme'
 export const SITE_THEME_KEY = 'lax360-site-theme'
-export const THEMES = ['dark', 'light', 'snow', 'rose', 'sage']
-const PALETTES = ['snow', 'rose', 'sage']
-const META_COLOR = { light: '#ffffff', dark: '#0a0c10', snow: '#fafafa', rose: '#fffafa', sage: '#fbfdfa' }
+export const THEMES = ALL_THEME_IDS // dark, light, the first three palettes (snow, rose, sage) and the 21 extra palette themes (data/themes.js)
+const PALETTES = PALETTE_IDS
+const META_COLOR = { light: '#ffffff', dark: '#0a0c10', snow: '#fafafa', rose: '#fffafa', sage: '#fbfdfa', ...Object.fromEntries(PALETTE_THEMES.map((t) => [t.id, t.bg])) }
 
 const listeners = new Set()
 const read = () => {
@@ -34,7 +35,7 @@ function apply(theme, persist = true) {
   root.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light')
   if (PALETTES.includes(theme)) root.setAttribute('data-palette', theme)
   else root.removeAttribute('data-palette')
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', META_COLOR[theme])
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', META_COLOR[theme] || '#ffffff')
   if (persist) {
     try {
       window.localStorage.setItem(THEME_KEY, theme)
@@ -43,6 +44,19 @@ function apply(theme, persist = true) {
     }
   }
   listeners.forEach((l) => l())
+}
+
+let previewBackup = null
+/** Admin theme preview: shows a theme on the page WITHOUT saving it anywhere. `endPreview()` puts the previous theme back. */
+export function previewTheme(theme) {
+  if (previewBackup === null) previewBackup = read()
+  apply(theme, false)
+}
+export function endPreview() {
+  if (previewBackup === null) return
+  const back = previewBackup
+  previewBackup = null
+  apply(back, false)
 }
 
 function subscribe(callback) {

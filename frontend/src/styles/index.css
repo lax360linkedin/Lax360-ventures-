@@ -4,9 +4,10 @@
 @import "@fontsource-variable/space-grotesk";
 @import "@fontsource-variable/inter-tight";
 @import "./themes.css";
+@import "./themes-extra.css";
 
 /*
- * LAX360 Ventures — "Violet Glass" design system (light theme); the dark theme is graphite + sky blue
+ * LAX360 Pvt Ltd — "Violet Glass" design system (light theme); the dark theme is graphite + sky blue
  * Deep violet base, translucent glass surfaces with restrained blur, thin lavender edges,
  * and gradients used only as supporting accents (selected headline words, ambient light).
  */

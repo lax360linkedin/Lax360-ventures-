@@ -18,7 +18,7 @@ from alembic.config import Config
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "sql" / "supabase_schema.sql"
 
-HEADER = """-- LAX360 Ventures database schema (generated from backend/alembic/versions by scripts/export_sql.py).
+HEADER = """-- LAX360 Pvt Ltd database schema (generated from backend/alembic/versions by scripts/export_sql.py).
 -- Run ONCE on an EMPTY database in the Supabase dashboard: SQL Editor -> New query -> paste -> Run.
 -- It creates 8 tables, seeds the branches Salem / Bangalore / Mumbai, and enables row-level security on every table.
 -- Do not run it together with `alembic upgrade head` on the same database. Regenerate after any schema change.

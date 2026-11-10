@@ -88,7 +88,7 @@ export default function Hero() {
           </h1>
           <div className="a-rise mt-6" style={{ '--d': '0.8s' }}><RotatingWord /></div>
           <p className="a-rise lead mx-auto mt-8 text-fg/85" style={{ '--d': '0.95s' }}>
-            {hero.lead || 'Custom software, AI automation, websites, apps, digital marketing and training — planned, built and supported by LAX360 Ventures.'}
+            {hero.lead || 'Custom software, AI automation, websites, apps, digital marketing and training — planned, built and supported by LAX360 Pvt Ltd.'}
           </p>
           <div className="mt-9 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
             <div className="a-rise w-full sm:w-auto" style={{ '--d': '1.1s' }}><CtaButton link={hero.cta_primary_link || '/contact?type=project'} arrow className="w-full sm:w-auto">{hero.cta_primary_label || 'Discuss Your Project'}</CtaButton></div>

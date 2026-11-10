@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bot, CalendarCheck, FileText, Image as ImageIcon, Inbox, MessageSquareWarning, UserRound } from 'lucide-react'
+import { Bot, CalendarCheck, FileText, Image as ImageIcon, Inbox, MessageSquareWarning, Palette, UserRound } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import { useAdmin } from '../AdminApp.jsx'
 import { Badge, Btn, Card, EmptyState, ErrorState, Field, Input, PageHeader, Spinner, fmtDate, label, useFetch } from '../ui.jsx'
@@ -8,26 +8,80 @@ import { Badge, Btn, Card, EmptyState, ErrorState, Field, Input, PageHeader, Spi
 const iso = (d) => d.toISOString().slice(0, 10)
 const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return iso(d) }
 
-/** Website content at a glance: how much is live and how much is waiting as a draft, plus the media library. Hidden if the account has no CMS access. */
-function CmsOverview() {
+const PAGE_NAMES = { '': 'Home page', about: 'About', services: 'Services', products: 'Products', industries: 'Industries', insights: 'Insights', 'our-network': 'Our Network', 'our-team': 'Our Team', work: 'Work', career: 'Careers', contact: 'Contact' }
+const PAGE_ORDER = ['', 'about', 'services', 'products', 'industries', 'insights', 'our-network', 'our-team', 'work', 'career', 'contact', '*']
+
+/** Your website, page by page: what can be edited on each public page, how much is live and how much is waiting as a draft. */
+function WebsitePages() {
   const content = useFetch(() => api('/api/admin/content/kinds').catch(() => null), [])
   const media = useFetch(() => api('/api/admin/media?page_size=1').catch(() => null), [])
-  if (!content.data && !media.data) return null
-  const groups = {}
-  ;(content.data?.kinds || []).forEach((k) => {
+  if (!content.data) return null
+  const pages = {}
+  content.data.kinds.forEach((k) => {
+    const site = k.group === 'Navigation & SEO'
+    const key = site ? '*' : (k.preview_path || '/').split('#')[0].replace(/^\//, '').split('/')[0]
     const c = content.data.counts[k.kind]
-    groups[k.group] = groups[k.group] || { published: 0, draft: 0 }
-    groups[k.group].published += c.published
-    groups[k.group].draft += c.draft
+    pages[key] = pages[key] || { kinds: [], published: 0, draft: 0 }
+    pages[key].kinds.push(k)
+    pages[key].published += c.published
+    pages[key].draft += c.draft
   })
+  const keys = PAGE_ORDER.filter((p) => pages[p])
   return (
-    <Card className="mt-6">
-      <div className="flex items-center justify-between"><h3 className="flex items-center gap-2 text-sm font-semibold"><FileText className="size-4 text-lav" aria-hidden="true" /> Website content</h3><Link to="/company-admin/content" className="text-sm font-semibold text-lav hover:underline">Manage</Link></div>
-      <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
-        {Object.entries(groups).map(([g, c]) => <li key={g} className="flex items-center justify-between rounded-lg border border-edge px-3 py-2"><span>{g}</span><span className="text-soft"><strong className="text-fg">{c.published}</strong> live{c.draft ? <> · <span className="text-amber-500">{c.draft} draft</span></> : ''}</span></li>)}
-        {media.data && <li className="flex items-center justify-between rounded-lg border border-edge px-3 py-2"><span className="flex items-center gap-2"><ImageIcon className="size-4 text-lav" aria-hidden="true" /> Media library</span><Link to="/company-admin/media" className="text-soft hover:underline"><strong className="text-fg">{media.data.usage.files}</strong> files</Link></li>}
+    <section className="mt-8" aria-labelledby="pages-title">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div><h2 id="pages-title" className="font-display text-xl font-semibold">Manage your website</h2><p className="text-sm text-soft">Every public page and what you can edit on it. Open a page to change its text, images, lists and settings.</p></div>
+        <Link to="/company-admin/content" className="text-sm font-semibold text-lav hover:underline">All content</Link>
+      </div>
+      <ul className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {keys.map((key) => {
+          const p = pages[key]
+          const first = p.kinds[0]
+          return (
+            <li key={key}>
+              <Card className="flex h-full flex-col">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-display text-lg font-semibold">{key === '*' ? 'Site-wide (menus, SEO, social)' : PAGE_NAMES[key] || key}</h3>
+                  {p.draft > 0 && <Badge value="draft" text={`${p.draft} draft${p.draft === 1 ? '' : 's'}`} />}
+                </div>
+                <p className="mt-1 text-xs text-soft">{p.published} published · {p.published + p.draft} total</p>
+                <ul className="mt-3 flex-1 space-y-1 text-sm">
+                  {p.kinds.slice(0, 6).map((k) => <li key={k.kind}><Link to={`/company-admin/content?kind=${k.kind}`} className="inline-flex min-h-8 items-center gap-1.5 text-soft hover:text-lav hover:underline">{k.label}<span className="text-xs opacity-70">({content.data.counts[k.kind].published}/{content.data.counts[k.kind].published + content.data.counts[k.kind].draft})</span></Link></li>)}
+                  {p.kinds.length > 6 && <li className="text-xs text-soft">+ {p.kinds.length - 6} more</li>}
+                </ul>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link to={`/company-admin/content?kind=${first.kind}`}><Btn kind="primary">Manage</Btn></Link>
+                  {key !== '*' && <a href={key ? `/${key}` : '/'} target="_blank" rel="noopener noreferrer"><Btn>View page</Btn></a>}
+                </div>
+              </Card>
+            </li>
+          )
+        })}
+        {media.data && (
+          <li><Card className="flex h-full flex-col"><div className="flex items-center gap-2"><ImageIcon className="size-5 text-lav" aria-hidden="true" /><h3 className="font-display text-lg font-semibold">Media library</h3></div>
+            <p className="mt-1 flex-1 text-sm text-soft">{media.data.total ?? media.data.items?.length ?? 0} files. Upload images, PDFs and videos once and reuse them anywhere.</p>
+            <div className="mt-4"><Link to="/company-admin/media"><Btn kind="primary">Open library</Btn></Link></div></Card></li>
+        )}
       </ul>
-    </Card>
+    </section>
+  )
+}
+
+/** Shortcuts to the things administrators do most. Only what the account may use is shown. */
+function QuickActions() {
+  const { can } = useAdmin()
+  const actions = [
+    can('enquiries') && { to: '/company-admin/enquiries', label: 'Review new enquiries', icon: Inbox },
+    can(['content', 'services', 'careers', 'navigation']) && { to: '/company-admin/content?kind=product', label: 'Edit products', icon: FileText },
+    can(['content', 'services', 'careers', 'navigation']) && { to: '/company-admin/content?kind=job', label: 'Post a job opening', icon: FileText },
+    can('media') && { to: '/company-admin/media', label: 'Upload media', icon: ImageIcon },
+    can('settings') && { to: '/company-admin/settings', label: 'Change website theme', icon: Palette },
+  ].filter(Boolean)
+  if (!actions.length) return null
+  return (
+    <section aria-label="Quick actions" className="mb-6 flex flex-wrap gap-2">
+      {actions.map(({ to, label: text, icon: Icon }) => <Link key={to} to={to} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-edge-strong bg-glass px-4 text-sm font-semibold transition-colors hover:border-lav"><Icon className="size-4 text-lav" aria-hidden="true" />{text}</Link>)}
+    </section>
   )
 }
 
@@ -89,6 +143,7 @@ export default function Dashboard() {
   return (
     <>
       <PageHeader title={`Welcome, ${me.user.full_name.split(' ')[0]}`} lead="Live numbers from the database. Totals are all-time; charts and “in range” figures follow the dates below." />
+      <QuickActions />
       <form onSubmit={apply} className="mb-6 flex flex-wrap items-end gap-3" aria-label="Date range">
         <Field label="From"><Input type="date" max={draft.to} value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.target.value })} /></Field>
         <Field label="To"><Input type="date" min={draft.from} max={iso(new Date())} value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.target.value })} /></Field>
@@ -138,7 +193,7 @@ export default function Dashboard() {
               )}
             </Card>
           )}
-          <CmsOverview />
+          <WebsitePages />
         </div>
       )}
     </>

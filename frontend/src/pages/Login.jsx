@@ -63,7 +63,7 @@ export default function Login() {
   }
 
   return (
-    <PageContainer path="/login" title="Login" description="Sign in to your LAX360 Ventures account to manage your profile and request a demo." noindex>
+    <PageContainer path="/login" title="Login" description="Sign in to your LAX360 Pvt Ltd account to manage your profile and request a demo." noindex>
       <div className="wrap section flex justify-center">
         <div className="glass w-full max-w-md p-6 md:p-8">
           <div className="flex items-center gap-4">

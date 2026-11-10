@@ -2,6 +2,7 @@ import { articles } from './data/articles.js'
 import { divisions } from './data/services.js'
 import portfolio from './data/products.json' with { type: 'json' }
 import industryPortfolio from './data/industries.json' with { type: 'json' }
+import networkPortfolio from './data/network.json' with { type: 'json' }
 import { slugify } from './utils/slugify.js'
 
 // Single list of indexable routes. Used by the prerender script and the sitemap generator.
@@ -24,6 +25,8 @@ export const routes = [
   '/insights',
   ...articles.map((a) => `/insights/${a.slug}`), // built-in starter articles (articles published in the admin panel are rendered in the browser)
   '/our-network',
+  '/our-network/cadpoint-salem',
+  ...networkPortfolio.companies.filter((c) => c.status === 'published' && c.category === 'authorized').map((c) => `/our-network/${c.slug}`), // built-in authorized partners (partners published in the admin panel are rendered in the browser)
   '/our-team',
   '/work',
   '/career',

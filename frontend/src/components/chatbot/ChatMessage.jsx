@@ -28,7 +28,7 @@ export default function ChatMessage({ message, onNavigate }) {
               <Link key={l.to} to={l.to} onClick={onNavigate} className={pill}>{l.label}</Link>
             ))}
             {message.whatsapp && (
-              <a href={whatsappLink('Hi LAX360 Ventures, I was chatting on your website and would like to talk to a person.')} target="_blank" rel="noopener noreferrer" className={pill}>
+              <a href={whatsappLink('Hi LAX360 Pvt Ltd, I was chatting on your website and would like to talk to a person.')} target="_blank" rel="noopener noreferrer" className={pill}>
                 <MessageCircle className="size-4" aria-hidden="true" /> WhatsApp a person
               </a>
             )}
