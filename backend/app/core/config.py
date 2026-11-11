@@ -11,7 +11,7 @@ import re
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import SecretStr, field_validator
+from pydantic import AliasChoices, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 MODEL_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]{1,99}$")
@@ -26,7 +26,7 @@ class ConfigError(RuntimeError):
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", populate_by_name=True)
 
     # --- application -------------------------------------------------------------------------
     app_env: Literal["development", "test", "production"] = "development"
@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     # Supabase Storage: set both of these (the service-role key is a SERVER-SIDE secret: never put it in the frontend). Without them, local disk is used.
     supabase_url: str | None = None  # https://<project-ref>.supabase.co
     supabase_service_role_key: SecretStr | None = None
-    hero_video_bucket: str = "hero-videos"  # created automatically (public) on first upload if it does not exist
+    hero_video_bucket: str = Field(default="hero-videos", validation_alias=AliasChoices("SUPABASE_VIDEO_BUCKET", "HERO_VIDEO_BUCKET"))  # SUPABASE_VIDEO_BUCKET or HERO_VIDEO_BUCKET; created automatically (public) on first upload if it does not exist
     hero_video_disk_is_persistent: bool = False  # set true only if HERO_VIDEO_DIR is on a persistent disk (e.g. a Render Disk): silences the warning
     hero_video_slot_seconds: int | None = None  # development/test ONLY: replaces the 3-day slot length so rotation can be watched in minutes
 

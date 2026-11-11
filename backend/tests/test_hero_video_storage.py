@@ -135,6 +135,30 @@ def test_storage_report_warns_when_files_would_be_lost_on_restart(env, monkeypat
     assert svc.storage_info(get_settings())["durable"] is True  # local development: a normal disk
 
 
+def test_upload_is_refused_when_it_would_be_lost_or_storage_is_half_configured(env, monkeypatch):
+    from app.core.config import get_settings
+    from app.core.errors import ApiError
+
+    monkeypatch.setenv("RENDER", "true")
+    env(SUPABASE_URL=None, SUPABASE_SERVICE_ROLE_KEY=None)
+    with pytest.raises(ApiError) as e:
+        svc.require_durable(get_settings())
+    assert e.value.status_code == 503 and "SUPABASE_URL" in e.value.message
+    env(SUPABASE_URL=PROJECT, SUPABASE_SERVICE_ROLE_KEY=None)
+    with pytest.raises(ApiError) as e:
+        svc.require_durable(get_settings())
+    assert "SUPABASE_SERVICE_ROLE_KEY is missing" in e.value.message
+    env(SUPABASE_URL=PROJECT, SUPABASE_SERVICE_ROLE_KEY=SERVICE_KEY)
+    svc.require_durable(get_settings())  # fully configured: accepted
+
+
+def test_the_bucket_can_be_named_with_supabase_video_bucket(env):
+    from app.core.config import get_settings
+
+    env(SUPABASE_VIDEO_BUCKET="my-videos")
+    assert get_settings().hero_video_bucket == "my-videos"
+
+
 # ---- integrity: verified uploads, safe deletion, availability windows, fallback, recovery ----------------------------------------------
 def items(admin):
     return {v["title"]: v for v in admin[0].get("/api/admin/hero-videos").json()["items"]}

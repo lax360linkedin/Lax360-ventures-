@@ -109,6 +109,7 @@ def list_videos(_: User = Depends(read), db: Session = Depends(get_db), settings
 @router.post("", status_code=201)
 async def upload(request: Request, filename: str = Query(..., min_length=1, max_length=200), title: str | None = Query(None, max_length=120),
                  user: User = Depends(write), db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> dict:
+    svc.require_durable(settings)
     received = await svc.receive(request, settings, settings.hero_video_max_bytes)
     try:
         checked = svc.check_video(received, filename, request.headers.get("content-type"))
@@ -187,6 +188,7 @@ def update(video_id: uuid.UUID, body: Rename, user: User = Depends(write), db: S
 async def replace_file(video_id: uuid.UUID, request: Request, filename: str = Query(..., min_length=1, max_length=200), user: User = Depends(write),
                        db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> dict:
     video = svc.get(db, video_id)
+    svc.require_durable(settings)
     received = await svc.receive(request, settings, settings.hero_video_max_bytes)
     try:
         checked = svc.check_video(received, filename, request.headers.get("content-type"))

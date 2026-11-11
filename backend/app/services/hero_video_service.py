@@ -102,7 +102,8 @@ def _upload_object(settings: Settings, path: Path, key: str, content_type: str) 
         r = put()
         if r.status_code in (400, 404) and "bucket" in r.text.lower() and "not found" in r.text.lower():  # first use: create the public bucket, then retry once
             http.post(f"{_storage_base(settings)}/bucket", json={"id": settings.hero_video_bucket, "name": settings.hero_video_bucket, "public": True,
-                                                                 "file_size_limit": settings.hero_video_max_bytes}, headers=_storage_headers(settings, "application/json"))
+                                                                 "file_size_limit": settings.hero_video_max_bytes,
+                                                                 "allowed_mime_types": ["video/mp4", "video/webm", "image/jpeg", "image/png", "image/webp"]},headers=_storage_headers(settings, "application/json"))
             r = put()
     if r.status_code >= 300:
         log.error("Supabase Storage upload failed: HTTP %s %s", r.status_code, r.text[:300])
@@ -188,6 +189,17 @@ def storage_info(settings: Settings) -> dict:
     return {"backend": "local", "durable": durable, "detail": f"Server disk ({settings.hero_video_dir})",
             "warning": None if durable else "Videos are stored on this server's disk, which Render wipes on every restart and redeploy. Configure SUPABASE_URL and "
                                             "SUPABASE_SERVICE_ROLE_KEY (or attach a persistent disk and set HERO_VIDEO_DISK_IS_PERSISTENT=true), then upload the videos again."}
+
+
+def require_durable(settings: Settings) -> None:
+    """Refuse a video upload that would be lost: half-configured Supabase, or local disk on a host that wipes it. Fails before any bytes are accepted."""
+    if bool(settings.supabase_url) != bool(settings.supabase_service_role_key):
+        missing = "SUPABASE_SERVICE_ROLE_KEY" if settings.supabase_url else "SUPABASE_URL"
+        raise ApiError(503, "storage_not_configured", f"Video storage is only partly configured: {missing} is missing on the server. Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_VIDEO_BUCKET.")
+    info = storage_info(settings)
+    if not info["durable"]:
+        raise ApiError(503, "storage_not_configured", "Permanent video storage is not configured, so the upload was refused to avoid losing it when the server restarts. "
+                                                       "Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_VIDEO_BUCKET on the server.")
 
 
 def remove_files(settings: Settings, storage: str, *keys: str | None, bucket: str | None = None) -> bool:
