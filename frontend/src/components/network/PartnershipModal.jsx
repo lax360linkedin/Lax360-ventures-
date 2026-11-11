@@ -29,7 +29,7 @@ function validate(v) {
  * No account is needed. It uses the website's existing enquiry API: the enquiry is stored in the database and appears in the admin panel under
  * Enquiries (type "Partnership: ..."). The hidden "company_url" input is the spam trap; the API also rate-limits and rejects repeats.
  */
-export default function PartnershipModal({ category, onClose }) {
+export default function PartnershipModal({ category, onClose, division = '', source = 'our-network' }) {
   const ref = useRef(null)
   const [v, setV] = useState({ ...blank, category })
   const [errors, setErrors] = useState({})
@@ -53,10 +53,10 @@ export default function PartnershipModal({ category, onClose }) {
     if (Object.keys(found).length) { setState('idle'); return }
     setState('sending')
     const extra = Object.fromEntries(Object.entries({
-      partnership_category: cat.label, country: v.country, state: v.state, city: v.city, website: v.website, business_background: v.background, additional_message: v.message,
+      partnership_category: cat.label, business_division: division, country: v.country, state: v.state, city: v.city, website: v.website, business_background: v.background, additional_message: v.message,
     }).map(([k, x]) => [k, String(x || '').trim()]).filter(([, x]) => x))
     try {
-      const res = await submitEnquiry({ type: cat.type, name: v.name.trim(), email: v.email.trim(), phone: v.phone.trim(), company: v.company.trim(), message: v.interest.trim(), extra, consent: v.consent, website: v.trap, source: 'our-network' })
+      const res = await submitEnquiry({ type: cat.type, name: v.name.trim(), email: v.email.trim(), phone: v.phone.trim(), company: v.company.trim(), message: (division ? `[Division: ${division}] ` : '') + v.interest.trim(), extra, consent: v.consent, website: v.trap, source })
       setState(res.duplicate ? 'duplicate' : 'done')
     } catch (err) {
       if (err.fields) setErrors((prev) => ({ ...prev, ...err.fields }))
@@ -85,6 +85,7 @@ export default function PartnershipModal({ category, onClose }) {
           </div>
         ) : (
           <form onSubmit={submit} noValidate className="relative grid gap-5 md:grid-cols-2" aria-label="Partnership enquiry">
+            {division && <p className="rounded-xl border border-edge-strong bg-glass px-4 py-3 text-sm md:col-span-2">Business division: <strong className="font-semibold">{division}</strong> (sent with your enquiry)</p>}
             <FormField id="pm-cat" as="select" label="Partnership category" required value={v.category} onChange={set('category')} className="md:col-span-2">
               {partnershipCategories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
             </FormField>

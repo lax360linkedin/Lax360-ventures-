@@ -145,7 +145,7 @@ def test_older_uploads_kept_in_the_database_still_work_and_are_not_touched(fake,
 # ---- content kinds, publishing and permissions ------------------------------------------------------------------------------------
 def test_super_admin_manages_every_cms_area_and_ordinary_admins_get_none_by_default(app, db, boss):
     kinds = {k["kind"] for k in boss[0].get("/api/admin/content/kinds").json()["kinds"]}
-    assert kinds == {"hero", "section", "faq_category", "faq", "about_section", "service_category", "service", "about_block", "project", "job", "career_page", "career_perk", "nav_item", "social_link", "seo_page", "contact_page", "industry", "article", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "client", "testimonial", "product", "product_module", "product_resource", "website"}
+    assert kinds == {"hero", "section", "faq_category", "faq", "about_section", "service_category", "service", "about_block", "project", "job", "career_page", "career_perk", "nav_item", "social_link", "seo_page", "contact_page", "industry", "article", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "client", "testimonial", "product", "product_module", "product_resource", "website", "welcome_page", "welcome_card"}
     bare, bcsrf, _ = staff(app, db, role="admin", email="plain@example.com", permissions=[])
     assert bare.get("/api/admin/content/kinds").status_code == 403 and bare.get("/api/admin/content/service").status_code == 403
     assert bare.post("/api/admin/content/service", json={"title": "X"}, headers=bcsrf).status_code == 403

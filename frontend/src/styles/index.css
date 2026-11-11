@@ -282,9 +282,36 @@ html.theme-switching, html.theme-switching *, html.theme-switching *::before, ht
 html[data-intro] { background: #0b0b0f; }
 html[data-intro="pending"] #root { visibility: hidden; animation: intro-failsafe 0.01s 4s forwards; } /* never leave the site hidden if scripts fail */
 html[data-intro="pending"] :is(.a-rise, .a-pop, .a-fade),
-html[data-intro="playing"] :is(.a-rise, .a-pop, .a-fade) { animation-play-state: paused; }
+html[data-intro="playing"] :is(.a-rise, .a-pop, .a-fade),
+html[data-intro="cards"] :is(.a-rise, .a-pop, .a-fade) { animation-play-state: paused; }
 @keyframes intro-failsafe { to { visibility: visible; } }
 html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s !important; animation-delay: 0s !important; } /* skipped: show the homepage immediately */
+
+/* ---------- Welcome experience (src/components/intro/WelcomeExperience.jsx): backdrop art. Transforms and opacity only; off for reduced motion. ---------- */
+.we-layer { transform: translate3d(calc(var(--px, 0) * var(--depth, 1) * -9px), calc(var(--py, 0) * var(--depth, 1) * -7px), 0); transition: transform 0.35s ease-out; will-change: transform; }
+.we-spin, .we-spin-r, .we-grow, .we-ping { transform-box: fill-box; transform-origin: center; }
+.we-spin { animation: we-spin 60s linear infinite; }
+.we-spin-r { animation: we-spin 80s linear infinite reverse; }
+.we-grow { transform-origin: bottom; animation: we-grow 2.6s ease-in-out infinite alternate both; }
+.we-ping { animation: we-ping 3.6s ease-out infinite; }
+.we-float { animation: we-float 7s ease-in-out infinite; }
+.we-pulse { animation: we-pulse 3.2s ease-in-out infinite; }
+.we-dash { animation: we-dash 2.4s linear infinite; }
+.we-trace { animation: we-trace 3.4s linear infinite; }
+.we-rise { transform-box: fill-box; transform-origin: bottom; animation: we-grow 3s ease-in-out infinite alternate both; }
+.we-drift { animation: we-drift 12s ease-in-out infinite alternate; }
+@keyframes we-spin { to { transform: rotate(360deg); } }
+@keyframes we-grow { from { transform: scaleY(0.55); } to { transform: scaleY(1); } }
+@keyframes we-ping { from { transform: scale(0.3); opacity: 0.9; } to { transform: scale(1.5); opacity: 0; } }
+@keyframes we-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@keyframes we-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+@keyframes we-dash { to { stroke-dashoffset: -88; } }
+@keyframes we-trace { from { stroke-dashoffset: 234; } to { stroke-dashoffset: -234; } }
+@keyframes we-drift { from { transform: translate(0, 0); } to { transform: translate(18px, -26px); } }
+@media (prefers-reduced-motion: reduce) {
+  .we-layer { transform: none; transition: none; }
+  .we-spin, .we-spin-r, .we-grow, .we-ping, .we-float, .we-pulse, .we-dash, .we-trace, .we-rise, .we-drift { animation: none; }
+}
 
 /* ---------- portfolio/concept fan (desktop only; mobile is a horizontal snap row) ---------- */
 .no-scrollbar { scrollbar-width: none; }

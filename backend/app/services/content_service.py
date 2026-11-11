@@ -29,6 +29,9 @@ def F(name, label, kind="text", required=False, max_len=300, options=None, help=
     return {"name": name, "label": label, "type": kind, "required": required, "max": max_len, "options": options or [], "help": help, "options_from": options_from, "default": default, "ui": ui}
 
 
+WELCOME_THEMES = [{"value": v, "label": l} for v, l in (("welcome", "Welcome (violet and electric blue)"), ("software", "Software (code and interface)"), ("marketing", "Marketing (growth and reach)"),
+                                                       ("education", "Education (learning paths)"), ("ai", "AI & Automation (neural network)"), ("robotics", "Robotics (circuits and motion)"),
+                                                       ("blockchain", "Blockchain (linked blocks)"))]
 DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("ai", "AI & Business Automation"), ("growth", "Digital Marketing"), ("headless", "Headless SaaS & API Solutions"), ("automation", "Workflow Automation & Integration"), ("mobile", "Mobile & Business Applications"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
     ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
@@ -464,6 +467,38 @@ KINDS: dict[str, dict] = {
             F("featured", "Featured", "bool", default=False, help="Featured websites are shown first on the Products page."),
         ],
     },
+    # ---- Welcome Experience (the interactive cards shown after the intro animation) -----------------------------------------------------
+    "welcome_page": {
+        "label": "Welcome Experience settings", "group": "Welcome Experience", "module": "content", "single": True, "slug": "welcome", "preview_path": "/?welcome=preview",
+        "help": "The master switch for the interactive welcome cards that follow the intro animation. Publish this item with “Show the welcome experience” ticked to turn the cards on; "
+                "untick it (or leave it unpublished) to go straight to the home page. The cards themselves are managed under Welcome cards.",
+        "fields": [
+            F("enabled", "Show the welcome experience", "bool", default=True),
+            F("once_per_session", "Show it once per browsing session", "bool", default=True, help="On: a visitor who has finished or skipped it is not shown it again until they close the browser tab. Visitors can always replay it from the footer."),
+            F("skip_label", "Skip button label", max_len=30, help="Leave empty for “Skip Intro”."),
+            F("final_label", "Last card button label", max_len=30, help="The button on the last card that enters the home page. Leave empty for “Explore LAX360”."),
+        ],
+    },
+    "welcome_card": {
+        "label": "Welcome cards", "group": "Welcome Experience", "module": "content", "single": False, "preview_path": "/?welcome=preview",
+        "help": "The cards of the welcome experience, in order. Use the order number or arrows to re-order, untick “Show this card” to hide one, and publish to make a change live. "
+                "Page links must be pages that exist (a path like /services/software). Emerging technologies must stay described as plans until they are launched.",
+        "title_label": "Card name (shown as the small label)",
+        "fields": [
+            F("theme", "Background style", "select", True, options=WELCOME_THEMES, default="welcome", help="The animated background and colours used for this card."),
+            F("enabled", "Show this card", "bool", default=True),
+            F("headline", "Headline", "text", True, max_len=140),
+            F("description", "Description", "textarea", True, max_len=900, help="A blank line starts a new paragraph."),
+            F("status_label", "Status badge", "text", False, max_len=40, help="e.g. “Planned initiative”. Leave empty for no badge. Use it for anything not yet launched."),
+            F("image", "Card image (optional)", "image", help="Shown beside the text. Leave empty to use the animated illustration for the background style."),
+            F("image_alt", "Image description (for screen readers)", max_len=160),
+            F("explore_label", "Main button label", max_len=40, help="e.g. “Explore Software”. Leave empty for no main button."),
+            F("explore_link", "Main button link", max_len=300, help="A page path such as /services/software, or a full https:// address."),
+            F("franchise_enabled", "Show the Franchise Opportunities button", "bool", default=False, help="Opens the existing franchise enquiry form with this division preselected."),
+            F("franchise_label", "Franchise button label", max_len=40, help="Leave empty for “Franchise Opportunities”."),
+            F("franchise_division", "Division named in the franchise enquiry", max_len=80, help="e.g. Software & IT Services. Defaults to the card name."),
+        ],
+    },
     # ---- Careers --------------------------------------------------------------------------------------------------------------------
     "job": {
         "label": "Job openings", "group": "Careers", "module": "careers", "single": False, "preview_path": "/career", "public_filter": ("open", True),
@@ -535,7 +570,7 @@ KINDS: dict[str, dict] = {
         "fields": [F("page", "Page", "select", True, options=PAGES), F("meta_description", "Meta description", "textarea", max_len=320), F("image", "Social sharing image", "image")],
     },
 }
-GROUP_ORDER = ["Homepage", "Services", "Products", "Websites", "Industries", "Insights", "Network", "Team", "Clients", "Testimonials", "About", "Portfolio", "Careers", "Contact", "Navigation & SEO"]
+GROUP_ORDER = ["Homepage", "Services", "Products", "Websites", "Welcome Experience", "Industries", "Insights", "Network", "Team", "Clients", "Testimonials", "About", "Portfolio", "Careers", "Contact", "Navigation & SEO"]
 
 
 def kinds_for_ui(db: Session, user=None) -> list[dict]:

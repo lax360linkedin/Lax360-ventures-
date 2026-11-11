@@ -6,7 +6,7 @@ import { footerColumns, legalLinks } from '../../data/navigation.js'
 import { branches } from '../../data/branches.js'
 import { useNav, useSite } from '../../hooks/useSite.js'
 import { whatsappLink } from '../../utils/whatsapp.js'
-import { replayIntro } from '../../utils/welcomeIntro.js'
+import { openWelcomeExperience, replayIntro } from '../../utils/welcomeIntro.js'
 
 const linkCls = 'group/l inline-flex min-h-10 items-center gap-1 text-soft transition-all duration-200 hover:translate-x-1 hover:text-lav focus-visible:text-lav'
 
@@ -37,7 +37,8 @@ export default function Footer() {
   const navigate = useNavigate()
   const services = useNav('footer_divisions', footerColumns[0].links)
   const company = useNav('footer_company', footerColumns[1].links)
-  const replay = () => { navigate('/'); window.setTimeout(replayIntro, 60) } // go Home first; the intro only plays on the homepage
+  // go Home first; the intro only plays on the homepage. Visitors who prefer reduced motion get the welcome cards without the animation.
+  const replay = () => { navigate('/'); window.setTimeout(() => { if (!replayIntro()) openWelcomeExperience() }, 60) }
   const site = useSite()
   const heading = 'mb-4 flex items-center gap-2 font-sans text-xs font-bold uppercase tracking-[0.16em] text-lav'
   const bar = <span aria-hidden="true" className="h-0.5 w-5 rounded-full bg-gradient-to-r from-primary to-accent" />

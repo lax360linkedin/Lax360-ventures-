@@ -10,7 +10,7 @@ def test_content_kinds_describe_only_what_the_site_actually_uses(app, db):
     admin, _, _ = staff(app, db, permissions=["content"])
     body = admin.get("/api/admin/content/kinds").json()
     # an admin who only holds the `content` module sees the homepage / about / portfolio kinds; services, careers and navigation are separate modules
-    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "article", "client", "testimonial", "project", "product", "product_module", "product_resource", "website", "contact_page"]
+    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "article", "client", "testimonial", "project", "product", "product_module", "product_resource", "website", "welcome_page", "welcome_card", "contact_page"]
     assert all(f["name"] for k in body["kinds"] for f in k["fields"])
     assert admin.get("/api/admin/content/pricing_table").status_code == 404  # not a managed section
 

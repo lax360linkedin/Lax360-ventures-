@@ -1,6 +1,6 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, Bot, Globe, Package, Search, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, Bot, Globe, Package, Search, Sparkles, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -17,6 +17,7 @@ const HeroVideos = lazy(() => import('./pages/HeroVideos.jsx'))
 const SiteSettings = lazy(() => import('./pages/SiteSettings.jsx'))
 const Products = lazy(() => import('./pages/Products.jsx'))
 const WebsitesAdmin = lazy(() => import('./pages/Websites.jsx'))
+const WelcomeAdmin = lazy(() => import('./pages/WelcomeAdmin.jsx'))
 const Staff = lazy(() => import('./pages/Staff.jsx'))
 const Audit = lazy(() => import('./pages/Audit.jsx'))
 const System = lazy(() => import('./pages/System.jsx'))
@@ -27,6 +28,7 @@ const NAV = [
   { section: 'Leads & customers', to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests', hint: 'Requests for a product demonstration' },
   { section: 'Website', to: '/company-admin/content', label: 'Website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'], hint: 'Edit every page, section, list and text of the public website' },
   { section: 'Website', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
+  { section: 'Website', to: '/company-admin/welcome', label: 'Welcome Experience', icon: Sparkles, module: 'content', hint: 'The interactive welcome cards shown after the intro animation' },
   { section: 'Website', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
   { section: 'Website', to: '/company-admin/media', label: 'Media library', icon: ImageIcon, module: 'media', hint: 'Images, PDFs and videos used on the website' },
   { section: 'Website', to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos', hint: 'The scheduled background videos of the home page' },
@@ -241,6 +243,7 @@ export default function AdminApp() {
           <Route path="chatbot" element={<Guard module="chatbot"><Chatbot /></Guard>} />
           <Route path="products" element={<Guard module="content"><Products /></Guard>} />
           <Route path="websites" element={<Guard module="content"><WebsitesAdmin /></Guard>} />
+          <Route path="welcome" element={<Guard module="content"><WelcomeAdmin /></Guard>} />
           <Route path="media" element={<Guard module="media"><Media /></Guard>} />
           <Route path="homepage-videos" element={<Guard module="hero_videos"><HeroVideos /></Guard>} />
           <Route path="hero-videos" element={<Navigate to="/company-admin/homepage-videos" replace />} />

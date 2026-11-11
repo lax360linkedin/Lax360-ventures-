@@ -1,7 +1,7 @@
-import { Fragment, lazy, Suspense } from 'react'
+import { Fragment, lazy, Suspense, useEffect } from 'react'
 import PageContainer from '../components/layout/PageContainer.jsx'
-import { useIntroState } from '../utils/welcomeIntro.js'
-import { useHomeSections } from '../hooks/useSite.js'
+import { openWelcomeExperience, useIntroState } from '../utils/welcomeIntro.js'
+import { useContentReady, useHomeSections } from '../hooks/useSite.js'
 import Hero from '../components/sections/Hero.jsx'
 import Marquee from '../components/sections/Marquee.jsx'
 import WhoWeAre from '../components/sections/WhoWeAre.jsx'
@@ -22,9 +22,17 @@ const SECTIONS = {
 
 const WelcomeIntro = lazy(() => import('../components/intro/WelcomeIntro.jsx')) // separate chunk
 
+const WelcomeExperience = lazy(() => import('../components/intro/WelcomeExperience.jsx')) // separate chunk: the 7-card welcome experience
+const cardsCover = <div aria-hidden="true" className="fixed inset-0 z-[1000] bg-[#0b0b0f]" />
+
 export default function Home() {
   const intro = useIntroState()
   const order = useHomeSections(DEFAULT_ORDER)
+  const contentReady = useContentReady()
+  // /?welcome=preview (the admin panel's "Preview the experience" button) opens the cards straight away, ignoring the on/off switches
+  useEffect(() => {
+    if (contentReady && new URLSearchParams(window.location.search).get('welcome') === 'preview') openWelcomeExperience({ preview: true })
+  }, [contentReady])
   // Testimonials and Team are intentionally not rendered: there is no verified content for them yet.
   return (
     <PageContainer
@@ -33,6 +41,7 @@ export default function Home() {
       description="One team to build, automate and grow your business. Custom software, AI automation, digital marketing and training from LAX360 Pvt Ltd."
     >
       {(intro === 'pending' || intro === 'playing' || intro === 'revealing') && <Suspense fallback={null}><WelcomeIntro /></Suspense>}
+      {intro === 'cards' && <Suspense fallback={cardsCover}><WelcomeExperience /></Suspense>}
       <Hero />
       {order.map((key) => <Fragment key={key}>{SECTIONS[key]}</Fragment>)}
     </PageContainer>

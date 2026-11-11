@@ -29,6 +29,8 @@ export const routes = [
   ...networkPortfolio.companies.filter((c) => c.status === 'published' && c.category === 'authorized').map((c) => `/our-network/${c.slug}`), // built-in authorized partners (partners published in the admin panel are rendered in the browser)
   '/our-team',
   '/work',
+  '/robotics',
+  '/blockchain',
   '/career',
   '/contact',
   '/privacy',

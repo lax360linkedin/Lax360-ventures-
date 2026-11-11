@@ -598,6 +598,33 @@ def seed_websites(args: argparse.Namespace) -> None:
         print(f"Added {added} website entr{'y' if added == 1 else 'ies'} ({len(rows) - added} already present). Review them in the admin panel (Website portfolio): add the live address for the entries that have none yet.")
 
 
+def seed_welcome(args: argparse.Namespace) -> None:
+    """Load the 7-card Welcome Experience (settings + cards from app/seed_welcome.py) into the CMS so it is managed in the admin panel.
+    Idempotent by slug; existing items are never overwritten. --remove deletes only the items this command added."""
+    from app import seed_welcome as data
+    from app.models import ContentItem
+
+    get_settings()
+    wanted = [("welcome_page", data.SETTINGS["slug"], data.SETTINGS["title"], data.SETTINGS["data"], 0)] + [("welcome_card", r["slug"], r["title"], r["data"], r["sort_order"]) for r in data.card_rows()]
+    with _factory()() as db:
+        existing = {(i.kind, i.slug): i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(("welcome_page", "welcome_card"))))}
+        if args.remove:
+            gone = [existing[(k, s)] for k, s, *_ in wanted if (k, s) in existing]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} welcome experience item(s). Cards you added yourself were not touched.")
+            return
+        added = 0
+        for kind, slug, title, payload, order in wanted:
+            if (kind, slug) in existing:
+                continue
+            db.add(ContentItem(kind=kind, slug=slug, title=title, data=payload, status="published", sort_order=order))
+            added += 1
+        db.commit()
+        print(f"Added {added} welcome experience item(s) ({len(wanted) - added} already present). Manage them in the admin panel (Welcome Experience).")
+
+
 def purge_enquiries(args: argparse.Namespace) -> None:
     """Data retention: delete enquiries (with their notes, follow-ups and attached documents) that are older than --days AND finished
     (converted, not interested or closed), or archived. Active leads are never touched. --dry-run only counts."""
@@ -676,6 +703,9 @@ def main(argv: list[str] | None = None) -> None:
     sw = sub.add_parser("seed-websites", help="load the website portfolio (Explore Our Websites: 21 entries) into the CMS, or --remove them")
     sw.add_argument("--remove", action="store_true")
     sw.set_defaults(func=seed_websites)
+    sw2 = sub.add_parser("seed-welcome", help="load the 7-card Welcome Experience (settings + cards) into the CMS, or --remove them")
+    sw2.add_argument("--remove", action="store_true")
+    sw2.set_defaults(func=seed_welcome)
     pe = sub.add_parser("purge-enquiries", help="data retention: delete finished (converted / not interested / closed) or archived enquiries older than --days, with their documents")
     pe.add_argument("--days", type=int, required=True, help="minimum age in days (at least 30)")
     pe.add_argument("--dry-run", action="store_true", help="only count what would be deleted")
