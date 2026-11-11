@@ -35,6 +35,8 @@ const listeners = new Set()
 const subscribe = (cb) => { listeners.add(cb); return () => listeners.delete(cb) }
 
 export function setIntroState(next) {
+  // The intro animation (unchanged) ends by setting 'done': when the welcome cards are enabled they follow it, floating over the homepage, instead.
+  if (next === 'done' && (state === 'revealing' || state === 'playing') && welcomePlan()) next = 'cards'
   if (state === next) return
   state = next
   if (typeof document !== 'undefined') {
@@ -74,7 +76,7 @@ export function welcomePlan() {
   if (!previewing && page.enabled === false) return null
   if (!previewing && !forced && page.once_per_session !== false && welcomeSeen()) return null
   const cards = (content.welcome_card || []).map(normaliseWelcomeCard).filter((c) => c.enabled).sort((a, b) => a.order - b.order)
-  return cards.length ? { cards, skipLabel: page.skip_label || 'Skip Intro', finalLabel: page.final_label || 'Explore LAX360' } : null
+  return cards.length ? { cards, finalLabel: page.final_label || 'Next' } : null
 }
 
 /** Show the cards now (the intro animation has ended or was skipped). Returns false when there is nothing to show. */

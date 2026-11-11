@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, m, useAnimationFrame } from 'framer-motion'
-import { goToCards, setIntroState } from '../../utils/welcomeIntro.js'
+import { setIntroState } from '../../utils/welcomeIntro.js'
 import { INTRO_ICONS } from './introIcons.js'
 
 /**
@@ -315,23 +315,14 @@ export default function WelcomeIntro() {
     setIntroState('revealing')
   }, [])
 
-  // The animation is over: when the welcome cards are enabled (and not yet seen) they take over from here instead of the homepage reveal.
-  const toCards = useCallback(() => {
-    const s = live.current
-    if (s.finished || !goToCards()) return false
-    s.finished = true // the cards own the state from now on (the unmount cleanup must not reset it)
-    return true
-  }, [])
-
   // Skip: reveal the homepage at once (the hero's entrance animations snap to their end state instead of replaying their delays)
   const skip = useCallback(() => {
-    if (toCards()) { setDone(true); return }
     const html = document.documentElement
     html.setAttribute('data-intro-skip', '')
     window.setTimeout(() => html.removeAttribute('data-intro-skip'), 400)
     startReveal()
     finish()
-  }, [finish, startReveal, toCards])
+  }, [finish, startReveal])
 
   // keyboard: Esc skips; focus the Skip button so it is the first Tab stop
   useEffect(() => {
@@ -362,10 +353,6 @@ export default function WelcomeIntro() {
     const { L: lay } = s
     const r = refs.current
     if (t >= REVEAL_START - 400 && !s.hdr) s.hdr = measureHeaderLogo()
-    if (t >= REVEAL_START - 250 && !s.cardsDecided && FREEZE_AT === null) { // hand over to the welcome cards (tried on every frame until just after the reveal point, even if frames were late)
-      if (toCards()) return
-      if (t >= REVEAL_START + 90) s.cardsDecided = true
-    }
     if (t >= REVEAL_START + 100) startReveal()
 
     const robot = robotAt(t, lay)

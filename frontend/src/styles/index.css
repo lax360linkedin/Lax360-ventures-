@@ -282,8 +282,7 @@ html.theme-switching, html.theme-switching *, html.theme-switching *::before, ht
 html[data-intro] { background: #0b0b0f; }
 html[data-intro="pending"] #root { visibility: hidden; animation: intro-failsafe 0.01s 4s forwards; } /* never leave the site hidden if scripts fail */
 html[data-intro="pending"] :is(.a-rise, .a-pop, .a-fade),
-html[data-intro="playing"] :is(.a-rise, .a-pop, .a-fade),
-html[data-intro="cards"] :is(.a-rise, .a-pop, .a-fade) { animation-play-state: paused; }
+html[data-intro="playing"] :is(.a-rise, .a-pop, .a-fade) { animation-play-state: paused; }
 @keyframes intro-failsafe { to { visibility: visible; } }
 html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s !important; animation-delay: 0s !important; } /* skipped: show the homepage immediately */
 

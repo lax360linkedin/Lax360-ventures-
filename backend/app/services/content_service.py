@@ -475,8 +475,7 @@ KINDS: dict[str, dict] = {
         "fields": [
             F("enabled", "Show the welcome experience", "bool", default=True),
             F("once_per_session", "Show it once per browsing session", "bool", default=True, help="On: a visitor who has finished or skipped it is not shown it again until they close the browser tab. Visitors can always replay it from the footer."),
-            F("skip_label", "Skip button label", max_len=30, help="Leave empty for “Skip Intro”."),
-            F("final_label", "Last card button label", max_len=30, help="The button on the last card that enters the home page. Leave empty for “Explore LAX360”."),
+            F("final_label", "Last card button label", max_len=30, help="The button on the last card that dismisses the cards and reveals the home page. Leave empty for “Next”."),
         ],
     },
     "welcome_card": {

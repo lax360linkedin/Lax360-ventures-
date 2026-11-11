@@ -128,11 +128,11 @@ export const WelcomeBackdrop = memo(function WelcomeBackdrop({ theme }) {
         <div className="absolute -bottom-[25%] -right-[10%] size-[60vmax] rounded-full opacity-70" style={{ background: `radial-gradient(closest-side, ${rgb(t.b, 0.28)}, transparent 72%)` }} />
         <div className="absolute inset-0 opacity-[0.16]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px)', backgroundSize: '64px 64px', maskImage: 'radial-gradient(70% 70% at 70% 45%, #000, transparent)', WebkitMaskImage: 'radial-gradient(70% 70% at 70% 45%, #000, transparent)' }} />
       </div>
-      <svg className="we-layer absolute inset-0 size-full opacity-[0.55] md:opacity-100" style={{ '--depth': 1.4 }} viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" focusable="false"><Art a={t.a} b={t.b} /></svg>
-      <svg className="we-layer absolute inset-0 size-full" style={{ '--depth': 2.6 }} viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <svg className="we-layer absolute inset-0 size-full opacity-80" style={{ '--depth': 1.4 }} viewBox="0 0 1200 800" preserveAspectRatio="xMaxYMid slice" focusable="false"><Art a={t.a} b={t.b} /></svg>
+      <svg className="we-layer absolute inset-0 size-full" style={{ '--depth': 2.6 }} viewBox="0 0 1200 800" preserveAspectRatio="xMaxYMid slice" focusable="false">
         {DOTS.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r={d.r} fill={rgb(i % 2 ? t.b : t.a, 0.55)} className="we-drift" style={{ animationDelay: `-${d.d}s`, animationDuration: `${9 + (i % 5) * 2}s` }} />)}
       </svg>
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(8,8,14,0.78) 0%, rgba(8,8,14,0.35) 55%, rgba(8,8,14,0.05) 100%)' }} /> {/* keeps the text readable over any illustration */}
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(8,8,14,0.15) 0%, rgba(8,8,14,0.62) 42%, rgba(8,8,14,0.9) 100%)' }} /> {/* keeps the text readable over any illustration */}
     </div>
   )
 })

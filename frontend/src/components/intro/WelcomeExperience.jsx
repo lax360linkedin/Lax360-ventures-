@@ -8,21 +8,16 @@ import { markWelcomeSeen, setIntroState, welcomePlan } from '../../utils/welcome
 import { WelcomeBackdrop, themeOf } from './welcomeArt.jsx'
 
 /**
- * The Welcome Experience: a full-screen, interactive card presentation shown after the intro animation and before the homepage.
- * Everything on the cards (text, order, buttons, links, images, on/off) comes from the admin panel (Welcome Experience); nothing is built into this file.
+ * The Welcome Experience: a small, centred card that floats over the (softly blurred) website right after the intro animation. Seven cards, one at a time, swiped
+ * with Next / Previous (or a swipe / the arrow keys). There is deliberately NO skip and no automatic exit: the homepage is revealed only when the visitor clicks Next
+ * on the last card. Everything on the cards (text, order, buttons, links, images, on/off) comes from the admin panel (Welcome Experience); nothing is built into this file.
  *
- *   - one card at a time, horizontal slide with depth (3D tilt, scale, fade), per-card animated backgrounds with a light pointer parallax;
- *   - Next / Previous, clickable progress bar, "n of N", swipe on touch screens, arrow keys, Esc = skip, a "Skip Intro" button, and a final button that enters the homepage;
  *   - "Franchise Opportunities" opens the website's existing franchise enquiry form (the Our Network one) with the card's division attached;
- *   - the page underneath is inert while the cards are open; reduced-motion visitors get plain fades and no parallax.
+ *   - "Explore ..." buttons go to the existing pages (the cards are then dismissed for this session);
+ *   - the page underneath is inert while the card is open; reduced-motion visitors get plain fades.
  */
 const EASE = [0.22, 1, 0.36, 1]
 const isInternal = (href) => href.startsWith('/') && !href.startsWith('//')
-
-function splitHeadline(text) { // "Line one. Line two." -> two lines, the second one in the card's accent gradient
-  const i = text.indexOf('. ')
-  return i > 0 && i < text.length - 3 ? [text.slice(0, i + 1), text.slice(i + 2)] : [text, '']
-}
 
 export default function WelcomeExperience() {
   const plan = useMemo(() => welcomePlan(), [])
@@ -33,14 +28,13 @@ export default function WelcomeExperience() {
   const [dir, setDir] = useState(1)
   const [leaving, setLeaving] = useState(false)
   const [franchise, setFranchise] = useState(null)
-  const rootRef = useRef(null)
   const nextRef = useRef(null)
-  const live = useRef({ leaving: false, touch: null, raf: 0 })
+  const live = useRef({ leaving: false, touch: null })
   const card = cards[index]
   const last = index === cards.length - 1
   const theme = themeOf(card?.theme)
 
-  // while the cards are open: no scrolling, and the page underneath cannot be reached with the keyboard or a screen reader
+  // while the card is open: no scrolling, and the page underneath cannot be reached with the keyboard or a screen reader
   useLayoutEffect(() => {
     const page = document.getElementById('root')
     const html = document.documentElement
@@ -52,7 +46,7 @@ export default function WelcomeExperience() {
 
   useEffect(() => { nextRef.current?.focus({ preventScroll: true }) }, [])
 
-  const finish = useCallback(() => { // enter the homepage: fade the cards away, then let the homepage animate in
+  const finish = useCallback(() => { // after Next on the last card: the card floats away and the homepage is revealed
     const s = live.current
     if (s.leaving) return
     s.leaving = true
@@ -60,8 +54,7 @@ export default function WelcomeExperience() {
     setLeaving(true)
     const page = document.getElementById('root')
     if (page) page.inert = false
-    // 'done' (not 'revealing': Home would mount the intro animation again for that state): the held-back homepage animations start now that the cards are gone
-    window.setTimeout(() => setIntroState('done'), reduce ? 60 : 450)
+    window.setTimeout(() => setIntroState('done'), reduce ? 60 : 550)
   }, [reduce])
 
   const go = useCallback((to) => {
@@ -72,41 +65,27 @@ export default function WelcomeExperience() {
   const next = useCallback(() => (last ? finish() : go(index + 1)), [finish, go, index, last])
   const prev = useCallback(() => go(index - 1), [go, index])
 
-  // nothing to show (should not happen: the cards state is only entered with a plan): continue to the homepage
-  useEffect(() => { if (!plan) setIntroState('done') }, [plan])
+  useEffect(() => { if (!plan) setIntroState('done') }, [plan]) // nothing to show (should not happen): carry on to the homepage
 
   useEffect(() => {
     const onKey = (e) => {
       if (franchise || live.current.leaving || e.altKey || e.ctrlKey || e.metaKey) return
       if (e.key === 'ArrowRight') { e.preventDefault(); next() }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); prev() }
-      else if (e.key === 'Escape') finish()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [franchise, next, prev, finish])
+  }, [franchise, next, prev])
 
-  // Swipe: a mostly horizontal drag of at least 50 px changes the card. Vertical movement is left alone, so long text can still be scrolled.
-  const onPointerDown = (e) => { if (e.pointerType !== 'mouse' && !e.target.closest('a,button')) live.current.touch = { x: e.clientX, y: e.clientY } }
+  // Swipe: a mostly horizontal drag of at least 40 px changes the card; vertical movement is left alone (long text can still be scrolled)
+  const onPointerDown = (e) => { if (!e.target.closest('a,button')) live.current.touch = { x: e.clientX, y: e.clientY } }
   const onPointerUp = (e) => {
     const t = live.current.touch
     live.current.touch = null
     if (!t) return
     const dx = e.clientX - t.x
     const dy = e.clientY - t.y
-    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) (dx < 0 ? next : prev)()
-  }
-  // light parallax (mouse only; the layers read --px / --py)
-  const onPointerMove = (e) => {
-    if (reduce || e.pointerType !== 'mouse') return
-    const s = live.current
-    cancelAnimationFrame(s.raf)
-    s.raf = requestAnimationFrame(() => {
-      const el = rootRef.current
-      if (!el) return
-      el.style.setProperty('--px', ((e.clientX / window.innerWidth) * 2 - 1).toFixed(3))
-      el.style.setProperty('--py', ((e.clientY / window.innerHeight) * 2 - 1).toFixed(3))
-    })
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) (dx < 0 ? next : prev)()
   }
 
   const open = (href) => {
@@ -115,120 +94,95 @@ export default function WelcomeExperience() {
   }
 
   if (!plan || typeof document === 'undefined' || !card) return null
-  const [line1, line2] = splitHeadline(card.headline)
   const slide = reduce
     ? { enter: { opacity: 0 }, center: { opacity: 1, transition: { duration: 0.2 } }, exit: { opacity: 0, transition: { duration: 0.15 } } }
     : {
-      enter: (d) => ({ opacity: 0, x: d * 110, scale: 0.93, rotateY: d * -16 }),
-      center: { opacity: 1, x: 0, scale: 1, rotateY: 0, transition: { duration: 0.7, ease: EASE, staggerChildren: 0.08, delayChildren: 0.12 } },
-      exit: (d) => ({ opacity: 0, x: d * -110, scale: 0.93, rotateY: d * 16, transition: { duration: 0.45, ease: EASE } }),
+      enter: (d) => ({ opacity: 0, x: d * 120, rotate: d * 7, scale: 0.9 }),
+      center: { opacity: 1, x: 0, rotate: 0, scale: 1, transition: { duration: 0.55, ease: EASE } },
+      exit: (d) => ({ opacity: 0, x: d * -120, rotate: d * -7, scale: 0.9, transition: { duration: 0.35, ease: EASE } }),
     }
-  const item = reduce
-    ? { enter: { opacity: 1 }, center: { opacity: 1 }, exit: { opacity: 1 } }
-    : { enter: { opacity: 0, y: 22 }, center: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } }, exit: { opacity: 1 } }
   const accent = { backgroundImage: `linear-gradient(90deg, rgb(${theme.a}), rgb(${theme.b}))` }
-  const glass = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 font-semibold text-white backdrop-blur transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
+  const btn = 'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border px-4 text-sm font-semibold text-white transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
   const Emblem = theme.Icon
+  const [line1, line2] = (() => { const i = card.headline.indexOf('. '); return i > 0 && i < card.headline.length - 3 ? [card.headline.slice(0, i + 1), card.headline.slice(i + 2)] : [card.headline, ''] })()
 
   return createPortal(
-    <div ref={rootRef} role="dialog" aria-modal="true" aria-label="Welcome to LAX360 Pvt Ltd" onPointerDown={onPointerDown} onPointerUp={onPointerUp} onPointerCancel={() => { live.current.touch = null }} onPointerMove={onPointerMove}
-      className="fixed inset-0 z-[1000] select-none overflow-hidden bg-[#0b0b0f] text-white" style={{ opacity: leaving ? 0 : 1, transition: `opacity ${reduce ? 0.05 : 0.45}s ease`, pointerEvents: leaving ? 'none' : 'auto' }}>
+    <div role="dialog" aria-modal="true" aria-label="Welcome to LAX360 Pvt Ltd" onPointerDown={onPointerDown} onPointerUp={onPointerUp} onPointerCancel={() => { live.current.touch = null }}
+      className="fixed inset-0 z-[1000] flex select-none items-center justify-center overflow-hidden p-4 text-white"
+      style={{ background: 'rgba(8,8,14,0.5)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', opacity: leaving ? 0 : 1, transition: `opacity ${reduce ? 0.05 : 0.55}s ease`, pointerEvents: leaving ? 'none' : 'auto' }}>
       <p className="sr-only" role="status" aria-live="polite">Card {index + 1} of {cards.length}: {card.name}</p>
 
-      <AnimatePresence initial={false}>
-        <m.div key={card.theme + index} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0.1 : 0.7 }}>
-          <WelcomeBackdrop theme={card.theme} />
-        </m.div>
-      </AnimatePresence>
+      <div className="relative h-[min(33rem,calc(100dvh-2rem))] w-[min(24.5rem,calc(100vw-2rem))] transition-transform duration-500 ease-out" style={{ perspective: 1200, transform: leaving && !reduce ? 'scale(0.9) translateY(14px)' : undefined }}>
+        <AnimatePresence mode="popLayout" custom={dir} initial>
+          <m.article key={card.id} custom={dir} variants={slide} initial="enter" animate="center" exit="exit" aria-roledescription="slide" aria-label={`${index + 1} of ${cards.length}`}
+            className="absolute inset-0 flex flex-col overflow-hidden rounded-[2rem] border border-white/20 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.75)]" style={{ touchAction: 'pan-y' }}>
+            <WelcomeBackdrop theme={card.theme} />
 
-      <div className="relative z-10 grid h-full grid-rows-[auto_minmax(0,1fr)_auto]">
-        {/* top bar: brand and Skip */}
-        <div className="flex items-center justify-between gap-3 px-5 pt-4 md:px-10 md:pt-6">
-          <div className="flex items-center gap-3">
-            <img src="/assets/logo-shield.png" alt="" width="284" height="302" className="h-9 w-auto md:h-11" draggable="false" />
-            <span className="font-display text-base font-semibold tracking-tight md:text-lg">LAX360 <span className="text-white/60">Pvt Ltd</span></span>
-          </div>
-          <button type="button" onClick={finish} className="inline-flex min-h-11 items-center rounded-full border border-white/25 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-            {plan.skipLabel}
-          </button>
-        </div>
-
-        {/* the card */}
-        <div className="relative min-h-0 overflow-y-auto overscroll-contain px-5 md:px-10" style={{ perspective: 1600, touchAction: 'pan-y' }}>
-          <div className="relative mx-auto flex min-h-full max-w-[1240px] items-center py-5">
-            <AnimatePresence mode="popLayout" custom={dir} initial>
-              <m.article key={card.id} custom={dir} variants={slide} initial="enter" animate="center" exit="exit" aria-roledescription="slide" aria-label={`${index + 1} of ${cards.length}`}
-                className="grid w-full items-center gap-8 lg:grid-cols-12 lg:gap-12" style={{ transformStyle: 'preserve-3d' }}>
-                <div className="lg:col-span-7">
-                  <m.div variants={item} className="flex flex-wrap items-center gap-3">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/30 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.16em] backdrop-blur">
-                      <span aria-hidden="true" className="size-2 rounded-full" style={{ background: `rgb(${theme.a})`, boxShadow: `0 0 10px rgb(${theme.a})` }} />{card.name}
-                    </span>
-                    {card.status && <span className="inline-flex items-center rounded-full border border-amber-300/60 bg-amber-300/15 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-amber-200">{card.status}</span>}
-                  </m.div>
-                  <m.h2 variants={item} className="mt-5 font-display text-[clamp(2rem,5.4vw,4.4rem)] font-bold leading-[1.04] tracking-tight [text-wrap:balance]">
-                    {line1}{line2 && <><br /><span className="bg-clip-text text-transparent" style={accent}>{line2}</span></>}
-                  </m.h2>
-                  <div className="mt-5 max-w-2xl space-y-3 text-[clamp(1rem,1.5vw,1.2rem)] leading-relaxed text-white/85">
-                    {card.paragraphs.map((p, i) => <m.p key={i} variants={item}>{p}</m.p>)}
-                  </div>
-                  {(card.exploreLabel && card.exploreLink) || card.franchise ? (
-                    <m.div variants={item} className="mt-7 flex flex-wrap gap-3">
-                      {card.franchise && <button type="button" onClick={() => setFranchise({ division: card.division })} className={glass}>{card.franchiseLabel}</button>}
-                      {card.exploreLabel && card.exploreLink && (
-                        <button type="button" onClick={() => open(card.exploreLink)} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border px-6 font-semibold text-white backdrop-blur transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" style={{ borderColor: `rgb(${theme.a})`, background: `rgba(${theme.a},0.22)` }}>
-                          {card.exploreLabel}{isInternal(card.exploreLink) ? <ArrowRight className="size-4" aria-hidden="true" /> : <><ExternalLink className="size-4" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></>}
-                        </button>
-                      )}
-                    </m.div>
-                  ) : null}
+            <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-6 pb-3 pt-5 [scrollbar-width:thin]">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/30 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] backdrop-blur">
+                    <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: `rgb(${theme.a})`, boxShadow: `0 0 8px rgb(${theme.a})` }} />{card.name}
+                  </span>
+                  {card.status && <span className="inline-flex items-center rounded-full border border-amber-300/60 bg-amber-300/15 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-amber-200">{card.status}</span>}
                 </div>
+              </div>
 
-                {/* the visual: an uploaded image when the administrator set one, otherwise the emblem of the card's background style */}
-                <m.div variants={item} className="hidden lg:col-span-5 lg:flex lg:justify-center" style={{ transform: 'translateZ(60px)' }}>
-                  {card.image ? (
-                    <img src={card.image} alt={card.imageAlt} width="640" height="480" decoding="async" draggable="false" className="max-h-[50vh] w-full rounded-3xl border border-white/25 object-cover shadow-2xl" />
-                  ) : index === 0 ? (
-                    <div className="relative grid place-items-center">
-                      <span aria-hidden="true" className="absolute size-[110%] rounded-full blur-2xl" style={{ background: `radial-gradient(closest-side, rgba(${theme.a},0.55), rgba(${theme.b},0.25) 60%, transparent)` }} />
-                      <img src="/assets/logo-shield.png" alt="LAX360 Pvt Ltd logo" width="284" height="302" decoding="async" draggable="false" className="we-float relative h-[min(38vh,22rem)] w-auto drop-shadow-[0_0_30px_rgba(139,92,246,0.7)]" />
-                    </div>
-                  ) : (
-                    <div aria-hidden="true" className="we-float relative grid size-[min(34vh,20rem)] place-items-center rounded-[2.2rem] border border-white/25 bg-white/[0.07] shadow-2xl backdrop-blur" style={{ boxShadow: `0 30px 80px -30px rgba(${theme.a},0.8)` }}>
-                      <Emblem className="size-1/2" strokeWidth={1.4} style={{ color: `rgb(${theme.a})`, filter: `drop-shadow(0 0 18px rgba(${theme.a},0.8))` }} />
-                    </div>
-                  )}
-                </m.div>
-              </m.article>
-            </AnimatePresence>
-          </div>
-        </div>
+              <div className="mt-3 flex justify-center" aria-hidden={card.image ? undefined : 'true'}>
+                {card.image ? (
+                  <img src={card.image} alt={card.imageAlt} width="480" height="270" decoding="async" draggable="false" className="h-28 w-full rounded-2xl border border-white/25 object-cover shadow-lg" />
+                ) : index === 0 ? (
+                  <img src="/assets/logo-shield.png" alt="" width="284" height="302" decoding="async" draggable="false" className="we-float h-20 w-auto drop-shadow-[0_0_24px_rgba(139,92,246,0.8)]" />
+                ) : (
+                  <span className="we-float grid size-16 place-items-center rounded-3xl border border-white/25 bg-white/[0.08] shadow-xl backdrop-blur" style={{ boxShadow: `0 16px 40px -14px rgba(${theme.a},0.85)` }}>
+                    <Emblem className="size-8" strokeWidth={1.5} style={{ color: `rgb(${theme.a})`, filter: `drop-shadow(0 0 12px rgba(${theme.a},0.8))` }} />
+                  </span>
+                )}
+              </div>
 
-        {/* bottom bar: progress and navigation */}
-        <div className="px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 md:px-10 md:pb-7">
-          <div className="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-5 gap-y-3">
-            <div className="order-1 flex min-w-0 flex-1 basis-full items-center gap-4 md:order-2 md:basis-auto">
-              <p className="shrink-0 font-display text-sm font-semibold tabular-nums tracking-wide" aria-hidden="true"><span className="text-lg">{index + 1}</span> <span className="text-white/60">of {cards.length}</span></p>
-              <ol className="flex min-w-0 flex-1 gap-1.5" aria-label="Cards">
-                {cards.map((c, i) => (
-                  <li key={c.id} className="min-w-0 flex-1">
-                    <button type="button" onClick={() => go(i)} aria-label={`Go to card ${i + 1}: ${c.name}`} aria-current={i === index ? 'step' : undefined} className="group flex h-6 w-full items-center focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white">
-                      <span className="relative block h-1.5 w-full overflow-hidden rounded-full bg-white/20 transition-[height] group-hover:h-2">
-                        <span className="absolute inset-0 origin-left rounded-full" style={{ ...accent, transform: `scaleX(${i <= index ? 1 : 0})`, transition: reduce ? 'none' : 'transform 0.7s cubic-bezier(0.22,1,0.36,1)', opacity: i === index ? 1 : 0.55 }} />
-                      </span>
+              <h2 className="mt-4 font-display text-[1.7rem] font-bold leading-[1.1] tracking-tight [text-wrap:balance]">
+                {line1}{line2 && <><br /><span className="bg-clip-text text-transparent" style={accent}>{line2}</span></>}
+              </h2>
+              <div className="mt-3 space-y-2 text-[0.88rem] leading-relaxed text-white/85">
+                {card.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+              </div>
+              {((card.exploreLabel && card.exploreLink) || card.franchise) && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {card.franchise && <button type="button" onClick={() => setFranchise({ division: card.division })} className={`${btn} border-white/30 bg-white/10`}>{card.franchiseLabel}</button>}
+                  {card.exploreLabel && card.exploreLink && (
+                    <button type="button" onClick={() => open(card.exploreLink)} className={btn} style={{ borderColor: `rgb(${theme.a})`, background: `rgba(${theme.a},0.25)` }}>
+                      {card.exploreLabel}{isInternal(card.exploreLink) ? <ArrowRight className="size-3.5" aria-hidden="true" /> : <><ExternalLink className="size-3.5" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></>}
                     </button>
-                  </li>
-                ))}
-              </ol>
+                  )}
+                </div>
+              )}
             </div>
-            <button type="button" onClick={prev} disabled={index === 0} className="order-2 inline-flex min-h-12 items-center gap-1.5 rounded-full border border-white/30 bg-white/10 pl-3 pr-5 font-semibold text-white backdrop-blur transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-35 md:order-1">
-              <ChevronLeft className="size-5" aria-hidden="true" />Previous
-            </button>
-            <button ref={nextRef} type="button" onClick={next} className="order-3 ml-auto inline-flex min-h-12 min-w-36 items-center justify-center gap-2 rounded-full bg-white px-7 text-base font-bold text-[#0b0b0f] shadow-[0_10px_30px_-8px_rgba(255,255,255,0.45)] transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-              {last ? plan.finalLabel : 'Next'}{last ? <ArrowRight className="size-5" aria-hidden="true" /> : <ChevronRight className="size-5" aria-hidden="true" />}
-            </button>
-          </div>
-        </div>
+
+            {/* progress and navigation: the same place on every card */}
+            <div className="relative border-t border-white/15 bg-black/35 px-4 py-3 backdrop-blur">
+              <div className="mb-2.5 flex items-center gap-3">
+                <p className="shrink-0 font-display text-xs font-semibold tabular-nums tracking-wide" aria-hidden="true">{index + 1}/{cards.length}</p>
+                <ol className="flex min-w-0 flex-1 gap-1" aria-label="Cards">
+                  {cards.map((c, i) => (
+                    <li key={c.id} className="min-w-0 flex-1">
+                      <span aria-hidden="true" className="relative block h-1 overflow-hidden rounded-full bg-white/20">
+                        <span className="absolute inset-0 origin-left rounded-full" style={{ ...accent, transform: `scaleX(${i <= index ? 1 : 0})`, transition: reduce ? 'none' : 'transform 0.55s cubic-bezier(0.22,1,0.36,1)' }} />
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <button type="button" onClick={prev} disabled={index === 0} className="inline-flex min-h-10 items-center gap-1 rounded-full border border-white/30 bg-white/10 pl-2.5 pr-4 text-sm font-semibold transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-35">
+                  <ChevronLeft className="size-4" aria-hidden="true" />Previous
+                </button>
+                <button ref={nextRef} type="button" onClick={next} className="inline-flex min-h-10 min-w-24 items-center justify-center gap-1 rounded-full bg-white pl-5 pr-3.5 text-sm font-bold text-[#0b0b0f] shadow-[0_8px_24px_-8px_rgba(255,255,255,0.5)] transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                  {last ? plan.finalLabel : 'Next'}<ChevronRight className="size-4" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          </m.article>
+        </AnimatePresence>
       </div>
 
       {franchise && <PartnershipModal category="franchise" division={franchise.division} source="welcome-experience" onClose={() => { setFranchise(null); document.documentElement.style.overflow = 'hidden' }} />}
