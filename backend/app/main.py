@@ -112,6 +112,18 @@ def _provision_admin(settings) -> None:
         log.warning("Initial admin provisioning skipped (%s). Run `alembic upgrade head`, then `python -m app.cli provision-admin`.", type(exc).__name__)
 
 
+def _log_video_storage(settings) -> None:
+    """Say at start-up where homepage videos are kept, and shout when that would lose them (no network call here: the admin page runs the real check)."""
+    if bool(settings.supabase_url) != bool(settings.supabase_service_role_key):
+        log.error("Homepage video storage is only partly configured: %s is missing. Videos fall back to this server's disk, which Render wipes on restart. "
+                  "Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_VIDEO_BUCKET.", "SUPABASE_SERVICE_ROLE_KEY" if settings.supabase_url else "SUPABASE_URL")
+    elif settings.video_storage == "supabase":
+        log.info("Homepage videos are stored in Supabase Storage (bucket %r).", settings.hero_video_bucket)
+    elif os.environ.get("RENDER") and not settings.hero_video_disk_is_persistent:
+        log.warning("Homepage videos are stored on this server's disk, which Render wipes on every restart and redeploy. Configure SUPABASE_URL, "
+                    "SUPABASE_SERVICE_ROLE_KEY and SUPABASE_VIDEO_BUCKET, then upload the videos again.")
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(settings.log_level, settings.log_json)
@@ -123,6 +135,7 @@ def create_app() -> FastAPI:
         elif not settings.auth_secret:
             log.warning("AUTH_SECRET is not set: login and chat sessions are unavailable until it is configured.")
         _warn_cross_site_cookies(settings)
+        _log_video_storage(settings)
         _provision_admin(settings)
         if not settings.ai_configured:
             log.warning("AI provider '%s' is not configured (set %s_API_KEY and %s_MODEL): /api/chat will return a safe fallback.", settings.ai_provider, settings.ai_provider.upper(), settings.ai_provider.upper())

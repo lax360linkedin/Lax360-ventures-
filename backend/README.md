@@ -79,8 +79,8 @@ uvicorn app.main:app --reload --port 8000
 
 ### Homepage background videos: permanent storage (Supabase Storage)
 Render's disk is **temporary** (wiped on every restart, redeploy and spin-down), so videos must live in Supabase Storage. On Render set:
-`SUPABASE_URL=https://<project-ref>.supabase.co` and `SUPABASE_SERVICE_ROLE_KEY=<service_role key>` (Project Settings -> API; **backend only**, never in the frontend or Vercel). Optional: `HERO_VIDEO_BUCKET` (default `hero-videos`).
-- The bucket is created **public** on the first upload (visitors play the video straight from the storage CDN); the service key is only used by the backend. If you create it yourself: Storage -> New bucket -> `hero-videos` -> Public. No other storage policies are needed (uploads/deletes use the service key; RLS stays on).
+`SUPABASE_URL=https://<project-ref>.supabase.co` and `SUPABASE_SERVICE_ROLE_KEY=<service_role key>` (Project Settings -> API; **backend only**, never in the frontend or Vercel). and `SUPABASE_VIDEO_BUCKET=lax360-videos` (the bucket name; `HERO_VIDEO_BUCKET` is accepted too; default `lax360-videos`).
+- The bucket is created **public** on the first upload (visitors play the video straight from the storage CDN); the service key is only used by the backend. If you create it yourself: Storage -> New bucket -> `lax360-videos` -> turn on **Public bucket** -> Create. No other storage policies are needed (uploads/deletes use the service key; RLS stays on).
 - An upload only counts as successful after the backend has **verified** the object exists in the bucket and is publicly readable (size checked); otherwise the new object is removed, no record is saved and the admin sees why. A database row is never treated as proof that a file exists.
 - **Deletion only happens when an authorized admin confirms it** (Delete -> confirm). Refreshing, logging out, deactivating, reordering, changing the schedule, a restart or a redeploy never delete a video. Deleting marks the record, removes the stored file, and only after the file is confirmed gone drops the record; if storage refuses, the record is kept as a pending deletion ("Deletions that did not finish") that can be retried or restored. Every step is in the audit log.
 - Admin -> Homepage Videos shows per video: file status (verified/missing/error + time + reason), where it is stored, the last playback result reported by visitors, availability window and fallback. **Check files** re-verifies everything; a missing file is skipped (never deleted) and you can re-upload it with **Replace file**. The star marks the single **fallback video** that plays only when no scheduled video is eligible.
@@ -89,9 +89,19 @@ Render's disk is **temporary** (wiped on every restart, redeploy and spin-down),
 ```powershell
 python -m app.cli hero-videos-report --json > videos-metadata-backup.json   # metadata backup + which stored files exist
 python -m app.cli hero-videos-report --verify                               # also records the check on each video
+python -m app.cli hero-videos-selftest                                      # REAL Supabase test: config, bucket, upload, public read, delete (one temporary file; add --create-bucket to create a missing public bucket)
 python -m app.cli hero-videos-migrate                                       # dry run: videos still on the server disk
 python -m app.cli hero-videos-migrate --apply                               # copy them to Supabase, verified, local file left in place
 ```
+
+**Exact setup (once):**
+1. Supabase dashboard -> *Storage* -> *New bucket* -> name `lax360-videos` -> switch **Public bucket** on -> *Create bucket*. (Optional: bucket settings -> *Restrict file size* 50 MB and allowed types `video/mp4, video/webm, image/jpeg, image/png, image/webp`. The backend also creates the bucket itself on the first upload if it is missing.) Also check *Storage -> Settings -> Global file size limit* is at least 50 MB (the backend's limit is `HERO_VIDEO_MAX_BYTES`, 50 MB).
+2. Supabase -> *Project Settings -> API*: copy the **Project URL** and the **service_role** secret (not the anon key).
+3. Render -> your backend service -> *Environment*: add `SUPABASE_URL` (the Project URL), `SUPABASE_SERVICE_ROLE_KEY` (the service_role key) and `SUPABASE_VIDEO_BUCKET=lax360-videos`; leave `HERO_VIDEO_DISK_IS_PERSISTENT` unset; *Save, rebuild and deploy*.
+4. Admin -> Homepage Videos: the amber "Videos may disappear" warning is replaced by a green **Permanent storage is working** note once the backend has really reached the bucket with the key (it checks the bucket, its public flag and the key; press **Check files** to re-check). If something is wrong the warning names it (key rejected, bucket missing or private, Supabase unreachable). The backend log says the same.
+5. Videos that were uploaded before are listed in an amber note **"N videos must be uploaded again"** (they exist only on Render's disk, or are already lost): on each one press **Replace file** and choose the video again. Its place in the queue, schedule and fallback flag are kept, and the file now goes to Supabase.
+
+**Restart test (proves permanence):** upload a video, confirm it plays on the homepage and in Admin, note its title and the "Stored permanently (lax360-videos)" label. Render -> *Manual Deploy -> Clear build cache & deploy* (or *Restart service*). When it is back, reload the homepage and Admin -> Homepage Videos -> **Check files**: the video must still play and show "verified". In Supabase -> Storage -> `lax360-videos` the object is listed throughout.
 
 ### Security notes for Supabase
 - **Row-level security is enabled on every table (migration 0002) with no policies**, and the `anon`/`authenticated` API roles are

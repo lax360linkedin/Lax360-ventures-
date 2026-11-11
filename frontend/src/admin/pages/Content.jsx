@@ -93,6 +93,7 @@ function FieldInput({ f, value, onChange, props }) {
   if (f.type === 'bool') return <Toggle checked={!!value} onChange={(v) => onChange({ target: { value: v } })} label={value ? 'On' : 'Off'} />
   if (f.type === 'document') return <MediaField {...props} kind="document" value={value} onChange={(v) => onChange({ target: { value: v } })} />
   if (f.type === 'image' || f.type === 'video') return <MediaField {...props} kind={f.type} value={value} onChange={(v) => onChange({ target: { value: v } })} />
+  if (f.ui === 'date') return <Input {...props} type="date" value={value} onChange={onChange} />
   if (f.type === 'textarea') return <Textarea {...props} maxLength={f.max} value={value} onChange={onChange} />
   if (f.ui === 'service') return <ServiceSingle f={f} value={value} onChange={onChange} props={props} />
   if (f.ui === 'services') return <ServiceMulti f={f} value={value} onChange={onChange} props={props} />

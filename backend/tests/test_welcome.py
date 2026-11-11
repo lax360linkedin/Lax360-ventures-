@@ -47,3 +47,16 @@ def test_welcome_cards_are_managed_validated_ordered_and_published(app, db, clie
     assert page[0]["data"]["enabled"] is False  # the master switch is what the website reads
     assert admin.patch(f"/api/admin/content/item/{ok.json()['id']}", json={"status": "draft"}, headers=csrf).status_code == 200
     assert [i["title"] for i in client.get("/api/public/content?kind=welcome_card").json()["items"]] == ["Second card"]  # unpublished = hidden
+
+
+def test_festival_and_offer_cards_have_a_type_and_a_valid_schedule(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    base = {"theme": "celebration", "headline": "Happy Diwali!", "description": "Warm wishes from LAX360.", "card_type": "festival", "start_date": "2026-11-01", "end_date": "2026-11-15"}
+    post = lambda title="Diwali", **extra: admin.post("/api/admin/content/welcome_card", json={"title": title, "data": {**base, **extra}, "status": "published", "sort_order": 5}, headers=csrf)  # noqa: E731
+    ok = post()
+    assert ok.status_code == 201, ok.text
+    for bad in ({"card_type": "party"}, {"start_date": "01-11-2026"}, {"end_date": "2026-10-01"}, {"theme": "disco"}):
+        assert post(**bad).status_code == 422, bad
+    assert post("Sale", start_date="", end_date="", card_type="offer").status_code == 201  # no dates = always active
+    data = {i["title"]: i["data"] for i in client.get("/api/public/content?kind=welcome_card").json()["items"]}
+    assert data["Diwali"]["card_type"] == "festival" and data["Diwali"]["start_date"] == "2026-11-01" and data["Diwali"]["end_date"] == "2026-11-15"

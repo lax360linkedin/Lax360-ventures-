@@ -28,7 +28,7 @@ const NAV = [
   { section: 'Leads & customers', to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests', hint: 'Requests for a product demonstration' },
   { section: 'Website', to: '/company-admin/content', label: 'Website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'], hint: 'Edit every page, section, list and text of the public website' },
   { section: 'Website', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
-  { section: 'Website', to: '/company-admin/welcome', label: 'Welcome Experience', icon: Sparkles, module: 'content', hint: 'The interactive welcome cards shown after the intro animation' },
+  { section: 'Website', to: '/company-admin/welcome', label: 'Welcome cards', icon: Sparkles, module: 'content', hint: 'Welcome cards, festival greetings and offers shown after the intro animation' },
   { section: 'Website', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
   { section: 'Website', to: '/company-admin/media', label: 'Media library', icon: ImageIcon, module: 'media', hint: 'Images, PDFs and videos used on the website' },
   { section: 'Website', to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos', hint: 'The scheduled background videos of the home page' },

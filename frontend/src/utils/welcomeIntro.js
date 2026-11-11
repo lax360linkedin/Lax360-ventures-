@@ -13,7 +13,7 @@
 //   cards     – the welcome cards are showing over the held-back homepage; leaving them reveals the homepage ('revealing' -> 'done')
 // The cards are managed in the admin panel (Welcome Experience). They are shown once per browsing session (sessionStorage, optional) and can be replayed from the footer.
 import { useSyncExternalStore } from 'react'
-import { getState } from '../services/siteService.js'
+import { getState, loadContent, subscribe as subscribeContent } from '../services/siteService.js'
 import { toParagraphs } from './cms.js'
 
 const prefersReducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -34,9 +34,33 @@ if (state === 'pending') {
 const listeners = new Set()
 const subscribe = (cb) => { listeners.add(cb); return () => listeners.delete(cb) }
 
+const CONTENT_WAIT_MS = 10000
+const contentWait = { waiting: false, gaveUp: false }
+function waitForContent() {
+  if (contentWait.waiting) return
+  contentWait.waiting = true
+  loadContent()
+  let unsub = () => {}
+  let timer = 0
+  const resume = (gaveUp) => {
+    if (!contentWait.waiting) return
+    contentWait.waiting = false
+    contentWait.gaveUp = gaveUp || contentWait.gaveUp
+    window.clearTimeout(timer)
+    unsub()
+    if (state === 'revealing' || state === 'playing') setIntroState('done') // decide now: cards if there are some, otherwise the homepage
+  }
+  unsub = subscribeContent(() => { if (getState().ready) resume(false) })
+  timer = window.setTimeout(() => resume(true), CONTENT_WAIT_MS)
+}
+
 export function setIntroState(next) {
   // The intro animation (unchanged) ends by setting 'done': when the welcome cards are enabled they follow it, floating over the homepage, instead.
-  if (next === 'done' && (state === 'revealing' || state === 'playing') && welcomePlan()) next = 'cards'
+  if (next === 'done' && (state === 'revealing' || state === 'playing')) {
+    // The managed content may still be on its way (a slow or cold-starting server): wait for it (bounded) instead of deciding "no cards" too early.
+    if (!getState().ready && !contentWait.gaveUp) { waitForContent(); return }
+    if (welcomePlan()) next = 'cards'
+  }
   if (state === next) return
   state = next
   if (typeof document !== 'undefined') {
@@ -54,29 +78,44 @@ const SEEN_KEY = 'lax360-welcome-seen'
 let forced = false // a visitor asked to see it again (footer): ignore the once-per-session rule
 let previewing = false // an administrator is previewing it: ignore the on/off switches
 
-export const welcomeSeen = () => { try { return sessionStorage.getItem(SEEN_KEY) === '1' } catch { return false } }
-export const markWelcomeSeen = () => { try { sessionStorage.setItem(SEEN_KEY, '1') } catch { /* storage blocked: it may show again, which is harmless */ } }
+// What the visitor has already seen is remembered with the list of promotional cards that were in front of them, so a NEW festival greeting or offer is shown even in a
+// browsing session that has already seen the regular cards.
+export const welcomeSeen = (sig = '') => { try { return sessionStorage.getItem(SEEN_KEY) === `seen:${sig}` } catch { return false } }
+export const markWelcomeSeen = (sig = '') => { try { sessionStorage.setItem(SEEN_KEY, `seen:${sig}`) } catch { /* storage blocked: it may show again, which is harmless */ } }
 export const isWelcomePreview = () => previewing
+
+const PROMO_LABEL = { festival: 'Festival greeting', announcement: 'Announcement', offer: 'Special offer' }
+const localToday = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
 
 export function normaliseWelcomeCard(item) {
   const d = item.data || {}
+  const promo = PROMO_LABEL[d.card_type] ? d.card_type : ''
   return {
     id: item.id || item.slug, slug: item.slug, name: item.title, theme: d.theme || 'welcome', headline: d.headline || item.title, paragraphs: toParagraphs(d.description),
-    status: d.status_label || '', image: d.image || '', imageAlt: d.image_alt || '', exploreLabel: d.explore_label || '', exploreLink: d.explore_link || '',
+    promo, status: d.status_label || (promo ? PROMO_LABEL[promo] : ''), image: d.image || '', imageAlt: d.image_alt || '', exploreLabel: d.explore_label || '', exploreLink: d.explore_link || '',
     franchise: d.franchise_enabled === true, franchiseLabel: d.franchise_label || 'Franchise Opportunities', division: d.franchise_division || item.title,
-    enabled: d.enabled !== false, order: item.sort_order || 0,
+    enabled: d.enabled !== false, order: item.sort_order || 0, start: d.start_date || '', end: d.end_date || '',
   }
 }
 
-/** The welcome experience to show now ({ cards, skipLabel, finalLabel }), or null when it is off, has no cards, was already seen this session or the content is not loaded. */
+/** Is the card inside its start / end dates today (inclusive)? A card with no dates is always inside. Expired and not-yet-started cards are not shown. */
+export const welcomeCardActive = (c, today = localToday()) => (!c.start || c.start <= today) && (!c.end || c.end >= today)
+
+/** The welcome experience to show now ({ cards, finalLabel, sig }), or null when it is off, has nothing to show, was already seen this session or the content is not loaded.
+ *  Active festival greetings / announcements / offers come first (in their configured order), then the regular cards in theirs. */
 export function welcomePlan() {
   const { content, ready } = getState()
   if (!ready) return null
   const page = (content.welcome_page || [])[0]?.data || {}
   if (!previewing && page.enabled === false) return null
-  if (!previewing && !forced && page.once_per_session !== false && welcomeSeen()) return null
-  const cards = (content.welcome_card || []).map(normaliseWelcomeCard).filter((c) => c.enabled).sort((a, b) => a.order - b.order)
-  return cards.length ? { cards, finalLabel: page.final_label || 'Next' } : null
+  const today = localToday()
+  const byOrder = (a, b) => a.order - b.order
+  const live = (content.welcome_card || []).map(normaliseWelcomeCard).filter((c) => c.enabled && (previewing || welcomeCardActive(c, today)))
+  const cards = [...live.filter((c) => c.promo).sort(byOrder), ...live.filter((c) => !c.promo).sort(byOrder)]
+  const sig = live.filter((c) => c.promo).map((c) => c.id).sort().join(',')
+  if (!cards.length) return null
+  if (!previewing && !forced && page.once_per_session !== false && welcomeSeen(sig)) return null
+  return { cards, sig }
 }
 
 /** Show the cards now (the intro animation has ended or was skipped). Returns false when there is nothing to show. */

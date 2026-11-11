@@ -82,7 +82,7 @@ def _out(settings: Settings, v: HeroVideo, res: svc.Resolution, windows: dict) -
             "poster_url": (svc.media_url(settings, v, "poster") or f"/api/admin/hero-videos/{v.id}/poster?v={int(v.updated_at.timestamp())}") if v.poster_key else None}
 
 
-def _state(db: Session, settings: Settings) -> dict:
+def _state(db: Session, settings: Settings, force_check: bool = False) -> dict:
     res = svc.resolve(db, settings)
     cfg = svc.get_config(db, settings)
     windows = res.windows()
@@ -95,7 +95,8 @@ def _state(db: Session, settings: Settings) -> dict:
         "current": _summary(settings, res.current), "next": _summary(settings, res.next), "server_time": _iso(settings, res.now),
         "limits": {"max_bytes": settings.hero_video_max_bytes, "types": ["video/mp4", "video/webm"], "min_seconds": svc.MIN_SECONDS, "max_seconds": svc.MAX_SECONDS},
         "usage": {"files": int(count), "bytes": int(size)},
-        "storage": svc.storage_info(settings),
+        "storage": svc.storage_status(settings, force=force_check),
+        "reupload": [{"id": str(v.id), "title": v.title, "file_ok": svc.is_available(settings, v)} for v in svc.needs_reupload(settings, videos)],
     }
 
 
@@ -296,7 +297,7 @@ def verify_all(user: User = Depends(write), db: Session = Depends(get_db), setti
     results = [svc.verify_video(settings, v) for v in db.scalars(select(HeroVideo).where(HeroVideo.deleted_at.is_(None)))]
     audit_service.record(db, user, "hero_video.verify_all", resource_type="hero_video", detail={"ok": results.count("ok"), "problems": len(results) - results.count("ok")})
     db.commit()
-    return _state(db, settings)
+    return _state(db, settings, force_check=True)  # "Check files" also re-checks the Supabase connection
 
 
 @router.post("/{video_id}/verify")

@@ -10,6 +10,7 @@
     python -m app.cli check-config
     python -m app.cli check-ai
     python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
+    python -m app.cli hero-videos-selftest [--create-bucket]    (real Supabase check: bucket, upload, public read, delete a temporary test video)
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
     python -m app.cli seed-network [--remove]                   (load the Our Network starter content; designations start unverified; --remove deletes only those)
     python -m app.cli seed-service-demo [--remove]               (load FICTIONAL demo clients and testimonials for every service page; labelled Sample; --remove deletes only those)
@@ -240,6 +241,81 @@ def hero_videos_report(args: argparse.Namespace) -> None:
     local = [r for r in out if r["storage"] == "local"]
     print(f"\n{len(out)} video(s): {len(out) - len(bad)} verified, {len(bad)} need attention, {len(local)} held only on the server disk (temporary: run hero-videos-migrate while the file is still there).")
     print("No records or files were deleted or changed by this report.")
+
+
+def hero_videos_selftest(args: argparse.Namespace) -> None:
+    """Prove the Supabase video storage works with the REAL project: configuration, bucket, upload, public read, delete. Uses one tiny temporary object
+    (selftest-<random>.mp4) that is removed again. Secrets are never printed. Exit code 1 when anything fails."""
+    import os
+    import uuid
+    from pathlib import Path
+    import tempfile
+
+    import httpx
+
+    from app.services import hero_video_service as svc
+
+    settings = get_settings()
+    key_set = bool(settings.supabase_service_role_key)
+    url_ok = (settings.supabase_url or "").startswith("https://")
+    results: list[tuple[str, bool, str]] = []
+
+    def step(name: str, ok: bool, detail: str = "") -> bool:
+        results.append((name, ok, detail))
+        print(f"[{'PASS' if ok else 'FAIL'}] {name}" + (f": {detail}" if detail else ""))
+        return ok
+
+    print(f"Render environment detected: {'yes' if os.environ.get('RENDER') else 'no (local run)'}")
+    step("SUPABASE_URL is set (https://<project-ref>.supabase.co)", url_ok, "" if url_ok else "missing, or not an https address")
+    step("SUPABASE_SERVICE_ROLE_KEY is set", key_set, "" if key_set else "missing")
+    print(f"Bucket name in use (SUPABASE_VIDEO_BUCKET): {settings.hero_video_bucket}")
+    if not (url_ok and key_set):
+        print("Supabase is not configured in this environment's .env / environment variables, so videos would go to the server disk. Nothing was tested.")
+        raise SystemExit(1)
+    health = svc._probe_storage(settings)
+    if health["status"] == "bucket_missing" and args.create_bucket:
+        with svc._client() as http:
+            r = http.post(f"{svc._storage_base(settings)}/bucket", json={"id": settings.hero_video_bucket, "name": settings.hero_video_bucket, "public": True,
+                                                                         "file_size_limit": settings.hero_video_max_bytes,
+                                                                         "allowed_mime_types": ["video/mp4", "video/webm", "image/jpeg", "image/png", "image/webp"]}, headers=svc._storage_headers(settings, "application/json"))
+        print(f"Bucket creation requested: HTTP {r.status_code}")
+        health = svc._probe_storage(settings)
+    if not step("Bucket exists, the key is accepted and the bucket is public", health["status"] == "ok", health["detail"]):
+        raise SystemExit(1)
+    key = f"selftest-{uuid.uuid4().hex}.mp4"
+    payload = bytes([0, 0, 0, 24]) + b"ftypmp42" + bytes(4) + b"mp42isom" + b"LAX360 storage self-test " * 40
+    tmp = Path(tempfile.gettempdir()) / key
+    tmp.write_bytes(payload)
+    try:
+        try:
+            svc._upload_object(settings, tmp, key, "video/mp4")
+            step("Upload a test video through the backend", True, f"{len(payload)} bytes")
+        except Exception as exc:  # noqa: BLE001 - report any failure, never a traceback with secrets
+            step("Upload a test video through the backend", False, getattr(exc, "message", None) or type(exc).__name__)
+            raise SystemExit(1) from None
+        status, detail = svc.verify_remote(settings, key, len(payload))
+        step("Backend can read it back and it is publicly playable (size matches)", status == "ok", detail)
+        with svc._client() as http:
+            pub = http.get(svc.public_url(settings, key), headers={"Range": "bytes=0-31"})
+        step("Anyone can fetch it from the public address (what visitors use)", pub.status_code in (200, 206) and pub.content[4:8] == b"ftyp", f"HTTP {pub.status_code}")
+        step("Delete the test video", svc._delete_object(settings, key))
+        gone, _ = svc.verify_remote(settings, key, None)
+        step("It is gone after deletion", gone == "missing")
+    finally:
+        tmp.unlink(missing_ok=True)
+        if not any(n.startswith("Delete") and ok for n, ok, _ in results):
+            svc._delete_object(settings, key)
+    with _factory()() as db:
+        videos = [v for v in _hero_rows(db) if v.deleted_at is None]
+        local = [(v.title, svc.is_available(settings, v)) for v in videos if v.storage == "local"]
+        db.rollback()
+    print(f"Homepage videos recorded: {len(videos)}; stored in Supabase: {len(videos) - len(local)}; only on the server disk (must be uploaded again): {len(local)}")
+    for title, on_disk in local:
+        print(f"  - {title}: {'file still on this disk (run hero-videos-migrate --apply here, or use Replace file in the admin)' if on_disk else 'file already lost: use Replace file in the admin and choose the video again'}")
+    failed = [n for n, ok, _ in results if not ok]
+    print("RESULT: " + ("ALL CHECKS PASSED: Supabase video storage works with this project." if not failed else f"{len(failed)} check(s) failed."))
+    if failed:
+        raise SystemExit(1)
 
 
 def hero_videos_migrate(args: argparse.Namespace) -> None:
@@ -684,6 +760,9 @@ def main(argv: list[str] | None = None) -> None:
     hm = sub.add_parser("hero-videos-migrate", help="copy videos held on the server disk to Supabase Storage (verified; never deletes)")
     hm.add_argument("--apply", action="store_true", help="actually copy (default is a dry run)")
     hm.set_defaults(func=hero_videos_migrate)
+    hst = sub.add_parser("hero-videos-selftest", help="test the real Supabase video storage: config, bucket, upload, public read, delete (one temporary object; secrets never printed)")
+    hst.add_argument("--create-bucket", action="store_true", help="create the public bucket if it does not exist")
+    hst.set_defaults(func=hero_videos_selftest)
     sprod = sub.add_parser("seed-products", help="load the LAX360 product portfolio into the CMS (all as Coming soon), or --remove those rows")
     sprod.add_argument("--remove", action="store_true")
     sprod.set_defaults(func=seed_products)

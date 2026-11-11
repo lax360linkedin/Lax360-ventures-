@@ -8,7 +8,7 @@ from tests.test_admin_hero_videos import active, admin, clock, make_mp4, upload,
 
 PROJECT = "https://abcdefgh.supabase.co"
 SERVICE_KEY = "service-role-key-for-tests-only"
-BUCKET = "hero-videos"
+BUCKET = "lax360-videos"
 
 
 class FakeStorage:
@@ -29,6 +29,10 @@ class FakeStorage:
 
             self.buckets.add(json.loads(request.content)["id"])
             return httpx.Response(200, json={"name": "created"})
+        if request.method == "GET" and path.startswith("/storage/v1/bucket/"):  # the bucket's metadata (what the admin check reads)
+            if path.rsplit("/", 1)[1] not in self.buckets:
+                return httpx.Response(404, json={"statusCode": "404", "error": "Bucket not found", "message": "Bucket not found"})
+            return httpx.Response(200, json={"id": path.rsplit("/", 1)[1], "public": not self.private_bucket})
         prefix = "/storage/v1/object/"
         if request.method == "POST" and path.startswith(prefix):
             bucket, _, key = path[len(prefix):].partition("/")
@@ -46,7 +50,8 @@ class FakeStorage:
             if kind == "public" and self.private_bucket:
                 return httpx.Response(400, json={"message": "Bucket not public"})
             data = self.objects[key][1]
-            return httpx.Response(206, content=data[:1], headers={"content-range": f"bytes 0-0/{len(data)}"})
+            end = int(request.headers.get("range", "bytes=0-0").rsplit("-", 1)[1])  # honour the requested byte range, like the real service
+            return httpx.Response(206, content=data[: end + 1], headers={"content-range": f"bytes 0-{min(end, len(data) - 1)}/{len(data)}"})
         if request.method == "DELETE" and path.startswith(prefix):
             if self.fail_deletes:
                 return httpx.Response(500, json={"message": "boom"})
@@ -58,6 +63,7 @@ class FakeStorage:
 @pytest.fixture
 def storage(monkeypatch, env, videos_dir):  # noqa: F811
     fake = FakeStorage()
+    svc._HEALTH.clear()
     monkeypatch.setattr(svc, "_client", lambda: httpx.Client(transport=httpx.MockTransport(fake)))
     env(SUPABASE_URL=PROJECT, SUPABASE_SERVICE_ROLE_KEY=SERVICE_KEY, HERO_VIDEO_BUCKET=BUCKET)
     return fake
@@ -301,3 +307,96 @@ def test_migration_copies_disk_videos_to_storage_without_deleting_the_local_file
     assert "MOVED" in capsys.readouterr().out and len(fake.objects) == 1 and list(videos_dir.glob("*.mp4"))
     row = items(admin)["Old"]
     assert row["storage"] == "supabase" and row["verify_status"] == "ok"
+
+
+# ---- the admin warning appears only when permanent storage is genuinely not usable --------------------------------------------------------------
+def test_the_default_bucket_is_lax360_videos(env):
+    from app.core.config import get_settings
+
+    env(HERO_VIDEO_BUCKET=None, SUPABASE_VIDEO_BUCKET=None)
+    assert get_settings().hero_video_bucket == "lax360-videos"
+
+
+def test_a_verified_bucket_shows_no_warning_and_every_failure_is_named(storage, monkeypatch, caplog):
+    from app.core.config import get_settings
+
+    storage.buckets.add(BUCKET)
+    ok = svc.storage_status(get_settings(), force=True)
+    assert ok["verified"] is True and ok["durable"] is True and "warning" not in ok and "verified" in ok["detail"]
+    storage.private_bucket = True
+    private = svc.storage_status(get_settings(), force=True)
+    assert private["problem"] == "bucket_private" and "Public" in private["warning"] and private["durable"] is False
+    storage.private_bucket = False
+    storage.buckets.clear()
+    missing = svc.storage_status(get_settings(), force=True)
+    assert missing["problem"] == "bucket_missing" and BUCKET in missing["warning"]
+    storage.buckets.add(BUCKET)
+    monkeypatch.setattr(svc, "_client", lambda: httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(401, json={"message": "bad key"}))))
+    assert svc.storage_status(get_settings(), force=True)["problem"] == "auth_failed"
+
+    def boom(request):
+        raise httpx.ConnectError("down")
+
+    monkeypatch.setattr(svc, "_client", lambda: httpx.Client(transport=httpx.MockTransport(boom)))
+    with caplog.at_level("ERROR", logger="app.hero_video"):
+        assert svc.storage_status(get_settings(), force=True)["problem"] == "unreachable"
+    assert "unreachable" in caplog.text and SERVICE_KEY not in caplog.text
+
+
+def test_half_configured_and_unconfigured_render_are_flagged(env, monkeypatch):
+    from app.core.config import get_settings
+
+    env(SUPABASE_URL=PROJECT, SUPABASE_SERVICE_ROLE_KEY=None)
+    half = svc.storage_status(get_settings())
+    assert half["problem"] == "partly_configured" and "SUPABASE_SERVICE_ROLE_KEY" in half["warning"]
+    monkeypatch.setenv("RENDER", "true")
+    env(SUPABASE_URL=None, SUPABASE_SERVICE_ROLE_KEY=None)
+    none = svc.storage_status(get_settings())
+    assert none["problem"] == "not_configured" and none["headline"] == "Videos may disappear."
+
+
+def test_videos_still_on_the_temporary_disk_are_listed_for_reupload(env, videos_dir, admin, monkeypatch):  # noqa: F811
+    c, csrf = admin
+    env(SUPABASE_URL=None, SUPABASE_SERVICE_ROLE_KEY=None)
+    assert upload(admin, "old").status_code == 201
+    fake = FakeStorage()
+    fake.buckets.add(BUCKET)
+    monkeypatch.setattr(svc, "_client", lambda: httpx.Client(transport=httpx.MockTransport(fake)))
+    svc._HEALTH.clear()
+    env(SUPABASE_URL=PROJECT, SUPABASE_SERVICE_ROLE_KEY=SERVICE_KEY, HERO_VIDEO_BUCKET=BUCKET)
+    state = c.get("/api/admin/hero-videos").json()
+    assert [v["title"] for v in state["reupload"]] == ["old"] and state["reupload"][0]["file_ok"] is True
+    assert state["storage"]["verified"] is True and SERVICE_KEY not in str(state)
+
+
+def test_upload_errors_say_what_is_wrong(storage, admin):  # noqa: F811
+    storage.buckets.add(BUCKET)
+    assert upload(admin, "a").status_code == 201
+    storage.fail_uploads = True
+    bad = upload(admin, "b")
+    assert bad.status_code == 502 and bad.json()["error"]["code"] == "storage_unavailable"
+
+
+def test_selftest_command_proves_upload_public_read_and_delete(storage, db, monkeypatch, capsys):
+    import argparse
+    import contextlib
+
+    from app import cli
+
+    storage.buckets.add(BUCKET)
+    monkeypatch.setattr(cli, "_factory", lambda: (lambda: contextlib.nullcontext(db)))
+    cli.hero_videos_selftest(argparse.Namespace(create_bucket=False))
+    out = capsys.readouterr().out
+    assert "ALL CHECKS PASSED" in out and "[FAIL]" not in out and SERVICE_KEY not in out
+    assert not storage.objects  # the temporary test object was removed again
+
+
+def test_selftest_command_fails_clearly_without_configuration(env, capsys):
+    import argparse
+
+    from app import cli
+
+    env(SUPABASE_URL=None, SUPABASE_SERVICE_ROLE_KEY=None)
+    with pytest.raises(SystemExit) as e:
+        cli.hero_videos_selftest(argparse.Namespace(create_bucket=False))
+    assert e.value.code == 1 and "SUPABASE_URL is set" in capsys.readouterr().out

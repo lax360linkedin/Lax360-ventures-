@@ -15,6 +15,7 @@ import hashlib
 import logging
 import os
 import struct
+import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -81,32 +82,45 @@ def _storage_base(settings: Settings) -> str:
     return f"{(settings.supabase_url or '').rstrip('/')}/storage/v1"
 
 
-def public_url(settings: Settings, key: str) -> str:
+def public_url(settings: Settings, key: str, bucket: str | None = None) -> str:
     """The CDN address of a stored file (the bucket is public; keys are random, so only addresses we hand out are known)."""
-    return f"{_storage_base(settings)}/object/public/{settings.hero_video_bucket}/{key}"
+    return f"{_storage_base(settings)}/object/public/{bucket or settings.hero_video_bucket}/{key}"
 
 
 def media_url(settings: Settings, video: HeroVideo, kind: str = "file") -> str | None:
-    """Direct file address when the file lives in object storage; None for local files (those go through this API)."""
+    """Direct file address when the file lives in object storage; None for local files (those go through this API).
+    A video keeps the bucket it was uploaded to, so it still plays if SUPABASE_VIDEO_BUCKET is changed later."""
     key = video.storage_key if kind == "file" else video.poster_key
-    return public_url(settings, key) if key and video.storage == "supabase" else None
+    return public_url(settings, key, video.bucket) if key and video.storage == "supabase" else None
 
 
 def _upload_object(settings: Settings, path: Path, key: str, content_type: str) -> None:
     url = f"{_storage_base(settings)}/object/{settings.hero_video_bucket}/{key}"
-    with _client() as http:
-        def put():
-            with path.open("rb") as f:
-                return http.post(url, content=f, headers={**_storage_headers(settings, content_type), "x-upsert": "true", "Cache-Control": "max-age=31536000"})
+    try:
+        with _client() as http:
+            def put():
+                with path.open("rb") as f:
+                    return http.post(url, content=f, headers={**_storage_headers(settings, content_type), "x-upsert": "true", "Cache-Control": "max-age=31536000"})
 
-        r = put()
-        if r.status_code in (400, 404) and "bucket" in r.text.lower() and "not found" in r.text.lower():  # first use: create the public bucket, then retry once
-            http.post(f"{_storage_base(settings)}/bucket", json={"id": settings.hero_video_bucket, "name": settings.hero_video_bucket, "public": True,
-                                                                 "file_size_limit": settings.hero_video_max_bytes,
-                                                                 "allowed_mime_types": ["video/mp4", "video/webm", "image/jpeg", "image/png", "image/webp"]},headers=_storage_headers(settings, "application/json"))
             r = put()
+            if r.status_code in (400, 404) and "bucket" in r.text.lower() and "not found" in r.text.lower():  # first use: create the public bucket, then retry once
+                log.info("Supabase Storage bucket %r not found: creating it (public)", settings.hero_video_bucket)
+                created = http.post(f"{_storage_base(settings)}/bucket", json={"id": settings.hero_video_bucket, "name": settings.hero_video_bucket, "public": True,
+                                                                               "file_size_limit": settings.hero_video_max_bytes,
+                                                                               "allowed_mime_types": ["video/mp4", "video/webm", "image/jpeg", "image/png", "image/webp"]}, headers=_storage_headers(settings, "application/json"))
+                if created.status_code >= 300:
+                    log.error("Could not create the Supabase Storage bucket %r: HTTP %s %s", settings.hero_video_bucket, created.status_code, created.text[:300])
+                    raise ApiError(502, "storage_bucket_missing", f"The storage bucket “{settings.hero_video_bucket}” does not exist and could not be created. Create it in Supabase (Storage > New bucket, Public) and try again.")
+                r = put()
+    except httpx.HTTPError as exc:
+        log.error("Supabase Storage unreachable during upload: %s", type(exc).__name__)
+        raise ApiError(502, "storage_unreachable", "Could not reach Supabase Storage. Check SUPABASE_URL and the network, then try again.") from None
     if r.status_code >= 300:
         log.error("Supabase Storage upload failed: HTTP %s %s", r.status_code, r.text[:300])
+        if r.status_code in (401, 403):
+            raise ApiError(502, "storage_auth_failed", "Supabase rejected the storage credentials. Check that SUPABASE_SERVICE_ROLE_KEY is the project's service_role key (not the anon key) and belongs to the project in SUPABASE_URL.")
+        if r.status_code == 413:
+            raise ApiError(502, "storage_file_too_large", "Supabase rejected the file as too large. Raise the file size limit of the bucket or the project (Storage settings), then try again.")
         raise ApiError(502, "storage_unavailable", "The video could not be saved to storage. Check the Supabase storage settings and try again.")
 
 
@@ -189,6 +203,79 @@ def storage_info(settings: Settings) -> dict:
     return {"backend": "local", "durable": durable, "detail": f"Server disk ({settings.hero_video_dir})",
             "warning": None if durable else "Videos are stored on this server's disk, which Render wipes on every restart and redeploy. Configure SUPABASE_URL and "
                                             "SUPABASE_SERVICE_ROLE_KEY (or attach a persistent disk and set HERO_VIDEO_DISK_IS_PERSISTENT=true), then upload the videos again."}
+
+
+_HEALTH: dict = {}
+HEALTH_TTL_SECONDS = 60
+
+
+def _probe_storage(settings: Settings) -> dict:
+    """One short real request to Supabase Storage (the bucket's metadata, with the service key): are the URL, the key and the bucket usable, and is the bucket public?"""
+    bucket = settings.hero_video_bucket
+    try:
+        with _client() as http:
+            r = http.get(f"{_storage_base(settings)}/bucket/{bucket}", headers=_storage_headers(settings), timeout=10.0)
+    except httpx.HTTPError as exc:
+        log.error("Supabase Storage is unreachable (%s). Check SUPABASE_URL (%s) and the network.", type(exc).__name__, (settings.supabase_url or "")[:60])
+        return {"status": "unreachable", "detail": "Supabase Storage could not be reached. Check that SUPABASE_URL is the project's https://<project-ref>.supabase.co address."}
+    if r.status_code in (401, 403):
+        log.error("Supabase Storage rejected the service role key (HTTP %s). Check SUPABASE_SERVICE_ROLE_KEY and SUPABASE_URL belong to the same project.", r.status_code)
+        return {"status": "auth_failed", "detail": "Supabase rejected the credentials. SUPABASE_SERVICE_ROLE_KEY must be the project's service_role key (not the anon key) and belong to the project in SUPABASE_URL."}
+    if r.status_code == 404 or (r.status_code == 400 and "not found" in r.text.lower()):
+        log.warning("Supabase Storage bucket %r does not exist.", bucket)
+        return {"status": "bucket_missing", "detail": f"The storage bucket “{bucket}” does not exist. Create it in Supabase (Storage > New bucket > name “{bucket}”, Public), or upload a video once and it is created for you."}
+    if r.status_code != 200:
+        log.error("Supabase Storage check failed: HTTP %s %s", r.status_code, r.text[:200])
+        return {"status": "error", "detail": f"Supabase Storage answered HTTP {r.status_code} when checking the bucket."}
+    try:
+        public = bool(r.json().get("public"))
+    except ValueError:
+        public = False
+    if not public:
+        log.warning("Supabase Storage bucket %r is private: visitors could not play the videos.", bucket)
+        return {"status": "bucket_private", "detail": f"The storage bucket “{bucket}” is private, so visitors could not play the videos. Open it in Supabase (Storage > {bucket} > Edit bucket) and turn on Public bucket."}
+    return {"status": "ok", "detail": f"Supabase Storage bucket “{bucket}” is reachable and public."}
+
+
+def storage_health(settings: Settings, force: bool = False) -> dict | None:
+    """The result of the real Supabase check (cached for a minute so the admin page stays fast; `force` re-checks). None when Supabase is not in use."""
+    if settings.video_storage != "supabase":
+        return None
+    ck = (settings.supabase_url, settings.hero_video_bucket, hash(settings.supabase_service_role_key.get_secret_value() if settings.supabase_service_role_key else ""))
+    hit = _HEALTH.get("v")
+    if hit and not force and hit["ck"] == ck and time.monotonic() - hit["at"] < HEALTH_TTL_SECONDS:
+        return hit["res"]
+    res = _probe_storage(settings)
+    _HEALTH["v"] = {"ck": ck, "at": time.monotonic(), "res": res}
+    return res
+
+
+def storage_status(settings: Settings, force: bool = False) -> dict:
+    """What the admin page shows. The "may disappear" warning appears ONLY when permanent storage is genuinely not usable: not configured, half configured,
+    or Supabase is configured but the check fails (bad key, unreachable, bucket missing or private). A verified Supabase bucket shows no warning."""
+    info = storage_info(settings)
+    if bool(settings.supabase_url) != bool(settings.supabase_service_role_key):
+        missing = "SUPABASE_SERVICE_ROLE_KEY" if settings.supabase_url else "SUPABASE_URL"
+        info.update(durable=False, problem="partly_configured", headline="Video storage is not fully configured.",
+                    warning=f"{missing} is missing on the server, so Supabase Storage is not used. Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_VIDEO_BUCKET, restart the backend, then upload the videos again.")
+        return info
+    if info["backend"] == "supabase":
+        health = storage_health(settings, force)
+        info["health"] = health
+        if health["status"] == "ok":
+            info["verified"] = True
+            info["detail"] = f"Supabase Storage bucket “{settings.hero_video_bucket}” (verified)"
+        else:
+            info.update(durable=False, problem=health["status"], headline="Video storage needs attention.", warning=health["detail"])
+    elif info.get("warning"):
+        info.update(problem="not_configured", headline="Videos may disappear.")
+    return info
+
+
+def needs_reupload(settings: Settings, videos) -> list:
+    """Videos that exist only on this server's disk although it is temporary (Supabase is in use or this is Render): they must be uploaded again."""
+    temporary = settings.video_storage == "supabase" or (bool(os.environ.get("RENDER")) and not settings.hero_video_disk_is_persistent)
+    return [v for v in videos if temporary and v.storage == "local" and v.deleted_at is None]
 
 
 def require_durable(settings: Settings) -> None:

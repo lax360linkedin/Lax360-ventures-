@@ -56,7 +56,7 @@ def snapshot(db: Session, settings: Settings) -> list[dict]:
     items.append(_item("media", "Media library", "connected", f"{count} files, {size / 1024 / 1024:.1f} MB (file data lives in object storage; older uploads stay in the database)."))
     from app.services import hero_video_service
 
-    store = hero_video_service.storage_info(settings)
+    store = hero_video_service.storage_status(settings)
     items.append(_item("video_storage", "Homepage video storage", "connected" if store["durable"] else "configuration_missing", store.get("warning") or store["detail"]))
     from app.services import object_storage
 

@@ -31,7 +31,8 @@ def F(name, label, kind="text", required=False, max_len=300, options=None, help=
 
 WELCOME_THEMES = [{"value": v, "label": l} for v, l in (("welcome", "Welcome (violet and electric blue)"), ("software", "Software (code and interface)"), ("marketing", "Marketing (growth and reach)"),
                                                        ("education", "Education (learning paths)"), ("ai", "AI & Automation (neural network)"), ("robotics", "Robotics (circuits and motion)"),
-                                                       ("blockchain", "Blockchain (linked blocks)"))]
+                                                       ("blockchain", "Blockchain (linked blocks)"), ("celebration", "Celebration (festival, announcement or offer)"))]
+WELCOME_CARD_TYPES = [{"value": v, "label": l} for v, l in (("regular", "Regular welcome card"), ("festival", "Festival greeting"), ("announcement", "Special announcement"), ("offer", "Company offer / promotion"))]
 DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("ai", "AI & Business Automation"), ("growth", "Digital Marketing"), ("headless", "Headless SaaS & API Solutions"), ("automation", "Workflow Automation & Integration"), ("mobile", "Mobile & Business Applications"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
     ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
@@ -475,7 +476,6 @@ KINDS: dict[str, dict] = {
         "fields": [
             F("enabled", "Show the welcome experience", "bool", default=True),
             F("once_per_session", "Show it once per browsing session", "bool", default=True, help="On: a visitor who has finished or skipped it is not shown it again until they close the browser tab. Visitors can always replay it from the footer."),
-            F("final_label", "Last card button label", max_len=30, help="The button on the last card that dismisses the cards and reveals the home page. Leave empty for “Next”."),
         ],
     },
     "welcome_card": {
@@ -484,6 +484,9 @@ KINDS: dict[str, dict] = {
                 "Page links must be pages that exist (a path like /services/software). Emerging technologies must stay described as plans until they are launched.",
         "title_label": "Card name (shown as the small label)",
         "fields": [
+            F("card_type", "Card type", "select", False, options=WELCOME_CARD_TYPES, default="regular", help="Festival greetings, announcements and offers are shown FIRST, while they are active, before the regular cards."),
+            F("start_date", "Show from (date)", max_len=10, ui="date", help="Optional. The card starts to appear on this day. Leave empty to show it straight away."),
+            F("end_date", "Show until (date)", max_len=10, ui="date", help="Optional. The last day the card appears; it stops by itself after that. Leave empty for no end."),
             F("theme", "Background style", "select", True, options=WELCOME_THEMES, default="welcome", help="The animated background and colours used for this card."),
             F("enabled", "Show this card", "bool", default=True),
             F("headline", "Headline", "text", True, max_len=140),
@@ -666,7 +669,7 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
         elif name == "linkedin_link":
             if value and not re.match(r"^https://([a-z0-9-]+\.)?linkedin\.com/[^\s]+$", value, re.I):
                 errors[name] = "Enter the full LinkedIn address starting with https://www.linkedin.com/"
-        elif name in ("published_on", "closing_date"):
+        elif name in ("published_on", "closing_date", "start_date", "end_date"):
             try:
                 if value:
                     datetime.date.fromisoformat(value)
@@ -680,6 +683,8 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
                 errors[name] = "Use a page path like /contact or a full https:// URL."
         if value:
             clean[name] = value
+    if kind == "welcome_card" and "end_date" not in errors and "start_date" not in errors and clean.get("start_date") and clean.get("end_date") and clean["end_date"] < clean["start_date"]:
+        errors["end_date"] = "The end date must be on or after the start date."
     if errors:
         raise ApiError(422, "validation_error", "Please check the highlighted fields.", fields=errors)
     return title or spec["label"], clean

@@ -23,7 +23,7 @@ const SECTIONS = {
 const WelcomeIntro = lazy(() => import('../components/intro/WelcomeIntro.jsx')) // separate chunk
 
 const WelcomeExperience = lazy(() => import('../components/intro/WelcomeExperience.jsx')) // separate chunk: the 7-card welcome experience
-const cardsCover = <div aria-hidden="true" className="fixed inset-0 z-[1000] bg-[#0b0b0f]" />
+const cardsCover = <div aria-hidden="true" className="fixed inset-0 z-[1000]" style={{ background: 'rgba(8,8,14,0.5)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} />
 
 export default function Home() {
   const intro = useIntroState()

@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { BrainCircuit, Blocks, Bot, Code2, Cpu, GraduationCap, Megaphone, Sparkles } from 'lucide-react'
+import { BrainCircuit, Blocks, Bot, Code2, Cpu, GraduationCap, Megaphone, PartyPopper, Sparkles } from 'lucide-react'
 
 /**
  * Backgrounds and emblems of the Welcome Experience cards. Every card has a background style (chosen in the admin panel): a dark graphite base with its own two
@@ -15,6 +15,7 @@ export const WELCOME_THEMES = {
   ai: { a: '34,211,238', b: '167,139,250', bg: ['#0a1f2c', '#0a0a16'], Icon: BrainCircuit },
   robotics: { a: '249,115,22', b: '148,163,184', bg: ['#26160c', '#0d0b0a'], Icon: Cpu },
   blockchain: { a: '59,130,246', b: '20,184,166', bg: ['#0b1a33', '#08101a'], Icon: Blocks },
+  celebration: { a: '251,191,36', b: '244,114,182', bg: ['#2d1c08', '#100a0e'], Icon: PartyPopper },
 }
 export const themeOf = (name) => WELCOME_THEMES[name] || WELCOME_THEMES.welcome
 export { Bot }
@@ -114,11 +115,23 @@ function Blockchain({ a, b }) {
   )
 }
 
-const ART = { welcome: Welcome, software: Software, marketing: Marketing, education: Education, ai: Ai, robotics: Robotics, blockchain: Blockchain }
+function Celebration({ a, b }) {
+  const rays = range(16)
+  const bits = range(26).map((i) => ({ x: 520 + frac(i, 5) * 640, y: 40 + frac(i, 6) * 700, w: 8 + frac(i, 7) * 14, h: 5 + frac(i, 8) * 9, r: frac(i, 9) * 360, c: i % 3 === 0 ? a : i % 3 === 1 ? b : '255,255,255', d: frac(i, 10) * 5 }))
+  return (
+    <g>
+      <g transform="translate(860 330)"><g className="we-spin">{rays.map((i) => <rect key={i} x="-3" y="-320" width="6" height="150" rx="3" transform={`rotate(${i * (360 / 16)})`} fill={rgb(i % 2 ? b : a, 0.22)} />)}</g></g>
+      {[[760, 250, 90], [1000, 420, 70], [700, 560, 60]].map(([x, y, r], k) => <g key={k} transform={`translate(${x} ${y})`} className="we-pulse" style={{ animationDelay: `${k * 0.6}s` }}>{range(8).map((i) => <line key={i} x1="0" y1={-r * 0.35} x2="0" y2={-r} stroke={rgb(k % 2 ? b : a, 0.85)} strokeWidth="4" strokeLinecap="round" transform={`rotate(${i * 45})`} />)}</g>)}
+      {bits.map((p, i) => <rect key={i} x={p.x} y={p.y} width={p.w} height={p.h} rx="2" transform={`rotate(${p.r} ${p.x} ${p.y})`} fill={rgb(p.c, 0.8)} className="we-float" style={{ animationDelay: `-${p.d}s`, animationDuration: `${5 + (i % 4)}s` }} />)}
+    </g>
+  )
+}
+
+const ART = { celebration: Celebration, welcome: Welcome, software: Software, marketing: Marketing, education: Education, ai: Ai, robotics: Robotics, blockchain: Blockchain }
 const DOTS = range(22).map((i) => ({ x: frac(i, 1) * 1200, y: frac(i, 2) * 800, r: 1.5 + frac(i, 3) * 2.5, d: frac(i, 4) * 6 }))
 
 /** One full-bleed background: base colour, glow orbs, grid, the illustration and drifting particles, in three parallax layers. */
-export const WelcomeBackdrop = memo(function WelcomeBackdrop({ theme }) {
+export const WelcomeBackdrop = memo(function WelcomeBackdrop({ theme, soft = false }) {
   const t = themeOf(theme)
   const Art = ART[theme] || Welcome
   return (
@@ -128,11 +141,11 @@ export const WelcomeBackdrop = memo(function WelcomeBackdrop({ theme }) {
         <div className="absolute -bottom-[25%] -right-[10%] size-[60vmax] rounded-full opacity-70" style={{ background: `radial-gradient(closest-side, ${rgb(t.b, 0.28)}, transparent 72%)` }} />
         <div className="absolute inset-0 opacity-[0.16]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px)', backgroundSize: '64px 64px', maskImage: 'radial-gradient(70% 70% at 70% 45%, #000, transparent)', WebkitMaskImage: 'radial-gradient(70% 70% at 70% 45%, #000, transparent)' }} />
       </div>
-      <svg className="we-layer absolute inset-0 size-full opacity-80" style={{ '--depth': 1.4 }} viewBox="0 0 1200 800" preserveAspectRatio="xMaxYMid slice" focusable="false"><Art a={t.a} b={t.b} /></svg>
+      <svg className="we-layer absolute inset-0 size-full opacity-80" style={{ '--depth': 1.4 }} viewBox="0 0 1200 800" preserveAspectRatio={soft ? 'xMidYMid slice' : 'xMaxYMid slice'} focusable="false"><Art a={t.a} b={t.b} /></svg>
       <svg className="we-layer absolute inset-0 size-full" style={{ '--depth': 2.6 }} viewBox="0 0 1200 800" preserveAspectRatio="xMaxYMid slice" focusable="false">
         {DOTS.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r={d.r} fill={rgb(i % 2 ? t.b : t.a, 0.55)} className="we-drift" style={{ animationDelay: `-${d.d}s`, animationDuration: `${9 + (i % 5) * 2}s` }} />)}
       </svg>
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(8,8,14,0.15) 0%, rgba(8,8,14,0.62) 42%, rgba(8,8,14,0.9) 100%)' }} /> {/* keeps the text readable over any illustration */}
+      <div className="absolute inset-0" style={{ background: soft ? 'linear-gradient(180deg, rgba(8,8,14,0.0) 55%, rgba(8,8,14,0.35) 100%)' : 'linear-gradient(180deg, rgba(8,8,14,0.0) 0%, rgba(8,8,14,0.25) 28%, rgba(8,8,14,0.82) 52%, rgba(8,8,14,0.94) 100%)' }} /> {/* keeps the text readable over any illustration */}
     </div>
   )
 })

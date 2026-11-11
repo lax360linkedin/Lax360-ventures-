@@ -123,7 +123,7 @@ export default function HeroVideos() {
 
   if (loading && !data) return <Spinner />
   if (error && !data) return <ErrorState error={error} onRetry={reload} />
-  const { items: all, config, current, next, limits, usage, storage } = data
+  const { items: all, config, current, next, limits, usage, storage, reupload = [] } = data
   const items = all.filter((v) => v.status !== 'deleting') // a pending deletion is not part of the queue (its file could not be removed yet)
   const pending = all.filter((v) => v.status === 'deleting')
   const problems = items.filter((v) => v.verify_status === 'missing' || v.verify_status === 'error')
@@ -172,7 +172,9 @@ export default function HeroVideos() {
           <Btn kind="primary" onClick={() => pickRef.current?.click()}><Upload className="size-4" aria-hidden="true" /> Upload videos</Btn>
         </>} />
 
-      {storage?.warning && <p role="alert" className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm"><strong>Videos may disappear.</strong> {storage.warning}</p>}
+      {storage?.warning && <p role="alert" className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm"><strong>{storage.headline || 'Videos may disappear.'}</strong> {storage.warning}{' '}<button type="button" className="font-semibold underline" onClick={() => run('verify-all', () => api(`${BASE}/verify-all`, { method: 'POST' }), 'Storage checked')}>Check again</button></p>}
+      {storage?.verified && <p className="mb-6 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm"><strong>Permanent storage is working.</strong> {storage.detail}. Videos survive Render restarts and redeploys.</p>}
+      {reupload.length > 0 && <p role="alert" className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm"><strong>{reupload.length} video{reupload.length === 1 ? '' : 's'} must be uploaded again:</strong> {reupload.map((v) => `${v.title}${v.file_ok ? '' : ' (file already lost)'}`).join(', ')}. {reupload.length === 1 ? 'It exists' : 'They exist'} only on the server&apos;s temporary disk and will be lost at the next restart. Use “Replace file” on each one and choose the video again: its place in the queue and schedule is kept.</p>}
       {problems.length > 0 && <p role="alert" className="mb-6 rounded-xl border border-error/40 bg-error/10 p-4 text-sm"><strong>{problems.length} video file{problems.length === 1 ? ' needs' : 's need'} attention:</strong> {problems.map((v) => v.title).join(', ')}. Nothing was deleted. Re-upload the file with “Replace file”, or check the storage bucket, then press “Check files”.</p>}
       {pending.length > 0 && <Card className="mb-6 !border-amber-500/40">
         <h2 className="mb-2 font-display text-base font-semibold">Deletions that did not finish</h2>
@@ -231,7 +233,7 @@ export default function HeroVideos() {
                       : v.starts_at ? <>Slot: {when(v.starts_at)} → {v.ends_at ? when(v.ends_at) : 'no end (last video)'}</> : v.is_active ? 'Not scheduled yet' : 'Switched off: skipped in the rotation'}</p>
                     <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-soft">
                       <span className={cx('font-medium', v.verify_status === 'ok' ? 'text-success' : v.verify_status === 'unknown' ? '' : 'text-error')}>File: {v.verify_status === 'ok' ? 'verified' : v.verify_status === 'unknown' ? 'not checked yet' : v.verify_status}{v.verified_at ? ` (${when(v.verified_at)})` : ''}</span>
-                      <span>{v.storage === 'supabase' ? `Stored permanently (${v.bucket || 'bucket'})` : 'On the server disk (temporary)'}</span>
+                      <span>{v.storage === 'supabase' ? `Stored permanently (${v.bucket || 'bucket'})` : 'On the server disk (temporary): upload it again'}</span>
                       {v.last_play_ok_at && <span>Last played by a visitor: {when(v.last_play_ok_at)}</span>}
                       {v.last_play_error && <span className="text-error">Last playback problem: {v.last_play_error}{v.last_play_error_at ? ` (${when(v.last_play_error_at)})` : ''}</span>}
                       {v.is_fallback && <span className="font-medium text-lav">Fallback video</span>}

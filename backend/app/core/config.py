@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     # Supabase Storage: set both of these (the service-role key is a SERVER-SIDE secret: never put it in the frontend). Without them, local disk is used.
     supabase_url: str | None = None  # https://<project-ref>.supabase.co
     supabase_service_role_key: SecretStr | None = None
-    hero_video_bucket: str = Field(default="hero-videos", validation_alias=AliasChoices("SUPABASE_VIDEO_BUCKET", "HERO_VIDEO_BUCKET"))  # SUPABASE_VIDEO_BUCKET or HERO_VIDEO_BUCKET; created automatically (public) on first upload if it does not exist
+    hero_video_bucket: str = Field(default="lax360-videos", validation_alias=AliasChoices("SUPABASE_VIDEO_BUCKET", "HERO_VIDEO_BUCKET"))  # SUPABASE_VIDEO_BUCKET or HERO_VIDEO_BUCKET; created automatically (public) on first upload if it does not exist
     hero_video_disk_is_persistent: bool = False  # set true only if HERO_VIDEO_DIR is on a persistent disk (e.g. a Render Disk): silences the warning
     hero_video_slot_seconds: int | None = None  # development/test ONLY: replaces the 3-day slot length so rotation can be watched in minutes
 
