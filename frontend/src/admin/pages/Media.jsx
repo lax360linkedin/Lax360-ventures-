@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { AlertTriangle, CheckCircle2, Copy, Replace, Search, Trash2, Upload } from 'lucide-react'
 import { api, upload } from '../../services/apiClient.js'
 import { ACCEPT, MediaThumb, UploadProgress, fmtSize, useUploader } from '../MediaPicker.jsx'
+import { Dropzone } from '../ImageUpload.jsx'
 import { Badge, Btn, Card, ConfirmDialog, EmptyState, ErrorState, Field, Input, Modal, PageHeader, Pagination, Select, Spinner, Toggle, cx, fmtDate, useDebounced, useFetch, useToast } from '../ui.jsx'
 
 const KIND_LABEL = { image: 'Image', video: 'Video', document: 'Document' }
@@ -90,6 +91,7 @@ export default function Media() {
         ? <p className="mb-4 flex items-center gap-2 text-sm text-soft"><CheckCircle2 className="size-4 text-success" aria-hidden="true" /> Stored permanently in {data.storage.detail}. {data.usage.files} file(s), {fmtSize(data.usage.bytes)}.</p>
         : <p role="alert" className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm"><AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><span><strong>Uploads are switched off.</strong> {data.storage.warning}</span></p>)}
       <UploadProgress jobs={up.jobs} onClear={up.clear} />
+      <Dropzone compact className="mb-4" busy={up.busy} onFiles={(f) => up.start(f, { isPublic: true })} title="Drag pictures here or paste them with Ctrl+V to add them to the library (videos and documents: use Upload files)" />
       <Card className="mb-4">
         <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
           <div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-soft" aria-hidden="true" /><Input aria-label="Search files" className="pl-9" placeholder="Search by file name…" value={text} onChange={(e) => { setText(e.target.value); setPage(1) }} /></div>

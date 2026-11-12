@@ -8,15 +8,16 @@ import WhoWeAre from '../components/sections/WhoWeAre.jsx'
 import OurServices from '../components/sections/OurServices.jsx'
 import WhyChooseUs from '../components/sections/WhyChooseUs.jsx'
 import OurClients from '../components/sections/OurClients.jsx'
+import ImageCarousel from '../components/sections/ImageCarousel.jsx'
 import Testimonials from '../components/sections/Testimonials.jsx'
 import ProcessWorkflow from '../components/sections/ProcessWorkflow.jsx'
 import FaqSection from '../components/sections/FaqSection.jsx'
 import ContactCta from '../components/sections/ContactCta.jsx'
 
 // The built-in home page sections, in their default order. The admin panel can re-order and hide them (Website content > Home page sections).
-const DEFAULT_ORDER = ['marquee', 'whoweare', 'services', 'outcomes', 'clients', 'testimonials', 'process', 'faq', 'contact']
+const DEFAULT_ORDER = ['marquee', 'whoweare', 'services', 'outcomes', 'clients', 'gallery', 'testimonials', 'process', 'faq', 'contact']
 const SECTIONS = {
-  marquee: <Marquee />, whoweare: <WhoWeAre />, services: <OurServices />, outcomes: <WhyChooseUs />, clients: <OurClients />, testimonials: <Testimonials />,
+  marquee: <Marquee />, whoweare: <WhoWeAre />, services: <OurServices />, outcomes: <WhyChooseUs />, testimonials: <Testimonials />, gallery: <ImageCarousel />, clients: <OurClients />,
   process: <ProcessWorkflow />, faq: <FaqSection />, contact: <ContactCta />,
 }
 

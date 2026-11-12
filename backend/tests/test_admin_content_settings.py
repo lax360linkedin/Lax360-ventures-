@@ -10,7 +10,7 @@ def test_content_kinds_describe_only_what_the_site_actually_uses(app, db):
     admin, _, _ = staff(app, db, permissions=["content"])
     body = admin.get("/api/admin/content/kinds").json()
     # an admin who only holds the `content` module sees the homepage / about / portfolio kinds; services, careers and navigation are separate modules
-    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "article", "client", "testimonial", "project", "product", "product_module", "product_resource", "website", "welcome_page", "welcome_card", "contact_page"]
+    assert [k["kind"] for k in body["kinds"]] == ["hero", "section", "about_section", "faq_category", "faq", "about_block", "industry", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "article", "client", "testimonial", "project", "product", "product_module", "product_resource", "website", "carousel_page", "carousel_image", "welcome_page", "welcome_card", "contact_page"]
     assert all(f["name"] for k in body["kinds"] for f in k["fields"])
     assert admin.get("/api/admin/content/pricing_table").status_code == 404  # not a managed section
 
@@ -204,13 +204,13 @@ def test_network_partners_and_team_members_are_managed_validated_ordered_and_rem
     assert [i["title"] for i in client.get("/api/public/content?kind=network_partner").json()["items"]] == ["Example Partner", "Second"]
 
     def member(name, **extra):
-        return {"title": name, "data": {"group": "software", "designation": "Engineer", "bio": "Builds things.", **extra}, "status": "published", "sort_order": 1}
+        return {"title": name, "data": {"role_level": "team_member", "designation": "Engineer", "bio": "Builds things.", **extra}, "status": "published", "sort_order": 1}
     ids = []
     for name in ("Asha", "Ravi"):
         r = admin.post("/api/admin/content/team_member", json=member(name), headers=csrf)
         assert r.status_code == 201
         ids.append(r.json()["id"])
-    for bad in ({"group": "interns"}, {"linkedin_link": "https://evil.example/in/x"}, {"linkedin_link": "http://www.linkedin.com/in/x"}, {"designation": ""}):
+    for bad in ({"role_level": "interns"}, {"linkedin_link": "https://evil.example/in/x"}, {"linkedin_link": "http://www.linkedin.com/in/x"}, {"designation": ""}):
         assert admin.post("/api/admin/content/team_member", json=member("Bad", **bad), headers=csrf).status_code == 422, bad
     assert admin.post("/api/admin/content/team_member", json=member("Linked", linkedin_link="https://www.linkedin.com/in/linked"), headers=csrf).status_code == 201
 
@@ -227,33 +227,39 @@ def test_team_departments_gallery_page_text_and_deactivated_profiles(app, db, cl
     post = lambda kind, body: admin.post(f"/api/admin/content/{kind}", json=body, headers=csrf)  # noqa: E731
     assert post("team_department", {"title": "AI & Automation", "data": {"description": "Builds AI features."}, "status": "published", "sort_order": 1}).status_code == 201
     slug = client.get("/api/public/content?kind=team_department").json()["items"][0]["slug"]
-    base = {"designation": "Engineer", "leadership_role": "founder", "department": slug, "expertise": "Python, FastAPI", "twitter_link": "https://x.com/a"}
+    base = {"designation": "Engineer", "role_level": "founder", "department": slug, "expertise": "Python, FastAPI"}
     ok = post("team_member", {"title": "Asha", "data": base, "status": "published", "sort_order": 1})
     assert ok.status_code == 201
-    for bad in ({"department": "nope"}, {"leadership_role": "ceo"}, {"github_link": "javascript:alert(1)"}):
+    for bad in ({"department": "nope"}, {"role_level": "intern"}, {"linkedin_link": "javascript:alert(1)"}, {"twitter_link": "https://x.com/a"}):  # departments must exist; no other personal links are stored
         assert post("team_member", {"title": "Bad", "data": {**base, **bad}, "status": "published", "sort_order": 1}).status_code == 422, bad
     shown = lambda: [i["title"] for i in client.get("/api/public/content?kind=team_member").json()["items"]]  # noqa: E731
     assert shown() == ["Asha"]
     assert admin.patch(f"/api/admin/content/item/{ok.json()['id']}", json={"data": {**base, "active": False}}, headers=csrf).status_code == 200
     assert shown() == []  # deactivated: kept in the admin panel, never public
     assert post("team_gallery", {"title": "Workshop", "data": {"category": "workshops"}, "status": "published", "sort_order": 1}).status_code == 422  # a photo is required
-    assert post("team_page", {"title": "Our Team page text", "data": {"hero_title": "The People Behind Innovation."}, "status": "published", "sort_order": 1}).status_code in (200, 201)
-    assert client.get("/api/public/content?kind=team_page").json()["items"][0]["data"]["hero_title"] == "The People Behind Innovation."
+    page = {"hero_title": "The People Behind Innovation.", "show_departments": True, "show_leadership": True, "show_directory": False}
+    assert post("team_page", {"title": "Our Team page text", "data": page, "status": "published", "sort_order": 1}).status_code in (200, 201)
+    data = client.get("/api/public/content?kind=team_page").json()["items"][0]["data"]
+    assert data["hero_title"] == "The People Behind Innovation." and data["show_departments"] is True and data["show_directory"] is False  # the section switches the website reads
 
 
-def test_demo_team_seed_is_valid_flagged_and_complete(app, db):
-    from app import seed_team_demo as demo
-    from app.services import content_service as cs
-
-    slugs = {d["slug"] for d in demo.DEPARTMENTS}
-    assert slugs == {o["value"] for o in cs.TEAM_DEPARTMENTS}
-    for d in demo.DEPARTMENTS:
-        cs._validate(db, "team_department", d["title"], {"description": d["description"], "overview": d["overview"], "roles": "\n".join(d["roles"]), "responsibilities": "\n".join(d["responsibilities"]), "expertise": d["expertise"]})
-        assert sum(1 for p in demo.PEOPLE if p[0] == d["slug"] and p[3]) == 1  # every department has exactly one head
-    assert len({p[1] for p in demo.PEOPLE}) == len(demo.PEOPLE)
-    for dept, name, designation, head, reports, skills, bio in demo.PEOPLE:
-        body = {"department": dept, "designation": designation, "bio": f"{bio} {demo.NOTE}", "expertise": skills, "reports_to": reports, "demo": True, **({"leadership_role": "department_head"} if head else {})}
-        cs._validate(db, "team_member", name, body)  # raises if invalid
+def test_departments_can_be_switched_off_and_employees_are_assigned_from_their_own_profile(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    post = lambda kind, body: admin.post(f"/api/admin/content/{kind}", json=body, headers=csrf)  # noqa: E731
+    d = post("team_department", {"title": "Marketing", "data": {"description": "Grows demand."}, "status": "published", "sort_order": 1})
+    assert d.status_code == 201
+    slug = client.get("/api/public/content?kind=team_department").json()["items"][0]["slug"]
+    lead = post("team_member", {"title": "Head Person", "data": {"designation": "Head of Marketing", "role_level": "department_head", "department": slug}, "status": "published", "sort_order": 1})
+    mate = post("team_member", {"title": "Team Person", "data": {"designation": "Designer", "role_level": "team_member"}, "status": "published", "sort_order": 2})  # no department: allowed
+    assert lead.status_code == 201 and mate.status_code == 201
+    # moving a person to a department is one edit on the profile (no second entry anywhere)
+    assert admin.patch(f"/api/admin/content/item/{mate.json()['id']}", json={"data": {"designation": "Designer", "role_level": "team_lead", "department": slug}}, headers=csrf).status_code == 200
+    people = {i["title"]: i["data"] for i in client.get("/api/public/content?kind=team_member").json()["items"]}
+    assert people["Team Person"]["department"] == slug and people["Head Person"]["role_level"] == "department_head"
+    # a department switched off disappears from the website; its people keep their profiles
+    assert admin.patch(f"/api/admin/content/item/{d.json()['id']}", json={"data": {"description": "Grows demand.", "active": False}}, headers=csrf).status_code == 200
+    assert client.get("/api/public/content?kind=team_department").json()["items"] == []
+    assert len(client.get("/api/public/content?kind=team_member").json()["items"]) == 2
 
 
 def test_testimonials_can_be_assigned_to_a_service_page_with_a_rating(app, db, client):

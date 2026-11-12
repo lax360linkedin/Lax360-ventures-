@@ -4,7 +4,6 @@
 // `group` (optional) sorts the offerings of a category into logical groups on its page.
 
 import { slugify } from '../utils/slugify.js'
-import { getServiceDetail } from './serviceDetails.js'
 
 export const processSteps = [
   { n: '01', title: 'Discover', text: 'We listen, ask questions and write down the business problem before any build starts.' },
@@ -280,14 +279,7 @@ export const divisions = [
 // Every offering gets its own slug (its page is /services/<category>/<slug>).
 divisions.forEach((d) => d.offerings.forEach((o) => { o.slug = slugify(o.name) }))
 
-/** An individual service with its category, its detail copy and the photo to show (its own, else the category's). */
-export const getOffering = (categorySlug, serviceSlug) => {
-  const d = divisions.find((x) => x.slug === categorySlug)
-  const o = d?.offerings.find((x) => x.slug === serviceSlug)
-  if (!o) return null
-  const detail = getServiceDetail(categorySlug, serviceSlug) || {}
-  return { ...o, ...detail, category: d, photo: detail.photo || d.photo }
-}
+// (getOffering lives in offerings.js: it needs the long per-service copy in serviceDetails.js, which the home page does not.)
 
 // All divisions (service categories), in page order.
 export const allDivisions = divisions.map((d) => ({ ...d, to: `/services/${d.slug}` }))

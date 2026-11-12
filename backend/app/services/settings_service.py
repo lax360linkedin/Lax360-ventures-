@@ -126,13 +126,20 @@ def get(db: Session, key: str, default=None):
 def public_settings(db: Session, settings=None) -> dict:
     """Public settings. Image settings hold a media id; the browser also gets `<key>_url` (None when the file is gone or not public)."""
     out = {row.key: row.value for row in db.scalars(select(SiteSetting).where(SiteSetting.is_public.is_(True))) if row.key in SPEC}
-    for key, spec in SPEC.items():
-        if spec["type"] == "image" and out.get(key) and settings is not None:
-            try:
-                asset = db.get(MediaAsset, uuid.UUID(out[key]))
-            except ValueError:
-                asset = None
-            out[key + "_url"] = media_service.url_of(settings, asset) if asset is not None and asset.is_public else None
+    images = {key: out[key] for key, spec in SPEC.items() if spec["type"] == "image" and out.get(key) and settings is not None}
+    ids = set()
+    for raw in images.values():
+        try:
+            ids.add(uuid.UUID(raw))
+        except ValueError:
+            pass
+    assets = {a.id: a for a in db.scalars(select(MediaAsset).where(MediaAsset.id.in_(ids)))} if ids else {}  # one query for every picture
+    for key, raw in images.items():
+        try:
+            asset = assets.get(uuid.UUID(raw))
+        except ValueError:
+            asset = None
+        out[key + "_url"] = media_service.url_of(settings, asset) if asset is not None and asset.is_public else None
     return out
 
 

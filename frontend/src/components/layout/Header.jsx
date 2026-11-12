@@ -7,7 +7,7 @@ import AccountMenu from './AccountMenu.jsx'
 import ThemeToggle from '../ui/ThemeToggle.jsx'
 import { primaryNav } from '../../data/navigation.js'
 import { useNav } from '../../hooks/useSite.js'
-import { useScrollDirection } from '../../hooks/useScrollDirection.js'
+import { useScrolledPast } from '../../hooks/useScrollDirection.js'
 import { useMediaQuery } from '../../hooks/useMediaQuery.js'
 
 const linkCls = 'relative z-10 inline-flex min-h-11 items-center px-2.5 text-sm xl:px-4 xl:text-[0.9375rem] 2xl:px-[1.125rem] font-medium tracking-tight transition-colors duration-200'
@@ -26,7 +26,7 @@ const linkCls = 'relative z-10 inline-flex min-h-11 items-center px-2.5 text-sm 
 export default function Header({ onOpenMenu, menuButtonRef }) {
   const { pathname } = useLocation()
   const nav = useNav('header', primaryNav) // the admin panel can replace the menu
-  const { y } = useScrollDirection()
+  const scrolled = useScrolledPast(24)
   const wide = useMediaQuery('(min-width: 1024px)')
   const [indicator, setIndicator] = useState(null)
   const navRef = useRef(null)
@@ -35,7 +35,6 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
   const headerRef = useRef(null)
   const leaveTimer = useRef(null)
 
-  const scrolled = y > 24
 
   // The nav item for the page being viewed (Services also covers /services/*). Null on Home (the bot stands on the "A" of LAX360 there, even though Home is now a menu link) and on pages outside the nav.
   const activeTo = nav.find((n) => !n.external && n.to !== '/' && (pathname === n.to || pathname.startsWith(`${n.to}/`)))?.to ?? null

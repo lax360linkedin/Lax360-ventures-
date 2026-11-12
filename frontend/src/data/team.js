@@ -4,13 +4,13 @@
 export const teamText = {
   heroEyebrow: 'Our Team',
   heroTitle: 'The People Behind Innovation.',
-  heroLead: 'Engineers, AI specialists, marketers and operators working as one team. The expertise, creativity and technology behind LAX360 Pvt Ltd come from the people who build it every day.',
+  heroLead: 'The people behind LAX360 Pvt Ltd: the leaders who set our direction and the specialists who plan, build and support what we deliver for our clients.',
   leadershipTitle: 'Leadership Team',
-  leadershipLead: 'The people who set the direction of LAX360 Pvt Ltd and keep every department accountable.',
+  leadershipLead: 'The people who set the direction of LAX360 Pvt Ltd.',
   departmentsTitle: 'Our Departments',
-  departmentsLead: 'Four departments, one accountable team: from software and AI to marketing and client operations.',
+  departmentsLead: 'Our people, organised by the department they work in.',
   directoryTitle: 'Meet Our Team',
-  directoryLead: 'The specialists who design, build, market and support what we deliver.',
+  directoryLead: 'The specialists who plan, build and support what we deliver.',
   cultureTitle: 'Our People & Culture',
   cultureLead: 'How we work, learn and celebrate together.',
   expertiseTitle: 'Our Expertise',
@@ -19,21 +19,15 @@ export const teamText = {
   careersLead: 'Join a team that works across software, AI and digital growth. Explore where you could fit, or send us your details.',
 }
 
-export const leadershipRoles = {
-  managing_director: { label: 'Managing Director', rank: 0 },
-  founder: { label: 'Founder / Co-Founder', rank: 1 },
-  technical_director: { label: 'Technical Director', rank: 2 },
-  department_head: { label: 'Department Head', rank: 3 },
-  leadership: { label: 'Leadership', rank: 4 },
+// Positions an employee can hold (the "Position" field of a profile). Founder, CEO and Managing Director are the Leadership section; the rest appear in the team gallery
+// or, when the Departments section is on, inside their department (the Department Head first, then Team Leads, then Team Members).
+export const roleLabels = {
+  founder: 'Founder', ceo: 'CEO', managing_director: 'Managing Director', department_head: 'Department Head', team_lead: 'Team Lead', team_member: 'Team Member',
 }
+export const leaderRank = { founder: 0, ceo: 1, managing_director: 2 }
+export const roleRank = { department_head: 0, team_lead: 1, team_member: 2 }
 
-// The four departments (used until departments are managed in the admin panel; a department created there with the same name replaces it).
-export const defaultDepartments = [
-  { slug: 'software-development', name: 'Software Development', icon: 'code', description: 'Designing and building custom software, websites, web platforms and mobile apps.', overview: 'The software team designs and builds the web applications, websites, APIs and mobile apps that LAX360 delivers.', roles: ['Frontend Developers', 'Backend Developers', 'Full Stack Developers', 'Mobile Application Developers'], responsibilities: [], expertise: [] },
-  { slug: 'ai-automation', name: 'AI & Automation', icon: 'bot', description: 'Creating AI-powered applications and automating business workflows.', overview: 'The AI & Automation team builds AI assistants, agents and workflow automations.', roles: ['AI Engineers', 'AI Application Developers', 'AI Agents Developers', 'Automation Specialists'], responsibilities: [], expertise: [] },
-  { slug: 'digital-marketing', name: 'Digital Marketing', icon: 'megaphone', description: 'Growing visibility and demand through search, paid media, social and content.', overview: 'The marketing team plans and runs campaigns across search, paid advertising, social media and content.', roles: ['Digital Marketing Manager', 'SEO Specialists', 'Google Ads Specialists', 'Meta Ads Specialists', 'Social Media Managers', 'Content Creators'], responsibilities: [], expertise: [] },
-  { slug: 'business-operations', name: 'Business & Operations', icon: 'briefcase', description: 'Keeping clients, projects and people supported from first conversation to delivery.', overview: 'Business & Operations looks after client relationships, project delivery and the people side of the company.', roles: ['Business Development Manager', 'Business Development Executives', 'Sales & Client Relations', 'Project Managers', 'HR & Operations'], responsibilities: [], expertise: [] },
-]
+// There are no built-in departments and no built-in profiles: departments and people are created in the admin panel (Team) and must be real.
 
 export const defaultExpertise = [
   { title: 'React & JavaScript', icon: 'code', tags: ['React', 'JavaScript', 'Modern web interfaces'] },

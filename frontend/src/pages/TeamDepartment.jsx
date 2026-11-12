@@ -4,10 +4,11 @@ import PageContainer from '../components/layout/PageContainer.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import Button from '../components/ui/Button.jsx'
-import { Avatar, DemoBadge, EmptyNote, SkillTags, Social } from '../components/team/TeamBits.jsx'
+import { Avatar, EmptyNote, SkillTags, Social } from '../components/team/TeamBits.jsx'
 import { useContentReady } from '../hooks/useSite.js'
 import { useDepartmentList, useTeam } from '../hooks/useCmsPages.js'
 import { toParagraphs } from '../utils/cms.js'
+import { roleRank } from '../data/team.js'
 
 function BackLink() {
   return (
@@ -25,10 +26,8 @@ function HeadCard({ p }) {
         <div className="overflow-hidden"><Avatar person={p} className="aspect-[4/5] md:h-full" sizes="(min-width: 768px) 20rem, 100vw" /></div>
         <div className="flex flex-col gap-2 p-6 md:p-10">
           <p className="eyebrow text-lav">Department Head</p>
-          {p.demo && <DemoBadge />}
           <h3 className="font-display text-3xl font-semibold leading-tight md:text-4xl">{p.name}</h3>
           <p className="text-lg font-semibold text-soft">{p.designation}</p>
-          {p.reportsTo && <p className="text-sm text-soft">Reports to: {p.reportsTo}</p>}
           {p.bio && <p className="mt-3 max-w-2xl text-lg text-soft">{p.bio}</p>}
           <SkillTags items={p.expertise} label={`${p.name}: areas of expertise`} className="mt-4" />
           <div className="mt-auto"><Social person={p} /></div>
@@ -44,10 +43,8 @@ function MemberCard({ p, i }) {
       <article className="glass-flat lift group flex h-full flex-col overflow-hidden">
         <div className="overflow-hidden"><Avatar person={p} className="aspect-[4/5]" sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 100vw" /></div>
         <div className="flex flex-1 flex-col gap-1 p-5">
-          {p.demo && <DemoBadge />}
           <h3 className="font-display text-xl font-semibold leading-tight">{p.name}</h3>
           <p className="text-sm font-semibold text-lav">{p.designation}</p>
-          {p.reportsTo && <p className="text-xs text-soft">Reports to: {p.reportsTo}</p>}
           {p.bio && <p className="mt-2 text-sm text-soft">{p.bio}</p>}
           <SkillTags items={p.expertise} label={`${p.name}: skills`} className="mt-3" />
           <div className="mt-auto"><Social person={p} /></div>
@@ -78,8 +75,8 @@ export default function TeamDepartment() {
   }
 
   const mine = people.filter((p) => p.department === d.slug)
-  const heads = mine.filter((p) => p.leadershipRole === 'department_head')
-  const team = mine.filter((p) => p.leadershipRole !== 'department_head').sort((a, b) => Number(b.featured) - Number(a.featured))
+  const heads = mine.filter((p) => p.isHead)
+  const team = mine.filter((p) => !p.isHead).sort((a, b) => (roleRank[a.role] ?? 9) - (roleRank[b.role] ?? 9) || a.order - b.order)
   const overview = toParagraphs(d.overview || d.description)
 
   return (

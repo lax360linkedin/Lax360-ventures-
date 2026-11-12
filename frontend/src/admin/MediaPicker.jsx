@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { FileText, Film, ImageOff, Search, Upload } from 'lucide-react'
 import { api, upload } from '../services/apiClient.js'
 import { Btn, EmptyState, ErrorState, Input, Modal, Select, Spinner, cx, useDebounced, useFetch, useToast } from './ui.jsx'
+import { Dropzone, fmtSize as fmtBytes, imageLimit, uploadImage } from './ImageUpload.jsx'
 
 export const fmtSize = (b) => (b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`)
 export const ACCEPT = { document: 'application/pdf', image: 'image/png,image/jpeg,image/gif,image/webp', video: 'video/mp4,video/webm,.mp4,.webm', all: 'image/png,image/jpeg,image/gif,image/webp,application/pdf,video/mp4,video/webm,.mp4,.webm' }
@@ -16,7 +17,7 @@ export function MediaThumb({ asset, className = '' }) {
   const src = asset.kind === 'image' ? (asset.url || blobUrl) : null
   return (
     <span className={cx('grid h-full w-full place-items-center overflow-hidden bg-glass text-soft', className)}>
-      {src ? <img src={src} alt={asset.alt_text || ''} className="h-full w-full object-cover" loading="lazy" />
+      {src ? <img src={src} alt={asset.alt_text || ''} className="h-full w-full object-contain" loading="lazy" />
         : asset.kind === 'video' ? <Film className="size-8" aria-hidden="true" /> : asset.kind === 'document' ? <FileText className="size-8" aria-hidden="true" /> : <ImageOff className="size-8" aria-hidden="true" />}
     </span>
   )
@@ -96,10 +97,42 @@ export function MediaPicker({ open, onClose, onPick, kind }) {
   )
 }
 
-/** A form field holding the id of a library item, with preview, choose, change and remove. */
+/** A picture field: shows the current picture and lets you replace it by dropping a file, pasting with Ctrl+V or clicking; uploads straight away (no file path, no description). */
+function ImageField({ value, onChange, id, ...aria }) {
+  const toast = useToast()
+  const [picking, setPicking] = useState(false)
+  const [busy, setBusy] = useState(null) // { name, progress }
+  const { data, error } = useFetch(() => (value ? api(`/api/admin/media/${value}`) : Promise.resolve(null)), [value])
+  const take = async ([file]) => {
+    if (!file) return
+    const max = await imageLimit()
+    if (file.size > max) { toast(`${file.name} is too large (${fmtBytes(file.size)}); the limit is ${fmtBytes(max)}.`, 'error'); return }
+    setBusy({ name: file.name, progress: 0 })
+    try { const asset = await uploadImage(file, (progress) => setBusy({ name: file.name, progress })); onChange(asset.id); toast('Picture saved') } catch (e) { toast(`${file.name}: ${e.message}`, 'error') } finally { setBusy(null) }
+  }
+  return (
+    <div id={id} {...aria}>
+      {value && data && (
+        <div className="mb-2 flex items-center gap-3 rounded-xl border border-edge p-2">
+          <span className="block size-24 shrink-0 overflow-hidden rounded-lg"><MediaThumb asset={data} /></span>
+          <div className="min-w-0 flex-1 text-sm"><p className="truncate font-medium">{data.filename}</p><p className="text-xs text-soft">{fmtSize(data.size_bytes)}</p>
+            <div className="mt-2 flex flex-wrap gap-2"><Btn kind="ghost" onClick={() => onChange('')}>Remove</Btn></div></div>
+        </div>
+      )}
+      {value && error && <p role="alert" className="mb-2 text-sm text-error">That picture no longer exists in the library. Add another or remove it.</p>}
+      {busy && <div className="mb-2" aria-live="polite"><p className="truncate text-xs text-soft">Uploading {busy.name}… {Math.round(busy.progress * 100)}%</p><div className="mt-1 h-1.5 overflow-hidden rounded-full bg-glass-strong" role="progressbar" aria-valuenow={Math.round(busy.progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Upload progress"><div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${Math.round(busy.progress * 100)}%` }} /></div></div>}
+      <Dropzone multiple={false} compact={Boolean(value)} busy={Boolean(busy)} onFiles={take} title={value ? 'Replace: drop a picture, paste with Ctrl+V, or click' : undefined} />
+      <button type="button" onClick={() => setPicking(true)} className="mt-2 text-sm font-semibold text-lav hover:underline">Choose one already in the library</button>
+      <MediaPicker open={picking} kind="image" onClose={() => setPicking(false)} onPick={(a) => { onChange(a.id); setPicking(false) }} />
+    </div>
+  )
+}
+
+/** A form field holding the id of a library item. Pictures: drop / paste / click to add or replace. Videos and documents: choose from the library (or upload there). */
 export function MediaField({ value, onChange, kind = 'image', id, ...aria }) {
   const [picking, setPicking] = useState(false)
-  const { data, error } = useFetch(() => (value ? api(`/api/admin/media/${value}`) : Promise.resolve(null)), [value])
+  const { data, error } = useFetch(() => (kind !== 'image' && value ? api(`/api/admin/media/${value}`) : Promise.resolve(null)), [value, kind])
+  if (kind === 'image') return <ImageField value={value} onChange={onChange} id={id} {...aria} />
   return (
     <div id={id} {...aria}>
       {value && data && (

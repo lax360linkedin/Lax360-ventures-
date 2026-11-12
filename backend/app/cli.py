@@ -14,7 +14,6 @@
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
     python -m app.cli seed-network [--remove]                   (load the Our Network starter content; designations start unverified; --remove deletes only those)
     python -m app.cli seed-service-demo [--remove]               (load FICTIONAL demo clients and testimonials for every service page; labelled Sample; --remove deletes only those)
-    python -m app.cli seed-team-demo [--draft|--remove]         (load FICTIONAL demonstration departments and team profiles for review; labelled on the website; --remove deletes only those)
     python -m app.cli seed-industries [--remove]               (load the 20-industry content into the CMS so it can be edited; --remove deletes only those)
     python -m app.cli seed-products [--remove]                  (load the LAX360 product portfolio into the CMS, all as Coming soon, so it can be edited; --remove deletes only those)
     python -m app.cli seed-faqs [--remove]                      (load the home page FAQ questions and categories into the CMS so they can be edited; --remove deletes only those)
@@ -580,47 +579,6 @@ def seed_network(args: argparse.Namespace) -> None:
         print(f"Added {added} network row(s). Review them in the admin panel (Website content > Network): verify each partner's designation, add official logos you are permitted to use, and adjust the text.")
 
 
-def seed_team_demo(args: argparse.Namespace) -> None:
-    """Load FICTIONAL demonstration departments and team members (flagged "demo", no photos) so the Our Team department pages can be reviewed.
-    Idempotent by slug; existing rows are never overwritten. --remove deletes only the seeded rows. --draft loads them unpublished."""
-    from app import seed_team_demo as data
-    from app.models import ContentItem
-    from app.services.content_service import _slugify
-
-    get_settings()
-    nl = chr(10)
-    dept_slugs = [d["slug"] for d in data.DEPARTMENTS]
-    people = [(p, f"demo-{_slugify(p[1])}") for p in data.PEOPLE]
-    with _factory()() as db:
-        existing = {(i.kind, i.slug): i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(["team_department", "team_member"])))}
-        if args.remove:
-            gone = [existing[k] for k in [("team_department", s) for s in dept_slugs if existing.get(("team_department", s)) and existing[("team_department", s)].data.get("demo")] + [("team_member", s) for _, s in people] if k in existing]
-            for item in gone:
-                db.delete(item)
-            db.commit()
-            print(f"Removed {len(gone)} demonstration row(s). Profiles you added yourself were not touched.")
-            return
-        status = "draft" if args.draft else "published"
-        added = 0
-        for n, d in enumerate(data.DEPARTMENTS, start=1):
-            if ("team_department", d["slug"]) in existing:
-                continue
-            body = {"description": d["description"], "overview": d["overview"], "roles": nl.join(d["roles"]), "responsibilities": nl.join(d["responsibilities"]), "expertise": d["expertise"]}
-            db.add(ContentItem(kind="team_department", slug=d["slug"], title=d["title"], data=body, status="published", sort_order=n * 10))
-            added += 1
-        for n, (p, slug) in enumerate(people, start=1):
-            if ("team_member", slug) in existing:
-                continue
-            dept, name, designation, head, reports, skills, bio = p
-            body = {"department": dept, "designation": designation, "bio": f"{bio} {data.NOTE}", "expertise": skills, "reports_to": reports, "demo": True, "active": True, "featured": False}
-            if head:
-                body["leadership_role"] = "department_head"
-            db.add(ContentItem(kind="team_member", slug=slug, title=name, data=body, status=status, sort_order=n * 10))
-            added += 1
-        db.commit()
-        print(f"Added {added} row(s) ({status}). These are FICTIONAL demonstration profiles (labelled on the website). Replace or delete them in the admin panel (Website content > Team).")
-
-
 def seed_service_demo(args: argparse.Namespace) -> None:
     """Load FICTIONAL demonstration clients and testimonials assigned to the individual service pages (flagged "sample", placeholder logos, no photos).
     The home page's own rows are never touched. Idempotent by slug; existing rows are not overwritten. --remove deletes only the rows this command added."""
@@ -701,6 +659,59 @@ def seed_welcome(args: argparse.Namespace) -> None:
         print(f"Added {added} welcome experience item(s) ({len(wanted) - added} already present). Manage them in the admin panel (Welcome Experience).")
 
 
+def seed_carousel(args: argparse.Namespace) -> None:
+    """Load the image carousel settings and its temporary sample pictures (app/seed_carousel.py) so the section can be previewed. Idempotent by slug; nothing is overwritten.
+    --remove deletes the sample pictures (and the settings only if you never changed them). Pictures you uploaded yourself are never touched."""
+    from app import seed_carousel as data
+    from app.models import ContentItem
+
+    get_settings()
+    wanted = [("carousel_page", data.SETTINGS["slug"], data.SETTINGS["title"], data.SETTINGS["data"], 0)] + [("carousel_image", r["slug"], r["title"], r["data"], r["sort_order"]) for r in data.image_rows()]
+    with _factory()() as db:
+        existing = {(i.kind, i.slug): i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(("carousel_page", "carousel_image"))))}
+        if args.remove:
+            gone = [existing[(k, s)] for k, s, *_ in wanted if k == "carousel_image" and (k, s) in existing and (existing[(k, s)].data or {}).get("sample")]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} sample picture(s). Pictures you added yourself were not touched.")
+            return
+        added = 0
+        for kind, slug, title, payload, order in wanted:
+            if (kind, slug) in existing:
+                continue
+            db.add(ContentItem(kind=kind, slug=slug, title=title, data=payload, status="published", sort_order=order))
+            added += 1
+        db.commit()
+        print(f"Added {added} image carousel item(s) ({len(wanted) - added} already present). Manage them in the admin panel (Image carousel).")
+
+
+def seed_team_samples(args: argparse.Namespace) -> None:
+    """Load TEMPORARY sample team profiles (one founder, five employees; fictional, labelled "Sample profile") so the Our Team page can be previewed. Idempotent by slug.
+    --remove deletes the profiles marked as samples; real profiles are never touched."""
+    from app import seed_team_samples as data
+    from app.models import ContentItem
+
+    get_settings()
+    with _factory()() as db:
+        existing = {i.slug: i for i in db.scalars(select(ContentItem).where(ContentItem.kind == "team_member"))}
+        if args.remove:
+            gone = [i for i in existing.values() if (i.data or {}).get("sample")]
+            for item in gone:
+                db.delete(item)
+            db.commit()
+            print(f"Removed {len(gone)} sample team profile(s). Profiles you added yourself were not touched.")
+            return
+        added = 0
+        for r in data.rows():
+            if r["slug"] in existing:
+                continue
+            db.add(ContentItem(kind="team_member", slug=r["slug"], title=r["title"], data=r["data"], status="published", sort_order=r["sort_order"]))
+            added += 1
+        db.commit()
+        print(f"Added {added} sample team profile(s) ({len(data.PEOPLE) - added} already present). They are fictional: replace them in the admin panel (Team) and remove the samples.")
+
+
 def purge_enquiries(args: argparse.Namespace) -> None:
     """Data retention: delete enquiries (with their notes, follow-ups and attached documents) that are older than --days AND finished
     (converted, not interested or closed), or archived. Active leads are never touched. --dry-run only counts."""
@@ -772,10 +783,6 @@ def main(argv: list[str] | None = None) -> None:
     snet = sub.add_parser("seed-network", help="load the Our Network starter companies (CADPOINT, Fatcat Wealthy, Zoho, OpenAI, Marg ERP, HexBis; designations pending verification), or --remove them")
     snet.add_argument("--remove", action="store_true")
     snet.set_defaults(func=seed_network)
-    std = sub.add_parser("seed-team-demo", help="load FICTIONAL demonstration team departments and members (labelled 'Demonstration profile', no photos), or --remove them")
-    std.add_argument("--remove", action="store_true")
-    std.add_argument("--draft", action="store_true", help="load the demonstration profiles unpublished")
-    std.set_defaults(func=seed_team_demo)
     ssd = sub.add_parser("seed-service-demo", help="load FICTIONAL demonstration clients and testimonials for every individual service page (labelled 'Sample'), or --remove them")
     ssd.add_argument("--remove", action="store_true")
     ssd.set_defaults(func=seed_service_demo)
@@ -785,6 +792,12 @@ def main(argv: list[str] | None = None) -> None:
     sw2 = sub.add_parser("seed-welcome", help="load the 7-card Welcome Experience (settings + cards) into the CMS, or --remove them")
     sw2.add_argument("--remove", action="store_true")
     sw2.set_defaults(func=seed_welcome)
+    sca = sub.add_parser("seed-carousel", help="load the image carousel settings and its temporary sample pictures, or --remove the samples")
+    sca.add_argument("--remove", action="store_true")
+    sca.set_defaults(func=seed_carousel)
+    sts = sub.add_parser("seed-team-samples", help="load temporary FICTIONAL sample team profiles (a founder and five employees, labelled Sample profile), or --remove them")
+    sts.add_argument("--remove", action="store_true")
+    sts.set_defaults(func=seed_team_samples)
     pe = sub.add_parser("purge-enquiries", help="data retention: delete finished (converted / not interested / closed) or archived enquiries older than --days, with their documents")
     pe.add_argument("--days", type=int, required=True, help="minimum age in days (at least 30)")
     pe.add_argument("--dry-run", action="store_true", help="only count what would be deleted")

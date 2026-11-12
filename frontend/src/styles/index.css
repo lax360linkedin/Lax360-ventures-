@@ -284,10 +284,31 @@ html[data-intro="pending"] #root { visibility: hidden; animation: intro-failsafe
 html[data-intro="pending"] :is(.a-rise, .a-pop, .a-fade),
 html[data-intro="playing"] :is(.a-rise, .a-pop, .a-fade) { animation-play-state: paused; }
 @keyframes intro-failsafe { to { visibility: visible; } }
+/* while the welcome cards are open the page behind is blurred and unreachable: stop its animations (and, in HeroVideo, its video) so the blur is cheap and the cards stay smooth */
+html[data-intro="cards"] #root *, html[data-intro="cards"] #root *::before, html[data-intro="cards"] #root *::after { animation-play-state: paused !important; }
 html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s !important; animation-delay: 0s !important; } /* skipped: show the homepage immediately */
 
+/* ---------- Founder spotlight (pages/Team.jsx): slow float, rotating light ring, breathing glow, orbiting dots, a passing sheen. Transform / opacity only. ---------- */
+.fd-float { animation: fd-float 7s ease-in-out infinite; }
+.fd-ring { animation: fd-spin 24s linear infinite; }
+.fd-orbit { animation: fd-spin 18s linear infinite; }
+.fd-orbit-r { animation: fd-spin 28s linear infinite reverse; }
+.fd-glow { animation: fd-pulse 6s ease-in-out infinite; }
+.fd-sheen { animation: fd-sheen 7s ease-in-out infinite; }
+@keyframes fd-float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -12px, 0); } }
+@keyframes fd-spin { to { transform: rotate(360deg); } }
+@keyframes fd-pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.85; transform: scale(1.07); } }
+@keyframes fd-sheen { 0%, 62% { transform: translateX(-130%) skewX(-18deg); opacity: 0; } 70% { opacity: 1; } 100% { transform: translateX(260%) skewX(-18deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .fd-float, .fd-ring, .fd-orbit, .fd-orbit-r, .fd-glow, .fd-sheen { animation: none; } }
+
+/* ---------- Image carousel (components/sections/ImageCarousel.jsx): one picture height per screen size; frames are 1.953 (wide) or 0.92 (narrow) times that wide ---------- */
+.gal { --gal-h: 170px; }
+@media (min-width: 640px) { .gal { --gal-h: 230px; } }
+@media (min-width: 1024px) { .gal { --gal-h: 300px; } }
+.gal-track { backface-visibility: hidden; }
+
 /* ---------- Welcome experience (src/components/intro/WelcomeExperience.jsx): backdrop art. Transforms and opacity only; off for reduced motion. ---------- */
-.we-layer { transform: translate3d(calc(var(--px, 0) * var(--depth, 1) * -9px), calc(var(--py, 0) * var(--depth, 1) * -7px), 0); transition: transform 0.35s ease-out; will-change: transform; }
+.we-layer { transform: translate3d(calc(var(--px, 0) * var(--depth, 1) * -9px), calc(var(--py, 0) * var(--depth, 1) * -7px), 0); }
 .we-spin, .we-spin-r, .we-grow, .we-ping { transform-box: fill-box; transform-origin: center; }
 .we-spin { animation: we-spin 60s linear infinite; }
 .we-spin-r { animation: we-spin 80s linear infinite reverse; }

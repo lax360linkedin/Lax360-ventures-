@@ -32,11 +32,13 @@ def F(name, label, kind="text", required=False, max_len=300, options=None, help=
 WELCOME_THEMES = [{"value": v, "label": l} for v, l in (("welcome", "Welcome (violet and electric blue)"), ("software", "Software (code and interface)"), ("marketing", "Marketing (growth and reach)"),
                                                        ("education", "Education (learning paths)"), ("ai", "AI & Automation (neural network)"), ("robotics", "Robotics (circuits and motion)"),
                                                        ("blockchain", "Blockchain (linked blocks)"), ("celebration", "Celebration (festival, announcement or offer)"))]
+CAROUSEL_SHAPES = [{"value": "landscape", "label": "Landscape (wide)"}, {"value": "portrait", "label": "Portrait (narrow)"}]
+CAROUSEL_SPEEDS = [{"value": "slow", "label": "Slow"}, {"value": "normal", "label": "Normal"}, {"value": "fast", "label": "Fast"}]
 WELCOME_CARD_TYPES = [{"value": v, "label": l} for v, l in (("regular", "Regular welcome card"), ("festival", "Festival greeting"), ("announcement", "Special announcement"), ("offer", "Company offer / promotion"))]
 DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("ai", "AI & Business Automation"), ("growth", "Digital Marketing"), ("headless", "Headless SaaS & API Solutions"), ("automation", "Workflow Automation & Integration"), ("mobile", "Mobile & Business Applications"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
     ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
-    ("process", "How we work"),
+    ("process", "How we work"), ("gallery", "Image carousel (between Testimonials and Our Clients)"),
     ("faq", "FAQ"), ("contact", "Contact call-to-action"))]
 ABOUT_SECTIONS = [{"value": v, "label": l} for v, l in (
     ("story", "Our story"), ("motto", "Our motto"), ("purpose", "Mission & vision"), ("expertise", "Core expertise"), ("features", "Our features"),
@@ -63,11 +65,9 @@ SOFTWARE_CATEGORIES = [{"value": v, "label": l} for v, l in (
     ("crm_erp", "CRM & ERP"), ("accounting", "Accounting & Billing"), ("hr", "HR & Payroll"), ("productivity", "Business Productivity"), ("ai", "AI Platforms & Subscriptions"),
     ("cloud", "Cloud & Business Applications"), ("other", "Other"))]
 SOFTWARE_OWNERSHIP = [{"value": v, "label": l} for v, l in (("lax360", "Developed by LAX360"), ("third_party", "Third-party partner product"), ("resold", "Resold / distributed software"), ("integrated", "Integrated technology solution"))]
-TEAM_GROUPS = [{"value": v, "label": l} for v, l in (("leadership", "Founder & Leadership"), ("management", "Management Team"), ("heads", "Department Heads"), ("software", "Software Development Team"),
-                                                    ("ai", "AI & Automation Team"), ("marketing", "Digital Marketing Team"))]
-TEAM_LEADERSHIP_ROLES = [{"value": v, "label": l} for v, l in (("managing_director", "Managing Director"), ("founder", "Founder / Co-Founder"), ("technical_director", "Technical Director"), ("department_head", "Department Head"), ("leadership", "Other leadership"))]
+TEAM_ROLE_LEVELS = [{"value": v, "label": l} for v, l in (("founder", "Founder"), ("ceo", "CEO"), ("managing_director", "Managing Director"), ("department_head", "Department Head"), ("team_lead", "Team Lead"), ("team_member", "Team Member"))]
+TEAM_LEADERSHIP = ("founder", "ceo", "managing_director")  # shown in the Leadership section
 CAREER_ICONS = (("sparkles", "Sparkles"), ("rocket", "Rocket"), ("graduation", "Learning"), ("users", "Team"), ("laptop", "Technology"), ("heart", "Care"), ("trending", "Growth"), ("clock", "Time"), ("map", "Location"))
-TEAM_DEPARTMENTS = [{"value": v, "label": l} for v, l in (("software-development", "Software Development"), ("ai-automation", "AI & Automation"), ("digital-marketing", "Digital Marketing"), ("business-operations", "Business & Operations"))]
 TEAM_GALLERY_CATEGORIES = [{"value": v, "label": l} for v, l in (("activities", "Team activities"), ("office", "Office environment"), ("celebrations", "Team celebrations"), ("workshops", "Technical workshops"),
                                                                 ("knowledge", "Knowledge-sharing sessions"), ("learning", "Learning & development"), ("achievements", "Employee achievements"))]
 ARTICLE_CATEGORIES =[{"value": v, "label": l} for v, l in (("ai", "Artificial Intelligence & Generative AI"), ("software", "Software Development & Technology"), ("automation", "Business Automation"),
@@ -186,7 +186,7 @@ KINDS: dict[str, dict] = {
         "fields": [F("description", "Short description", "textarea", False, max_len=300)],
     },
     "network_partner": {
-        "label": "Network companies & partners", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
+        "public_filter": ("enabled", False, "exclude"), "label": "Network companies & partners", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
         "help": "Companies in the LAX360 Pvt Ltd network. New entries start as drafts: check the company's identity, website and the exact relationship, set Verification, then publish. "
                 "A partnership designation (for example \"Authorized Partner\") is shown publicly only when Verification is \"Verified\" and the expiry date has not passed. "
                 "Never describe another company as owned by LAX360 unless that is verified.",
@@ -205,6 +205,7 @@ KINDS: dict[str, dict] = {
             F("contact_email", "Contact email (optional)", max_len=120), F("contact_phone", "Contact phone (optional)", max_len=40),
             F("website_link", "Official website (optional)", max_len=300, help="The full https:// address of the company's own website"),
             F("cta_label", "Button text", max_len=40, help="e.g. Visit CADPOINT"), F("featured", "Featured", "bool", default=False),
+            F("enabled", "Show on the website", "bool", default=True, help="Untick to hide this entry from the website without deleting it. Publishing and unpublishing work as well: hiding is the quick on/off switch."),
             F("logo", "Official logo (optional)", "image", help="Only a logo you are permitted to use. Do not edit or redraw a company's logo."),
             # ---- Partner details page (/our-network/<partner>): every field is optional; a section with nothing entered says the details are being confirmed ----
             F("overview", "Company introduction (details page)", "textarea", False, max_len=2500, help="Who the company is, from its own website. A blank line starts a new paragraph."),
@@ -230,7 +231,7 @@ KINDS: dict[str, dict] = {
         ],
     },
     "software_product": {
-        "label": "Software distribution", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
+        "public_filter": ("enabled", False, "exclude"), "label": "Software distribution", "group": "Network", "module": "content", "single": False, "preview_path": "/our-network",
         "help": "Software LAX360 helps customers choose, buy, implement and use. Link each product to its real vendor and state clearly whether it is third-party, resold, integrated or developed by LAX360. "
                 "Do not present third-party software as LAX360's own.",
         "title_label": "Product name",
@@ -239,6 +240,7 @@ KINDS: dict[str, dict] = {
             F("software_category", "Software category", "select", True, options=SOFTWARE_CATEGORIES),
             F("ownership", "Type", "select", True, options=SOFTWARE_OWNERSHIP, default="third_party"),
             F("description", "Description", "textarea", True, max_len=500, help="What the vendor's product is, in neutral terms."),
+            F("enabled", "Show on the website", "bool", default=True, help="Untick to hide this entry from the website without deleting it. Publishing and unpublishing work as well: hiding is the quick on/off switch."),
             F("product_link", "Vendor product page (optional)", max_len=300), F("cta_link", "Enquiry link (optional)", max_len=300, help="e.g. /contact?type=project"),
         ],
     },
@@ -254,46 +256,46 @@ KINDS: dict[str, dict] = {
         ],
     },
     "team_member": {
-        "label": "Team members", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team",
-        "help": "The people behind LAX360 Pvt Ltd. Choose the team each person belongs to; use the order number to arrange people within a team. Publish to show a profile, unpublish to hide it.",
-        "title_label": "Name", "public_filter": ("active", False, "exclude"),
+        "label": "Employees", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team",
+        "help": "The people behind LAX360 Pvt Ltd: one profile per employee. The Founder (also CEO / Managing Director: one person, shown once, centred at the top) is marked with the Founder, CEO or Managing Director position; "
+                "everyone else appears in the team gallery, or under their department when the Departments section is switched on. Use the order number (or the arrows) to arrange people. Untick “Show on the website” to hide a profile without deleting it.",
+        "title_label": "Full name", "public_filter": ("active", False, "exclude"),
         "fields": [
-            F("leadership_role", "Leadership role", "select", False, options=TEAM_LEADERSHIP_ROLES, help="Set this to show the person in the Leadership section. Leave empty for a regular team member."),
-            F("department", "Department", "select", False, options=TEAM_DEPARTMENTS, options_from="team_department", help="The four standard departments, plus any you add under Team > Departments."),
-            F("group", "Team group (optional)", "select", False, options=TEAM_GROUPS, help="Older grouping, kept for existing profiles."),
-            F("designation", "Designation", "text", True, max_len=120),
-            F("bio", "Short biography", "textarea", max_len=800),
-            F("expertise", "Skills & areas of expertise", "textarea", max_len=400, help="Comma-separated, e.g. React, FastAPI, SEO."),
-            F("photo", "Photo", "image"), F("photo_alt", "Photo description", max_len=160, help="Short description for screen readers."),
-            F("linkedin_link", "LinkedIn profile (optional)", max_len=300, help="The person's full LinkedIn address, e.g. https://www.linkedin.com/in/name"),
-            F("twitter_link", "X (Twitter) profile (optional)", max_len=300), F("github_link", "GitHub profile (optional)", max_len=300), F("instagram_link", "Instagram profile (optional)", max_len=300),
-            F("featured", "Featured profile", "bool", default=False, help="Featured people are shown first in the team directory."),
-            F("reports_to", "Reporting role", max_len=120, help="Who this person reports to, e.g. Head of Software Development."),
-            F("demo", "Demonstration profile (fictional)", "bool", default=False, help="Marks sample content. It is labelled “Demonstration profile” on the website. Replace it with real details, then untick this."),
-            F("active", "Active", "bool", default=True, help="Untick to hide the profile from the website without deleting it."),
+            F("role_level", "Position", "select", False, options=TEAM_ROLE_LEVELS, default="team_member", help="Founder, CEO and Managing Director are shown in the Leadership section. Leave empty for a team member."),
+            F("designation", "Designation (job title)", "text", True, max_len=120),
+            F("department", "Department", "select", False, options_from="team_department", help="A department you created under Departments. Leave empty if you do not use departments. Changing it moves the person automatically."),
+            F("bio", "Short professional bio (optional)", "textarea", max_len=800),
+            F("expertise", "Skills", "textarea", max_len=400, help="Comma-separated, e.g. React, FastAPI, SEO."),
+            F("photo", "Photograph", "image", help="A real, professional photograph (portrait, about 600 x 750 px). Without one the card shows the person's initials."), F("photo_alt", "Photo description", max_len=160, help="Short description for screen readers."),
+            F("linkedin_link", "LinkedIn profile (optional)", max_len=300, help="The person's full LinkedIn address, e.g. https://www.linkedin.com/in/name. No other contact details are shown on the website."),
+            F("active", "Show on the website", "bool", default=True, help="Untick to hide the profile from the website without deleting it."),
+            F("sample", "Temporary sample profile", "bool", default=False, help="Marks demonstration content: the website shows a “Sample profile” label on it. Untick it once you have entered the real details and photograph."),
+            F("photo_path", "Built-in picture (file path)", max_len=120, ui="hidden"),
         ],
     },
     "team_department": {
-        "label": "Team departments", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team#departments",
-        "help": "The departments shown on the Our Team page. Add the roles that exist in each one; team members are linked to a department from their own profile.",
-        "title_label": "Department name",
+        "label": "Departments", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team#departments",
+        "help": "The departments of the Our Team page (only shown when the Departments section is switched on). Employees are assigned from their own profile, and the person marked Department Head leads the department. "
+                "Use the order number (or the arrows) to arrange departments.",
+        "title_label": "Department name", "public_filter": ("active", False, "exclude"),
         "fields": [
-            F("description", "Description", "textarea", True, max_len=500, help="Short text for the department card."),
-            F("overview", "Overview (department page)", "textarea", max_len=1500, help="A longer introduction. A blank line starts a new paragraph."),
-            F("roles", "Roles in this department", "textarea", max_len=800, help="One role per line, e.g. Frontend Developers."),
-            F("responsibilities", "Responsibilities", "textarea", max_len=1200, help="One responsibility per line."),
-            F("expertise", "Key areas of expertise", "textarea", max_len=600, help="Comma-separated."),
-            F("demo", "Demonstration content (fictional)", "bool", default=False, help="Marks sample content; it is labelled on the website."),
-            F("image", "Department image", "image"), F("image_alt", "Image description", max_len=160),
+            F("description", "Description", "textarea", False, max_len=500, help="Short text shown under the department name."),
+            F("image", "Department image (optional)", "image"), F("image_alt", "Image description", max_len=160),
+            F("overview", "Overview for the department page (optional)", "textarea", max_len=1500, help="A longer introduction. A blank line starts a new paragraph."),
+            F("roles", "Roles in this department (optional)", "textarea", max_len=800, help="One role per line."),
+            F("responsibilities", "Responsibilities (optional)", "textarea", max_len=1200, help="One responsibility per line."),
+            F("expertise", "Key areas of expertise (optional)", "textarea", max_len=600, help="Comma-separated."),
+            F("active", "Show this department", "bool", default=True, help="Untick to hide the department; its employees then appear under “Other team members” while the Departments section is on."),
         ],
     },
     "team_gallery": {
         "label": "Team & culture gallery", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team#culture",
         "help": "Genuine LAX360 photographs only (team activities, office, celebrations, workshops, learning, achievements). Nothing is shown until you publish photos.",
-        "title_label": "Caption",
+        "title_label": "Photo name (for you)",
         "fields": [
             F("category", "Category", "select", True, options=TEAM_GALLERY_CATEGORIES), F("image", "Photograph", "image", True),
-            F("image_alt", "Photo description", max_len=160, help="Short description for screen readers."), F("description", "Details (optional)", "textarea", max_len=300),
+            F("caption", "Caption shown on the website (optional)", max_len=120, help="Leave empty to show the photograph alone."),
+            F("image_alt", "Photo description", max_len=160, help="Short description for screen readers."), F("description", "Details (optional)", "textarea", max_len=300, ui="optional"),
         ],
     },
     "team_expertise": {
@@ -304,8 +306,15 @@ KINDS: dict[str, dict] = {
     },
     "team_page": {
         "label": "Our Team page text", "group": "Team", "module": "content", "single": True, "slug": "team", "preview_path": "/our-team",
-        "help": "The hero and the section headings of the Our Team page. Leave a field empty to keep the built-in text.",
+        "help": "Switch the sections of the Our Team page on or off, and edit the hero and the section headings. Leave a text field empty to keep the built-in text. "
+                "With Departments off the page is the leadership profile followed by the team gallery; with Departments on, employees are grouped under their departments.",
         "fields": [
+            F("show_leadership", "Leadership Team section", "bool", default=True, help="Founder, CEO and Managing Director profiles at the top."),
+            F("show_departments", "Departments section", "bool", default=False, help="Off: all employees in one gallery. On: employees are grouped automatically under their departments."),
+            F("show_directory", "Team members section", "bool", default=True, help="The employee gallery (when Departments is on, the employees are shown inside their departments instead)."),
+            F("show_culture", "People & culture photographs", "bool", default=True, help="Only shown when you have published photographs."),
+            F("show_expertise", "Expertise section", "bool", default=False),
+            F("show_careers", "Careers section", "bool", default=True),
             F("hero_eyebrow", "Hero small label", max_len=60), F("hero_title", "Hero headline", max_len=120), F("hero_lead", "Hero introduction", "textarea", max_len=500),
             F("hero_image", "Hero background image (a real LAX360 team photograph)", "image"), F("hero_image_alt", "Hero image description", max_len=160),
             F("leadership_title", "Leadership heading", max_len=100), F("leadership_lead", "Leadership description", "textarea", max_len=300),
@@ -339,7 +348,7 @@ KINDS: dict[str, dict] = {
     },
     # ---- Clients --------------------------------------------------------------------------------------------------------------------
     "client": {
-        "label": "Our clients", "group": "Clients", "module": "content", "single": False, "preview_path": "/",
+        "public_filter": ("enabled", False, "exclude"), "label": "Our clients", "group": "Clients", "module": "content", "single": False, "preview_path": "/",
         "help": "Genuine clients only, with their permission to be shown. Published clients with no service chosen appear in the \"Our Clients\" strip on the home page, in this order (use the order number to arrange them); clients assigned to services appear on those service pages. "
                 "Entries marked as samples are placeholders: edit or delete them once you have real clients. With none published, the section is hidden.",
         "title_label": "Company name",
@@ -350,13 +359,14 @@ KINDS: dict[str, dict] = {
             F("services", "Services this client has received", "multiselect", False, max_len=2000, ui="services", options=[{"value": v, "label": l} for v, l in SERVICE_SCOPES],
               help="Choose the main service, then tick the sub-services. The client then appears automatically on each sub-service page, on the main service page, and on the home page. Leave empty for a general client (home page only)."),
             F("hide_on_home", "Hide from the home page", "bool", default=False, help="Tick to show it only on its service pages."),
+            F("enabled", "Show on the website", "bool", default=True, help="Untick to hide this entry from the website without deleting it. Publishing and unpublishing work as well: hiding is the quick on/off switch."),
             F("is_sample", "Sample entry (placeholder, not a real client)", "bool", default=False, help="Tick only for placeholders. Replace a sample by editing it (upload a real logo, rename it, untick this) or delete it."),
-            F("logo_url", "Built-in sample logo (leave empty for real clients)", max_len=120, help="Path of artwork shipped with the website, used only when no logo is uploaded above."),
+            F("logo_url", "Built-in sample logo (leave empty for real clients)", max_len=120, help="Path of artwork shipped with the website, used only when no logo is uploaded above.", ui="hidden"),
         ],
     },
     # ---- Testimonials ---------------------------------------------------------------------------------------------------------------
     "testimonial": {
-        "label": "Client & student testimonials", "group": "Testimonials", "module": "content", "single": False, "preview_path": "/",
+        "public_filter": ("enabled", False, "exclude"), "label": "Client & student testimonials", "group": "Testimonials", "module": "content", "single": False, "preview_path": "/",
         "help": "Real feedback only, shown with the person's permission. Published testimonials with no service chosen appear one at a time in \"What Our Clients & Students Say\" on the home page; choose a service to show one on that service page instead. Order: "
                 "(use the order number to arrange them). Entries marked as samples are fictional placeholders shown with a \"Sample\" label: edit or delete them once you have real feedback. "
                 "With none published, the section is hidden.",
@@ -371,12 +381,13 @@ KINDS: dict[str, dict] = {
               help="Step 1: choose the main service. Step 2: choose the exact sub-service (or the main service itself). The testimonial then appears automatically on that sub-service page, on its main service page, and on the home page. Leave empty for a general testimonial (home page only)."),
             F("hide_on_home", "Hide from the home page", "bool", default=False, help="Tick to show it only on its service pages."),
             F("rating", "Rating (optional)", "select", False, options=[{"value": str(n), "label": f"{n} out of 5"} for n in (5, 4, 3, 2, 1)]),
+            F("enabled", "Show on the website", "bool", default=True, help="Untick to hide this entry from the website without deleting it. Publishing and unpublishing work as well: hiding is the quick on/off switch."),
             F("is_sample", "Sample (fictional placeholder, not real feedback)", "bool", default=False, help="Untick once you replace the content with real feedback."),
         ],
     },
     # ---- Portfolio ------------------------------------------------------------------------------------------------------------------
     "project": {
-        "label": "Projects & solutions", "group": "Portfolio", "module": "content", "single": False, "preview_path": "/work",
+        "public_filter": ("enabled", False, "exclude"), "label": "Projects & solutions", "group": "Portfolio", "module": "content", "single": False, "preview_path": "/work",
         "help": "Publish only client-approved work with verified details. When at least one project is published, the Work page shows projects instead of the illustrative concepts.",
         "fields": [
             F("division", "Division", "select", True, options=DIVISIONS),
@@ -385,12 +396,13 @@ KINDS: dict[str, dict] = {
             F("summary", "Summary", "textarea", True, max_len=600),
             F("image", "Project image", "image"), F("video", "Project video", "video"),
             F("link", "Case study link (optional)", max_len=300),
+            F("enabled", "Show on the website", "bool", default=True, help="Untick to hide this entry from the website without deleting it. Publishing and unpublishing work as well: hiding is the quick on/off switch."),
         ],
         "title_label": "Project title",
     },
     # ---- Products -------------------------------------------------------------------------------------------------------------------
     "product": {
-        "label": "Products", "group": "Products", "module": "content", "single": False, "preview_path": "/products",
+        "public_filter": ("enabled", False, "exclude"), "label": "Products", "group": "Products", "module": "content", "single": False, "preview_path": "/products",
         "help": "LAX360's own software products and SaaS platforms (never third-party products). Each published product appears on the Products page and gets its own details page. "
                 "When at least one product is published, these replace the built-in list. Add screenshots of the real product, and keep the status accurate: the demo and access buttons only appear for Live and Beta products.",
         "title_label": "Product name",
@@ -413,6 +425,7 @@ KINDS: dict[str, dict] = {
             F("demo_link", "Demo request link", max_len=300, help="Optional: a page where visitors can request a demo."),
             F("demo_site_link", "Demo website / live preview link", max_len=300, help="A working demo of the software that anyone can open without logging in (https:// URL). Shown on the card and the product page, whatever the status."),
             F("cta_label", "Main button text", max_len=40, help="Defaults to \"Enquire about this product\"."),
+            F("enabled", "Show on the website", "bool", default=True, help="Untick to hide this entry from the website without deleting it. Publishing and unpublishing work as well: hiding is the quick on/off switch."),
         ],
     },
     "product_module": {
@@ -441,7 +454,7 @@ KINDS: dict[str, dict] = {
     },
     # ---- Website portfolio ----------------------------------------------------------------------------------------------------------
     "website": {
-        "label": "Website portfolio", "group": "Websites", "module": "content", "single": False, "preview_path": "/websites",
+        "public_filter": ("enabled", False, "exclude"), "label": "Website portfolio", "group": "Websites", "module": "content", "single": False, "preview_path": "/websites",
         "help": "The websites shown under “Our Websites & Live Demos”: LAX360 company websites, client websites and demonstration projects. Describe only what the live website really has. "
                 "Leave the web address empty for a site that is not live yet (no link is shown). Publish to list it; each entry gets its own details page.",
         "title_label": "Website name",
@@ -462,10 +475,40 @@ KINDS: dict[str, dict] = {
             F("screenshot_1", "Screenshot 1", "image"), F("screenshot_2", "Screenshot 2", "image"), F("screenshot_3", "Screenshot 3", "image"), F("screenshot_4", "Screenshot 4", "image"),
             F("screenshot_5", "Screenshot 5", "image"), F("screenshot_6", "Screenshot 6", "image"),
             F("mobile_image", "Mobile view screenshot", "image"),
-            F("preview_paths", "Built-in screenshots (file paths)", "textarea", max_len=1500, help="Screenshots shipped with the website, one path per line (/assets/websites/name.jpg). Uploaded images above are shown first."),
-            F("mobile_path", "Built-in mobile screenshot (file path)", max_len=120),
+            F("preview_paths", "Built-in screenshots (file paths)", "textarea", max_len=1500, help="Screenshots shipped with the website, one path per line (/assets/websites/name.jpg). Uploaded images above are shown first.", ui="hidden"),
+            F("mobile_path", "Built-in mobile screenshot (file path)", max_len=120, ui="hidden"),
             F("embed_preview", "Show an embedded live preview on the details page", "bool", default=False, help="Visitors can load the live site inside the page. If the website blocks embedding, the screenshots and the Explore button are used instead."),
             F("featured", "Featured", "bool", default=False, help="Featured websites are shown first on the Products page."),
+            F("enabled", "Show on the website", "bool", default=True, help="Untick to hide this entry from the website without deleting it. Publishing and unpublishing work as well: hiding is the quick on/off switch."),
+        ],
+    },
+    # ---- Image carousel (the slow, swipeable picture strip between Testimonials and Our Clients) ----------------------------------------------------------
+    "carousel_page": {
+        "label": "Image carousel settings", "group": "Homepage", "module": "content", "single": True, "slug": "carousel", "preview_path": "/#gallery",
+        "help": "The heading, introduction, speed and on/off switch of the picture strip on the home page (between Testimonials and Our Clients). The pictures themselves are managed under Image carousel. "
+                "The strip is hidden automatically when no picture is switched on.",
+        "fields": [
+            F("enabled", "Show the image carousel", "bool", default=True),
+            F("eyebrow", "Small label above the title", max_len=60),
+            F("title", "Title", max_len=80), F("title_accent", "Title: highlighted words", max_len=60),
+            F("lead", "Short introduction", "textarea", max_len=300),
+            F("speed", "Automatic movement", "select", options=CAROUSEL_SPEEDS, default="normal", help="Visitors can always swipe, drag or scroll it themselves; it pauses while they do."),
+            F("pause_on_hover", "Pause when the pointer is over it", "bool", default=True),
+        ],
+    },
+    "carousel_image": {
+        "label": "Image carousel", "group": "Homepage", "module": "content", "single": False, "preview_path": "/#gallery",
+        "help": "The pictures of the strip, in order. Upload your own photographs, switch pictures on or off, re-order them and delete the temporary sample images when you no longer need them. "
+                "A picture marked as a sample shows a small “Sample image” label on the website, so placeholders are never mistaken for real photographs.",
+        "title_label": "Picture name (for you)",
+        "fields": [
+            F("image", "Picture", "image", help="Upload in the media library. Wide pictures look best at about 1170 x 600 px, narrow ones at about 550 x 600 px."),
+            F("shape", "Frame shape", "select", options=CAROUSEL_SHAPES, default="landscape", help="Wide or narrow frame; the picture is cropped to fill it."),
+            F("alt", "Description of the picture (for screen readers)", max_len=160),
+            F("caption", "Caption shown on hover (optional)", max_len=120),
+            F("enabled", "Show this picture", "bool", default=True),
+            F("sample", "This is a temporary sample image", "bool", default=False, help="Shows a “Sample image” label on the website. Untick it for your own photographs."),
+            F("image_path", "Built-in picture (file path)", max_len=120, help="Only for the pictures shipped with the website (/assets/carousel/name.webp). An uploaded picture above takes priority.", ui="hidden"),
         ],
     },
     # ---- Welcome Experience (the interactive cards shown after the intro animation) -----------------------------------------------------
@@ -660,6 +703,12 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
         elif name == "logo_url":
             if value and not re.match(r"^/assets/clients/[A-Za-z0-9._-]+\.(svg|png|webp)$", value):
                 errors[name] = "Leave this empty, or use a built-in artwork path such as /assets/clients/sample-1.svg"
+        elif name == "image_path":
+            if value and not re.match(r"^/assets/carousel/[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$", value):
+                errors[name] = "Use a built-in picture path such as /assets/carousel/sample-1.webp, or leave this empty."
+        elif name == "photo_path":
+            if value and not re.match(r"^/assets/team/[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$", value):
+                errors[name] = "Use a built-in picture path such as /assets/team/sample-1.webp, or leave this empty."
         elif name == "preview_paths" or name == "mobile_path":
             if value and not all(re.match(r"^/assets/websites/[A-Za-z0-9._-]+\.(jpg|jpeg|png|webp)$", line.strip()) for line in value.splitlines() if line.strip()):
                 errors[name] = "Use built-in screenshot paths such as /assets/websites/name.jpg (one per line), or leave this empty."
@@ -683,6 +732,8 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
                 errors[name] = "Use a page path like /contact or a full https:// URL."
         if value:
             clean[name] = value
+    if kind == "carousel_image" and not errors.get("image") and not clean.get("image") and not clean.get("image_path"):
+        errors["image"] = "Choose a picture."
     if kind == "welcome_card" and "end_date" not in errors and "start_date" not in errors and clean.get("start_date") and clean.get("end_date") and clean["end_date"] < clean["start_date"]:
         errors["end_date"] = "The end date must be on or after the start date."
     if errors:
@@ -787,25 +838,28 @@ def reorder(db: Session, kind: str, ids: list[uuid.UUID]) -> None:
         items[item_id].sort_order = position * 10
 
 
-def _resolve(db: Session, settings: Settings, kind: str, data: dict, preview: bool = False) -> dict:
+def _asset(db: Session, assets: dict | None, raw: str):
+    """The media row for an id: from a preloaded map when there is one (the bundle), otherwise one query."""
+    try:
+        key = uuid.UUID(raw)
+    except ValueError:
+        return None
+    return assets.get(key) if assets is not None else db.get(MediaAsset, key)
+
+
+def _resolve(db: Session, settings: Settings, kind: str, data: dict, preview: bool = False, assets: dict | None = None) -> dict:
     """Replace media ids with the URL a browser can load (None when the file is gone or not public, so a deleted file never breaks a page)."""
     out = dict(data or {})
     for f in KINDS[kind]["fields"]:
         if f["type"] == "document" and out.get(f["name"]):  # a private download: the browser only gets the file's name, size and type, never a link to it
-            try:
-                asset = db.get(MediaAsset, uuid.UUID(out[f["name"]]))
-            except ValueError:
-                asset = None
+            asset = _asset(db, assets, out[f["name"]])
             if asset is None:
                 del out[f["name"]]
             else:
                 out[f["name"] + "_info"] = {"filename": asset.filename, "size": asset.size_bytes, "type": asset.content_type}
             continue
         if f["type"] in ("image", "video") and out.get(f["name"]):
-            try:
-                asset = db.get(MediaAsset, uuid.UUID(out[f["name"]]))
-            except ValueError:
-                asset = None
+            asset = _asset(db, assets, out[f["name"]])
             if asset is None:
                 out[f["name"]] = None
             elif asset.is_public:
@@ -860,8 +914,26 @@ def public_items(db: Session, settings: Settings, kind: str, *, include_drafts: 
 
 
 def public_bundle(db: Session, settings: Settings) -> dict[str, list[dict]]:
-    """Every kind's published items in one response (the website fetches this once instead of once per section)."""
-    return {kind: public_items(db, settings, kind) for kind in KINDS}
+    """Every kind's published items in one response (the website fetches this once instead of once per section).
+    Two queries in total (all published items, then every picture they use), whatever the number of kinds or pictures: each query is a network round trip."""
+    rows = list(db.scalars(select(ContentItem).where(ContentItem.status == "published", ContentItem.kind.in_(list(KINDS))).order_by(ContentItem.sort_order, ContentItem.created_at)))
+    wanted: set[uuid.UUID] = set()
+    for i in rows:
+        for f in KINDS[i.kind]["fields"]:
+            raw = (i.data or {}).get(f["name"])
+            if raw and f["type"] in ("image", "video", "document"):
+                try:
+                    wanted.add(uuid.UUID(raw))
+                except ValueError:
+                    pass
+    assets = {a.id: a for a in db.scalars(select(MediaAsset).where(MediaAsset.id.in_(wanted)))} if wanted else {}
+    out: dict[str, list[dict]] = {kind: [] for kind in KINDS}
+    for i in rows:
+        flt = KINDS[i.kind].get("public_filter")
+        if flt and (((i.data or {}).get(flt[0]) == flt[1]) if len(flt) > 2 else ((i.data or {}).get(flt[0]) != flt[1])):
+            continue  # e.g. a closed job opening, or a deactivated team profile
+        out[i.kind].append({"id": str(i.id), "slug": i.slug, "title": i.title, "data": _resolve(db, settings, i.kind, i.data, assets=assets), "sort_order": i.sort_order})
+    return out
 
 
 def counts(db: Session) -> dict[str, dict[str, int]]:

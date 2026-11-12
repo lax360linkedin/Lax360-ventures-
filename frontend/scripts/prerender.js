@@ -77,7 +77,7 @@ async function build(route, outFile) {
   if (!head) throw new Error(`No head data recorded for ${route}`)
   const page = stripped
     .replace('</head>', `    ${headTags(head, route === '/404' ? '/404' : route)}\n  </head>`)
-    .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
+    .replace('<div id="root"></div>', `<div id="root" data-route="${route}">${html}</div>`)
   mkdirSync(dirname(outFile), { recursive: true })
   writeFileSync(outFile, page)
   console.log(`prerendered ${route.padEnd(24)} ${(page.length / 1024).toFixed(1)} kB  "${head.title}"`)

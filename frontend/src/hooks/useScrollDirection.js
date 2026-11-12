@@ -1,32 +1,27 @@
 import { useEffect, useState } from 'react'
 
-/** Tracks scroll position and direction for the hide-on-scroll header. */
-export function useScrollDirection(threshold = 8) {
-  const [state, setState] = useState({ y: 0, direction: 'up' })
-
+/**
+ * Has the page been scrolled past `threshold` px? The state is a single boolean that changes only when the line is CROSSED, so the component that uses it re-renders
+ * twice per visit instead of on every scroll frame (it used to hold the scroll position itself, which re-rendered the whole page shell, header and footer
+ * included, for every frame of every scroll). The listener is passive and runs at most once per animation frame.
+ */
+export function useScrolledPast(threshold) {
+  const [past, setPast] = useState(false)
   useEffect(() => {
-    let last = window.scrollY
     let ticking = false
     const update = () => {
-      const y = Math.max(window.scrollY, 0)
-      if (Math.abs(y - last) >= threshold) {
-        setState({ y, direction: y > last ? 'down' : 'up' })
-        last = y
-      } else {
-        setState((s) => (s.y === y ? s : { ...s, y }))
-      }
       ticking = false
+      setPast(Math.max(window.scrollY, 0) > threshold) // React ignores a set to the same value: no render unless it flipped
     }
     const onScroll = () => {
       if (!ticking) {
-        window.requestAnimationFrame(update)
         ticking = true
+        window.requestAnimationFrame(update)
       }
     }
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [threshold])
-
-  return state
+  return past
 }

@@ -40,6 +40,7 @@ const ChatLauncher = forwardRef(function ChatLauncher({ open, onOpen, raised }, 
     }
     const timer = setTimeout(reveal, 10000)
     const onScroll = () => {
+      if (shown) return // (reading scrollHeight forces a layout: not on every scroll event once the callout is out)
       const scrollable = document.documentElement.scrollHeight - window.innerHeight
       if (scrollable > 0 && window.scrollY / scrollable > 0.4) reveal()
     }

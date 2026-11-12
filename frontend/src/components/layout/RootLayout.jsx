@@ -7,7 +7,7 @@ import MobileBottomBar from './MobileBottomBar.jsx'
 import WhatsAppFloat from './WhatsAppFloat.jsx'
 import TopBar from './TopBar.jsx'
 import SocialBand from '../sections/SocialBand.jsx'
-import { useScrollDirection } from '../../hooks/useScrollDirection.js'
+import { useScrolledPast } from '../../hooks/useScrollDirection.js'
 import PreviewBanner from '../cms/PreviewBanner.jsx'
 import { useSite, useSiteSettings } from '../../hooks/useSite.js'
 import { SiteThemeSync } from '../../hooks/useTheme.js'
@@ -57,7 +57,7 @@ export default function RootLayout() {
   const [enquiryOpen, setEnquiryOpen] = useState(false)
   const [enquiryEverOpened, setEnquiryEverOpened] = useState(false)
   const menuButtonRef = useRef(null)
-  const { y } = useScrollDirection()
+  const barVisible = useScrolledPast(500)
   const { pathname } = useLocation()
   const closeMenu = useCallback(() => setMenuOpen(false), [])
   const openEnquiry = useCallback(() => { setEnquiryEverOpened(true); setEnquiryOpen(true) }, [])
@@ -82,7 +82,6 @@ export default function RootLayout() {
     return () => window.removeEventListener('lax360:open-enquiry', openEnquiry)
   }, [openEnquiry])
 
-  const barVisible = y > 500
   if (settings.maintenance_mode === true) return <Maintenance message={settings.maintenance_message} />
 
   return (

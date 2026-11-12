@@ -1,6 +1,6 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, Bot, Globe, Package, Search, Sparkles, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -18,6 +18,14 @@ const SiteSettings = lazy(() => import('./pages/SiteSettings.jsx'))
 const Products = lazy(() => import('./pages/Products.jsx'))
 const WebsitesAdmin = lazy(() => import('./pages/Websites.jsx'))
 const WelcomeAdmin = lazy(() => import('./pages/WelcomeAdmin.jsx'))
+const CarouselAdmin = lazy(() => import('./pages/CarouselAdmin.jsx'))
+const TeamAdmin = lazy(() => import('./pages/TeamAdmin.jsx'))
+const DepartmentsAdmin = () => <TeamAdmin view="departments" />
+const sect = (name) => lazy(() => import('./pages/Sections.jsx').then((m) => ({ default: m[name] })))
+const TestimonialsAdmin = sect('TestimonialsAdmin')
+const ClientsAdmin = sect('ClientsAdmin')
+const NetworkAdmin = sect('NetworkAdmin')
+const FounderAdmin = sect('FounderAdmin')
 const Staff = lazy(() => import('./pages/Staff.jsx'))
 const Audit = lazy(() => import('./pages/Audit.jsx'))
 const System = lazy(() => import('./pages/System.jsx'))
@@ -26,13 +34,20 @@ const NAV = [
   { section: 'Overview', to: '/company-admin/dashboard', end: true, label: 'Dashboard', icon: LayoutDashboard, module: null, hint: 'Numbers, shortcuts and your website at a glance' },
   { section: 'Leads & customers', to: '/company-admin/enquiries', label: 'Enquiries & leads', icon: Inbox, module: 'enquiries', hint: 'Contact forms, quotes, partnership and career enquiries' },
   { section: 'Leads & customers', to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests', hint: 'Requests for a product demonstration' },
-  { section: 'Website', to: '/company-admin/content', label: 'Website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'], hint: 'Edit every page, section, list and text of the public website' },
-  { section: 'Website', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
-  { section: 'Website', to: '/company-admin/welcome', label: 'Welcome cards', icon: Sparkles, module: 'content', hint: 'Welcome cards, festival greetings and offers shown after the intro animation' },
-  { section: 'Website', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
-  { section: 'Website', to: '/company-admin/media', label: 'Media library', icon: ImageIcon, module: 'media', hint: 'Images, PDFs and videos used on the website' },
-  { section: 'Website', to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos', hint: 'The scheduled background videos of the home page' },
-  { section: 'Website', to: '/company-admin/settings', label: 'Settings & theme', icon: SettingsIcon, module: 'settings', hint: 'Contact details, logo, footer, maintenance mode and the website theme' },
+  { section: 'Home page', to: '/company-admin/welcome', label: 'Welcome cards', icon: Sparkles, module: 'content', hint: 'Welcome cards, festival greetings and offers shown after the intro animation' },
+  { section: 'Home page', to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos', hint: 'The scheduled background videos of the home page' },
+  { section: 'Home page', to: '/company-admin/carousel', label: 'Image carousel', icon: Images, module: 'content', hint: 'The swipeable picture strip on the home page: upload, replace, re-order, delete' },
+  { section: 'Home page', to: '/company-admin/testimonials', label: 'Testimonials', icon: Quote, module: 'content', hint: 'What clients and students say: add, edit, replace samples, re-order' },
+  { section: 'Home page', to: '/company-admin/clients', label: 'Our clients', icon: Building2, module: 'content', hint: 'The client logos strip: add many logos, replace samples, re-order' },
+  { section: 'Company', to: '/company-admin/founder', label: 'Founder profile', icon: Crown, module: 'content', hint: 'The founder, CEO and Managing Director: name, photograph and introduction' },
+  { section: 'Company', to: '/company-admin/team', label: 'Our team', icon: UsersRound, module: 'content', hint: 'Employees, photographs and the sections of the Our Team page' },
+  { section: 'Company', to: '/company-admin/departments', label: 'Departments', icon: Users, module: 'content', hint: 'The departments employees belong to' },
+  { section: 'Company', to: '/company-admin/network', label: 'Our network', icon: Network, module: 'content', hint: 'Group companies, partners, software distribution and the Our Network page' },
+  { section: 'Products & portfolio', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
+  { section: 'Products & portfolio', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
+  { section: 'Pages & settings', to: '/company-admin/content', label: 'All website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'], hint: 'Every other page, section, list and text of the public website' },
+  { section: 'Pages & settings', to: '/company-admin/media', label: 'Media library', icon: ImageIcon, module: 'media', hint: 'Images, PDFs and videos used on the website' },
+  { section: 'Pages & settings', to: '/company-admin/settings', label: 'Settings & theme', icon: SettingsIcon, module: 'settings', hint: 'Contact details, logo, footer, maintenance mode and the website theme' },
   { section: 'Assistant', to: '/company-admin/chatbot', label: 'AI chatbot', icon: Bot, module: 'chatbot', hint: 'Chatbot settings, conversations and usage' },
   { section: 'Administration', to: '/company-admin/users', label: 'Administrators', icon: Users, module: 'users', hint: 'Staff accounts and what each person may manage' },
   { section: 'Administration', to: '/company-admin/audit', label: 'Audit log', icon: ScrollText, module: 'audit', hint: 'Who changed what, and when' },
@@ -244,6 +259,13 @@ export default function AdminApp() {
           <Route path="products" element={<Guard module="content"><Products /></Guard>} />
           <Route path="websites" element={<Guard module="content"><WebsitesAdmin /></Guard>} />
           <Route path="welcome" element={<Guard module="content"><WelcomeAdmin /></Guard>} />
+          <Route path="carousel" element={<Guard module="content"><CarouselAdmin /></Guard>} />
+          <Route path="team" element={<Guard module="content"><TeamAdmin /></Guard>} />
+          <Route path="departments" element={<Guard module="content"><DepartmentsAdmin /></Guard>} />
+          <Route path="founder" element={<Guard module="content"><FounderAdmin /></Guard>} />
+          <Route path="testimonials" element={<Guard module="content"><TestimonialsAdmin /></Guard>} />
+          <Route path="clients" element={<Guard module="content"><ClientsAdmin /></Guard>} />
+          <Route path="network" element={<Guard module="content"><NetworkAdmin /></Guard>} />
           <Route path="media" element={<Guard module="media"><Media /></Guard>} />
           <Route path="homepage-videos" element={<Guard module="hero_videos"><HeroVideos /></Guard>} />
           <Route path="hero-videos" element={<Navigate to="/company-admin/homepage-videos" replace />} />

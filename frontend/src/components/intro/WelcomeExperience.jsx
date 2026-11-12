@@ -5,6 +5,7 @@ import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ArrowRight, ChevronDown, ExternalLink } from 'lucide-react'
 import PartnershipModal from '../network/PartnershipModal.jsx'
 import { markWelcomeSeen, setIntroState, welcomePlan } from '../../utils/welcomeIntro.js'
+import { createWheelGesture } from '../../utils/scrollGesture.js'
 import { WelcomeBackdrop, themeOf } from './welcomeArt.jsx'
 
 /**
@@ -13,21 +14,21 @@ import { WelcomeBackdrop, themeOf } from './welcomeArt.jsx'
  *
  *   scroll down (wheel, touchpad, swipe up, arrow / page keys)  -> the next card;   scroll up -> the previous card;   scroll down on the last card -> the homepage.
  *
- * Scrolling is turned into one deliberate step per gesture (not per wheel tick): a step needs a small amount of movement, and after a step the same gesture (touchpad
- * momentum, a spinning wheel) is ignored until it stops, so one swipe never skips several cards. Everything on the cards (text, order, buttons, links, images, schedule,
+ * Scrolling is turned into exactly one step per GESTURE (not per wheel tick). A gesture is recognised from the shape of the wheel stream: it starts at the first movement,
+ * the momentum that follows it (decreasing deltas) is ignored, and a pause, a change of direction or a new, stronger flick starts the next gesture at once. Nothing is
+ * swallowed by a timer, so a new gesture is never lost, and one gesture never skips two cards. Everything on the cards (text, order, buttons, links, images, schedule,
  * on/off) comes from the admin panel (Welcome cards); nothing is built into this file. The page underneath is inert while the cards are open.
  */
 const EASE = [0.22, 1, 0.36, 1]
-const STEP_DISTANCE = 60 // px of wheel movement (or touch drag: 48) that makes one step
-const LOCK_MS = 750 // after a step, ignore input for at least this long ...
-const QUIET_MS = 140 // ... and until the gesture (momentum scrolling) has been quiet for this long
+const MIN_STEP_GAP = 280 // ms between two card changes (shorter than the card animation: the next gesture is never lost)
+const TOUCH_TRIGGER = 36 // px of finger movement that changes the card (while the finger is still moving)
 const isInternal = (href) => href.startsWith('/') && !href.startsWith('//')
 const dark = (rgbList, f) => rgbList.split(',').map((n) => Math.round(Number(n) * f)).join(',') // a deeper shade of an accent, so white button text stays readable
 
 /** Can this element (or a parent inside the card) still scroll in the direction of the gesture? Then the card's own text scrolls instead of changing card. */
 function innerScrollWants(target, dy) {
   for (let el = target instanceof Element ? target : null; el && el.dataset?.weRoot === undefined; el = el.parentElement) {
-    if (el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) {
+    if (el.scrollHeight > el.clientHeight + 28 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) {
       if (dy > 0 && el.scrollTop + el.clientHeight < el.scrollHeight - 1) return true
       if (dy < 0 && el.scrollTop > 0) return true
     }
@@ -44,7 +45,7 @@ export default function WelcomeExperience() {
   const [dir, setDir] = useState(1)
   const [leaving, setLeaving] = useState(false)
   const [franchise, setFranchise] = useState(null)
-  const live = useRef({ leaving: false, index: 0, lockUntil: 0, lastInput: 0, acc: 0, touchY: null })
+  const live = useRef({ leaving: false, index: 0, gesture: createWheelGesture({ minStepGap: MIN_STEP_GAP }), touch: null })
   const card = cards[index]
   const last = index === cards.length - 1
   const theme = themeOf(card?.theme)
@@ -75,7 +76,7 @@ export default function WelcomeExperience() {
     if (s.leaving) return
     const to = s.index + d
     if (to < 0) return // already on the first card
-    s.lockUntil = performance.now() + LOCK_MS
+    s.gesture.noteStep(performance.now())
     if (to >= cards.length) { finish(); return }
     s.index = to
     setDir(d)
@@ -94,23 +95,21 @@ export default function WelcomeExperience() {
       if (Math.abs(dy) < 1) return
       e.preventDefault() // the page behind must never scroll
       if (innerScrollWants(e.target, dy)) return
-      const now = performance.now()
-      if (now < s.lockUntil) { s.lastInput = now; s.acc = 0; s.lockUntil = Math.max(s.lockUntil, now + QUIET_MS); return } // the previous step (or its momentum) is still going: swallow, and keep waiting until it stops
-      if (now - s.lastInput > 220) s.acc = 0 // a new gesture
-      s.lastInput = now
-      s.acc += dy
-      if (Math.abs(s.acc) >= STEP_DISTANCE) { const d = s.acc > 0 ? 1 : -1; s.acc = 0; step(d) }
+      const dir = s.gesture.push(dy, performance.now()) // exactly one step per gesture, at its start (see utils/scrollGesture.js)
+      if (dir) step(dir)
     }
-    const onTouchStart = (e) => { s.touchY = e.touches.length === 1 && !(e.target instanceof Element && e.target.closest('dialog')) ? e.touches[0].clientY : null }
-    const onTouchMove = (e) => { if (!(e.target instanceof Element && e.target.closest('dialog'))) { if (e.cancelable) e.preventDefault() } } // no page scroll / pull-to-refresh behind the card
-    const onTouchEnd = (e) => {
-      if (s.touchY === null || franchise || s.leaving) return
-      const dy = s.touchY - (e.changedTouches[0]?.clientY ?? s.touchY)
-      const target = e.target
-      s.touchY = null
-      if (Math.abs(dy) < 48 || performance.now() < s.lockUntil || innerScrollWants(target, dy)) return
+    const onTouchStart = (e) => { s.touch = e.touches.length === 1 && !(e.target instanceof Element && e.target.closest('dialog')) ? { y0: e.touches[0].clientY, stepped: false } : null }
+    const onTouchMove = (e) => {
+      if (e.target instanceof Element && e.target.closest('dialog')) return
+      if (e.cancelable) e.preventDefault() // no page scroll / pull-to-refresh behind the card
+      const tc = s.touch
+      if (!tc || tc.stepped || franchise || s.leaving) return
+      const dy = tc.y0 - e.touches[0].clientY
+      if (Math.abs(dy) < TOUCH_TRIGGER || performance.now() - s.gesture.lastStep < MIN_STEP_GAP || innerScrollWants(e.target, dy)) return
+      tc.stepped = true // one swipe = one card, taken as soon as the finger has moved far enough
       step(dy > 0 ? 1 : -1)
     }
+    const onTouchEnd = () => { s.touch = null }
     const onKey = (e) => {
       if (franchise || s.leaving || e.altKey || e.ctrlKey || e.metaKey) return
       if (e.target instanceof Element && e.target.closest('dialog')) return
@@ -118,18 +117,20 @@ export default function WelcomeExperience() {
       const up = e.key === 'ArrowUp' || e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)
       if (!down && !up) return
       e.preventDefault()
-      if (performance.now() >= s.lockUntil) step(down ? 1 : -1)
+      if (performance.now() - s.gesture.lastStep >= MIN_STEP_GAP) step(down ? 1 : -1)
     }
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('touchstart', onTouchStart, { passive: true })
     window.addEventListener('touchmove', onTouchMove, { passive: false })
     window.addEventListener('touchend', onTouchEnd, { passive: true })
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true })
     window.addEventListener('keydown', onKey)
     return () => {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
       window.removeEventListener('touchend', onTouchEnd)
+      window.removeEventListener('touchcancel', onTouchEnd)
       window.removeEventListener('keydown', onKey)
     }
   }, [franchise, step])
@@ -159,18 +160,18 @@ export default function WelcomeExperience() {
 
   return createPortal(
     <div data-we-root="" role="dialog" aria-modal="true" aria-label="Welcome to LAX360 Pvt Ltd"
-      className="fixed inset-0 z-[1000] flex select-none items-center justify-center overflow-hidden p-4 pb-12"
+      className="fixed inset-0 z-[1000] flex select-none items-center justify-center overflow-hidden p-4"
       style={{ background: 'rgba(8,8,14,0.4)', backdropFilter: 'blur(7px)', WebkitBackdropFilter: 'blur(7px)', opacity: leaving ? 0 : 1, transition: `opacity ${reduce ? 0.05 : 0.65}s ease`, pointerEvents: leaving ? 'none' : 'auto', touchAction: 'none', overscrollBehavior: 'contain' }}>
       <p className="sr-only" role="status" aria-live="polite">Card {index + 1} of {cards.length}: {card.name}. Scroll or use the arrow keys to move between cards{last ? '; scroll down again to enter the website' : ''}.</p>
       <button type="button" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-10 focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-[#0b0b0f]" onClick={() => step(1)}>{last ? 'Enter the website' : 'Next card'}</button>
       {index > 0 && <button type="button" className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-14 focus:z-10 focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-[#0b0b0f]" onClick={() => step(-1)}>Previous card</button>}
 
-      <div className="relative h-[min(38rem,calc(100dvh-5.5rem))] w-[min(29rem,calc(100vw-2rem))] transition-transform duration-500 ease-out" style={{ transform: leaving && !reduce ? 'translateY(-36px) scale(0.96)' : undefined }}>
+      <div className="relative h-[min(40rem,calc(100dvh-2rem))] w-[min(29rem,calc(100vw-1.5rem))] transition-transform sm:h-[min(34.25rem,calc(100dvh-2rem))] sm:w-[min(60rem,calc(100vw-2rem))] duration-500 ease-out" style={{ transform: leaving && !reduce ? 'translateY(-36px) scale(0.96)' : undefined }}>
         <AnimatePresence mode="popLayout" custom={dir} initial>
           <m.article key={card.id} custom={dir} variants={slide} initial="enter" animate="center" exit="exit" aria-roledescription="slide" aria-label={`${index + 1} of ${cards.length}`}
-            className="absolute inset-0 flex flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_40px_90px_-24px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.18)]">
+            className="absolute inset-0 flex flex-col overflow-hidden rounded-[1.75rem] bg-white sm:flex-row sm:rounded-[1.5rem] shadow-[0_40px_90px_-24px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.18)]">
             {/* the picture: an uploaded image, or the animated artwork with the card's emblem / the logo */}
-            <div className="relative h-[38%] min-h-[8rem] shrink-0 overflow-hidden">
+            <div className="relative h-[36%] min-h-[8rem] shrink-0 overflow-hidden sm:h-auto sm:min-h-0 sm:w-[45%]">
               <WelcomeBackdrop theme={card.theme} soft />
               {card.image && <img src={card.image} alt={card.imageAlt} width="720" height="400" decoding="async" draggable="false" className="absolute inset-0 size-full object-cover" />}
               {!card.image && (
@@ -193,16 +194,16 @@ export default function WelcomeExperience() {
             </div>
 
             {/* the message */}
-            <div className="relative -mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-t-[1.5rem] bg-white px-6 pb-5 pt-5 text-[#0b0b0f] [scrollbar-width:thin]">
+            <div className="relative -mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-t-[1.5rem] bg-white px-6 pb-4 pt-5 text-[#0b0b0f] [scrollbar-width:thin] sm:mt-0 sm:rounded-none sm:px-10 sm:pb-5 sm:pt-[clamp(1.25rem,5vh,2.25rem)]">
               <m.p variants={item} className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em]" style={accentText}>{card.name}</m.p>
-              <m.h2 variants={item} className="mt-1.5 font-display text-[1.7rem] font-bold leading-[1.08] tracking-tight [text-wrap:balance] sm:text-[1.85rem]">
+              <m.h2 variants={item} className="mt-1.5 font-display text-[1.7rem] font-bold leading-[1.08] tracking-tight [text-wrap:balance] sm:text-[clamp(1.45rem,4.4vh,2.15rem)]">
                 {line1}{line2 && <><br /><span className="bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(90deg, rgb(${dark(theme.a, 0.8)}), rgb(${dark(theme.b, 0.85)}))` }}>{line2}</span></>}
               </m.h2>
-              <div className={`mt-2.5 space-y-2 text-slate-600 ${long ? 'text-[0.82rem] leading-[1.55] sm:text-[0.88rem]' : 'text-[0.9rem] leading-[1.6]'}`}>
+              <div className={`mt-2.5 space-y-2 text-slate-600 ${long ? 'text-[0.82rem] leading-[1.55] sm:text-[clamp(0.8rem,2vh,0.95rem)] sm:leading-[1.55]' : 'text-[0.9rem] leading-[1.6] sm:text-[clamp(0.82rem,2.1vh,1rem)]'}`}>
                 {card.paragraphs.map((p, i) => <m.p key={i} variants={item}>{p}</m.p>)}
               </div>
               {((card.exploreLabel && card.exploreLink) || card.franchise) && (
-                <m.div variants={item} className="mt-auto flex flex-wrap gap-2.5 pt-4">
+                <m.div variants={item} className="mt-5 flex flex-wrap gap-2.5">
                   {card.exploreLabel && card.exploreLink && (
                     <button type="button" onClick={() => open(card.exploreLink)} className={`${btn} text-white`} style={cta}>
                       {card.exploreLabel}{isInternal(card.exploreLink) ? <ArrowRight className="size-4" aria-hidden="true" /> : <><ExternalLink className="size-4" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></>}
@@ -211,14 +212,15 @@ export default function WelcomeExperience() {
                   {card.franchise && <button type="button" onClick={() => setFranchise({ division: card.division })} className={`${btn} border-2 border-[#0b0b0f]/80 bg-white text-[#0b0b0f] hover:bg-[#0b0b0f]/5`}>{card.franchiseLabel}</button>}
                 </m.div>
               )}
+              {/* where we are, and how to move on: there are no buttons, the visitor scrolls */}
+              <div aria-hidden="true" className="mt-auto flex items-center gap-2 pt-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                <ChevronDown className="we-bob size-4" />
+                <span>{last ? 'Scroll to enter the website' : index === 0 ? 'Scroll down' : 'Keep scrolling'}</span>
+                <span className="ml-auto tabular-nums">{index + 1} / {cards.length}</span>
+              </div>
             </div>
           </m.article>
         </AnimatePresence>
-        {/* the scroll hint, under the card */}
-        <p aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-9 flex flex-col items-center text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
-          <span>{last ? 'Scroll to enter the website' : index === 0 ? 'Scroll down' : `${index + 1} / ${cards.length}`}</span>
-          <ChevronDown className="we-bob -mt-0.5 size-4" />
-        </p>
       </div>
 
       {franchise && <PartnershipModal category="franchise" division={franchise.division} source="welcome-experience" onClose={() => { setFranchise(null); document.documentElement.style.overflow = 'hidden' }} />}

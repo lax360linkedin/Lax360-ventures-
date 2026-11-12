@@ -10,5 +10,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     server: { proxy: { '/api': { target, changeOrigin: false } } },
+    preview: { proxy: { '/api': { target, changeOrigin: false } } }, // `vite preview` (the production build, for measuring) talks to the same backend
   }
 })

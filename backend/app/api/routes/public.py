@@ -11,32 +11,37 @@ from pydantic import Field
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
-from app.db.session import get_db
+from app.core import pubcache
+from app.db.session import _factory, _read_factory, get_db, get_read_db
 from app.models import HeroVideo
 from app.schemas.common import ApiModel
 from app.services import content_service, hero_video_service, media_service, settings_service
 from app.core.errors import ApiError
 
 router = APIRouter(tags=["public"])
-CACHE = {"Cache-Control": "public, max-age=10"}  # short: a published change reaches visitors within seconds
+CACHE = {"Cache-Control": "public, max-age=10"}  # short: a published change reaches visitors within seconds (no browser-side stale window: an edit must show on the next reload)
+
+
+def _cacheable(settings: Settings) -> bool:
+    return settings.app_env != "test"  # tests reset the database underneath the cache
 
 
 @router.get("/public/site")
-def site(db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
-    values = settings_service.public_settings(db, settings)
-    return JSONResponse({"settings": values}, headers=CACHE)
+def site(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
+    return pubcache.cached_json(request, _cacheable(settings), "site", lambda d: {"settings": settings_service.public_settings(d, settings)}, CACHE, db, _read_factory())
 
 
 @router.get("/public/content")
-def content(kind: str = Query(..., max_length=30), db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
+def content(kind: str = Query(..., max_length=30), db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
     """PUBLISHED items only (drafts, and closed job openings, are never returned)."""
     return JSONResponse({"kind": kind, "items": content_service.public_items(db, settings, kind)}, headers=CACHE)
 
 
 @router.get("/public/content-all")
-def content_all(db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
-    """Every kind's published items in one response: the website loads this once instead of one request per section."""
-    return JSONResponse({"kinds": content_service.public_bundle(db, settings)}, headers=CACHE)
+def content_all(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
+    """Every kind's published items in one response: the website loads this once instead of one request per section. Built with two queries, cached for a few seconds
+    (dropped as soon as anything is saved) and gzip-compressed."""
+    return pubcache.cached_json(request, _cacheable(settings), "content-all", lambda d: {"kinds": content_service.public_bundle(d, settings)}, CACHE, db, _read_factory())
 
 
 @router.get("/public/contact-options")
@@ -48,13 +53,13 @@ def contact_options() -> JSONResponse:
 
 
 @router.get("/public/services/{category}/content")
-def service_content(category: str, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
+def service_content(category: str, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
     """Clients and testimonials for a MAIN service page: everything assigned to the main service or any of its sub-services."""
     return JSONResponse(content_service.service_content(db, settings, category), headers=CACHE)
 
 
 @router.get("/public/services/{category}/{sub}/content")
-def sub_service_content(category: str, sub: str, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
+def sub_service_content(category: str, sub: str, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
     """Clients and testimonials for ONE sub-service page: what is assigned to it, plus what is assigned to its main service as a whole."""
     return JSONResponse(content_service.service_content(db, settings, category, sub), headers=CACHE)
 
@@ -91,24 +96,27 @@ def _public_slot(slot, settings: Settings, full: bool) -> dict:
 
 
 @router.get("/public/hero-video")
-def hero_video(db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
+def hero_video(request: Request, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> Response:
     """What the homepage background should be RIGHT NOW, from the saved schedule (not from when the visitor arrived).
-    Only the playing video and the one after it are described; nothing else about the library is public."""
-    res = hero_video_service.resolve(db, settings)
-    db.rollback()
-    zone = hero_video_service.tz_of(settings)
-    ends = res.current.end if res.current else (res.upcoming[0].start if res.upcoming else None)
-    seconds = int((ends - res.now).total_seconds()) if ends else 600
-    check_in = max(1, min(seconds, 600))  # the page asks again by then, so a change (or a new slot) is never missed for long
-    body = {
-        "active": _public_slot(res.current, settings, True) if res.current else None,
-        "next": _public_slot(res.next, settings, False) if res.next else None,
-        "fallback": res.current is None,
-        "timezone": settings.app_timezone,
-        "server_time": res.now.astimezone(zone).isoformat(),
-        "check_again_in_seconds": check_in,
-    }
-    return JSONResponse(body, headers={"Cache-Control": f"public, max-age={min(check_in, 60)}"})
+    Only the playing video and the one after it are described; nothing else about the library is public.
+    Built once per few seconds (the schedule takes several database round trips) and dropped as soon as a video or the schedule is saved."""
+    def build(d: Session) -> dict:
+        res = hero_video_service.resolve(d, settings)
+        d.rollback()  # reading must not leave a schedule row half-created
+        zone = hero_video_service.tz_of(settings)
+        ends = res.current.end if res.current else (res.upcoming[0].start if res.upcoming else None)
+        seconds = int((ends - res.now).total_seconds()) if ends else 600
+        check_in = max(1, min(seconds, 600))  # the page asks again by then, so a change (or a new slot) is never missed for long
+        return {
+            "active": _public_slot(res.current, settings, True) if res.current else None,
+            "next": _public_slot(res.next, settings, False) if res.next else None,
+            "fallback": res.current is None,
+            "timezone": settings.app_timezone,
+            "server_time": res.now.astimezone(zone).isoformat(),
+            "check_again_in_seconds": check_in,
+        }
+
+    return pubcache.cached_json(request, _cacheable(settings), "hero-video", build, {"Cache-Control": "public, max-age=5"}, db, _factory())
 
 
 def _public_file(db: Session, settings: Settings, video_id: uuid.UUID, kind: str):

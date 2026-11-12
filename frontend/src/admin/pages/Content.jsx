@@ -104,7 +104,7 @@ function FieldInput({ f, value, onChange, props }) {
 
 /** A quick look at the content as entered. The exact result, in the real design, is one click away ("Preview on the website"). */
 function Preview({ spec, title, data }) {
-  const shown = spec.fields.filter((f) => f.type !== 'image' && f.type !== 'video' && data[f.name] !== '' && data[f.name] !== undefined && data[f.name] !== false)
+  const shown = spec.fields.filter((f) => f.ui !== 'hidden' && f.type !== 'image' && f.type !== 'video' && data[f.name] !== '' && data[f.name] !== undefined && data[f.name] !== false)
   const label = (f, v) => (f.type === 'multiselect' ? String(v).split(',').map((x) => f.options.find((o) => o.value === x)?.label || x).join(', ') : f.type === 'select' ? (f.options.find((o) => o.value === v)?.label || v) : f.type === 'bool' ? 'Yes' : v)
   return (
     <div className="rounded-lg border border-edge p-3 text-sm">
@@ -128,6 +128,12 @@ function Editor({ spec, item, onClose, onSaved, preset = {} }) {
   const effectiveTitle = spec.single ? spec.label : title
   const wasPublished = item?.status === 'published'
 
+  const isOptional = (f) => f.type !== 'image' && f.type !== 'bool' && !f.required && (f.ui === 'optional' || /(^|_)(alt|caption)$/.test(f.name)) // a picture's description and caption are never required
+  const visible = spec.fields.filter((f) => f.ui !== 'hidden') // built-in file paths: kept as they are, never shown or typed
+  const optional = visible.filter(isOptional)
+  const shown = visible.filter((f) => !isOptional(f))
+  const fieldRow = (f) => <Field key={f.name} label={f.label} required={f.required} hint={f.help} error={errors[f.name]}>{(p) => <FieldInput f={f} props={p} value={data[f.name]} onChange={(e) => setData({ ...data, [f.name]: e.target.value })} />}</Field>
+
   const save = async (status) => {
     setBusy(status)
     setErrors({})
@@ -149,7 +155,13 @@ function Editor({ spec, item, onClose, onSaved, preset = {} }) {
       <div className="grid gap-6 md:grid-cols-[3fr_2fr]">
         <div className="space-y-3">
           {!spec.single && <Field label={spec.title_label || 'Title'} required error={errors.title}>{(p) => <Input {...p} maxLength={200} value={title} onChange={(e) => setTitle(e.target.value)} />}</Field>}
-          {spec.fields.map((f) => <Field key={f.name} label={f.label} required={f.required} hint={f.help} error={errors[f.name]}>{(p) => <FieldInput f={f} props={p} value={data[f.name]} onChange={(e) => setData({ ...data, [f.name]: e.target.value })} />}</Field>)}
+          {shown.map(fieldRow)}
+          {optional.length > 0 && (
+            <details className="rounded-lg border border-edge px-3 py-2">
+              <summary className="cursor-pointer text-sm font-semibold">Optional details <span className="font-normal text-soft">(picture description, caption: not needed)</span></summary>
+              <div className="mt-3 space-y-3">{optional.map(fieldRow)}</div>
+            </details>
+          )}
           {!spec.single && <Field label="Display order" hint="Lower numbers come first. You can also reorder with the arrows in the list."><Input type="number" min="0" max="100000" value={order} onChange={(e) => setOrder(e.target.value)} aria-label="Display order" /></Field>}
           <p className="text-xs text-soft">Status: <Badge value={item?.status || 'draft'} />. A draft is private. It only appears on the website after you publish it.</p>
         </div>

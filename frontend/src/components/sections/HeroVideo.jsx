@@ -30,7 +30,7 @@ const STALL_WATCHDOG_MS = 12000 // buffering for this long: reload the source
 const warn = (...args) => console.warn(TAG, ...args) // eslint-disable-line no-console
 const fail = (...args) => console.error(TAG, ...args) // eslint-disable-line no-console
 const info = (...args) => console.info(TAG, ...args) // eslint-disable-line no-console
-const introActive = () => ['pending', 'playing'].includes(document.documentElement.getAttribute('data-intro')) // page is hidden under the welcome intro
+const introActive = () => ['pending', 'playing', 'cards'].includes(document.documentElement.getAttribute('data-intro')) // page is hidden under the welcome intro
 const withParam = (url, key, value) => `${url}${url.includes('?') ? '&' : '?'}${key}=${value}`
 
 const describe = (el) => ({
