@@ -29,23 +29,32 @@ def backend(settings: Settings) -> str:
     return "supabase" if settings.supabase_url and settings.supabase_service_role_key else "local"
 
 
+def missing_settings(settings: Settings) -> list[str]:
+    """Names (never values) of the Supabase settings that are not set. Images and videos share ONE project (URL + key); only their bucket names differ, and buckets have defaults."""
+    return [n for n, v in (("SUPABASE_URL", settings.supabase_url), ("SUPABASE_SERVICE_ROLE_KEY", settings.supabase_service_role_key)) if not v]
+
+
 def durability(settings: Settings) -> dict:
     """Is a file stored now going to survive a restart / redeploy? Used to block uploads that would silently vanish."""
     if backend(settings) == "supabase":
         return {"backend": "supabase", "durable": True, "detail": "Supabase Storage"}
     on_ephemeral_host = bool(os.environ.get("RENDER")) or settings.is_production
     durable = settings.hero_video_disk_is_persistent or not on_ephemeral_host
-    return {"backend": "local", "durable": durable, "detail": f"Server disk ({settings.media_dir})",
-            "warning": None if durable else "Uploads would be stored on this server's disk, which is wiped on every restart and redeploy. Configure SUPABASE_URL "
-                                            "and SUPABASE_SERVICE_ROLE_KEY (or attach a persistent disk and set HERO_VIDEO_DISK_IS_PERSISTENT=true)."}
+    missing = missing_settings(settings)
+    return {"backend": "local", "durable": durable, "detail": f"Server disk ({settings.media_dir})", "missing": missing,
+            "warning": None if durable else f"Permanent file storage is not configured: {' and '.join(missing)} {'is' if len(missing) == 1 else 'are'} not set on this server, so uploads are refused "
+                                            "(a file saved on this server's disk would be lost on every restart and redeploy). Add the missing setting(s) to the server's environment variables, then restart the backend."}
 
 
 def require_durable(settings: Settings) -> str:
     """Refuse an upload that could not be kept. Returns the backend to use."""
     info = durability(settings)
     if not info["durable"]:
+        missing = info.get("missing") or []
         raise ApiError(503, "storage_not_configured", "Permanent file storage is not configured on the server, so the upload was refused to avoid losing it. "
-                                                       "Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY on the server (see the deployment notes).")
+                                                       f"Not set on the server: {', '.join(missing) or 'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'}. "
+                                                       "Add it in the hosting dashboard's environment variables (the same Supabase project that stores the homepage videos) and restart the backend. "
+                                                       "Pictures use the bucket SUPABASE_MEDIA_BUCKET (default site-media), videos use SUPABASE_VIDEO_BUCKET: they share the credentials, nothing else.")
     return info["backend"]
 
 
@@ -98,7 +107,24 @@ def put(settings: Settings, bucket: str, path: Path, key: str, content_type: str
     if r.status_code >= 300:
         log.error("Supabase Storage upload failed: HTTP %s %s", r.status_code, r.text[:300])
         raise ApiError(502, "storage_unavailable", "The file could not be saved to permanent storage. Check the Supabase storage settings and try again.")
+    if not exists(settings, bucket, key, "supabase"):  # a write is only a success once the object can be read back
+        log.error("Supabase Storage accepted the upload but the object %s/%s cannot be read back", bucket, key)
+        raise ApiError(502, "storage_unavailable", "The file was sent to permanent storage but could not be confirmed there, so it was not saved. Try again; if it keeps failing check the Supabase project and bucket.")
     path.unlink(missing_ok=True)
+
+
+def exists(settings: Settings, bucket: str, key: str, where: str) -> bool:
+    """Is the stored object really there? (local disk, or Supabase: a one-byte ranged read with the service key.) Errors count as "cannot confirm": False."""
+    try:
+        if where == "local":
+            return exists_local(settings, key)
+        if where != "supabase":
+            return True  # 'db' rows hold their bytes in the database
+        with _client() as http:
+            r = http.get(f"{_base(settings)}/object/authenticated/{bucket}/{key}", headers={**_headers(settings), "Range": "bytes=0-0"})
+        return r.status_code in (200, 206)
+    except (httpx.HTTPError, OSError):
+        return False
 
 
 def delete(settings: Settings, bucket: str, key: str, where: str) -> bool:

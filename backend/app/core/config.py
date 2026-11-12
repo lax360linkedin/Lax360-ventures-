@@ -37,15 +37,16 @@ class Settings(BaseSettings):
     trust_proxy_headers: bool = False  # honour X-Forwarded-For (only behind a proxy you control)
     max_request_body_bytes: int = 65_536
     media_max_bytes: int = 10_485_760  # largest uploaded image/PDF (videos use HERO_VIDEO_MAX_BYTES)
-    media_bucket: str = "site-media"  # Supabase Storage bucket for the media library (created public on first upload)
+    media_bucket: str = Field(default="site-media", validation_alias=AliasChoices("SUPABASE_MEDIA_BUCKET", "MEDIA_BUCKET"))  # Supabase Storage bucket for ALL pictures and documents (created public on first upload); videos use SUPABASE_VIDEO_BUCKET
     media_dir: str = "storage/media"  # development only: where files go when Supabase Storage is not configured
     app_timezone: str = "Asia/Kolkata"  # the timezone every schedule (homepage videos) is calculated and displayed in
     hero_video_dir: str = "storage/hero_videos"  # homepage background videos live on disk (relative paths are inside backend/), NOT in the database
     hero_video_max_bytes: int = 52_428_800  # largest homepage video upload (50 MB)
     # Durable storage for homepage videos. Render's disk is ephemeral (wiped on every restart/redeploy), so in production keep the files in
     # Supabase Storage: set both of these (the service-role key is a SERVER-SIDE secret: never put it in the frontend). Without them, local disk is used.
-    supabase_url: str | None = None  # https://<project-ref>.supabase.co
-    supabase_service_role_key: SecretStr | None = None
+    # The usual names are SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY; the common alternatives people use are accepted too (names only: nothing is guessed about values).
+    supabase_url: str | None = Field(default=None, validation_alias=AliasChoices("SUPABASE_URL", "SUPABASE_PROJECT_URL", "NEXT_PUBLIC_SUPABASE_URL", "VITE_SUPABASE_URL"))  # https://<project-ref>.supabase.co
+    supabase_service_role_key: SecretStr | None = Field(default=None, validation_alias=AliasChoices("SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_KEY", "SUPABASE_SERVICE_ROLE"))
     hero_video_bucket: str = Field(default="lax360-videos", validation_alias=AliasChoices("SUPABASE_VIDEO_BUCKET", "HERO_VIDEO_BUCKET"))  # SUPABASE_VIDEO_BUCKET or HERO_VIDEO_BUCKET; created automatically (public) on first upload if it does not exist
     hero_video_disk_is_persistent: bool = False  # set true only if HERO_VIDEO_DIR is on a persistent disk (e.g. a Render Disk): silences the warning
     hero_video_slot_seconds: int | None = None  # development/test ONLY: replaces the 3-day slot length so rotation can be watched in minutes
@@ -113,6 +114,28 @@ class Settings(BaseSettings):
     @classmethod
     def _provider_lower(cls, v):
         return v.strip().lower() if isinstance(v, str) else v
+
+    @field_validator("supabase_url", mode="before")
+    @classmethod
+    def _clean_supabase_url(cls, v):
+        """Hosting dashboards often keep quotes or stray spaces, or a pasted API path: SUPABASE_URL is always just https://<project-ref>.supabase.co."""
+        if not isinstance(v, str):
+            return v
+        v = v.strip().strip("\"'").strip().rstrip("/")
+        for tail in ("/storage/v1", "/rest/v1", "/auth/v1"):
+            if v.endswith(tail):
+                v = v[: -len(tail)]
+        if v and "://" not in v:
+            v = f"https://{v}"
+        return v
+
+    @field_validator("supabase_service_role_key", mode="before")
+    @classmethod
+    def _clean_supabase_key(cls, v):
+        if not isinstance(v, str):
+            return v
+        v = v.strip().strip("\"'").strip()
+        return v[7:].strip() if v.lower().startswith("bearer ") else v
 
     @field_validator("openai_api_key", "gemini_api_key", "auth_secret", "admin_password", "supabase_service_role_key", mode="before")
     @classmethod

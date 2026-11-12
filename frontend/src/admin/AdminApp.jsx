@@ -1,6 +1,6 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -102,6 +102,21 @@ function QuickFind({ open, onClose, items }) {
 const AdminCtx = createContext(null)
 export const useAdmin = () => useContext(AdminCtx)
 
+/** Shown on every admin page when pictures cannot be stored permanently (server settings missing): uploads are refused, so say why and what to set, instead of failing one upload at a time. */
+function StorageBanner() {
+  const { can } = useAdmin()
+  const allowed = can('media') || can('content')
+  const q = useFetch(() => (allowed ? api('/api/admin/media?page_size=1').catch(() => null) : Promise.resolve(null)), [allowed])
+  const s = q.data?.storage
+  if (!s || s.durable) return null
+  return (
+    <p role="alert" className="mb-5 flex items-start gap-3 rounded-xl border border-amber-500/50 bg-amber-500/10 p-4 text-sm">
+      <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-300" aria-hidden="true" />
+      <span><strong>Picture uploads are switched off on this server.</strong> {s.warning} Nothing has been lost: existing pictures are unaffected.</span>
+    </p>
+  )
+}
+
 /** Loads what the signed-in staff member may use (from the server). The UI hides what is not allowed; the API enforces it. */
 function AdminShell() {
   const { identity, loading, signOut } = useAdminAuth() // the company-admin session only: a customer's website login never appears here
@@ -174,6 +189,7 @@ function AdminShell() {
             </div>
           </header>
           <main id="admin-main" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-6 outline-none md:px-8 md:py-8">
+            <StorageBanner />
             <Suspense fallback={<Spinner />}><Outlet /></Suspense>
           </main>
         </div>

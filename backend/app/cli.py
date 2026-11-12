@@ -10,6 +10,7 @@
     python -m app.cli check-config
     python -m app.cli check-ai
     python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
+    python -m app.cli storage-selftest                          (real Supabase check for PICTURE uploads: settings, bucket, upload, read-back, public address, delete one temporary image)
     python -m app.cli hero-videos-selftest [--create-bucket]    (real Supabase check: bucket, upload, public read, delete a temporary test video)
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
     python -m app.cli seed-network [--remove]                   (load the Our Network starter content; designations start unverified; --remove deletes only those)
@@ -240,6 +241,64 @@ def hero_videos_report(args: argparse.Namespace) -> None:
     local = [r for r in out if r["storage"] == "local"]
     print(f"\n{len(out)} video(s): {len(out) - len(bad)} verified, {len(bad)} need attention, {len(local)} held only on the server disk (temporary: run hero-videos-migrate while the file is still there).")
     print("No records or files were deleted or changed by this report.")
+
+
+def storage_selftest(args: argparse.Namespace) -> None:
+    """Prove that PICTURE uploads (carousel, team and founder photos, testimonials, client logos, welcome cards, every other website image) reach permanent storage with the REAL
+    project: settings, bucket, upload, read-back, public address, delete. One tiny temporary image is stored and removed. Secrets are never printed. Exit code 1 on any failure."""
+    import os
+    import tempfile
+    from pathlib import Path
+
+    import httpx
+
+    from app.services import object_storage as store
+
+    settings = get_settings()
+    failed: list[str] = []
+
+    def step(name: str, ok: bool, detail: str = "") -> bool:
+        print(f"[{'PASS' if ok else 'FAIL'}] {name}" + (f": {detail}" if detail else ""))
+        if not ok:
+            failed.append(name)
+        return ok
+
+    print(f"Environment: APP_ENV={settings.app_env}; Render detected: {'yes' if os.environ.get('RENDER') else 'no (local run)'}")
+    missing = store.missing_settings(settings)
+    step("SUPABASE_URL is set", "SUPABASE_URL" not in missing, "missing" if "SUPABASE_URL" in missing else "")
+    step("SUPABASE_SERVICE_ROLE_KEY is set", "SUPABASE_SERVICE_ROLE_KEY" not in missing, "missing" if "SUPABASE_SERVICE_ROLE_KEY" in missing else "")
+    info = store.durability(settings)
+    step("Pictures would be stored permanently (not on this server's disk)", info["backend"] == "supabase" and info["durable"], info.get("warning") or "")
+    print(f"Picture bucket (SUPABASE_MEDIA_BUCKET): {settings.media_bucket}   Video bucket (SUPABASE_VIDEO_BUCKET): {settings.hero_video_bucket}   (they share the credentials only)")
+    if info["backend"] != "supabase":
+        print("RESULT: not configured: nothing was uploaded.")
+        raise SystemExit(1)
+    png = bytes.fromhex("89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d49444154789c6360f8cfc0f01f0005000100a1d1ba7f0000000049454e44ae426082")
+    key = store.new_key("selftest", ".png")
+    tmp = Path(tempfile.gettempdir()) / key.replace("/", "-")
+    tmp.write_bytes(png)
+    stored = False
+    try:
+        try:
+            store.put(settings, settings.media_bucket, tmp, key, "image/png", "supabase")
+            stored = True
+            step("Upload a test picture (the bucket is created public if it does not exist)", True, f"{len(png)} bytes")
+        except Exception as exc:  # noqa: BLE001 - report, never a traceback that could carry secrets
+            step("Upload a test picture", False, getattr(exc, "message", None) or type(exc).__name__)
+            raise SystemExit(1) from None
+        step("The backend can read it back from storage", store.exists(settings, settings.media_bucket, key, "supabase"))
+        pub = httpx.get(store.public_url(settings, settings.media_bucket, key), timeout=20)
+        step("Visitors can fetch it from the public address", pub.status_code == 200 and pub.content[:4] == b"\x89PNG", f"HTTP {pub.status_code}")
+        step("Delete the test picture", store.delete(settings, settings.media_bucket, key, "supabase"))
+        stored = False
+        step("It is gone after deletion", not store.exists(settings, settings.media_bucket, key, "supabase"))
+    finally:
+        tmp.unlink(missing_ok=True)
+        if stored:
+            store.delete(settings, settings.media_bucket, key, "supabase")
+    print("RESULT: " + ("ALL CHECKS PASSED: pictures are stored permanently in Supabase Storage." if not failed else f"{len(failed)} check(s) failed."))
+    if failed:
+        raise SystemExit(1)
 
 
 def hero_videos_selftest(args: argparse.Namespace) -> None:
@@ -771,6 +830,8 @@ def main(argv: list[str] | None = None) -> None:
     hm = sub.add_parser("hero-videos-migrate", help="copy videos held on the server disk to Supabase Storage (verified; never deletes)")
     hm.add_argument("--apply", action="store_true", help="actually copy (default is a dry run)")
     hm.set_defaults(func=hero_videos_migrate)
+    sst = sub.add_parser("storage-selftest", help="test the real permanent PICTURE storage: settings, bucket, upload, read-back, public address, delete (one temporary image; secrets never printed)")
+    sst.set_defaults(func=storage_selftest)
     hst = sub.add_parser("hero-videos-selftest", help="test the real Supabase video storage: config, bucket, upload, public read, delete (one temporary object; secrets never printed)")
     hst.add_argument("--create-bucket", action="store_true", help="create the public bucket if it does not exist")
     hst.set_defaults(func=hero_videos_selftest)

@@ -353,3 +353,44 @@ def test_switching_an_entry_off_hides_it_from_the_website_without_deleting_it(fa
         assert [i["id"] for i in c.get(f"/api/admin/content/{kind}").json()] == [item["id"]]  # but still manageable
         c.patch(f"/api/admin/content/item/{item['id']}", json={"data": {**item["data"], "enabled": True}}, headers=csrf)
         assert len(client.get("/api/public/content-all").json()["kinds"][kind]) == 1
+
+
+def test_the_refusal_names_exactly_what_is_missing_and_never_mentions_a_video_bucket_as_the_cause(env, boss, monkeypatch):
+    monkeypatch.setenv("RENDER", "true")
+    env(SUPABASE_URL="https://proj.supabase.co", SUPABASE_SERVICE_ROLE_KEY=None)
+    msg = upload(boss).json()["error"]["message"]
+    assert "Not set on the server: SUPABASE_SERVICE_ROLE_KEY." in msg and "SUPABASE_URL," not in msg
+    env(SUPABASE_URL=None, SUPABASE_SERVICE_ROLE_KEY=SERVICE_KEY)
+    assert "Not set on the server: SUPABASE_URL." in upload(boss).json()["error"]["message"]
+
+
+def test_images_need_only_the_url_and_key_not_the_video_bucket_settings(fake, boss, monkeypatch):
+    monkeypatch.delenv("SUPABASE_VIDEO_BUCKET", raising=False)
+    monkeypatch.delenv("HERO_VIDEO_BUCKET", raising=False)
+    assert upload(boss, public="true").status_code == 201
+
+
+def test_the_settings_tolerate_quotes_spaces_pasted_api_paths_and_the_usual_alternative_names(monkeypatch):
+    from app.core.config import Settings
+
+    s = Settings(_env_file=None, supabase_url=' "https://proj.supabase.co/storage/v1/" ', supabase_service_role_key=' Bearer abc ')
+    assert s.supabase_url == "https://proj.supabase.co" and s.supabase_service_role_key.get_secret_value() == "abc"
+    monkeypatch.setenv("SUPABASE_PROJECT_URL", "proj2.supabase.co")
+    monkeypatch.setenv("SUPABASE_SERVICE_KEY", "xyz")
+    t = Settings(_env_file=None)
+    assert t.supabase_url == "https://proj2.supabase.co" and t.supabase_service_role_key.get_secret_value() == "xyz"
+
+
+def test_an_identical_picture_whose_stored_file_is_gone_is_stored_again_under_the_same_item(fake, boss, db):
+    first = upload(boss, public="true").json()
+    fake.objects.clear()  # the file vanished from storage (e.g. an old disk was wiped)
+    again = upload(boss, name="again.png", public="true").json()
+    assert again["id"] == first["id"] and len(fake.objects) == 1  # same item, file restored: every page that uses it works again
+    row = db.scalar(select(MediaAsset))
+    assert list(fake.objects) == [row.storage_key]
+
+
+def test_an_upload_is_only_saved_when_it_can_be_read_back(fake, boss, db, monkeypatch):
+    monkeypatch.setattr(store, "exists", lambda *a, **k: False)
+    r = upload(boss)
+    assert r.status_code == 502 and db.scalar(select(func.count()).select_from(MediaAsset)) == 0

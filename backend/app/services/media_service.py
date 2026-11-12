@@ -110,12 +110,16 @@ def find_duplicate(db: Session, sha256: str) -> MediaAsset | None:
 def create(db: Session, settings: Settings, user: User, prep: Prepared, alt: str | None, is_public: bool) -> tuple[MediaAsset, bool]:
     """Store a prepared upload. Returns (asset, duplicate): an identical file already in the library is reused instead of stored again."""
     existing = find_duplicate(db, prep.sha256)
-    if existing is not None:
+    if existing is not None and (existing.storage == "db" or store.exists(settings, existing.bucket or settings.media_bucket, existing.storage_key or "", existing.storage)):
         prep.tmp.unlink(missing_ok=True)
         return existing, True
     where = store.backend(settings)
     key = store.new_key("media", prep.ext)
     store.put(settings, settings.media_bucket, prep.tmp, key, prep.ctype, where)
+    if existing is not None:  # the same picture was uploaded before but its file is gone (e.g. kept on a disk that was wiped): store it again under the SAME item so every reference works again
+        existing.storage, existing.storage_key, existing.bucket, existing.data = where, key, settings.media_bucket, None
+        db.flush()
+        return existing, True
     asset = MediaAsset(filename=prep.filename, content_type=prep.ctype, size_bytes=prep.size, alt_text=(alt or None), is_public=is_public, uploaded_by=user.id,
                        storage=where, storage_key=key, bucket=settings.media_bucket, sha256=prep.sha256, kind=prep.kind, data=None)
     db.add(asset)
