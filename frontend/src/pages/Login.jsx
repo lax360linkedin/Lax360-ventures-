@@ -20,7 +20,7 @@ function validate({ email, password }) {
 export default function Login() {
   const { user, notice, signIn } = useAuth()
   const location = useLocation()
-  const from = typeof location.state?.from === 'string' ? location.state.from : '/user/dashboard'
+  const from = typeof location.state?.from === 'string' ? location.state.from : '/'
   const [values, setValues] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
   const [show, setShow] = useState(false)
@@ -34,7 +34,7 @@ export default function Login() {
     if (attempt) formRef.current?.querySelector('[aria-invalid="true"]')?.focus()
   }, [attempt])
 
-  if (user) return <Navigate to={from} replace />
+  if (user) return <Navigate to={from} replace state={location.state?.reopenChat ? { reopenChat: true } : undefined} /> // customers always land on the public website, never an admin page
 
   const set = (id) => (e) => {
     setValues((v) => ({ ...v, [id]: e.target.value }))
@@ -109,13 +109,14 @@ export default function Login() {
                 </button>
               }
             />
+            <p className="-mt-2 text-right text-sm"><Link to="/forgot-password" className="font-semibold text-fg underline">Forgot your password?</Link></p>
             <Button type="submit" className="w-full" loading={status === 'submitting'}>
               <LogIn className="size-5" aria-hidden="true" /> {status === 'submitting' ? 'Signing in…' : 'Login'}
             </Button>
           </form>
 
           <p className="mt-6 text-sm text-soft">
-            New to LAX360? <Link to="/register" className="font-semibold text-fg underline">Create an account</Link>. This login is for website customers; LAX360 staff use the separate company admin login.
+            New to LAX360? <Link to="/register" state={location.state} className="font-semibold text-fg underline">Create an account</Link>. This login is for website customers; LAX360 staff use the separate company admin login.
           </p>
         </div>
       </div>

@@ -15,7 +15,7 @@ from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass
 
 from fastapi.concurrency import run_in_threadpool
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, text
 from sqlalchemy.orm import Session
 
 from app.core.config import ConfigError, Settings
@@ -105,7 +105,16 @@ def _load_session(db: Session, settings: Settings, user: User | None, data: Chat
 
 
 @dataclass
+class Guest:
+    """Who a signed-out visitor is, as far as the server can tell: an opaque cookie id (digest) and the network address (digest). Built by the route; never trusted from the request body."""
+
+    key: str
+    ip_hash: str
+
+
+@dataclass
 class _Prepared:
+    guest_left: int | None  # free messages left after this one (None for a signed-in user)
     session_id: uuid.UUID
     new_token: str | None
     context: list[dict[str, str]]
@@ -117,7 +126,32 @@ def _model_name(settings: Settings) -> str | None:
     return getattr(settings, f"{settings.ai_provider}_model", None)
 
 
-def _prepare(db: Session, settings: Settings, user: User | None, data: ChatRequest) -> _Prepared:
+def _guest_used(db: Session, key: str) -> int:
+    return int(db.scalar(select(func.count()).select_from(ChatMessage).join(ChatSession, ChatSession.id == ChatMessage.session_id)
+                         .where(ChatSession.guest_key == key, ChatMessage.role == "user", ChatMessage.status != "failed")) or 0)
+
+
+def _guest_ip_used(db: Session, ip_hash: str) -> int:
+    since = _now() - timedelta(hours=24)
+    return int(db.scalar(select(func.count()).select_from(ChatMessage).join(ChatSession, ChatSession.id == ChatMessage.session_id)
+                         .where(ChatSession.ip_hash == ip_hash, ChatMessage.role == "user", ChatMessage.status != "failed", ChatMessage.created_at >= since)) or 0)
+
+
+def _enforce_guest_limit(db: Session, settings: Settings, guest: Guest) -> int:
+    """Signed-out visitors get `chat_guest_message_limit` messages (default 3). Counted from the stored messages of every conversation carrying their guest key, plus a larger per-address cap
+    against clearing cookies. Concurrent requests are serialised so two quick messages cannot both slip under the limit. Returns how many free messages remain after this one."""
+    if db.bind is not None and db.bind.dialect.name == "postgresql":
+        db.execute(text("select pg_advisory_xact_lock(hashtext(:k))"), {"k": f"chat-guest:{guest.key}"})
+    limit = settings.chat_guest_message_limit
+    used = _guest_used(db, guest.key)
+    over_ip = settings.chat_guest_ip_message_limit > 0 and _guest_ip_used(db, guest.ip_hash) >= settings.chat_guest_ip_message_limit
+    if used >= limit or over_ip:
+        db.rollback()
+        raise ApiError(401, "login_required", f"You have used your {limit} free messages. Please log in or create a free account to continue chatting: your conversation will be kept.")
+    return limit - used - 1
+
+
+def _prepare(db: Session, settings: Settings, user: User | None, data: ChatRequest, guest: Guest | None = None) -> _Prepared:
     """All the blocking database work before the provider call (validation, session, user message, bounded context)."""
     if len(data.message) > settings.chat_max_input_chars:
         raise ApiError(422, "validation_error", "Please check the highlighted fields.", fields={"message": f"Please keep your message under {settings.chat_max_input_chars} characters."})
@@ -136,15 +170,30 @@ def _prepare(db: Session, settings: Settings, user: User | None, data: ChatReque
     if settings.chat_daily_token_budget and _tokens_used_today(db) >= settings.chat_daily_token_budget:
         raise _unavailable(db, settings, "budget_exceeded", 503, "ai_budget_exceeded")
 
+    guest_left: int | None = None
+    if user is None:
+        if guest is None:
+            raise ApiError(401, "login_required", "Please log in to continue chatting.")
+        guest_left = _enforce_guest_limit(db, settings, guest)  # BEFORE anything is stored or the model is called
+
     new_session_token: str | None = None
     if data.session_id:
         session = _load_session(db, settings, user, data)
+        if user is not None and session.user_id is None:
+            session.user_id = user.id  # a conversation started as a guest continues, in the same place, once the visitor has logged in
     else:
         new_session_token = new_token()
         session = ChatSession(user_id=user.id if user else None, token_hash=token_digest(new_session_token, settings),
+                              guest_key=guest.key if (guest and user is None) else None, ip_hash=guest.ip_hash if (guest and user is None) else None,
                               expires_at=_now() + timedelta(days=settings.chat_retention_days))
         db.add(session)
         db.flush()
+    if user is None:  # a guest may only continue a conversation that carries THEIR key: a session token alone is not enough to dodge the allowance with a fresh cookie
+        if session.guest_key and session.guest_key != guest.key:
+            db.rollback()
+            raise ApiError(404, "chat_session_not_found", "That conversation was not found. Please start a new one.")
+        session.guest_key = session.guest_key or guest.key
+        session.ip_hash = session.ip_hash or guest.ip_hash
     if session.message_count >= settings.chat_max_messages_per_session:
         raise ApiError(409, "conversation_limit", "This conversation has reached its length limit. Please start a new one.")
 
@@ -169,7 +218,7 @@ def _prepare(db: Session, settings: Settings, user: User | None, data: ChatReque
     context = context[-settings.chat_context_messages:] or context
     while context and context[0]["role"] != "user":
         context.pop(0)
-    return _Prepared(session.id, new_session_token, context, build_instructions(list_branches(db), settings_service.get(db, "chatbot_instructions")),
+    return _Prepared(guest_left, session.id, new_session_token, context, build_instructions(list_branches(db), settings_service.get(db, "chatbot_instructions")),
                      hashlib.sha256(str(session.id).encode()).hexdigest()[:32])
 
 
@@ -206,12 +255,12 @@ def _finish(db: Session, settings: Settings, prep: _Prepared, result, message: s
         session_id=prep.session_id, session_token=prep.new_token,
         message=ChatReply(id=str(reply.id), text=result.text),
         links=links, whatsapp=whatsapp, follow_ups=follow,
-        meta={"status": "ok", "latency_ms": result.latency_ms},
+        meta={"status": "ok", "latency_ms": result.latency_ms, **({"guest_messages_left": prep.guest_left} if prep.guest_left is not None else {})},
     )
 
 
-async def handle_chat(db: Session, settings: Settings, ai: AIService, user: User | None, data: ChatRequest) -> ChatResponse:
-    prep = await run_in_threadpool(_prepare, db, settings, user, data)
+async def handle_chat(db: Session, settings: Settings, ai: AIService, user: User | None, data: ChatRequest, guest: Guest | None = None) -> ChatResponse:
+    prep = await run_in_threadpool(_prepare, db, settings, user, data, guest)
     try:
         result = await ai.generate(instructions=prep.instructions, messages=prep.context, safety_identifier=prep.safety_id)
     except AIServiceError as err:

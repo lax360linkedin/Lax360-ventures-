@@ -37,9 +37,9 @@ async function signIn({ email, password }) {
   }
 }
 
-async function signUp({ fullName, email, password }) {
+async function signUp({ fullName, email, password, details }) {
   try {
-    const s = await register({ fullName, email, password })
+    const s = await register({ fullName, email, password, details })
     setCsrfToken(s.csrf_token)
     set({ user: s.user, status: 'ready', notice: null })
     return { ok: true }

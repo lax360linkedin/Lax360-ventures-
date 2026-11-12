@@ -394,3 +394,59 @@ def test_an_upload_is_only_saved_when_it_can_be_read_back(fake, boss, db, monkey
     monkeypatch.setattr(store, "exists", lambda *a, **k: False)
     r = upload(boss)
     assert r.status_code == 502 and db.scalar(select(func.count()).select_from(MediaAsset)) == 0
+
+
+def _pic(c, csrf, title, asset_id, **extra):
+    return c.post("/api/admin/content/carousel_image", json={"title": title, "status": "published", "data": {"image": asset_id, "enabled": True, **extra}}, headers=csrf)
+
+
+def test_the_same_picture_cannot_be_added_to_the_carousel_twice(fake, boss, db):
+    c, csrf = boss
+    a = upload(boss, name="a.png", public="true").json()
+    assert _pic(c, csrf, "First", a["id"]).status_code == 201
+    again = _pic(c, csrf, "Second", a["id"])
+    assert again.status_code == 409 and again.json()["error"]["code"] == "duplicate_picture"
+    # the same file uploaded again is the same library item, so pasting it twice cannot add it twice either
+    same = upload(boss, name="pasted-copy.png", public="true").json()
+    assert same["id"] == a["id"] and _pic(c, csrf, "Third", same["id"]).status_code == 409
+    assert len(c.get("/api/admin/content/carousel_image").json()) == 1
+
+
+def test_a_picture_stored_twice_in_the_library_is_still_the_same_picture(fake, boss, db):
+    c, csrf = boss
+    a = upload(boss, name="a.png", public="true").json()
+    row = db.scalar(select(MediaAsset))
+    twin = MediaAsset(filename="legacy-copy.png", content_type=row.content_type, size_bytes=row.size_bytes, is_public=True, storage=row.storage, storage_key=row.storage_key, bucket=row.bucket, sha256=row.sha256, kind="image")
+    db.add(twin)
+    db.commit()
+    assert _pic(c, csrf, "One", a["id"]).status_code == 201
+    assert _pic(c, csrf, "Two", str(twin.id)).status_code == 409  # different library item, identical file
+
+
+def test_editing_an_entry_never_blocks_on_its_own_picture_and_a_new_picture_is_accepted(fake, boss):
+    c, csrf = boss
+    png2 = PNG + b"\x00"  # a different file
+    a = upload(boss, name="a.png", public="true").json()
+    b = upload(boss, name="b.png", content=png2, public="true").json()
+    first = _pic(c, csrf, "A", a["id"]).json()
+    second = _pic(c, csrf, "B", b["id"]).json()
+    assert c.patch(f"/api/admin/content/item/{first['id']}", json={"data": {**first["data"], "caption": "hello"}}, headers=csrf).status_code == 200
+    assert c.patch(f"/api/admin/content/item/{second['id']}", json={"data": {**second["data"], "image": a["id"]}}, headers=csrf).status_code == 409  # cannot be switched to a picture already used
+
+
+def test_existing_repeats_are_found_and_removed_keeping_the_first_copy_and_the_order(fake, boss, db):
+    from app.models import ContentItem
+
+    c, csrf = boss
+    a = upload(boss, name="a.png", public="true").json()
+    b = upload(boss, name="b.png", content=PNG + b"\x00", public="true").json()
+    for n, (title, asset, order) in enumerate((("A1", a["id"], 10), ("B", b["id"], 20), ("A2", a["id"], 30))):  # A2 repeats A1: written directly, as old data could be
+        db.add(ContentItem(kind="carousel_image", slug=f"s{n}", title=title, data={"image": asset, "enabled": True}, status="published", sort_order=order))
+    db.commit()
+    dry = c.post("/api/admin/content/carousel_image/dedupe", headers=csrf).json()
+    assert dry["duplicates"] == 1 and dry["removed"] == 0 and len(c.get("/api/admin/content/carousel_image").json()) == 3  # a dry run changes nothing
+    done = c.post("/api/admin/content/carousel_image/dedupe?apply=true", headers=csrf).json()
+    assert done["removed"] == 1
+    left = c.get("/api/admin/content/carousel_image").json()
+    assert [i["title"] for i in left] == ["A1", "B"]  # first copy kept, unique pictures and their order untouched
+    assert c.post("/api/admin/content/carousel_image/dedupe?apply=true", headers=csrf).json()["removed"] == 0  # and nothing comes back

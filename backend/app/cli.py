@@ -243,6 +243,28 @@ def hero_videos_report(args: argparse.Namespace) -> None:
     print("No records or files were deleted or changed by this report.")
 
 
+def dedupe_carousel(args: argparse.Namespace) -> None:
+    """Find (and with --apply remove) repeated pictures in the home-page image carousel. The first copy of each picture keeps its place; unique pictures are never touched.
+    Without --apply nothing is changed."""
+    from app.services import content_service as cs
+
+    get_settings()
+    with _factory()() as db:
+        groups = cs.duplicate_groups(db, "carousel_image")
+        if not groups:
+            print("No repeated pictures in the carousel.")
+            return
+        for kept, extra in groups:
+            print(f"Kept “{kept.title}” (order {kept.sort_order}); repeated as: " + ", ".join(f"“{d.title}” (order {d.sort_order})" for d in extra))
+        total = sum(len(e) for _, e in groups)
+        if not args.apply:
+            print(f"{total} repeated entr{'y' if total == 1 else 'ies'} found. Run again with --apply to remove them (their files stay in the media library).")
+            return
+        removed = cs.remove_duplicates(db, "carousel_image")
+        db.commit()
+        print(f"Removed {len(removed)} repeated entr{'y' if len(removed) == 1 else 'ies'}. Every unique picture kept its place.")
+
+
 def storage_selftest(args: argparse.Namespace) -> None:
     """Prove that PICTURE uploads (carousel, team and founder photos, testimonials, client logos, welcome cards, every other website image) reach permanent storage with the REAL
     project: settings, bucket, upload, read-back, public address, delete. One tiny temporary image is stored and removed. Secrets are never printed. Exit code 1 on any failure."""
@@ -830,6 +852,9 @@ def main(argv: list[str] | None = None) -> None:
     hm = sub.add_parser("hero-videos-migrate", help="copy videos held on the server disk to Supabase Storage (verified; never deletes)")
     hm.add_argument("--apply", action="store_true", help="actually copy (default is a dry run)")
     hm.set_defaults(func=hero_videos_migrate)
+    ddc = sub.add_parser("dedupe-carousel", help="find repeated pictures in the home-page image carousel; --apply removes the later copies (unique pictures and order untouched)")
+    ddc.add_argument("--apply", action="store_true")
+    ddc.set_defaults(func=dedupe_carousel)
     sst = sub.add_parser("storage-selftest", help="test the real permanent PICTURE storage: settings, bucket, upload, read-back, public address, delete (one temporary image; secrets never printed)")
     sst.set_defaults(func=storage_selftest)
     hst = sub.add_parser("hero-videos-selftest", help="test the real Supabase video storage: config, bucket, upload, public read, delete (one temporary object; secrets never printed)")

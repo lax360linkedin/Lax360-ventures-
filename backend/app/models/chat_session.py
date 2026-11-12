@@ -14,10 +14,12 @@ class ChatSession(UUIDPk, Base):
     and, when the visitor was signed in, by the user id. Rows expire (`expires_at`) and are purged."""
 
     __tablename__ = "chat_sessions"
-    __table_args__ = (Index("ix_chat_sessions_expires_at", "expires_at"),)
+    __table_args__ = (Index("ix_chat_sessions_expires_at", "expires_at"), Index("ix_chat_sessions_guest_key", "guest_key"), Index("ix_chat_sessions_ip_hash_created_at", "ip_hash", "created_at"))
 
     user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
     token_hash: Mapped[str] = mapped_column(String(64))
+    guest_key: Mapped[str | None] = mapped_column(String(64))  # digest of the guest cookie id (NULL for signed-in users): the 'free messages' allowance is counted per key
+    ip_hash: Mapped[str | None] = mapped_column(String(64))  # digest of the client IP: a second, larger cap against clearing cookies
     message_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_active_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

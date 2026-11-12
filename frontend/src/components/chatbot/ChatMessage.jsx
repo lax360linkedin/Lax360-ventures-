@@ -25,7 +25,7 @@ export default function ChatMessage({ message, onNavigate }) {
         {(message.links?.length > 0 || message.whatsapp) && (
           <div className="mt-2 flex flex-wrap gap-2">
             {message.links.map((l) => (
-              <Link key={l.to} to={l.to} onClick={onNavigate} className={pill}>{l.label}</Link>
+              <Link key={l.to} to={l.to} state={l.state} onClick={onNavigate} className={message.loginPrompt ? `${pill} bg-violet !text-white hover:opacity-90` : pill}>{l.label}</Link>
             ))}
             {message.whatsapp && (
               <a href={whatsappLink('Hi LAX360 Pvt Ltd, I was chatting on your website and would like to talk to a person.')} target="_blank" rel="noopener noreferrer" className={pill}>

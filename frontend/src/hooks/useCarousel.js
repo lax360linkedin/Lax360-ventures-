@@ -8,9 +8,11 @@ export function useCarousel() {
   const pictures = useContent('carousel_image')
   const page = useContent('carousel_page')?.[0]?.data
   return useMemo(() => {
+    const seen = new Set()
     const items = (pictures || [])
       .filter((i) => i.data.enabled !== false && (i.data.image || i.data.image_path))
       .map((i) => ({ id: i.id, name: i.title, src: i.data.image || i.data.image_path, alt: i.data.alt || '', caption: i.data.caption || '', portrait: i.data.shape === 'portrait', sample: i.data.sample === true }))
+      .filter((i) => !seen.has(i.src) && seen.add(i.src)) // the same picture is shown once, even if the content holds it twice
     const p = page || {}
     return {
       items,

@@ -69,6 +69,22 @@ def order(kind: str, body: ContentOrder, user: User = Depends(staff_user_csrf), 
     return [_out(i) for i in svc.list_items(db, kind)]
 
 
+@router.post("/content/{kind}/dedupe")
+def dedupe(kind: str, apply: bool = Query(False), user: User = Depends(staff_user_csrf), db: Session = Depends(get_db)) -> dict:
+    """Repeated pictures (carousel): `apply=false` lists what would be removed, `apply=true` removes the later copies. Unique pictures and their order are untouched."""
+    _allow(user, kind)
+    if kind not in svc.UNIQUE_PICTURE_KINDS:
+        raise ApiError(404, "not_found", "Duplicate checking is not used for this content type.")
+    groups = svc.duplicate_groups(db, kind)
+    found = [{"kept": {"id": str(k.id), "title": k.title}, "duplicates": [{"id": str(d.id), "title": d.title} for d in v]} for k, v in groups]
+    removed = 0
+    if apply and groups:
+        removed = len(svc.remove_duplicates(db, kind))
+        audit_service.record(db, user, "content.dedupe", resource_type=kind, detail={"removed": removed})
+        db.commit()
+    return {"groups": found, "duplicates": sum(len(g["duplicates"]) for g in found), "removed": removed}
+
+
 @router.patch("/content/item/{item_id}")
 def update(item_id: uuid.UUID, body: ContentUpdate, user: User = Depends(staff_user_csrf), db: Session = Depends(get_db)) -> dict:
     item = svc.get_item(db, item_id)

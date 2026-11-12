@@ -11,7 +11,7 @@ import { whatsappLink } from '../../utils/whatsapp.js'
 
 const FOCUSABLE = 'a[href], button:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
-export default function ChatPanel({ messages, pending, isMobile, onSend, onClear, onClose }) {
+export default function ChatPanel({ messages, pending, isMobile, guestLeft = null, onSend, onClear, onClose }) {
   const site = useSite()
   const welcome = useSiteSettings().chatbot_welcome || WELCOME_MESSAGE // editable in the admin panel
   const reduce = useReducedMotion()
@@ -100,6 +100,7 @@ export default function ChatPanel({ messages, pending, isMobile, onSend, onClear
         {pending && <TypingIndicator />}
       </div>
 
+      {guestLeft !== null && guestLeft > 0 && <p role="status" className="border-t border-edge bg-glass px-4 py-1.5 text-xs text-soft">{guestLeft} free message{guestLeft === 1 ? '' : 's'} left. <Link to="/login" state={{ from: typeof window !== 'undefined' ? window.location.pathname : '/', reopenChat: true }} onClick={isMobile ? onClose : undefined} className="font-semibold text-fg underline">Log in</Link> or create a free account for unlimited chat.</p>}
       <ChatInput ref={inputRef} onSend={onSend} disabled={pending} />
 
       <footer className="border-t border-edge bg-night/40 px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-xs text-soft">

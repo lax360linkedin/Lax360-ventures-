@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Response
+import logging
+
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from sqlalchemy.orm import Session
 
 from app.api.deps import clear_session_cookie, csrf_session, current_session, set_session_cookie
@@ -8,11 +10,13 @@ from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
 from app.core.rate_limit import rate_limit
 from app.db.session import get_db
-from app.models import AuthSession
-from app.schemas.auth import LoginRequest, RegisterRequest, SessionOut
+from sqlalchemy import select
+
+from app.models import AuthSession, User
+from app.schemas.auth import ForgotPasswordRequest, LoginRequest, RegisterRequest, ResetPasswordRequest, SessionOut
 from app.schemas.user import UserOut
 from app.core.permissions import is_staff
-from app.services import auth_service
+from app.services import auth_service, email_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -40,12 +44,45 @@ def login(body: LoginRequest, response: Response, db: Session = Depends(get_db),
 @router.post("/register", response_model=SessionOut, status_code=201, dependencies=[Depends(rate_limit("register", "register_rate_limit_max", "register_rate_limit_window_seconds"))])
 def register(body: RegisterRequest, response: Response, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)):
     """Public sign-up: always creates a customer (role `user`) and signs them in to the public website. Never an administrator."""
-    user = auth_service.register_public_user(db, settings, full_name=body.full_name, email=body.email, password=body.password)
+    user = auth_service.register_public_user(db, settings, full_name=body.full_name, email=body.email, password=body.password,
+                                             profile=body.model_dump(include=set(auth_service.PROFILE_KEYS)))
     user.last_login_at = auth_service.utcnow()
     token, session = auth_service.create_session(db, user, settings)
     db.commit()
     set_session_cookie(response, token, settings)
     return _session_out(session)
+
+
+_RESET_LIMIT = Depends(rate_limit("reset", "reset_rate_limit_max", "reset_rate_limit_window_seconds"))
+log = logging.getLogger("app.auth")
+
+
+def _send_reset(settings: Settings, email: str, name: str, token: str) -> None:
+    link = f"{settings.frontend_origin.rstrip('/')}/reset-password?token={token}"
+    sent = email_service.send(settings, email, "Reset your LAX360 password",
+                              f"Hello {name},\n\nSomeone asked to reset the password of your LAX360 Pvt Ltd account. To choose a new password, open this link (valid for {settings.password_reset_ttl_minutes} minutes, usable once):\n\n"
+                              f"{link}\n\nIf you did not ask for this, ignore this message: your password has not changed.\n\nLAX360 Pvt Ltd")
+    if not sent and not settings.is_production:
+        log.info("Development: password reset link for %s: %s", email, link)  # never logged in production
+
+
+@router.post("/forgot-password", status_code=202, dependencies=[_RESET_LIMIT])
+def forgot_password(body: ForgotPasswordRequest, tasks: BackgroundTasks, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> dict:
+    """Ask for a password-reset e-mail. The answer is always the same, whether or not the address has an account (no account enumeration), and the e-mail is sent after the response."""
+    user = db.scalar(select(User).where(User.email == auth_service.normalize_email(body.email)))
+    if user is not None and user.is_active and not is_staff(user):
+        tasks.add_task(_send_reset, settings, user.email, user.full_name, auth_service.make_reset_token(settings, user))
+    return {"status": "ok", "message": "If an account exists for that address, we have sent a link to reset the password."}
+
+
+@router.post("/reset-password", status_code=204, dependencies=[Depends(rate_limit("reset_use", "reset_rate_limit_max", "reset_rate_limit_window_seconds"))])
+def reset_password(body: ResetPasswordRequest, response: Response, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)):
+    """Choose a new password with the link from the e-mail. Single use; every session of the account is signed out."""
+    auth_service.reset_password_with_token(db, settings, body.token, body.new_password)
+    db.commit()
+    clear_session_cookie(response, settings)
+    response.status_code = 204
+    return response
 
 
 @router.get("/me", response_model=SessionOut)

@@ -1,6 +1,6 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -27,6 +27,7 @@ const ClientsAdmin = sect('ClientsAdmin')
 const NetworkAdmin = sect('NetworkAdmin')
 const FounderAdmin = sect('FounderAdmin')
 const Staff = lazy(() => import('./pages/Staff.jsx'))
+const Customers = lazy(() => import('./pages/Customers.jsx'))
 const Audit = lazy(() => import('./pages/Audit.jsx'))
 const System = lazy(() => import('./pages/System.jsx'))
 
@@ -34,6 +35,7 @@ const NAV = [
   { section: 'Overview', to: '/company-admin/dashboard', end: true, label: 'Dashboard', icon: LayoutDashboard, module: null, hint: 'Numbers, shortcuts and your website at a glance' },
   { section: 'Leads & customers', to: '/company-admin/enquiries', label: 'Enquiries & leads', icon: Inbox, module: 'enquiries', hint: 'Contact forms, quotes, partnership and career enquiries' },
   { section: 'Leads & customers', to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests', hint: 'Requests for a product demonstration' },
+  { section: 'Leads & customers', to: '/company-admin/customers', label: 'Registered users', icon: UserCog, module: 'customers', hint: 'Website customers: accounts, enquiry and demo history, activate or deactivate' },
   { section: 'Home page', to: '/company-admin/welcome', label: 'Welcome cards', icon: Sparkles, module: 'content', hint: 'Welcome cards, festival greetings and offers shown after the intro animation' },
   { section: 'Home page', to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos', hint: 'The scheduled background videos of the home page' },
   { section: 'Home page', to: '/company-admin/carousel', label: 'Image carousel', icon: Images, module: 'content', hint: 'The swipeable picture strip on the home page: upload, replace, re-order, delete' },
@@ -270,6 +272,7 @@ export default function AdminApp() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="enquiries" element={<Guard module="enquiries"><Enquiries /></Guard>} />
           <Route path="demos" element={<Guard module="demo_requests"><Demos /></Guard>} />
+          <Route path="customers" element={<Guard module="customers"><Customers /></Guard>} />
           <Route path="content" element={<Guard module={['content', 'services', 'careers', 'navigation']}><Content /></Guard>} />
           <Route path="chatbot" element={<Guard module="chatbot"><Chatbot /></Guard>} />
           <Route path="products" element={<Guard module="content"><Products /></Guard>} />

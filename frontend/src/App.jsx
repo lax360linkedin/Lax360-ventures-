@@ -29,6 +29,8 @@ const Privacy = lazy(() => import('./pages/Privacy.jsx'))
 const Terms = lazy(() => import('./pages/Terms.jsx'))
 const Login = lazy(() => import('./pages/Login.jsx'))
 const Register = lazy(() => import('./pages/Register.jsx'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'))
 const Profile = lazy(() => import('./pages/Profile.jsx'))
 const DemoRequest = lazy(() => import('./pages/DemoRequest.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
@@ -73,6 +75,8 @@ export default function App() {
         <Route path="contact" element={<Contact />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
         {/* Signed-in customers only (public-website session). Not prerendered or in the sitemap. */}
         <Route path="user/dashboard" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="user" element={<Navigate to="/user/dashboard" replace />} />

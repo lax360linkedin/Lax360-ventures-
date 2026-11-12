@@ -12,7 +12,7 @@ from app.core.config import Settings
 from app.core.errors import ApiError
 from app.core.permissions import is_staff
 from app.core.security import hash_password, needs_rehash, new_token, token_digest, verify_password
-from app.models import AuthSession, User
+from app.models import AuthSession, User, UserProfile
 
 
 _EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
@@ -86,6 +86,47 @@ def resolve_session(db: Session, token: str | None, settings: Settings, realm: s
     return Resolved(row)
 
 
+# ---- password reset: a signed, expiring, SINGLE-USE token (nothing is stored) -----------------------------------------------------------------
+# token = <user id>.<expiry>.<signature>; the signature covers the user's CURRENT password hash, so the moment the password changes (by this reset or any other way) the token stops working.
+def _reset_signature(settings: Settings, user: User, user_id: str, expires: int) -> str:
+    import hashlib
+    import hmac
+
+    key = settings.require_auth_secret().encode()
+    return hmac.new(key, f"pwreset|{user_id}|{expires}|{user.password_hash}".encode(), hashlib.sha256).hexdigest()
+
+
+def make_reset_token(settings: Settings, user: User) -> str:
+    expires = int((utcnow() + timedelta(minutes=settings.password_reset_ttl_minutes)).timestamp())
+    return f"{user.id}.{expires}.{_reset_signature(settings, user, str(user.id), expires)}"
+
+
+def user_for_reset_token(db: Session, settings: Settings, token: str) -> User | None:
+    """The account a valid, unexpired, unused reset token belongs to; None for anything else (the reason is never revealed)."""
+    from app.core.security import safe_equal
+
+    try:
+        user_id, expires, signature = token.split(".")
+        user = db.get(User, uuid.UUID(user_id))
+        if user is None or int(expires) < int(utcnow().timestamp()):
+            return None
+    except (ValueError, AttributeError):
+        return None
+    if not user.is_active or is_staff(user) or not safe_equal(signature, _reset_signature(settings, user, user_id, int(expires))):
+        return None  # staff accounts are never reset from the public website
+    return user
+
+
+def reset_password_with_token(db: Session, settings: Settings, token: str, new_password: str) -> User:
+    check_password_policy(new_password, settings)
+    user = user_for_reset_token(db, settings, token)
+    if user is None:
+        raise ApiError(400, "invalid_reset_link", "This reset link is invalid or has expired. Please request a new one.")
+    user.password_hash = hash_password(new_password)
+    db.execute(update(AuthSession).where(AuthSession.user_id == user.id, AuthSession.revoked_at.is_(None)).values(revoked_at=utcnow()))  # sign out everywhere
+    return user
+
+
 def revoke_session(db: Session, session: AuthSession) -> None:
     session.revoked_at = utcnow()
 
@@ -127,7 +168,21 @@ def reserved_identity(settings: Settings, email: str) -> bool:
     return bool(settings.admin_email) and normalize_email(email) == normalize_email(settings.admin_email)
 
 
-def register_public_user(db: Session, settings: Settings, *, full_name: str, email: str, password: str) -> User:
+PROFILE_KEYS = ('mobile', 'category', 'institution', 'course', 'department', 'study_year', 'company', 'job_role', 'industry', 'experience_years', 'other_details', 'purposes', 'purpose_note')
+
+
+def apply_profile(db: Session, user: User, details: dict) -> UserProfile:
+    """Create or replace the customer's registration details (only the known keys are ever copied: nothing from a request can reach another column)."""
+    profile = user.profile or db.get(UserProfile, user.id)
+    if profile is None:
+        profile = UserProfile(user_id=user.id)
+        db.add(profile)
+    for key in PROFILE_KEYS:
+        setattr(profile, key, details.get(key) if key != "purposes" else list(details.get("purposes") or []))
+    return profile
+
+
+def register_public_user(db: Session, settings: Settings, *, full_name: str, email: str, password: str, profile: dict | None = None) -> User:
     """Self-service sign-up. The role is ALWAYS `user` (a website customer): nothing in the request can choose it."""
     check_password_policy(password, settings, field="password")
     clean = normalize_email(email)
@@ -136,6 +191,8 @@ def register_public_user(db: Session, settings: Settings, *, full_name: str, ema
     user = User(email=clean, full_name=full_name.strip(), password_hash=hash_password(password), role="user", permissions=[])
     db.add(user)
     db.flush()
+    if profile is not None:
+        apply_profile(db, user, profile)
     return user
 
 

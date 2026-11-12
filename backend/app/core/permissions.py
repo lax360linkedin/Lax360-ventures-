@@ -11,6 +11,7 @@ from __future__ import annotations
 MODULES: dict[str, str] = {
     "enquiries": "Customer enquiries",
     "demo_requests": "Demo requests",
+    "customers": "Registered users (website customers)",
     "content": "Website content",
     "chatbot": "AI chatbot",
     "media": "Media library",

@@ -46,5 +46,5 @@ export async function sendMessage({ text }, { signal } = {}) {
     data = await post(text, signal)
   }
   if (data.session_token) conversation = { id: data.session_id, token: data.session_token }
-  return { id: data.message.id, text: data.message.text, links: data.links || [], whatsapp: Boolean(data.whatsapp), followUps: topicFollowUps(data.follow_ups) }
+  return { id: data.message.id, text: data.message.text, links: data.links || [], whatsapp: Boolean(data.whatsapp), followUps: topicFollowUps(data.follow_ups), guestLeft: data.meta?.guest_messages_left ?? null }
 }

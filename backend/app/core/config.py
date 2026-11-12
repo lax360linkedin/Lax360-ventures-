@@ -94,6 +94,17 @@ class Settings(BaseSettings):
     chat_max_messages_per_session: int = 40
     chat_retention_days: int = 30
     chat_daily_token_budget: int = 0  # 0 = no application-side budget
+    chat_guest_message_limit: int = 3  # messages a visitor may send without an account; the next one needs a login (enforced on the server)
+    chat_guest_ip_message_limit: int = 15  # a second cap per network address per day, against clearing cookies to get a new allowance (0 = off)
+    chat_guest_cookie_name: str = "lax360_chat_guest"
+    # Password reset e-mail. Without SMTP_HOST the site cannot send e-mail: the reset request still answers neutrally, and an administrator can set a new password instead.
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: SecretStr | None = None
+    smtp_from: str | None = None  # e.g. "LAX360 Pvt Ltd <no-reply@yourdomain.com>"
+    smtp_starttls: bool = True
+    password_reset_ttl_minutes: int = 60
 
     # --- rate limiting (in-memory, per process) ---------------------------------------------
     rate_limit_enabled: bool = True
@@ -101,6 +112,8 @@ class Settings(BaseSettings):
     login_rate_limit_window_seconds: int = 300
     register_rate_limit_max: int = 5
     register_rate_limit_window_seconds: int = 3600
+    reset_rate_limit_max: int = 5  # password-reset requests per address per window
+    reset_rate_limit_window_seconds: int = 3600
     contact_rate_limit_max: int = 5
     contact_rate_limit_window_seconds: int = 3600
     contact_upload_rate_limit_max: int = 12  # project documents attached to an enquiry
@@ -137,12 +150,12 @@ class Settings(BaseSettings):
         v = v.strip().strip("\"'").strip()
         return v[7:].strip() if v.lower().startswith("bearer ") else v
 
-    @field_validator("openai_api_key", "gemini_api_key", "auth_secret", "admin_password", "supabase_service_role_key", mode="before")
+    @field_validator("openai_api_key", "gemini_api_key", "auth_secret", "admin_password", "supabase_service_role_key", "smtp_password", mode="before")
     @classmethod
     def _blank_secret_is_none(cls, v):
         return None if isinstance(v, str) and not v.strip() else v
 
-    @field_validator("openai_model", "gemini_model", "admin_email", "admin_username", "supabase_url", "hero_video_slot_seconds", "database_url", "cookie_domain", "docs_enabled", "cookie_secure", "db_disable_prepared_statements", mode="before")
+    @field_validator("openai_model", "gemini_model", "smtp_host", "smtp_from", "smtp_username", "admin_email", "admin_username", "supabase_url", "hero_video_slot_seconds", "database_url", "cookie_domain", "docs_enabled", "cookie_secure", "db_disable_prepared_statements", mode="before")
     @classmethod
     def _blank_is_none(cls, v):
         return None if isinstance(v, str) and not v.strip() else v

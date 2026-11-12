@@ -15,17 +15,19 @@ import { useCarousel } from '../../hooks/useCarousel.js'
  * Pictures, order, on/off, shape, caption and the heading come from the admin panel; none are built into this file.
  */
 const FRICTION = 3.2 // momentum decay per second
+const GAP = 20 // the gap between pictures (gap-5)
 const RESUME_AFTER_MS = 1800 // drift resumes this long after the visitor lets go
 
 export default function ImageCarousel() {
   const { items, config } = useCarousel()
   const reduce = useReducedMotion()
   const [paused, setPaused] = useState(false) // the visitor pressed Pause
-  const [sets, setSets] = useState(2) // how many copies of the list make the strip long enough to never show an end
+  const [sets, setSets] = useState(2) // 2 copies while measuring or looping; 1 when the whole list fits on screen (then it is static)
   const box = useRef(null)
   const track = useRef(null)
   const s = useRef({ x: 0, v: 0, loop: 0, dragging: false, hover: false, focus: false, visible: false, until: 0, raf: 0, last: 0, moved: 0, samples: [], pointer: null })
-  const auto = !reduce && !paused && items.length > 0
+  const looping = sets > 1
+  const auto = !reduce && !paused && items.length > 0 && looping
 
   const apply = useCallback(() => {
     const st = s.current
@@ -33,18 +35,23 @@ export default function ImageCarousel() {
     if (track.current) track.current.style.transform = `translate3d(${-st.x}px,0,0)`
   }, [])
 
+  // One copy of the list is the whole strip when it fits on screen: it is shown once, centred, and does not move (so no picture is ever repeated). A longer list loops, and the
+  // loop is always wider than the screen, so the same picture is never visible twice at the same time (the second copy only exists to make the wrap-around seamless).
   const measure = useCallback(() => {
     const el = track.current
     const wrap = box.current
-    if (!el || !wrap || el.children.length < items.length * 2) return
-    const one = el.children[items.length].offsetLeft - el.children[0].offsetLeft // width of one copy of the list, gaps included
-    if (one > 0) {
-      s.current.loop = one
-      const need = Math.max(2, Math.ceil(wrap.clientWidth / one) + 1)
-      setSets((n) => (n === need ? n : need))
+    if (!el || !wrap || !items.length) return
+    const view = wrap.clientWidth
+    if (sets === 1) {
+      if (el.scrollWidth > view + 1) setSets(2) // grew past the screen (resize, a picture finished loading): loop from now on
+      else { s.current.loop = 0; s.current.x = 0 }
+    } else if (el.children.length >= items.length * 2) {
+      const one = el.children[items.length].offsetLeft - el.children[0].offsetLeft // width of one copy of the list, gaps included
+      if (one > 0 && one - GAP <= view) setSets(1) // everything fits: show it once
+      else if (one > 0) s.current.loop = one
     }
     apply()
-  }, [apply, items.length])
+  }, [apply, items.length, sets])
 
   useEffect(() => {
     measure()
@@ -153,7 +160,7 @@ export default function ImageCarousel() {
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={key}
         onMouseEnter={() => { s.current.hover = true }} onMouseLeave={() => { s.current.hover = false }} onFocus={() => { s.current.focus = true }} onBlur={() => { s.current.focus = false }}
         className="mt-10 cursor-grab select-none overflow-hidden active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lav md:mt-14" style={{ touchAction: 'pan-y' }}>
-        <ul ref={track} className="gal-track flex w-max items-stretch gap-5 will-change-transform">
+        <ul ref={track} className={`gal-track flex w-max items-stretch gap-5 will-change-transform ${looping ? '' : 'mx-auto'}`}>
           {copies.flatMap((c) => items.map((p, i) => (
             <li key={`${c}-${p.id}`} aria-hidden={c > 0 || undefined} className="group relative shrink-0">
               <figure className="relative m-0 rounded-[1.1rem] border-2 border-edge-strong bg-glass p-2.5 shadow-[0_18px_40px_-26px_rgba(0,0,0,0.7)]">
@@ -169,7 +176,7 @@ export default function ImageCarousel() {
           )))}
         </ul>
       </div>
-      {!reduce && (
+      {!reduce && looping && (
         <div className="wrap mt-5 flex justify-end">
           <button type="button" onClick={() => setPaused((v) => !v)} aria-pressed={paused} aria-label={paused ? 'Resume the automatic movement of the pictures' : 'Pause the automatic movement of the pictures'}
             className="inline-flex size-10 items-center justify-center rounded-full border border-edge-strong bg-glass text-fg transition-colors hover:border-lav hover:bg-glass-strong">

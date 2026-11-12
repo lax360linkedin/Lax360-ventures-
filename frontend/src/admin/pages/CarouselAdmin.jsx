@@ -18,6 +18,7 @@ export default function CarouselAdmin() {
   const kinds = useFetch(() => api('/api/admin/content/kinds'), [])
   const picsQ = useFetch(() => api('/api/admin/content/carousel_image'), [])
   const pageQ = useFetch(() => api('/api/admin/content/carousel_page'), [])
+  const dupQ = useFetch(() => api('/api/admin/content/carousel_image/dedupe', { method: 'POST' }).catch(() => null), []) // a dry run: which pictures are in the carousel more than once
   const [edit, setEdit] = useState(null)
   const [del, setDel] = useState(null)
   const [clearing, setClearing] = useState(false)
@@ -62,7 +63,12 @@ export default function CarouselAdmin() {
   const samples = pics.filter((p) => p.data?.sample === true)
   const shown = pics.filter((p) => p.status === 'published' && p.data?.enabled !== false)
   const on = settings ? settings.status === 'published' && settings.data?.enabled !== false : true
-  const reload = () => { picsQ.reload(); pageQ.reload() }
+  const reload = () => { picsQ.reload(); pageQ.reload(); dupQ.reload() }
+  const dupes = dupQ.data?.duplicates || 0
+  const removeDupes = async () => {
+    setBusy(true)
+    try { const r = await api('/api/admin/content/carousel_image/dedupe?apply=true', { method: 'POST' }); toast(`${r.removed} repeated picture${r.removed === 1 ? '' : 's'} removed: every picture is in the carousel once`); reload() } catch (e) { toast(e.message, 'error') } finally { setBusy(false) }
+  }
   const patch = async (item, body, ok) => {
     try { await api(`/api/admin/content/item/${item.id}`, { method: 'PATCH', body }); toast(ok); reload() } catch (e) { toast(e.message, 'error') }
   }
@@ -109,6 +115,16 @@ export default function CarouselAdmin() {
         </div>
         <Btn kind={on ? 'default' : 'primary'} onClick={toggleSection}><Power className="size-4" aria-hidden="true" /> {on ? 'Turn off' : 'Turn on'}</Btn>
       </Card>
+
+      {dupes > 0 && (
+        <Card className="mb-4 flex flex-wrap items-center justify-between gap-4 !border-amber-500/50 !p-5" role="alert">
+          <div>
+            <p className="font-display text-lg font-semibold">{dupes} picture{dupes === 1 ? ' is' : 's are'} in the carousel more than once</p>
+            <p className="mt-1 text-sm text-soft">The first copy of each keeps its place and order; the repeats are removed (the files stay in the media library). New uploads can no longer repeat a picture.</p>
+          </div>
+          <Btn kind="primary" loading={busy} onClick={removeDupes}>Remove the repeats</Btn>
+        </Card>
+      )}
 
       {samples.length > 0 && (
         <Card className="mb-6 flex flex-wrap items-center justify-between gap-4 !border-amber-500/50 !p-5">

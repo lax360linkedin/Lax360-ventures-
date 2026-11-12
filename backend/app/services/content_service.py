@@ -11,7 +11,7 @@ import datetime
 import re
 import uuid
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -780,9 +780,77 @@ def _slug_for(db: Session, spec: dict, title: str, clean: dict, current: Content
     return _slugify(title)
 
 
+# ---- one picture, one place -------------------------------------------------------------------------------------------------------
+UNIQUE_PICTURE_KINDS = ("carousel_image",)  # kinds where the same picture may appear only once (the carousel: a repeated picture is a mistake, never a design choice)
+
+
+def _sha_map(db: Session, datas: list[dict]) -> dict[str, str | None]:
+    ids = set()
+    for d in datas:
+        try:
+            if d.get("image"):
+                ids.add(uuid.UUID(d["image"]))
+        except ValueError:
+            pass
+    return {str(a.id): a.sha256 for a in db.scalars(select(MediaAsset).where(MediaAsset.id.in_(ids)))} if ids else {}
+
+
+def picture_identity(data: dict, sha_by_id: dict[str, str | None]) -> str | None:
+    """What makes two entries 'the same picture': the same file content (the library already stores identical files once, but older uploads may exist twice), the same library item,
+    or the same built-in picture path."""
+    if data.get("image"):
+        sha = sha_by_id.get(str(data["image"]))
+        return f"sha:{sha}" if sha else f"asset:{data['image']}"
+    return f"path:{data['image_path']}" if data.get("image_path") else None
+
+
+def _ensure_unique_picture(db: Session, kind: str, new: dict, current: ContentItem | None) -> None:
+    if kind not in UNIQUE_PICTURE_KINDS:
+        return
+    db.execute(text("select pg_advisory_xact_lock(hashtext(:k))"), {"k": f"unique-picture:{kind}"}) if db.bind.dialect.name == "postgresql" else None  # two simultaneous adds cannot both pass the check
+    others = [i for i in list_items(db, kind) if not current or i.id != current.id]
+    sha = _sha_map(db, [new] + [i.data or {} for i in others])
+    mine = picture_identity(new, sha)
+    if current is not None and picture_identity(current.data or {}, sha) == mine:
+        return  # the picture is not changing: editing other details (or hiding an old duplicate) must stay possible
+    if mine:
+        for i in others:
+            if picture_identity(i.data or {}, sha) == mine:
+                raise ApiError(409, "duplicate_picture", f"This picture is already in the carousel (“{i.title}”). Each picture can be added only once.", fields={"image": "Already in the carousel."})
+
+
+def duplicate_groups(db: Session, kind: str) -> list[tuple[ContentItem, list[ContentItem]]]:
+    """[(the entry kept, [its later duplicates])] in display order: the first entry (lowest order, then oldest) keeps its place."""
+    items = list_items(db, kind)
+    sha = _sha_map(db, [i.data or {} for i in items])
+    seen: dict[str, ContentItem] = {}
+    dupes: dict[str, list[ContentItem]] = {}
+    for i in items:
+        key = picture_identity(i.data or {}, sha)
+        if not key:
+            continue
+        if key in seen:
+            dupes.setdefault(key, []).append(i)
+        else:
+            seen[key] = i
+    return [(seen[k], v) for k, v in dupes.items()]
+
+
+def remove_duplicates(db: Session, kind: str) -> list[ContentItem]:
+    """Delete the later copies of any repeated picture (their library files stay). Every unique picture keeps its place and order. Returns what was removed."""
+    gone = []
+    for _, extra in duplicate_groups(db, kind):
+        for i in extra:
+            gone.append(i)
+            db.delete(i)
+    db.flush()
+    return gone
+
+
 def create(db: Session, user: User, kind: str, *, title: str, data: dict, status: str, sort_order: int) -> ContentItem:
     spec = get_kind(kind)
     title, clean = _validate(db, kind, title, data)
+    _ensure_unique_picture(db, kind, clean, None)
     slug = _slug_for(db, spec, title, clean, None, kind)
     if db.scalar(select(ContentItem.id).where(ContentItem.kind == kind, ContentItem.slug == slug)):
         if spec["single"]:
@@ -814,6 +882,7 @@ def update(db: Session, user: User, item: ContentItem, *, title: str | None, dat
             item.title = new_title
             changed.append("title")
         if clean != item.data:
+            _ensure_unique_picture(db, item.kind, clean, item)
             item.data = clean
             changed.append("data")
             spec = KINDS[item.kind]

@@ -71,6 +71,17 @@ class StaffUpdate(ApiModel):
     is_active: bool | None = None
 
 
+class CustomerUpdate(ApiModel):
+    """What may be changed on a website customer from the admin panel. Role changes have their own super-admin-only endpoint; unknown fields are rejected."""
+
+    is_active: bool | None = None
+    full_name: OneLine | None = Field(default=None, min_length=2, max_length=120)
+
+
+class CustomerPromote(ApiModel):
+    permissions: list[str] = Field(default_factory=list, max_length=20)
+
+
 class PasswordReset(ApiModel):
     new_password: str = Field(min_length=1, max_length=256)
 

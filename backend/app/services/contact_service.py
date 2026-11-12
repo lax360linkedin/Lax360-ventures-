@@ -57,7 +57,7 @@ def _checked_attachments(db: Session, ids) -> list[str]:
     return out
 
 
-def create_enquiry(db: Session, data: ContactCreate) -> tuple[ContactEnquiry, bool]:
+def create_enquiry(db: Session, data: ContactCreate, user=None) -> tuple[ContactEnquiry, bool]:
     """Store an enquiry. Returns (row, duplicate). A repeat of the same message within an hour is not stored twice."""
     require_branch(db, data.branch_id)
     errors = contact_catalog.validate_lead(data.extra)
@@ -85,11 +85,16 @@ def create_enquiry(db: Session, data: ContactCreate) -> tuple[ContactEnquiry, bo
         consented=data.consent,
         source=data.source,
         fingerprint=fingerprint,
+        user_id=user.id if user is not None else None,
     )
     db.add(row)
     db.commit()
     db.refresh(row)
     return row, False
+
+
+def list_for_user(db: Session, user_id: uuid.UUID, limit: int = 50) -> list[ContactEnquiry]:
+    return list(db.scalars(select(ContactEnquiry).where(ContactEnquiry.user_id == user_id).order_by(ContactEnquiry.created_at.desc()).limit(limit)))
 
 
 def list_all(db: Session, *, status: str | None, limit: int, offset: int) -> list[ContactEnquiry]:

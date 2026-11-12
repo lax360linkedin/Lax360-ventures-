@@ -10,7 +10,7 @@ from app.models import AuthSession, User
 from tests.conftest import PASSWORD, make_user
 
 PUBLIC, ADMIN = "lax360_session", "lax360_admin_session"
-SIGNUP = {"full_name": "Grace Hopper", "email": "grace@example.com", "password": "a-long-enough-password"}
+SIGNUP = {"full_name": "Grace Hopper", "email": "grace@example.com", "password": "a-long-enough-password", "mobile": "+91 98765 43210", "category": "other", "purposes": ["explore"]}
 
 
 def new_client(app):

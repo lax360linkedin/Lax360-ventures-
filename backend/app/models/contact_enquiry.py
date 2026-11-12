@@ -20,6 +20,7 @@ class ContactEnquiry(UUIDPk, Timestamps, Base):
         CheckConstraint("status in ('new','in_progress','contacted','qualified','proposal_sent','negotiation','converted','not_interested','closed')", name="status"),
         Index("ix_contact_enquiries_status_created_at", "status", "created_at"),
         Index("ix_contact_enquiries_fingerprint", "fingerprint"),
+        Index("ix_contact_enquiries_user_id", "user_id"),
     )
 
     name: Mapped[str] = mapped_column(String(120))
@@ -35,6 +36,7 @@ class ContactEnquiry(UUIDPk, Timestamps, Base):
     source: Mapped[str | None] = mapped_column(String(30))
     status: Mapped[str] = mapped_column(String(20), default="new", server_default="new")
     fingerprint: Mapped[str] = mapped_column(String(64))
+    user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))  # the signed-in customer who sent it (NULL for a visitor)
     assigned_to: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

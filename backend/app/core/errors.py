@@ -54,6 +54,11 @@ def install_error_handlers(app: FastAPI, *, expose_hints: bool) -> None:
     async def _validation_error(_: Request, exc: RequestValidationError):
         fields: dict[str, str] = {}
         for err in exc.errors():
+            per_field = (err.get("ctx") or {}).get("fields") if err.get("type") == "profile" else None  # a model-level check that names several fields at once
+            if isinstance(per_field, dict):
+                for name, message in per_field.items():
+                    fields.setdefault(name, str(message))
+                continue
             fields.setdefault(_field_name(tuple(err.get("loc", ()))), str(err.get("msg", "Invalid value")).removeprefix("Value error, "))
         return JSONResponse(envelope("validation_error", "Please check the highlighted fields.", fields), status_code=422)
 

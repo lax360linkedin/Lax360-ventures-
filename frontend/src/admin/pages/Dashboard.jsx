@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bot, CalendarCheck, FileText, Image as ImageIcon, Inbox, MessageSquareWarning, Palette, UserRound } from 'lucide-react'
+import { Bot, CalendarCheck, FileText, Image as ImageIcon, Inbox, MessageSquareWarning, Palette, UserRound, Users } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import { useAdmin } from '../AdminApp.jsx'
 import { Badge, Btn, Card, EmptyState, ErrorState, Field, Input, PageHeader, Spinner, fmtDate, label, useFetch } from '../ui.jsx'
@@ -62,6 +62,26 @@ function WebsitePages() {
             <p className="mt-1 flex-1 text-sm text-soft">{media.data.total ?? media.data.items?.length ?? 0} files. Upload images, PDFs and videos once and reuse them anywhere.</p>
             <div className="mt-4"><Link to="/company-admin/media"><Btn kind="primary">Open library</Btn></Link></div></Card></li>
         )}
+      </ul>
+    </section>
+  )
+}
+
+/** Registration numbers at a glance (only for administrators who may manage registered users): the full charts, filters and export are in Registered users. */
+function RegisteredUsersSummary() {
+  const { can } = useAdmin()
+  const q = useFetch(() => (can('customers') ? api('/api/admin/customers/stats?days=14') : Promise.resolve(null)).catch(() => null), [])
+  const s = q.data
+  if (!s) return null
+  return (
+    <section aria-label="Registered users" className="mb-6">
+      <div className="mb-2 flex items-center justify-between"><h2 className="font-display text-lg font-semibold">Registered users</h2><Link to="/company-admin/customers" className="text-sm font-semibold underline">Open the module</Link></div>
+      <ul className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <li><Stat icon={Users} name="Total registered" value={s.total} hint={`${s.active} active`} to="/company-admin/customers" /></li>
+        <li><Stat icon={Users} name="Students" value={s.categories.student} to="/company-admin/customers" /></li>
+        <li><Stat icon={Users} name="Working professionals" value={s.categories.professional} to="/company-admin/customers" /></li>
+        <li><Stat icon={Users} name="Other" value={s.categories.other} to="/company-admin/customers" /></li>
+        <li><Stat icon={Users} name="New this week" value={s.new.week} hint={`${s.new.today} today`} to="/company-admin/customers" /></li>
       </ul>
     </section>
   )
@@ -144,6 +164,7 @@ export default function Dashboard() {
     <>
       <PageHeader title={`Welcome, ${me.user.full_name.split(' ')[0]}`} lead="Live numbers from the database. Totals are all-time; charts and “in range” figures follow the dates below." />
       <QuickActions />
+      <RegisteredUsersSummary />
       <form onSubmit={apply} className="mb-6 flex flex-wrap items-end gap-3" aria-label="Date range">
         <Field label="From"><Input type="date" max={draft.to} value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.target.value })} /></Field>
         <Field label="To"><Input type="date" min={draft.from} max={iso(new Date())} value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.target.value })} /></Field>

@@ -39,4 +39,4 @@ export const routes = [
 
 // Prerendered for fast first paint but kept out of the sitemap (the pages are noindex).
 // /user/dashboard and /demo are signed-in only and are rendered in the browser, not prerendered.
-export const noindexRoutes = ['/login', '/register']
+export const noindexRoutes = ['/login', '/register', '/forgot-password', '/reset-password']

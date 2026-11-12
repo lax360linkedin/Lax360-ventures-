@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('7fc290a0-fafd-4364-a5fc-d8324003e819', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('191c8c54-7908-401d-bd32-a9cb64fad836', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('b701ea02-0d93-4c1e-a6b7-138dd6b69d9f', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('8d6503b8-6150-4dcf-8129-3ac868cbcbce', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('09ca7785-bb0c-4df6-b88b-ff400cceee3b', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('dd768223-4297-4c24-8550-2cfca7a567fd', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -580,6 +580,56 @@ UPDATE content_items SET data = replace(data::text, 'LAX360 Pvt Ltd is a brand o
 UPDATE site_settings SET value = replace(value::text, 'LAX360 Pvt Ltd is a brand of LAX360 Pvt Ltd', 'LAX360 Pvt Ltd')::json WHERE strpos(value::text, 'LAX360 Pvt Ltd is a brand of LAX360 Pvt Ltd') > 0;
 
 UPDATE alembic_version SET version_num='0013' WHERE alembic_version.version_num = '0012';
+
+-- Running upgrade 0013 -> 0014
+
+ALTER TABLE chat_sessions ADD COLUMN guest_key VARCHAR(64);
+
+ALTER TABLE chat_sessions ADD COLUMN ip_hash VARCHAR(64);
+
+CREATE INDEX ix_chat_sessions_guest_key ON chat_sessions (guest_key);
+
+CREATE INDEX ix_chat_sessions_ip_hash_created_at ON chat_sessions (ip_hash, created_at);
+
+ALTER TABLE contact_enquiries ADD COLUMN user_id UUID;
+
+ALTER TABLE contact_enquiries ADD CONSTRAINT fk_contact_enquiries_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE SET NULL;
+
+CREATE INDEX ix_contact_enquiries_user_id ON contact_enquiries (user_id);
+
+UPDATE alembic_version SET version_num='0014' WHERE alembic_version.version_num = '0013';
+
+-- Running upgrade 0014 -> 0015
+
+CREATE TABLE user_profiles (
+    user_id UUID NOT NULL, 
+    mobile VARCHAR(20), 
+    category VARCHAR(15), 
+    institution VARCHAR(160), 
+    course VARCHAR(120), 
+    department VARCHAR(120), 
+    study_year VARCHAR(20), 
+    company VARCHAR(160), 
+    job_role VARCHAR(120), 
+    industry VARCHAR(120), 
+    experience_years INTEGER, 
+    other_details VARCHAR(300), 
+    purposes JSON DEFAULT '[]' NOT NULL, 
+    purpose_note TEXT, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_user_profiles PRIMARY KEY (user_id), 
+    CONSTRAINT ck_user_profiles_ck_user_profiles_category CHECK (category in ('student','professional','other')), 
+    CONSTRAINT fk_user_profiles_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_user_profiles_category ON user_profiles (category);
+
+CREATE INDEX ix_user_profiles_mobile ON user_profiles (mobile);
+
+ALTER TABLE public."user_profiles" ENABLE ROW LEVEL SECURITY;
+
+UPDATE alembic_version SET version_num='0015' WHERE alembic_version.version_num = '0014';
 
 COMMIT;
 
