@@ -29,4 +29,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
 
 # Behind a reverse proxy set FORWARDED_ALLOW_IPS=<proxy ip> (uvicorn reads it) and TRUST_PROXY_HEADERS=true so rate limits see real client IPs.
 # One worker keeps the in-memory rate limiter exact; add `--workers N` only if you accept N x the limits.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+# The schema is brought up to date BEFORE the API starts (forward-only, transactional, a no-op when current): a failed migration stops the container instead of serving errors.
+# Several replicas starting together: run `python -m app.cli migrate` once as a release / pre-deploy step instead and use `uvicorn` as the start command.
+CMD ["sh", "-c", "python -m app.cli migrate && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"]

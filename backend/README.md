@@ -58,6 +58,10 @@ placed in the frontend). Nothing has been created in your Supabase project yet: 
    - **Direct connection** (host `db.<project-ref>.supabase.co`, port 5432, user `postgres`): fine if your network supports IPv6.
    - **Transaction pooler** (port **6543**): for serverless/many short connections. Supported (prepared statements are switched off
      automatically), but use port 5432 for `alembic upgrade head`.
+   - **After every code update, migrate:** `python -m app.cli migrate` (same as `alembic upgrade head`, forward-only, a no-op when current, and it prints the revision before and after;
+     `--check` only reports). Until the database is migrated the API answers "The service is not fully set up yet (database schema missing or out of date)".
+     **On Render:** set the service's *Pre-Deploy Command* to `python -m app.cli migrate` (or the *Start Command* to `python -m app.cli migrate && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers`);
+     the Docker image already migrates before it starts.
 4. Paste it into `backend/.env` as `DATABASE_URL=...`, replacing `[YOUR-PASSWORD]` with your password. **URL-encode special
    characters** in the password (`@` -> `%40`, `:` -> `%3A`, `/` -> `%2F`, `#` -> `%23`). `postgresql://` is converted to the
    `psycopg` driver URL automatically, and `sslmode=require` is added for Supabase hosts.

@@ -10,6 +10,7 @@
     python -m app.cli check-config
     python -m app.cli check-ai
     python -m app.cli hero-videos-report [--verify] [--json]    (read-only recovery report of homepage videos and their stored files)
+    python -m app.cli migrate [--check]                         (apply pending database migrations safely and verify the revision: run at every deploy)
     python -m app.cli storage-selftest                          (real Supabase check for PICTURE uploads: settings, bucket, upload, read-back, public address, delete one temporary image)
     python -m app.cli hero-videos-selftest [--create-bucket]    (real Supabase check: bucket, upload, public read, delete a temporary test video)
     python -m app.cli hero-videos-migrate [--apply]             (copy videos held on the server disk to Supabase Storage; never deletes anything)
@@ -169,6 +170,42 @@ def check_ai(_: argparse.Namespace) -> None:
 
 EXPECTED_TABLES = {"users", "auth_sessions", "branches", "demo_requests", "contact_enquiries", "chat_sessions", "chat_messages", "ai_usage",
                    "enquiry_notes", "site_settings", "content_items", "media_assets", "audit_logs"}
+
+
+def migrate(args: argparse.Namespace) -> None:
+    """Bring the database schema to the current version (`alembic upgrade head`), safely, for deployments. Only ever moves FORWARD; applies what is missing and does nothing when the
+    database is already current. Each migration runs in its own transaction (a failed one changes nothing), and the command exits non-zero on any problem so a deploy stops instead of
+    starting an API that cannot work. Run it at every deploy: it is the same as running `alembic upgrade head` in backend/."""
+    from pathlib import Path
+
+    from alembic import command
+    from alembic.config import Config
+    from alembic.runtime.migration import MigrationContext
+    from alembic.script import ScriptDirectory
+
+    backend = Path(__file__).resolve().parents[1]
+    cfg = Config(str(backend / "alembic.ini"))
+    cfg.set_main_option("script_location", str(backend / "alembic"))
+    heads = ScriptDirectory.from_config(cfg).get_heads()
+    if len(heads) != 1:
+        print(f"Migration files have {len(heads)} heads ({', '.join(heads)}): resolve the branch before deploying.")
+        raise SystemExit(1)
+    get_settings()
+    with _factory()().connection() as conn:
+        current = MigrationContext.configure(conn).get_current_revision()
+    print(f"Database revision: {current or 'none (empty database)'}; latest: {heads[0]}")
+    if current == heads[0]:
+        print("The database schema is up to date: nothing to do.")
+        return
+    if args.check:
+        print("The schema is OUT OF DATE (run without --check to upgrade).")
+        raise SystemExit(1)
+    command.upgrade(cfg, "head")
+    with _factory()().connection() as conn:
+        now = MigrationContext.configure(conn).get_current_revision()
+    print(f"Upgraded to {now}.")
+    if now != heads[0]:
+        raise SystemExit(1)
 
 
 def check_db(_: argparse.Namespace) -> None:
@@ -855,6 +892,9 @@ def main(argv: list[str] | None = None) -> None:
     ddc = sub.add_parser("dedupe-carousel", help="find repeated pictures in the home-page image carousel; --apply removes the later copies (unique pictures and order untouched)")
     ddc.add_argument("--apply", action="store_true")
     ddc.set_defaults(func=dedupe_carousel)
+    mg = sub.add_parser("migrate", help="apply pending database migrations (alembic upgrade head) and verify the result; use at every deploy. --check only reports")
+    mg.add_argument("--check", action="store_true")
+    mg.set_defaults(func=migrate)
     sst = sub.add_parser("storage-selftest", help="test the real permanent PICTURE storage: settings, bucket, upload, read-back, public address, delete (one temporary image; secrets never printed)")
     sst.set_defaults(func=storage_selftest)
     hst = sub.add_parser("hero-videos-selftest", help="test the real Supabase video storage: config, bucket, upload, public read, delete (one temporary object; secrets never printed)")
