@@ -14,6 +14,7 @@ class BranchOut(OutModel):
     city: str
     address: str | None = None
     phone: str | None = None
+    map_embed_url: str | None = None
 
     @computed_field
     @property

@@ -10,6 +10,8 @@ email-validator==2.3.0
 argon2-cffi==25.1.0
 openai==3.41.0
 google-genai==2.34.0
+google-auth>=2.30  # Google Sheets service-account sign-in (also pulled in by google-genai)
+requests>=2.31  # used by google-auth's token refresh
 
 tzdata>=2024.1
 httpx>=0.27

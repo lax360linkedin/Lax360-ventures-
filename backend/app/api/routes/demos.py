@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
 
 from app.api.deps import csrf_user, current_user
@@ -8,7 +8,7 @@ from app.core.rate_limit import rate_limit
 from app.db.session import get_db
 from app.models import DemoRequest, User
 from app.schemas.demo_request import DemoRequestCreate, DemoRequestOut
-from app.services import demo_service
+from app.services import demo_service, sheets_service
 
 router = APIRouter(prefix="/demo-requests", tags=["demo requests"])
 
@@ -20,9 +20,12 @@ def to_out(row: DemoRequest) -> dict:
 
 @router.post("", response_model=DemoRequestOut, status_code=201,
              dependencies=[Depends(rate_limit("demo", "demo_rate_limit_max", "demo_rate_limit_window_seconds"))])
-def create_demo_request(body: DemoRequestCreate, user: User = Depends(csrf_user), db: Session = Depends(get_db)):
+def create_demo_request(body: DemoRequestCreate, tasks: BackgroundTasks, user: User = Depends(csrf_user), db: Session = Depends(get_db)):
     """Login required (as in the website). The request is stored as `pending`; it is not a confirmed booking."""
-    return to_out(demo_service.create_request(db, user, body))
+    row = demo_service.create_request(db, user, body)
+    tasks.add_task(sheets_service.sync_demo, row.id)  # a copy goes to the Google Spreadsheet after the response
+    tasks.add_task(sheets_service.retry_recent)
+    return to_out(row)
 
 
 @router.get("/me", response_model=list[DemoRequestOut])

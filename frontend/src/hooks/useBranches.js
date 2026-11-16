@@ -1,7 +1,30 @@
 import { useEffect, useState } from 'react'
 import { fetchBranches } from '../services/branchService.js'
+import { branches as staticBranches } from '../data/branches.js'
 
 let cache = null
+
+/** The branches for DISPLAY (cards, maps): the database's published branches as { id, city, name, address (lines), phone, tel, mapUrl, embed }. While the list is loading, or if the backend cannot be
+ *  reached, the built-in list (data/branches.js) is shown instead so the page is never empty; once the backend has answered, ONLY its branches are shown (so a branch the administrator added, edited,
+ *  disabled or deleted is exactly what visitors see). */
+export function useBranchDirectory() {
+  const [state, setState] = useState(() => ({ list: cache, failed: false }))
+  useEffect(() => {
+    if (cache) return undefined
+    let alive = true
+    fetchBranches().then((list) => { cache = list; if (alive) setState({ list, failed: false }) }).catch(() => { if (alive) setState({ list: null, failed: true }) })
+    return () => { alive = false }
+  }, [])
+  if (!state.list) return { branches: staticBranches, live: false }
+  const place = (b) => [...(b.address_lines || []), b.city].join(', ')
+  return {
+    live: true,
+    branches: state.list.map((b) => ({
+      id: b.slug, city: b.city, name: b.name, address: b.address_lines?.length ? b.address_lines : null, phone: b.phone, tel: b.phone ? b.phone.replace(/[^\d+]/g, '') : null, embed: b.map_embed_url || null,
+      mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place(b))}`,
+    })),
+  }
+}
 
 /** Branch list from the backend. `branches` is [] until loaded or if the backend is unreachable (the forms still work without it). */
 export function useBranches() {

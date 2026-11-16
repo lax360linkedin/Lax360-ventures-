@@ -40,7 +40,7 @@ export default function WelcomeAdmin() {
   }
   const toggleExperience = async () => {
     if (!settings) {
-      try { await api('/api/admin/content/welcome_page', { method: 'POST', body: { title: pageSpec.label, data: { enabled: true, once_per_session: true }, status: 'published' } }); toast('The welcome experience is on'); reload() } catch (e) { toast(e.message, 'error') }
+      try { await api('/api/admin/content/welcome_page', { method: 'POST', body: { title: pageSpec.label, data: { enabled: true }, status: 'published' } }); toast('The welcome experience is on'); reload() } catch (e) { toast(e.message, 'error') }
       return
     }
     const on = settings.data?.enabled !== false && settings.status === 'published'
@@ -70,11 +70,11 @@ export default function WelcomeAdmin() {
       <Card className="mb-6 flex flex-wrap items-center justify-between gap-4 !p-5">
         <div>
           <p className="flex items-center gap-2 font-display text-lg font-semibold">The welcome experience is <Badge value={live ? 'published' : 'draft'} text={live ? 'ON' : 'OFF'} /></p>
-          <p className="mt-1 text-sm text-soft">{live ? `Visitors see ${visible} card${visible === 1 ? '' : 's'} after the intro${settings?.data?.once_per_session === false ? ' on every visit' : ', once per browsing session'}. They can replay it from the footer.` : 'Visitors go straight to the home page after the intro.'}{!settings && ' (No settings saved yet: the defaults apply.)'}</p>
+          <p className="mt-1 text-sm text-soft">{live ? `Visitors see ${visible} card${visible === 1 ? '' : 's'} below the home header, every time the website is opened. They are always there: refreshing or viewing them never hides them.` : 'Visitors go straight to the home page after the intro.'}{!settings && ' (No settings saved yet: the defaults apply.)'}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Btn kind={live ? 'default' : 'primary'} onClick={toggleExperience}><Power className="size-4" aria-hidden="true" /> {live ? 'Turn off' : 'Turn on'}</Btn>
-          <Btn onClick={() => setEdit({ spec: pageSpec, item: settings || null })}><Pencil className="size-4" aria-hidden="true" /> Settings (once per session)</Btn>
+          <Btn onClick={() => setEdit({ spec: pageSpec, item: settings || null })}><Pencil className="size-4" aria-hidden="true" /> Settings</Btn>
         </div>
       </Card>
 

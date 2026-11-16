@@ -8,13 +8,10 @@ card links to CADPOINT Academy, the training centre operated by LAX360 (there is
 
 from __future__ import annotations
 
-SETTINGS = {"slug": "welcome", "title": "Welcome Experience settings", "data": {"enabled": True, "once_per_session": True}}
+SETTINGS = {"slug": "welcome", "title": "Welcome Experience settings", "data": {"enabled": True}}
 
 # (slug, title, theme, headline, description, status_label, explore_label, explore_link, franchise_enabled, franchise_division)
-CARDS = [
-    ("welcome", "Welcome to LAX360 Pvt Ltd", "welcome", "Ideas Into Innovation. Technology Into Possibilities.",
-     "Welcome to LAX360 Pvt Ltd, where technology, creativity, and innovation come together to help businesses grow. Explore our technology services, digital solutions, "
-     "educational initiatives, and emerging technology innovations.", "", "", "", False, ""),
+CARDS = [  # (the opening "Welcome to LAX360" intro card was removed on request: it is no longer part of the sequence)
     ("software-it-services", "Software & IT Services", "software", "Powerful Software. Smarter Business.",
      "We build intelligent software solutions that simplify business operations, improve productivity, and support digital transformation. From custom software development "
      "to enterprise applications, we turn business requirements into practical technology solutions.", "", "Explore Software", "/services/software", True, "Software & IT Services"),

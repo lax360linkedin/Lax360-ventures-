@@ -1,7 +1,8 @@
-import { Fragment, lazy, Suspense, useEffect } from 'react'
+import { Fragment, lazy, Suspense, useEffect, useState } from 'react'
 import PageContainer from '../components/layout/PageContainer.jsx'
-import { openWelcomeExperience, useIntroState } from '../utils/welcomeIntro.js'
+import { openWelcomeExperience, useIntroState, useWelcomePlan } from '../utils/welcomeIntro.js'
 import { useContentReady, useHomeSections } from '../hooks/useSite.js'
+import { useAuth } from '../hooks/useAuth.js'
 import Hero from '../components/sections/Hero.jsx'
 import Marquee from '../components/sections/Marquee.jsx'
 import WhoWeAre from '../components/sections/WhoWeAre.jsx'
@@ -23,13 +24,25 @@ const SECTIONS = {
 
 const WelcomeIntro = lazy(() => import('../components/intro/WelcomeIntro.jsx')) // separate chunk
 
-const WelcomeExperience = lazy(() => import('../components/intro/WelcomeExperience.jsx')) // separate chunk: the 7-card welcome experience
-const cardsCover = <div aria-hidden="true" className="fixed inset-0 z-[1000]" style={{ background: 'rgba(8,8,14,0.5)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} />
+const WelcomeCards = lazy(() => import('../components/sections/WelcomeCards.jsx')) // separate chunk: the welcome cards section, directly below the home header
+const WelcomeContactCard = lazy(() => import('../components/sections/WelcomeContactCard.jsx')) // separate chunk: the optional contact card shown after the intro
+let contactOffered = false // once per page load: coming back to Home by navigating inside the site does not offer it again
+const cardsRoom = <div aria-hidden="true" style={{ height: 'calc(100dvh - var(--header-bottom, 0px))', minHeight: '34rem' }} /> // reserves the section's height while its code loads, so nothing jumps
 
 export default function Home() {
   const intro = useIntroState()
   const order = useHomeSections(DEFAULT_ORDER)
   const contentReady = useContentReady()
+  const welcome = useWelcomePlan()
+  const { user, loading: authLoading } = useAuth()
+  const [contactOpen, setContactOpen] = useState(false)
+  // The flow of a visit: intro animation, then the OPTIONAL contact card (fill it in or skip), then the home page with the welcome cards below its header. The card is offered right after the intro
+  // on every page load (or at once when there is no animation); never for a signed-in customer or an admin preview.
+  useEffect(() => {
+    if ((intro !== 'done' && intro !== 'off') || authLoading || user || contactOffered || new URLSearchParams(window.location.search).get('welcome') === 'preview') return undefined
+    const t = window.setTimeout(() => { contactOffered = true; setContactOpen(true) }, intro === 'done' ? 900 : 1500)
+    return () => window.clearTimeout(t)
+  }, [intro, user, authLoading])
   // /?welcome=preview (the admin panel's "Preview the experience" button) opens the cards straight away, ignoring the on/off switches
   useEffect(() => {
     if (contentReady && new URLSearchParams(window.location.search).get('welcome') === 'preview') openWelcomeExperience({ preview: true })
@@ -42,8 +55,9 @@ export default function Home() {
       description="One team to build, automate and grow your business. Custom software, AI automation, digital marketing and training from LAX360 Pvt Ltd."
     >
       {(intro === 'pending' || intro === 'playing' || intro === 'revealing') && <Suspense fallback={null}><WelcomeIntro /></Suspense>}
-      {intro === 'cards' && <Suspense fallback={cardsCover}><WelcomeExperience /></Suspense>}
       <Hero />
+      {contactOpen && <Suspense fallback={null}><WelcomeContactCard open={contactOpen} onClose={() => setContactOpen(false)} /></Suspense>}
+      {welcome && <Suspense fallback={cardsRoom}><WelcomeCards plan={welcome} /></Suspense>}
       {order.map((key) => <Fragment key={key}>{SECTIONS[key]}</Fragment>)}
     </PageContainer>
   )

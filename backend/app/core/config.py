@@ -105,6 +105,14 @@ class Settings(BaseSettings):
     smtp_from: str | None = None  # e.g. "LAX360 Pvt Ltd <no-reply@yourdomain.com>"
     smtp_starttls: bool = True
     password_reset_ttl_minutes: int = 60
+    # Google Sheets: every enquiry, demo request and franchise / partnership application is also appended to one Google Spreadsheet (3 tabs). BACKEND ONLY: the service-account key never
+    # reaches the browser. Share the spreadsheet with the service account's e-mail address (Editor). Without these settings nothing is sent and the website works as before.
+    google_sheets_spreadsheet_id: str | None = None  # the long id in https://docs.google.com/spreadsheets/d/<ID>/edit
+    google_service_account_json: SecretStr | None = None  # the downloaded key file's JSON (one line), or base64 of it
+    google_service_account_file: str | None = None  # alternatively: the path of the key file on the server
+    google_sheets_tab_enquiries: str = "Enquiries"
+    google_sheets_tab_demos: str = "Demo Requests"
+    google_sheets_tab_franchise: str = "Franchise Requests"
 
     # --- rate limiting (in-memory, per process) ---------------------------------------------
     rate_limit_enabled: bool = True
@@ -150,12 +158,12 @@ class Settings(BaseSettings):
         v = v.strip().strip("\"'").strip()
         return v[7:].strip() if v.lower().startswith("bearer ") else v
 
-    @field_validator("openai_api_key", "gemini_api_key", "auth_secret", "admin_password", "supabase_service_role_key", "smtp_password", mode="before")
+    @field_validator("openai_api_key", "gemini_api_key", "auth_secret", "admin_password", "supabase_service_role_key", "smtp_password", "google_service_account_json", mode="before")
     @classmethod
     def _blank_secret_is_none(cls, v):
         return None if isinstance(v, str) and not v.strip() else v
 
-    @field_validator("openai_model", "gemini_model", "smtp_host", "smtp_from", "smtp_username", "admin_email", "admin_username", "supabase_url", "hero_video_slot_seconds", "database_url", "cookie_domain", "docs_enabled", "cookie_secure", "db_disable_prepared_statements", mode="before")
+    @field_validator("openai_model", "gemini_model", "smtp_host", "smtp_from", "smtp_username", "google_sheets_spreadsheet_id", "google_service_account_file", "admin_email", "admin_username", "supabase_url", "hero_video_slot_seconds", "database_url", "cookie_domain", "docs_enabled", "cookie_secure", "db_disable_prepared_statements", mode="before")
     @classmethod
     def _blank_is_none(cls, v):
         return None if isinstance(v, str) and not v.strip() else v

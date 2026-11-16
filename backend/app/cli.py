@@ -172,6 +172,39 @@ EXPECTED_TABLES = {"users", "auth_sessions", "branches", "demo_requests", "conta
                    "enquiry_notes", "site_settings", "content_items", "media_assets", "audit_logs"}
 
 
+def sheets_setup(args: argparse.Namespace) -> None:
+    """Check the Google Sheets connection and prepare the spreadsheet: the three tabs (Enquiries, Demo Requests, Franchise Requests) are created when missing and their header rows written
+    when empty. Existing tabs, headers and data are never changed. Secrets are never printed."""
+    from app.services import sheets_service as ss
+
+    settings = get_settings()
+    if not ss.configured(settings):
+        print("Google Sheets is not configured: set GOOGLE_SHEETS_SPREADSHEET_ID and GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT_FILE) on the server.")
+        raise SystemExit(1)
+    try:
+        with ss._client() as http:
+            done = ss.ensure_tabs(settings, http)
+    except Exception as exc:  # noqa: BLE001
+        print(f"Could not prepare the spreadsheet: {str(exc)[:300]}")
+        print("Check that the spreadsheet id is right and that the sheet is shared (Editor) with the service account's e-mail address.")
+        raise SystemExit(1) from None
+    for name, what in done.items():
+        print(f"[OK] {name}: {what}")
+
+
+def sheets_sync(args: argparse.Namespace) -> None:
+    """Append the submissions that are not in the Google Spreadsheet yet (earlier failures). Recent ones only (--days, default 7) unless --all. Nothing is ever added twice."""
+    from app.services import sheets_service as ss
+
+    result = ss.sync_pending(get_settings(), days=None if args.all else args.days, limit=args.limit)
+    if not result["configured"]:
+        print("Google Sheets is not configured: nothing to do.")
+        raise SystemExit(1)
+    print(f"Appended {result['synced']} row(s); {result['failed']} failed (see the log; run again later).")
+    if result["failed"]:
+        raise SystemExit(1)
+
+
 def migrate(args: argparse.Namespace) -> None:
     """Bring the database schema to the current version (`alembic upgrade head`), safely, for deployments. Only ever moves FORWARD; applies what is missing and does nothing when the
     database is already current. Each migration runs in its own transaction (a failed one changes nothing), and the command exits non-zero on any problem so a deploy stops instead of
@@ -892,6 +925,13 @@ def main(argv: list[str] | None = None) -> None:
     ddc = sub.add_parser("dedupe-carousel", help="find repeated pictures in the home-page image carousel; --apply removes the later copies (unique pictures and order untouched)")
     ddc.add_argument("--apply", action="store_true")
     ddc.set_defaults(func=dedupe_carousel)
+    ssu = sub.add_parser("sheets-setup", help="check the Google Sheets connection and create the three tabs + header rows when missing (never overwrites)")
+    ssu.set_defaults(func=sheets_setup)
+    ssy = sub.add_parser("sheets-sync", help="append submissions that are not in the Google Spreadsheet yet (retry of failures; nothing is added twice)")
+    ssy.add_argument("--days", type=int, default=7)
+    ssy.add_argument("--all", action="store_true")
+    ssy.add_argument("--limit", type=int, default=500)
+    ssy.set_defaults(func=sheets_sync)
     mg = sub.add_parser("migrate", help="apply pending database migrations (alembic upgrade head) and verify the result; use at every deploy. --check only reports")
     mg.add_argument("--check", action="store_true")
     mg.set_defaults(func=migrate)

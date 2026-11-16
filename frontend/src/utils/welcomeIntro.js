@@ -9,11 +9,11 @@
 // from the beginning). It does not restart on normal in-app navigation, because this module's state lives only as long as the page does.
 // The server / prerender snapshot is always "off", so hydration matches the prerendered HTML.
 //
-// After the intro animation the 7-card Welcome Experience (components/intro/WelcomeExperience.jsx) may follow:
-//   cards     – the welcome cards are showing over the held-back homepage; leaving them reveals the homepage ('revealing' -> 'done')
-// The cards are managed in the admin panel (Welcome Experience). They are shown once per browsing session (sessionStorage, optional) and can be replayed from the footer.
-import { useSyncExternalStore } from 'react'
-import { getState, loadContent, subscribe as subscribeContent } from '../services/siteService.js'
+// The Welcome Cards (components/sections/WelcomeCards.jsx) are a section of the home page, directly below the home header: they are NOT part of this state machine (the intro animation ends with 'done'
+// and the page, cards included, is simply there). They are managed in the admin panel (Welcome cards), PERMANENT: always there on every load and refresh, whatever the visitor has already seen (nothing is stored in the browser). The footer button replays the intro.
+import { useMemo, useSyncExternalStore } from 'react'
+import { getState } from '../services/siteService.js'
+import { useContentReady } from '../hooks/useSite.js'
 import { toParagraphs } from './cms.js'
 
 const prefersReducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -29,43 +29,17 @@ let state = initial()
 // Start downloading the intro code right away (in parallel with React starting up) instead of when the homepage first renders.
 if (state === 'pending') {
   import('../components/intro/WelcomeIntro.jsx').catch(() => {})
-  import('../components/intro/WelcomeExperience.jsx').catch(() => {}) // ready (and cached) by the time the animation hands over to the cards
+  import('../components/sections/WelcomeCards.jsx').catch(() => {}) // ready (and cached) by the time the animation hands over to the page
 }
 const listeners = new Set()
 const subscribe = (cb) => { listeners.add(cb); return () => listeners.delete(cb) }
 
-const CONTENT_WAIT_MS = 10000
-const contentWait = { waiting: false, gaveUp: false }
-function waitForContent() {
-  if (contentWait.waiting) return
-  contentWait.waiting = true
-  loadContent()
-  let unsub = () => {}
-  let timer = 0
-  const resume = (gaveUp) => {
-    if (!contentWait.waiting) return
-    contentWait.waiting = false
-    contentWait.gaveUp = gaveUp || contentWait.gaveUp
-    window.clearTimeout(timer)
-    unsub()
-    if (state === 'revealing' || state === 'playing') setIntroState('done') // decide now: cards if there are some, otherwise the homepage
-  }
-  unsub = subscribeContent(() => { if (getState().ready) resume(false) })
-  timer = window.setTimeout(() => resume(true), CONTENT_WAIT_MS)
-}
-
 export function setIntroState(next) {
-  // The intro animation (unchanged) ends by setting 'done': when the welcome cards are enabled they follow it, floating over the homepage, instead.
-  if (next === 'done' && (state === 'revealing' || state === 'playing')) {
-    // The managed content may still be on its way (a slow or cold-starting server): wait for it (bounded) instead of deciding "no cards" too early.
-    if (!getState().ready && !contentWait.gaveUp) { waitForContent(); return }
-    if (welcomePlan()) next = 'cards'
-  }
   if (state === next) return
   state = next
   if (typeof document !== 'undefined') {
     const root = document.documentElement
-    if (next === 'pending' || next === 'playing' || next === 'revealing' || next === 'cards') root.setAttribute('data-intro', next)
+    if (next === 'pending' || next === 'playing' || next === 'revealing') root.setAttribute('data-intro', next)
     else root.removeAttribute('data-intro')
   }
   listeners.forEach((l) => l())
@@ -73,15 +47,10 @@ export function setIntroState(next) {
 
 export const useIntroState = () => useSyncExternalStore(subscribe, () => state, () => 'off')
 
-// ---- the Welcome Experience cards ---------------------------------------------------------------------------------------------------
-const SEEN_KEY = 'lax360-welcome-seen'
-let forced = false // a visitor asked to see it again (footer): ignore the once-per-session rule
-let previewing = false // an administrator is previewing it: ignore the on/off switches
-
-// What the visitor has already seen is remembered with the list of promotional cards that were in front of them, so a NEW festival greeting or offer is shown even in a
-// browsing session that has already seen the regular cards.
-export const welcomeSeen = (sig = '') => { try { return sessionStorage.getItem(SEEN_KEY) === `seen:${sig}` } catch { return false } }
-export const markWelcomeSeen = (sig = '') => { try { sessionStorage.setItem(SEEN_KEY, `seen:${sig}`) } catch { /* storage blocked: it may show again, which is harmless */ } }
+// ---- the Welcome Cards -----------------------------------------------------------------------------------------------------------------
+// The cards are PERMANENT: a fixed section of the home page below the header. Nothing a visitor does (viewing them, finishing them, refreshing, coming back) hides or skips them, and
+// nothing about them is stored in localStorage / sessionStorage. Only the administrator's own switches (Welcome cards in the admin panel) decide whether they exist.
+let previewing = false // an administrator is previewing it: ignore the on/off switches so drafts can be checked
 export const isWelcomePreview = () => previewing
 
 const PROMO_LABEL = { festival: 'Festival greeting', announcement: 'Announcement', offer: 'Special offer' }
@@ -101,7 +70,7 @@ export function normaliseWelcomeCard(item) {
 /** Is the card inside its start / end dates today (inclusive)? A card with no dates is always inside. Expired and not-yet-started cards are not shown. */
 export const welcomeCardActive = (c, today = localToday()) => (!c.start || c.start <= today) && (!c.end || c.end >= today)
 
-/** The welcome experience to show now ({ cards, finalLabel, sig }), or null when it is off, has nothing to show, was already seen this session or the content is not loaded.
+/** The cards to show ({ cards }), or null when the administrator has switched the section off, has no card on, or the content is not loaded yet. Whether the visitor has seen them before plays NO part.
  *  Active festival greetings / announcements / offers come first (in their configured order), then the regular cards in theirs. */
 export function welcomePlan() {
   const { content, ready } = getState()
@@ -112,32 +81,38 @@ export function welcomePlan() {
   const byOrder = (a, b) => a.order - b.order
   const live = (content.welcome_card || []).map(normaliseWelcomeCard).filter((c) => c.enabled && (previewing || welcomeCardActive(c, today)))
   const cards = [...live.filter((c) => c.promo).sort(byOrder), ...live.filter((c) => !c.promo).sort(byOrder)]
-  const sig = live.filter((c) => c.promo).map((c) => c.id).sort().join(',')
   if (!cards.length) return null
-  if (!previewing && !forced && page.once_per_session !== false && welcomeSeen(sig)) return null
-  return { cards, sig }
+  return { cards }
 }
 
-/** Show the cards now (the intro animation has ended or was skipped). Returns false when there is nothing to show. */
-export function goToCards() {
-  if (!welcomePlan()) return false
-  setIntroState('cards')
-  return true
+// A request to show the cards from the first one, at the top of the screen (footer replay, admin preview). The section takes it when it exists, or when it mounts.
+let openRequested = false
+let version = 0
+const bump = () => { version += 1; listeners.forEach((l) => l()) }
+export const takeOpenRequest = () => { const r = openRequested; openRequested = false; return r }
+
+/** The cards for the Welcome Cards section of the home page (null: the administrator has none switched on). Worked out when the content is ready or a replay / preview is asked for. */
+export function useWelcomePlan() {
+  const ready = useContentReady()
+  const v = useSyncExternalStore(subscribe, () => version, () => 0)
+  return useMemo(() => (ready ? welcomePlan() : null), [ready, v]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-/** Open the cards directly (admin preview, or the footer when the animation is not wanted). `preview` ignores the switches so a draft can be checked. */
+/** Show the cards from the first one (admin preview, or the footer when the animation is not wanted). `preview` ignores the on/off switches so a draft can be checked.
+ *  Returns false when there is nothing to show. */
 export function openWelcomeExperience({ preview = false } = {}) {
   previewing = preview
-  forced = true
-  window.scrollTo(0, 0)
-  return goToCards()
+  openRequested = true
+  bump()
+  window.dispatchEvent(new Event('lax360:welcome-open'))
+  return Boolean(welcomePlan())
 }
 
-/** Replay on request (footer button). Returns false when the visitor prefers reduced motion. The cards follow the animation again. */
+/** Replay on request (footer button). Returns false when the visitor prefers reduced motion. The cards are there again when the animation has ended. */
 export function replayIntro() {
   if (prefersReducedMotion()) return false
-  forced = true
   window.scrollTo(0, 0)
+  bump()
   setIntroState('pending')
   return true
 }

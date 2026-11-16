@@ -3,7 +3,9 @@ from __future__ import annotations
 import uuid
 from datetime import date
 
-from sqlalchemy import CheckConstraint, Date, ForeignKey, Index, String, Text, Uuid
+from datetime import datetime
+
+from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Index, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, Timestamps, UUIDPk
@@ -33,5 +35,6 @@ class DemoRequest(UUIDPk, Timestamps, Base):
     message: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(20), default="pending", server_default="pending")
     fingerprint: Mapped[str] = mapped_column(String(64))  # duplicate-submission guard
+    sheets_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))  # appended to the Google Spreadsheet (NULL: not yet, retried)
 
     branch: Mapped[Branch | None] = relationship(lazy="joined")

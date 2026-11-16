@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('191c8c54-7908-401d-bd32-a9cb64fad836', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('b79600be-4c69-43ae-b3cd-aab6a362062f', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('8d6503b8-6150-4dcf-8129-3ac868cbcbce', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('d528af44-a6ab-43eb-bf1e-e5bc7f56c4ae', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('dd768223-4297-4c24-8550-2cfca7a567fd', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('815bd051-01c4-4093-98ec-300435aa6a4b', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -630,6 +630,22 @@ CREATE INDEX ix_user_profiles_mobile ON user_profiles (mobile);
 ALTER TABLE public."user_profiles" ENABLE ROW LEVEL SECURITY;
 
 UPDATE alembic_version SET version_num='0015' WHERE alembic_version.version_num = '0014';
+
+-- Running upgrade 0015 -> 0016
+
+ALTER TABLE branches ADD COLUMN map_embed_url VARCHAR(1500);
+
+UPDATE branches SET map_embed_url = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1380.1767868508273!2d78.14095405285593!3d11.673119895912297!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x49584e947d17121d%%3A0x4c167403feb05364!2sLax360%%20Pvt%%20ltd!5e0!3m2!1sen!2sin!4v1794821244657!5m2!1sen!2sin' WHERE slug = 'salem' AND map_embed_url IS NULL;
+
+UPDATE alembic_version SET version_num='0016' WHERE alembic_version.version_num = '0015';
+
+-- Running upgrade 0016 -> 0017
+
+ALTER TABLE contact_enquiries ADD COLUMN sheets_synced_at TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE demo_requests ADD COLUMN sheets_synced_at TIMESTAMP WITH TIME ZONE;
+
+UPDATE alembic_version SET version_num='0017' WHERE alembic_version.version_num = '0016';
 
 COMMIT;
 

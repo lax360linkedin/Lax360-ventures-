@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.routes import admin, admin_customers, admin_content, admin_enquiries, admin_auth, admin_hero_videos, admin_media, admin_settings, admin_staff, auth, branches, chat, contact, demos, health, product_resources, public, users
+from app.api.routes import admin, admin_branches, admin_customers, admin_page_images, admin_content, admin_enquiries, admin_auth, admin_hero_videos, admin_media, admin_settings, admin_staff, auth, branches, chat, contact, demos, health, product_resources, public, users
 
 api_router = APIRouter(prefix="/api")
-for module in (health, auth, users, branches, demos, contact, chat, product_resources, public, admin, admin_enquiries, admin_content, admin_settings, admin_media, admin_hero_videos, admin_staff, admin_customers, admin_auth):
+for module in (health, auth, users, branches, demos, contact, chat, product_resources, public, admin, admin_enquiries, admin_content, admin_settings, admin_media, admin_hero_videos, admin_staff, admin_customers, admin_page_images, admin_branches, admin_auth):
     api_router.include_router(module.router)

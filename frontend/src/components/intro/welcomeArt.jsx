@@ -135,8 +135,9 @@ export const WelcomeBackdrop = memo(function WelcomeBackdrop({ theme, soft = fal
   const t = themeOf(theme)
   const Art = ART[theme] || Welcome
   return (
-    <div aria-hidden="true" className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(160deg, ${t.bg[0]} 0%, ${t.bg[1]} 100%)` }}>
+    <div aria-hidden="true" className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(155deg, color-mix(in srgb, rgb(var(--glow)) 26%, ${t.bg[0]}) 0%, color-mix(in srgb, rgb(var(--glow2)) 9%, ${t.bg[1]}) 100%)` }}> {/* the card's own dark base, tinted with the website theme's colour so every card belongs to the site */}
       <div className="we-layer absolute inset-0" style={{ '--depth': 0.5 }}>
+        <div className="absolute -right-[10%] -top-[25%] size-[55vmax] rounded-full opacity-60" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow) / 0.35), transparent 72%)' }} />
         <div className="absolute -left-[15%] -top-[20%] size-[70vmax] rounded-full opacity-70" style={{ background: `radial-gradient(closest-side, ${rgb(t.a, 0.32)}, transparent 72%)` }} />
         <div className="absolute -bottom-[25%] -right-[10%] size-[60vmax] rounded-full opacity-70" style={{ background: `radial-gradient(closest-side, ${rgb(t.b, 0.28)}, transparent 72%)` }} />
         <div className="absolute inset-0 opacity-[0.16]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px)', backgroundSize: '64px 64px', maskImage: 'radial-gradient(70% 70% at 70% 45%, #000, transparent)', WebkitMaskImage: 'radial-gradient(70% 70% at 70% 45%, #000, transparent)' }} />

@@ -1,6 +1,6 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, MapPin, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -28,11 +28,14 @@ const NetworkAdmin = sect('NetworkAdmin')
 const FounderAdmin = sect('FounderAdmin')
 const Staff = lazy(() => import('./pages/Staff.jsx'))
 const Customers = lazy(() => import('./pages/Customers.jsx'))
+const PagesModule = lazy(() => import('./pages/Pages.jsx'))
+const BranchLocations = lazy(() => import('./pages/BranchLocations.jsx'))
 const Audit = lazy(() => import('./pages/Audit.jsx'))
 const System = lazy(() => import('./pages/System.jsx'))
 
 const NAV = [
   { section: 'Overview', to: '/company-admin/dashboard', end: true, label: 'Dashboard', icon: LayoutDashboard, module: null, hint: 'Numbers, shortcuts and your website at a glance' },
+  { section: 'Pages', to: '/company-admin/pages', label: 'Pages', icon: PanelsTopLeft, module: ['content', 'services', 'careers', 'navigation', 'settings'], hint: 'Every page and section of the website with its pictures: upload, replace or remove' },
   { section: 'Leads & customers', to: '/company-admin/enquiries', label: 'Enquiries & leads', icon: Inbox, module: 'enquiries', hint: 'Contact forms, quotes, partnership and career enquiries' },
   { section: 'Leads & customers', to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests', hint: 'Requests for a product demonstration' },
   { section: 'Leads & customers', to: '/company-admin/customers', label: 'Registered users', icon: UserCog, module: 'customers', hint: 'Website customers: accounts, enquiry and demo history, activate or deactivate' },
@@ -44,6 +47,7 @@ const NAV = [
   { section: 'Company', to: '/company-admin/founder', label: 'Founder profile', icon: Crown, module: 'content', hint: 'The founder, CEO and Managing Director: name, photograph and introduction' },
   { section: 'Company', to: '/company-admin/team', label: 'Our team', icon: UsersRound, module: 'content', hint: 'Employees, photographs and the sections of the Our Team page' },
   { section: 'Company', to: '/company-admin/departments', label: 'Departments', icon: Users, module: 'content', hint: 'The departments employees belong to' },
+  { section: 'Company', to: '/company-admin/branches', label: 'Branch locations', icon: MapPin, module: 'settings', hint: 'Branches with their address, phone and Google Map: add, edit, enable or delete' },
   { section: 'Company', to: '/company-admin/network', label: 'Our network', icon: Network, module: 'content', hint: 'Group companies, partners, software distribution and the Our Network page' },
   { section: 'Products & portfolio', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
   { section: 'Products & portfolio', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
@@ -272,6 +276,9 @@ export default function AdminApp() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="enquiries" element={<Guard module="enquiries"><Enquiries /></Guard>} />
           <Route path="demos" element={<Guard module="demo_requests"><Demos /></Guard>} />
+          <Route path="pages/*" element={<Guard module={['content', 'services', 'careers', 'navigation', 'settings']}><PagesModule /></Guard>} />
+          <Route path="page-images" element={<Navigate to="/company-admin/pages" replace />} />
+          <Route path="branches" element={<Guard module="settings"><BranchLocations /></Guard>} />
           <Route path="customers" element={<Guard module="customers"><Customers /></Guard>} />
           <Route path="content" element={<Guard module={['content', 'services', 'careers', 'navigation']}><Content /></Guard>} />
           <Route path="chatbot" element={<Guard module="chatbot"><Chatbot /></Guard>} />

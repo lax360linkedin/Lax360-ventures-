@@ -38,6 +38,7 @@ class ContactEnquiry(UUIDPk, Timestamps, Base):
     fingerprint: Mapped[str] = mapped_column(String(64))
     user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))  # the signed-in customer who sent it (NULL for a visitor)
     assigned_to: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    sheets_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))  # appended to the Google Spreadsheet (NULL: not yet, retried)
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     branch: Mapped[Branch | None] = relationship(lazy="joined")

@@ -518,7 +518,6 @@ KINDS: dict[str, dict] = {
                 "untick it (or leave it unpublished) to go straight to the home page. The cards themselves are managed under Welcome cards.",
         "fields": [
             F("enabled", "Show the welcome experience", "bool", default=True),
-            F("once_per_session", "Show it once per browsing session", "bool", default=True, help="On: a visitor who has finished or skipped it is not shown it again until they close the browser tab. Visitors can always replay it from the footer."),
         ],
     },
     "welcome_card": {

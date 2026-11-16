@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query, Request, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response
 from sqlalchemy.orm import Session
 
 from app.api.deps import current_user, optional_user
@@ -9,20 +9,23 @@ from app.models import User
 from app.core.rate_limit import rate_limit
 from app.db.session import get_db
 from app.schemas.contact import ContactCreate, ContactReceipt
-from app.services import contact_service
+from app.services import contact_service, sheets_service
 
 router = APIRouter(prefix="/contact", tags=["contact"])
 
 
 @router.post("", response_model=ContactReceipt, status_code=201,
              dependencies=[Depends(rate_limit("contact", "contact_rate_limit_max", "contact_rate_limit_window_seconds"))])
-def submit_contact(body: ContactCreate, response: Response, db: Session = Depends(get_db), user: User | None = Depends(optional_user)):
+def submit_contact(body: ContactCreate, response: Response, tasks: BackgroundTasks, db: Session = Depends(get_db), user: User | None = Depends(optional_user)):
     """Public enquiry form. Stored in PostgreSQL; no email is sent (email delivery is not configured)."""
     if body.website:  # honeypot filled: a bot. Pretend success, store nothing.
         return ContactReceipt(status="received")
     row, duplicate = contact_service.create_enquiry(db, body, user)  # a signed-in customer's enquiry is linked to their account (visitors can still send enquiries)
     if duplicate:
         response.status_code = 200
+    else:  # a copy goes to the Google Spreadsheet after the response (never delays or breaks the submission; a repeated submission is not sent twice)
+        tasks.add_task(sheets_service.sync_enquiry, row.id)
+        tasks.add_task(sheets_service.retry_recent)
     return ContactReceipt(id=row.id, status="received", duplicate=duplicate)
 
 
