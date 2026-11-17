@@ -15,3 +15,17 @@ export function parseMapEmbed(value) {
     return u.protocol === 'https:' && HOSTS.has(u.hostname) && !u.username && (u.port === '' || u.port === '443') && embed ? url : null
   } catch { return null }
 }
+
+/**
+ * The address that OPENS a branch's location in Google Maps (not the embedded frame), worked out from its saved embed address: the place id (`!1s0x..:0x..`) opens that exact place, otherwise the
+ * coordinates (`!2d<lng>!3d<lat>`) open that point; `fallback` (a plain search link) is used when the embed holds neither. Nothing about any branch is hard-coded here.
+ */
+export function mapOpenUrl(embed, fallback = '') {
+  const url = parseMapEmbed(embed)
+  if (!url) return fallback
+  const place = decodeURIComponent(url).match(/!1s(0x[0-9a-f]+:0x[0-9a-f]+)/i)
+  if (place) return `https://www.google.com/maps?ftid=${place[1]}`
+  const lng = url.match(/!2d(-?\d+(?:\.\d+)?)/)
+  const lat = url.match(/!3d(-?\d+(?:\.\d+)?)/)
+  return lng && lat ? `https://www.google.com/maps/search/?api=1&query=${lat[1]},${lng[1]}` : fallback
+}

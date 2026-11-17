@@ -21,7 +21,7 @@ from sqlalchemy.orm import Session
 
 TTL_SECONDS = 5.0
 STALE_SECONDS = 60.0  # an expired entry is still served (and refreshed in the background) for this long
-_WATCHED = {"ContentItem", "SiteSetting", "MediaAsset", "Branch", "HeroVideo", "HeroVideoConfig"}
+_WATCHED = {"ContentItem", "SiteSetting", "MediaAsset", "Branch", "ContactChannel", "HeroVideo", "HeroVideoConfig"}
 _lock = threading.Lock()
 _store: dict[str, tuple[float, int, object]] = {}
 _version = 0

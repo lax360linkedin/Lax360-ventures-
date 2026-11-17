@@ -2,6 +2,7 @@ import { ArrowUpRight, MapPin, Phone } from 'lucide-react'
 import Reveal from '../ui/Reveal.jsx'
 import { Rise } from '../contact/Motion.jsx'
 import BranchMap from '../ui/BranchMap.jsx'
+import OwnerLinks from '../layout/OwnerLinks.jsx'
 import { useBranchDirectory } from '../../hooks/useBranches.js'
 
 /**
@@ -33,6 +34,7 @@ export default function BranchCards({ className = '', refined = false }) {
                 <Phone className="size-4 text-lav" aria-hidden="true" /> {b.phone}
               </a>
             )}
+            <OwnerLinks type="branch" owner={b.id} name={`${b.city} branch`} className="mt-3" />
             {b.embed && <BranchMap src={b.embed} title={`Map of the ${b.city} branch`} className="mt-4" />}
             {b.mapUrl && (
               <a href={b.mapUrl} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex min-h-11 items-center gap-1.5 self-start pt-1 text-sm font-semibold text-lav hover:underline">

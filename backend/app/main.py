@@ -112,6 +112,24 @@ def _provision_admin(settings) -> None:
         log.warning("Initial admin provisioning skipped (%s). Run `alembic upgrade head`, then `python -m app.cli provision-admin`.", type(exc).__name__)
 
 
+def _log_google_sheets(settings) -> None:
+    """Say at start-up whether the Google Sheets copy of enquiries is on, and shout when its key cannot be read (the usual cause: the JSON pasted over several lines in .env instead of ONE line)."""
+    from app.services import sheets_service
+
+    if not (settings.google_sheets_spreadsheet_id or settings.google_service_account_json or settings.google_service_account_file):
+        return
+    try:
+        email = sheets_service._key_info(settings).get("client_email", "?")
+    except Exception as exc:  # noqa: BLE001
+        log.error("Google Sheets is configured but its key cannot be read (%s): GOOGLE_SERVICE_ACCOUNT_JSON must be the key file on ONE line (or a file path in GOOGLE_SERVICE_ACCOUNT_FILE). "
+                  "Enquiries are still saved in the database but are not copied to the spreadsheet.", type(exc).__name__)
+        return
+    if not settings.google_sheets_spreadsheet_id:
+        log.error("Google Sheets: GOOGLE_SHEETS_SPREADSHEET_ID is missing.")
+    else:
+        log.info("Google Sheets copy is on (service account %s). Run `python -m app.cli sheets-setup` once to create the tabs.", email)
+
+
 def _log_video_storage(settings) -> None:
     """Say at start-up where homepage videos are kept, and shout when that would lose them (no network call here: the admin page runs the real check)."""
     if bool(settings.supabase_url) != bool(settings.supabase_service_role_key):
@@ -136,6 +154,7 @@ def create_app() -> FastAPI:
             log.warning("AUTH_SECRET is not set: login and chat sessions are unavailable until it is configured.")
         _warn_cross_site_cookies(settings)
         _log_video_storage(settings)
+        _log_google_sheets(settings)
         _provision_admin(settings)
         if not settings.ai_configured:
             log.warning("AI provider '%s' is not configured (set %s_API_KEY and %s_MODEL): /api/chat will return a safe fallback.", settings.ai_provider, settings.ai_provider.upper(), settings.ai_provider.upper())

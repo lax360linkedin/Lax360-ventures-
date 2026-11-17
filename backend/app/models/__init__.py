@@ -5,12 +5,13 @@ from app.models.ai_usage import AiUsage
 from app.models.branch import Branch
 from app.models.chat_message import ChatMessage
 from app.models.chat_session import ChatSession
+from app.models.contact_channel import ContactChannel
 from app.models.contact_enquiry import ContactEnquiry
 from app.models.demo_request import DemoRequest
 from app.models.hero_video import HeroVideo, HeroVideoConfig
 from app.models.user import AuthSession, User, UserProfile
 
 __all__ = [
-    "AiUsage", "AuditLog", "AuthSession", "Branch", "ChatMessage", "ChatSession", "ContactEnquiry", "ContentItem",
+    "AiUsage", "AuditLog", "AuthSession", "Branch", "ChatMessage", "ChatSession", "ContactChannel", "ContactEnquiry", "ContentItem",
     "DemoRequest", "EnquiryFollowup", "EnquiryNote", "HeroVideo", "HeroVideoConfig", "MediaAsset", "SiteSetting", "User", "UserProfile",
 ]

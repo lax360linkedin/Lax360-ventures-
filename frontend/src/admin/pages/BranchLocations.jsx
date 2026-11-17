@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Eye, EyeOff, ExternalLink, MapPin, Pencil, Phone, Plus, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Eye, EyeOff, ExternalLink, MapPin, Pencil, Phone, Plus, Share2, Trash2 } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import BranchMap from '../../components/ui/BranchMap.jsx'
 import { parseMapEmbed } from '../../utils/mapEmbed.js'
@@ -102,6 +103,7 @@ export default function BranchLocations() {
               {b.map_embed_url && <BranchMap src={b.map_embed_url} title={`Map of the ${b.city} branch`} />}
               <div className="mt-auto flex flex-wrap gap-2">
                 <Btn kind="primary" onClick={() => setEdit({ branch: b })}><Pencil className="size-4" aria-hidden="true" /> Edit / replace map</Btn>
+                <Link to={`/company-admin/branches/${b.slug}/social`}><Btn><Share2 className="size-4" aria-hidden="true" /> Social media & contact</Btn></Link>
                 <Btn onClick={() => toggle(b)}>{b.is_active ? <><EyeOff className="size-4" aria-hidden="true" /> Disable</> : <><Eye className="size-4" aria-hidden="true" /> Enable</>}</Btn>
                 <Btn kind="danger" onClick={() => setDel(b)} aria-label={`Delete ${b.city} branch`}><Trash2 className="size-4" aria-hidden="true" /></Btn>
               </div>

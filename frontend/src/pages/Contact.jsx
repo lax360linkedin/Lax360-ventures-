@@ -1,26 +1,32 @@
 import { useSearchParams } from 'react-router-dom'
-import { Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { Clock, MapPin } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import BotCall from '../components/contact/BotCall.jsx'
 import EnquiryForm from '../components/sections/EnquiryForm.jsx'
 import LeadForm from '../components/contact/LeadForm.jsx'
-import SocialIcon from '../components/layout/SocialIcon.jsx'
+import ChannelIcon, { opensNewTab } from '../components/layout/ChannelIcon.jsx'
 import Button from '../components/ui/Button.jsx'
 import { Rise as Reveal, Stagger, StaggerItem } from '../components/contact/Motion.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import BranchCards from '../components/sections/BranchCards.jsx'
 import { branchSentence } from '../data/branches.js'
-import { useSite, useSocial } from '../hooks/useSite.js'
+import { useContacts, useSite, useSocial } from '../hooks/useSite.js'
 import { useContactPageText } from '../hooks/useCmsPages.js'
 import { courses } from '../data/courses.js'
-import { whatsappLink } from '../utils/whatsapp.js'
 
 // Business enquiries use the full lead form; the other kinds (careers, partnerships, courses, workshops, general questions) keep the simple form they always had.
 const LEAD_TYPES = { project: [], quote: [], ai: ['ai-solutions'], 'website-app': ['website-development'], marketing: ['digital-marketing'] }
 
 export default function Contact() {
   const site = useSite()
-  const social = useSocial()
+  const social = useSocial('contact')
+  const contacts = useContacts('contact')
+  const addresses = contacts.filter((c) => c.type === 'address')
+  const quick = contacts.filter((c) => !['address', 'branch'].includes(c.type)).slice(0, 5)
+  // one card per kind of contact detail (WhatsApp, Phone, Email, ...), in the order of the managed list; the lines inside a card keep their order too
+  const GROUPS = { whatsapp: 'WhatsApp', phone: 'Phone', email: 'Email', branch: 'Branch contacts', enquiry: 'Business enquiries', other: 'More ways to reach us' }
+  const groups = [...new Set(contacts.filter((c) => c.type !== 'address').map((c) => c.type))].map((type) => ({ type, items: contacts.filter((c) => c.type === type) }))
+  const line = 'inline-flex min-h-11 items-center hover:text-lav'
   const page = useContactPageText()
   const [params] = useSearchParams()
   const type = params.get('type') || 'quote'
@@ -48,9 +54,7 @@ export default function Contact() {
               <Button href="#enquiry" arrow>Get a Quote</Button>
             </div>
             <ul style={{ '--d': '0.54s' }} className="ct-in mt-8 flex flex-wrap gap-x-8 gap-y-2 text-base">
-              {site.phones.slice(0, 2).map((p) => <li key={p.tel}><a href={`tel:${p.tel}`} className="link-underline inline-flex min-h-11 items-center gap-2"><Phone className="size-4 text-lav" aria-hidden="true" />{p.display}</a></li>)}
-              <li><a href={`mailto:${site.email}`} className="link-underline inline-flex min-h-11 items-center gap-2 break-all"><Mail className="size-4 shrink-0 text-lav" aria-hidden="true" />{site.email}</a></li>
-              <li><a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="link-underline inline-flex min-h-11 items-center gap-2"><MessageCircle className="size-4 text-lav" aria-hidden="true" />WhatsApp<span className="sr-only"> (opens in a new tab)</span></a></li>
+              {quick.map((c) => <li key={c.id}><a href={c.href} {...(opensNewTab(c) ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className="link-underline inline-flex min-h-11 items-center gap-2 break-all"><span className="shrink-0 text-lav"><ChannelIcon channel={c} className="size-4" /></span>{c.type === 'whatsapp' ? 'WhatsApp' : c.type === 'enquiry' || c.type === 'other' ? c.label : c.value}{opensNewTab(c) && <span className="sr-only"> (opens in a new tab)</span>}</a></li>)}
             </ul>
           </div>
           <Reveal delay={0.2} x={30} y={20} className="lg:col-span-5"><BotCall className="ct-float" /></Reveal>
@@ -86,17 +90,30 @@ export default function Contact() {
         <div className="wrap section">
           <SectionHeading id="info-title" eyebrow="Contact information" title={page.info_title || 'Reach us'} gradient={page.info_title ? undefined : 'directly.'} lead={page.info_lead || site.contactIntro || 'Prefer to talk or write? Use any of these.'} />
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Reveal as="li" className="ct-card glass-flat p-6"><MessageCircle className="ct-icon size-6 text-lav" aria-hidden="true" /><h3 className="mt-3 font-display text-lg font-semibold">WhatsApp</h3><a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex min-h-11 items-center font-semibold text-lav hover:underline">Chat with us<span className="sr-only"> (opens in a new tab)</span></a></Reveal>
-            <Reveal as="li" delay={0.05} className="ct-card glass-flat p-6"><Phone className="ct-icon size-6 text-lav" aria-hidden="true" /><h3 className="mt-3 font-display text-lg font-semibold">Phone</h3>{site.phones.map((p) => <p key={p.tel}><a href={`tel:${p.tel}`} className="inline-flex min-h-11 items-center hover:text-lav">{p.display}{p.label && <span className="ml-1 text-sm text-soft">({p.label})</span>}</a></p>)}</Reveal>
-            <Reveal as="li" delay={0.1} className="ct-card glass-flat p-6"><Mail className="ct-icon size-6 text-lav" aria-hidden="true" /><h3 className="mt-3 font-display text-lg font-semibold">Email</h3><p><a href={`mailto:${site.email}`} className="inline-flex min-h-11 items-center break-all hover:text-lav">{site.email}</a></p>{site.email2 && <p><a href={`mailto:${site.email2}`} className="inline-flex min-h-11 items-center break-all hover:text-lav">{site.email2}</a></p>}</Reveal>
-            <Reveal as="li" delay={0.15} className="ct-card glass-flat p-6">
+            {groups.map((g, n) => (
+              <Reveal as="li" key={g.type} delay={n * 0.05} className="ct-card glass-flat p-6">
+                <span className="ct-icon inline-block text-lav"><ChannelIcon channel={g.items[0]} className="size-6" /></span>
+                <h3 className="mt-3 font-display text-lg font-semibold">{GROUPS[g.type]}</h3>
+                {g.items.map((c) => {
+                  const out = opensNewTab(c)
+                  const text = c.type === 'whatsapp' ? 'Chat with us' : c.type === 'enquiry' || c.type === 'other' ? c.label : c.value
+                  return (
+                    <p key={c.id}>
+                      {c.href ? <a href={c.href} {...(out ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={`${line} break-all ${c.type === 'whatsapp' ? 'font-semibold text-lav hover:underline' : ''}`}>{text}{c.note && <span className="ml-1 text-sm text-soft">({c.note})</span>}{out && <span className="sr-only"> (opens in a new tab)</span>}</a> : <span className="inline-flex min-h-11 items-center">{text}</span>}
+                      {c.detail && <span className="block whitespace-pre-line text-sm text-soft">{c.detail}</span>}
+                    </p>
+                  )
+                })}
+              </Reveal>
+            ))}
+            <Reveal as="li" delay={groups.length * 0.05} className="ct-card glass-flat p-6">
               <Clock className="ct-icon size-6 text-lav" aria-hidden="true" /><h3 className="mt-3 font-display text-lg font-semibold">Business hours</h3>
               {site.businessHours ? <p className="mt-1 whitespace-pre-line text-soft">{site.businessHours}</p> : <p className="mt-1 text-soft">Send an enquiry or message us on WhatsApp and the team will reply{site.responseTime ? ` ${site.responseTime}` : ' as soon as possible'}.</p>}
             </Reveal>
           </ul>
           {social.length > 0 && (
             <div className="mt-8 flex flex-wrap items-center gap-3"><span className="font-semibold">Follow us</span>
-              <ul className="flex flex-wrap gap-2">{social.map((s) => <li key={s.platform}><a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`} className="ct-social inline-flex size-11 items-center justify-center rounded-full border border-edge-strong bg-glass transition-colors hover:border-lav hover:text-lav"><SocialIcon platform={s.platform} className="size-4" /></a></li>)}</ul>
+              <ul className="flex flex-wrap gap-2">{social.map((s) => <li key={s.id}><a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`} className="ct-social inline-flex size-11 items-center justify-center rounded-full border border-edge-strong bg-glass transition-colors hover:border-lav hover:text-lav"><ChannelIcon channel={s} className="size-4" /></a></li>)}</ul>
             </div>
           )}
         </div>
@@ -106,8 +123,8 @@ export default function Contact() {
       <section id="branches" className="wrap section" aria-labelledby="branches-title">
         <SectionHeading id="branches-title" eyebrow="Office locations" title="Visit our" gradient="branches." bot lead={`LAX360 Pvt Ltd has branches in ${branchSentence}.`} />
         <BranchCards refined className="mt-10" />
-        {site.address && (
-          <div className="mt-8 flex items-start gap-3 text-soft"><MapPin className="mt-1 size-5 shrink-0 text-lav" aria-hidden="true" /><address className="whitespace-pre-line not-italic">{site.address}{site.mapLink && <> <a href={site.mapLink} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold text-lav hover:underline">Open in maps<span className="sr-only"> (opens in a new tab)</span></a></>}</address></div>
+        {addresses.length > 0 && (
+          <div className="mt-8 flex items-start gap-3 text-soft"><MapPin className="mt-1 size-5 shrink-0 text-lav" aria-hidden="true" /><address className="space-y-2 whitespace-pre-line not-italic">{addresses.map((c) => <span key={c.id} className="block">{c.value}</span>)}{site.mapLink && <> <a href={site.mapLink} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-semibold text-lav hover:underline">Open in maps<span className="sr-only"> (opens in a new tab)</span></a></>}</address></div>
         )}
       </section>
     </PageContainer>

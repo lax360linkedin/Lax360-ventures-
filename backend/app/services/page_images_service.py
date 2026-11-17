@@ -15,7 +15,8 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import ApiError
 from app.core.permissions import has_permission
-from app.models import MediaAsset, User
+from app.models import ContentItem, MediaAsset, User
+from app.page_image_catalog import CATALOG
 from app.services import content_service as cs, settings_service
 
 # (page key, label, public path)
@@ -25,11 +26,12 @@ PAGES = [
     ("insights", "Insights", "/insights"), ("career", "Careers", "/career"), ("contact", "Contact", "/contact"), ("seo", "Search & sharing", "/"), ("site", "Whole website", "/"),
 ]
 PAGE_OF = {
-    "carousel_image": "home", "client": "home", "testimonial": "home", "welcome_card": "home", "about_block": "about", "service_category": "services", "service": "services",
+    "carousel_image": "home", "service_card": "home", "client": "home", "testimonial": "home", "welcome_card": "home", "about_block": "about", "service_category": "services", "service": "services",
     "industry": "industries", "product": "products", "product_module": "products", "website": "websites", "project": "work", "network_partner": "network", "team_member": "team",
     "team_department": "team", "team_gallery": "team", "team_page": "team", "article": "insights", "career_page": "career", "seo_page": "seo",
 }
-BUILTIN = {"team_member": {"photo": "photo_path"}, "client": {"logo": "logo_url"}, "carousel_image": {"image": "image_path"}}  # artwork shipped with the website, shown until a picture is uploaded
+BUILTIN = {"team_member": {"photo": "photo_path"}, "client": {"logo": "logo_url"}, "carousel_image": {"image": "image_path"}, "service_card": {"image": "builtin_image"}}  # artwork shipped with the website, shown until a picture is uploaded
+BY_PATH = {c["path"]: c for c in CATALOG}
 SITE_IMAGE_KEYS = ("site_logo", "site_favicon", "default_og_image")
 
 
@@ -47,7 +49,7 @@ def _asset_ids(values) -> set[uuid.UUID]:
     return out
 
 
-ADMIN_ROUTE = {"carousel_image": "/company-admin/carousel", "client": "/company-admin/clients", "testimonial": "/company-admin/testimonials", "welcome_card": "/company-admin/welcome",
+ADMIN_ROUTE = {"carousel_image": "/company-admin/carousel", "service_card": "/company-admin/service-carousel", "client": "/company-admin/clients", "testimonial": "/company-admin/testimonials", "welcome_card": "/company-admin/welcome",
                "team_member": "/company-admin/team", "team_department": "/company-admin/departments", "team_gallery": "/company-admin/team", "network_partner": "/company-admin/network",
                "product": "/company-admin/products", "product_module": "/company-admin/products", "website": "/company-admin/websites"}
 
@@ -65,7 +67,9 @@ def listing(db: Session, user: User) -> dict:
     if not allowed and not site_keys:
         return {"pages": []}  # nothing here for this account (the route answers 403)
     stored = settings_service.get_all(db) if site_keys else {}
-    ids = _asset_ids([(i.data or {}).get(f["name"]) for k, rows in items.items() for i in rows for f in _image_fields(k)] + [stored.get(k) for k in site_keys])
+    overrides = {i.slug: i for i in cs.list_items(db, "site_image")} if has_permission(user, "content") else {}
+    ids = _asset_ids([(i.data or {}).get(f["name"]) for k, rows in items.items() for i in rows for f in _image_fields(k)] + [stored.get(k) for k in site_keys]
+                     + [(o.data or {}).get(n) for o in overrides.values() for n in ("image", "previous")])
     present = {a.id for a in db.scalars(select(MediaAsset).where(MediaAsset.id.in_(ids)))} if ids else set()
 
     def slot(label: str, field: str, raw, builtin=None) -> dict:
@@ -101,6 +105,8 @@ def listing(db: Session, user: User) -> dict:
     # ---- Home: the header, the welcome sections and the home sections the website really has (cs.SECTION_KEYS), in their default order
     home_labels = {o["value"]: o["label"] for o in cs.SECTION_KEYS}
     pages["home"].append(section("header", "Header section", [], note="The header's background videos are managed under Homepage videos; its text under Website content > Home page hero.", manage="/company-admin/homepage-videos"))
+    if "service_card" in allowed:  # directly below the header, above the welcome sections
+        pages["home"].append(section("service-carousel", "Services & industries carousel", [entry("service_card", i) for i in items["service_card"]], kind="service_card"))
     if "welcome_card" in allowed:
         pages["home"].append(section("welcome", "Welcome sections", [entry("welcome_card", i, "Welcome section") for i in items["welcome_card"]], kind="welcome_card"))
     home_kinds = {"clients": ("client", "Our Clients"), "testimonials": ("testimonial", "Testimonials"), "gallery": ("carousel_image", "Image carousel")}
@@ -171,6 +177,36 @@ def listing(db: Session, user: User) -> dict:
         pages["site"].append(section("brand", "Logo and icons", [{"id": "site", "kind": "site", "title": "Website", "subtitle": "", "status": "published",
                                                                   "slots": [slot(settings_service.SPEC[k]["label"], k, stored.get(k)) for k in site_keys]}], manage="/company-admin/settings"))
 
+
+    # ---- the website's built-in pictures (frontend files): shown in every section that uses them, with whatever replaced them ----
+    ORDER = {"about": ["hero", "about-intro", "about-us", "about-story", "about-motto", "about-purpose", "about-expertise", "about-features", "about-values", "about-technology", "about-cta"],
+             "services": ["hero", "categories", "details"]}
+
+    def image_entry(c: dict, where: str) -> dict:
+        o = overrides.get(c["path"])
+        d = (o.data or {}) if o else {}
+        cur, prev = slot("Picture", "image", d.get("image"), c["path"]), slot("Previous", "image", d.get("previous"))
+        also = [f"{p['section_label']} ({dict((k, l) for k, l, _ in PAGES).get(p['page'], p['page'])})" for p in c["places"] if p["where"] != where]
+        slot_ = {**cur, "key": c["path"], "replaced": bool(cur["asset_id"]), "previous_id": prev["asset_id"]}
+        return {"id": "img:" + c["path"], "kind": "site_image", "title": c["label"], "subtitle": where, "status": "published", "also": also, "slots": [slot_]}
+
+    if has_permission(user, "content"):
+        for c in CATALOG:
+            for pl in c["places"]:
+                secs = pages[pl["page"]]
+                sec = next((x for x in secs if x["key"] == pl["section"]), None)
+                if sec is None:
+                    sec = section(pl["section"], pl["section_label"], [])
+                    secs.append(sec)
+                sec["items"].append(image_entry(c, pl["where"]))
+                sec["note"] = ""
+        for key, order in ORDER.items():
+            pages[key].sort(key=lambda x: order.index(x["key"]) if x["key"] in order else len(order))
+        for secs in pages.values():
+            for sec in secs:
+                slots = [x for e in sec["items"] for x in e["slots"]]
+                sec.update(count=len(sec["items"]), filled=sum(1 for x in slots if x["asset_id"] or x["builtin"]), slots=len(slots))
+
     empty_of = {"services": ("service", "Services"), "industries": ("industry", "Industries"), "products": ("product", "Products"), "websites": ("website", "Websites"), "work": ("project", "Projects"),
                 "network": ("network_partner", "Companies & partners"), "insights": ("article", "Articles"), "team": ("team_member", "Team")}
     out = []
@@ -215,3 +251,35 @@ def set_slot(db: Session, user: User, *, item_id: uuid.UUID | None, setting: str
         data.pop(BUILTIN.get(item.kind, {}).get(field, ""), None)  # a built-in sample picture is removed too, otherwise it would simply reappear
     cs.update(db, user, item, title=None, data=data, status=None, sort_order=None)
     return {"kind": item.kind, "field": field, "item": str(item.id)}
+
+
+def set_image(db: Session, user: User, *, key: str, asset_id: uuid.UUID | None, action: str) -> dict:
+    """Replace, or put back, one built-in picture of the website (identified by its path). Only that picture changes: the website swaps just the files with that path and keeps the layout.
+    `replace` uses a new uploaded picture (the one it replaces is remembered as the previous one); `restore_previous` brings the previous replacement back; `restore_original` goes back to the
+    picture the website was built with (the replacement is remembered, so this can be undone too)."""
+    if not has_permission(user, "content"):
+        raise ApiError(403, "forbidden", "You do not have permission for this action.")
+    entry = BY_PATH.get(key)
+    if entry is None:
+        raise ApiError(422, "validation_error", "That is not one of the website's pictures.")
+    item = db.scalar(select(ContentItem).where(ContentItem.kind == "site_image", ContentItem.slug == key))
+    d = (item.data or {}) if item else {}
+    cur, prev = d.get("image") or "", d.get("previous") or ""
+    if action == "replace":
+        if asset_id is None:
+            raise ApiError(422, "validation_error", "Choose an uploaded picture.")
+        _check_asset(db, asset_id)
+        data = {"key": key, "image": str(asset_id), "previous": cur or prev}
+    elif action == "restore_previous":
+        if not prev:
+            raise ApiError(422, "validation_error", "There is no previous picture to restore.")
+        data = {"key": key, "image": prev, "previous": cur}
+    elif action == "restore_original":
+        data = {"key": key, "image": "", "previous": cur or prev}
+    else:
+        raise ApiError(422, "validation_error", "Unknown action.")
+    if item is None:
+        cs.create(db, user, "site_image", title=entry["label"], data=data, status="published", sort_order=0)
+    else:
+        cs.update(db, user, item, title=None, data=data, status="published", sort_order=None)
+    return {"kind": "site_image", "field": key, "action": action}

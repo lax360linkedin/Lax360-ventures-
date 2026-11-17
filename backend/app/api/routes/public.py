@@ -15,7 +15,7 @@ from app.core import pubcache
 from app.db.session import _factory, _read_factory, get_db, get_read_db
 from app.models import HeroVideo
 from app.schemas.common import ApiModel
-from app.services import content_service, hero_video_service, media_service, settings_service
+from app.services import channel_service, content_service, hero_video_service, media_service, settings_service
 from app.core.errors import ApiError
 
 router = APIRouter(tags=["public"])
@@ -28,7 +28,7 @@ def _cacheable(settings: Settings) -> bool:
 
 @router.get("/public/site")
 def site(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
-    return pubcache.cached_json(request, _cacheable(settings), "site", lambda d: {"settings": settings_service.public_settings(d, settings)}, CACHE, db, _read_factory())
+    return pubcache.cached_json(request, _cacheable(settings), "site", lambda d: {"settings": settings_service.public_settings(d, settings), "channels": channel_service.public_channels(d), "owned": channel_service.public_owned(d)}, CACHE, db, _read_factory())
 
 
 @router.get("/public/content")

@@ -1,28 +1,38 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowUpRight, ChevronRight, Globe, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { ArrowUp, ArrowUpRight, Building2, ChevronRight, Compass, Headset, Layers, MapPin, Navigation, Phone, RotateCcw } from 'lucide-react'
+import ChannelIcon, { opensNewTab } from './ChannelIcon.jsx'
 import Logo from './Logo.jsx'
+import OwnerLinks from './OwnerLinks.jsx'
 import Reveal from '../ui/Reveal.jsx'
 import { footerColumns, legalLinks } from '../../data/navigation.js'
-import { branches } from '../../data/branches.js'
-import { useNav, useSite } from '../../hooks/useSite.js'
-import { whatsappLink } from '../../utils/whatsapp.js'
+import { useBranchDirectory } from '../../hooks/useBranches.js'
+import { useContacts, useNav, useSite, useSocial } from '../../hooks/useSite.js'
 import { openWelcomeExperience, replayIntro } from '../../utils/welcomeIntro.js'
 
-const linkCls = 'group/l inline-flex min-h-10 items-center gap-1 text-soft transition-all duration-200 hover:translate-x-1 hover:text-lav focus-visible:text-lav'
+const linkCls = 'group/l inline-flex min-h-10 items-center gap-1 text-soft transition-all duration-300 ease-out hover:translate-x-1.5 hover:text-lav focus-visible:text-lav'
 
-// Simple brand marks (lucide no longer ships brand icons), 24x24, filled with currentColor.
-const BRAND = {
-  Instagram: 'M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 4 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9z',
-  LinkedIn: 'M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.4V9h3.4v1.6c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 1 1 0-4.1 2.1 2.1 0 0 1 0 4.1zM7.1 20.5H3.6V9h3.5v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z',
-  X: 'M18.2 2.3h3.3l-7.2 8.3 8.5 11.2h-6.7l-5.2-6.8-6 6.8H1.6l7.7-8.8L1.2 2.3H8l4.7 6.2 5.5-6.2zm-1.2 17.5h1.8L7 4.2H5.1l11.9 15.6z',
-  Facebook: 'M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z',
-  YouTube: 'M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z',
-}
+/** One icon style for the whole footer: a rounded tile with a soft gradient; it fills with the brand gradient (and tilts a little) when its row is hovered. */
+const tile = 'grid shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary/25 to-accent/10 text-lav ring-1 ring-edge transition-all duration-300 group-hover/c:-rotate-6 group-hover/c:from-primary group-hover/c:to-accent group-hover/c:text-white group-hover/c:shadow-[0_10px_22px_-10px_rgb(var(--glow2)/0.9)] group-hover/c:ring-transparent'
+const ico = { strokeWidth: 1.75, 'aria-hidden': 'true' }
 
-function SocialIcon({ label }) {
-  return BRAND[label]
-    ? <svg viewBox="0 0 24 24" className="size-[1.15rem]" fill="currentColor" aria-hidden="true" focusable="false"><path d={BRAND[label]} /></svg>
-    : <Globe className="size-[1.15rem]" aria-hidden="true" />
+/** A contact row from the managed "Social & contact" list: icon tile, a small label above the value (hierarchy); the whole row is the link (an address is plain text). */
+function ContactRow({ c }) {
+  const label = c.type === 'phone' ? (c.note ? `Phone · ${c.note}` : c.label) : c.note && c.type !== 'whatsapp' ? `${c.label} · ${c.note}` : c.label
+  const value = c.type === 'whatsapp' ? 'Chat with us' : c.value
+  const external = opensNewTab(c)
+  const body = (
+    <>
+      <span className={`${tile} size-11`}><ChannelIcon channel={c} className="size-[1.15rem]" /></span>
+      <span className="min-w-0">
+        <span className="block text-[0.68rem] font-bold uppercase tracking-[0.14em] text-soft/80">{label}</span>
+        <span className="block whitespace-pre-line break-words text-[0.95rem] font-semibold text-fg transition-colors group-hover/c:text-lav">{value}{external && <span className="sr-only"> (opens in a new tab)</span>}</span>
+        {c.detail && <span className="mt-0.5 block whitespace-pre-line text-sm font-normal text-soft">{c.detail}</span>}
+      </span>
+      {c.href && <ArrowUpRight className="ml-auto size-4 shrink-0 -translate-x-1 text-lav opacity-0 transition-all duration-300 group-hover/c:translate-x-0 group-hover/c:opacity-100" aria-hidden="true" />}
+    </>
+  )
+  const cls = 'group/c -ml-1.5 flex items-center gap-3.5 rounded-2xl p-1.5 text-soft transition-colors duration-200 hover:bg-glass hover:text-fg focus-visible:bg-glass'
+  return <li>{c.href ? <a href={c.href} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={cls}>{body}</a> : <div className={cls}>{body}</div>}</li>
 }
 
 function FooterLink({ l }) {
@@ -35,13 +45,22 @@ function FooterLink({ l }) {
 /** Footer: closing CTA, then brand + socials, quick links, services, branches and contact, and a large typographic wordmark. Same on every page. */
 export default function Footer() {
   const navigate = useNavigate()
+  const { branches } = useBranchDirectory() // the published branches from the database (Admin > Branch locations); a branch with a saved Google Maps location opens exactly that place
   const services = useNav('footer_divisions', footerColumns[0].links)
   const company = useNav('footer_company', footerColumns[1].links)
   // go Home first; the intro only plays on the homepage. Visitors who prefer reduced motion get the welcome cards without the animation.
   const replay = () => { navigate('/'); window.setTimeout(() => { if (!replayIntro()) openWelcomeExperience() }, 60) }
   const site = useSite()
-  const heading = 'mb-4 flex items-center gap-2 font-sans text-xs font-bold uppercase tracking-[0.16em] text-lav'
-  const bar = <span aria-hidden="true" className="h-0.5 w-5 rounded-full bg-gradient-to-r from-primary to-accent" />
+  const social = useSocial('footer')
+  const contacts = useContacts('footer')
+  const heading = 'mb-5 flex items-center gap-2.5 font-sans text-xs font-bold uppercase tracking-[0.18em] text-fg'
+  const Head = ({ icon: Icon, children }) => (
+    <h2 className={heading}>
+      <span className="grid size-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-accent text-white shadow-[0_6px_16px_-8px_rgb(var(--glow)/0.9)]"><Icon className="size-4" {...ico} /></span>
+      {children}
+      <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-edge-strong to-transparent" />
+    </h2>
+  )
   return (
     <footer className="relative overflow-hidden border-t border-edge bg-gradient-to-b from-base2 to-deep/70 pb-24 pt-14 lg:pb-0 lg:pt-20">
       <div aria-hidden="true" className="pointer-events-none absolute -left-32 top-0 size-[28rem] rounded-full bg-primary/25 blur-3xl" />
@@ -65,12 +84,13 @@ export default function Footer() {
             <p className="mt-5 max-w-sm text-base text-soft">
               {site.footerTagline || 'One team to build, automate and grow your business — software, AI, digital growth and training.'}
             </p>
-            <ul className="mt-5 flex flex-wrap gap-2.5" aria-label="Social profiles">
-              {site.social.map((s) => (
-                <li key={s.label}>
+            {social.length > 0 && <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-fg">Follow us</p>}
+            <ul className="mt-3 flex flex-wrap gap-2.5" aria-label="Social profiles">
+              {social.map((s) => (
+                <li key={s.id}>
                   <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`} title={s.label}
-                    className="flex size-11 items-center justify-center rounded-full border border-edge-strong bg-glass text-soft transition-all duration-200 hover:-translate-y-1 hover:border-transparent hover:bg-gradient-to-br hover:from-primary hover:to-accent hover:text-white hover:shadow-[0_10px_24px_-10px_rgb(var(--glow2)/0.9)] focus-visible:text-lav">
-                    <SocialIcon label={s.label} />
+                    className="flex size-11 items-center justify-center rounded-full border border-edge-strong bg-glass text-soft transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-105 hover:border-transparent hover:bg-gradient-to-br hover:from-primary hover:to-accent hover:text-white hover:shadow-[0_12px_26px_-10px_rgb(var(--glow2)/0.95)] focus-visible:-translate-y-1 focus-visible:text-lav">
+                    <ChannelIcon channel={s} className="size-[1.15rem]" />
                   </a>
                 </li>
               ))}
@@ -78,41 +98,44 @@ export default function Footer() {
           </div>
 
           <nav aria-label="Quick links" className="lg:col-span-2">
-            <h2 className={heading}>{bar}Quick links</h2>
+            <Head icon={Compass}>Quick links</Head>
             <ul>{company.map((l) => <li key={l.to}><FooterLink l={l} /></li>)}</ul>
           </nav>
 
           <nav aria-label="Our services" className="lg:col-span-2">
-            <h2 className={heading}>{bar}Our services</h2>
+            <Head icon={Layers}>Our services</Head>
             <ul>{services.map((l) => <li key={l.to}><FooterLink l={l} /></li>)}</ul>
           </nav>
 
           <div className="lg:col-span-4">
-            <h2 className={heading}>{bar}Get in touch</h2>
-            <ul className="space-y-1">
-              <li><a href={`mailto:${site.email}`} className="group/c flex min-h-10 items-center gap-3 text-soft transition-colors hover:text-lav"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-glass text-lav ring-1 ring-edge transition-colors group-hover/c:bg-primary group-hover/c:text-white"><Mail className="size-4" aria-hidden="true" /></span><span className="break-all">{site.email}</span></a></li>
-              {site.phones.map((p) => (
-                <li key={p.tel}><a href={`tel:${p.tel}`} className="group/c flex min-h-10 items-center gap-3 text-soft transition-colors hover:text-lav"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-glass text-lav ring-1 ring-edge transition-colors group-hover/c:bg-primary group-hover/c:text-white"><Phone className="size-4" aria-hidden="true" /></span>{p.display}{p.label && <span className="text-sm">({p.label})</span>}</a></li>
-              ))}
-              <li><a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="group/c flex min-h-10 items-center gap-3 text-soft transition-colors hover:text-lav"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-glass text-lav ring-1 ring-edge transition-colors group-hover/c:bg-primary group-hover/c:text-white"><MessageCircle className="size-4" aria-hidden="true" /></span>WhatsApp<span className="sr-only"> (opens in a new tab)</span></a></li>
+            <Head icon={Headset}>Get in touch</Head>
+            <ul className="space-y-2">
+              {contacts.map((c) => <ContactRow key={c.id} c={c} />)}
             </ul>
           </div>
         </div>
 
         <div className="mt-12 border-t border-edge pt-8">
-          <h2 className={heading}>{bar}Our branches</h2>
-          <ul className="grid gap-4 md:grid-cols-3">
+          <Head icon={Building2}>Our branches</Head>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {branches.map((b) => (
-              <li key={b.id} className="group rounded-2xl border border-edge bg-glass/60 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-edge-strong hover:bg-glass-strong">
-                <a href={b.mapUrl} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 focus-visible:text-lav">
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white"><MapPin className="size-4" aria-hidden="true" /></span>
-                  <span>
-                    <span className="block font-display text-lg font-semibold leading-tight">{b.city}</span>
-                    <span className="mt-1 block text-sm leading-relaxed text-soft">{b.address.join(', ')}</span>
+              <li key={b.id} className="group/c group/b relative flex flex-col overflow-hidden rounded-2xl border border-edge bg-glass/60 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-edge-strong hover:bg-glass-strong hover:shadow-[0_22px_44px_-26px_rgb(var(--glow)/0.7)]">
+                <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-lav to-transparent opacity-0 transition-opacity duration-300 group-hover/b:opacity-100" />
+                <a href={b.mapUrl} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3.5 focus-visible:text-lav">
+                  <span className={`${tile} size-11`}><MapPin className="size-[1.15rem]" {...ico} /></span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-display text-xl font-semibold leading-tight transition-colors group-hover/b:text-lav">{b.city}</span>
+                    <span className="mt-1.5 block text-sm leading-relaxed text-soft">{(b.address || []).join(', ')}</span>
                     <span className="sr-only"> (view on map, opens in a new tab)</span>
                   </span>
                 </a>
-                <a href={`tel:${b.tel}`} className="mt-3 inline-flex min-h-9 items-center gap-2 pl-12 text-sm font-semibold text-lav transition-colors hover:text-fg"><Phone className="size-3.5" aria-hidden="true" />{b.phone}</a>
+                <OwnerLinks type="branch" owner={b.id} name={`${b.city} branch`} socialOnly className="mt-4" />
+                <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-edge pt-4">
+                  <a href={b.mapUrl} target="_blank" rel="noopener noreferrer" className="group/a inline-flex min-h-9 items-center gap-1.5 rounded-full border border-edge-strong bg-glass px-3.5 text-[0.8rem] font-semibold text-fg transition-all duration-300 hover:border-transparent hover:bg-gradient-to-r hover:from-primary hover:to-accent hover:text-white">
+                    <Navigation className="size-3.5 transition-transform duration-300 group-hover/a:rotate-12" {...ico} />View on map<ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover/a:-translate-y-0.5 group-hover/a:translate-x-0.5" {...ico} /><span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                  {b.phone && <a href={`tel:${b.tel}`} className="inline-flex min-h-9 items-center gap-1.5 rounded-full px-2.5 text-[0.8rem] font-semibold text-lav transition-colors hover:text-fg"><Phone className="size-3.5" {...ico} />{b.phone}</a>}
+                </div>
               </li>
             ))}
           </ul>
@@ -124,7 +147,8 @@ export default function Footer() {
             {legalLinks.map((l) => (
               <li key={l.to}><Link to={l.to} className="inline-flex min-h-10 items-center transition-colors hover:text-lav focus-visible:text-lav">{l.label}</Link></li>
             ))}
-            <li><button type="button" onClick={replay} className="inline-flex min-h-10 items-center transition-colors hover:text-lav focus-visible:text-lav">Replay welcome intro</button></li>
+            <li><button type="button" onClick={replay} className="group/r inline-flex min-h-10 items-center gap-1.5 transition-colors hover:text-lav focus-visible:text-lav"><RotateCcw className="size-3.5 transition-transform duration-500 group-hover/r:-rotate-180" {...ico} />Replay welcome intro</button></li>
+            <li><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="group/t inline-flex min-h-10 items-center gap-1.5 transition-colors hover:text-lav focus-visible:text-lav"><ArrowUp className="size-3.5 transition-transform duration-300 group-hover/t:-translate-y-0.5" {...ico} />Back to top</button></li>
           </ul>
         </div>
       </div>

@@ -365,6 +365,26 @@ html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s 
 @media (min-width: 1024px) { .gal { --gal-h: 300px; } }
 .gal-track { backface-visibility: hidden; }
 
+/* ---------- Services & industries carousel (components/sections/ServiceCarousel.jsx): picture cards. Transform / opacity only; hover effects only where hover exists; off for reduced motion. ---------- */
+.sc-card { position: relative; display: block; overflow: hidden; width: min(80vw, 21rem); height: 25rem; border-radius: 1.5rem; border: 1px solid var(--color-edge-strong); background: var(--img-shade); box-shadow: 0 20px 44px -26px rgba(0, 0, 0, 0.7); transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s; }
+@media (min-width: 640px) { .sc-card { width: 22rem; height: 27rem; } }
+@media (min-width: 1024px) { .sc-card { width: 24rem; height: 28rem; } }
+.sc-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+.sc-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8, 10, 16, 0.92) 0%, rgba(8, 10, 16, 0.55) 42%, rgba(8, 10, 16, 0.05) 75%); }
+.sc-shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%); transform: translateX(-120%); }
+.sc-tag { position: absolute; left: 1rem; top: 1rem; border-radius: 9999px; background: rgba(8, 10, 16, 0.55); padding: 0.25rem 0.7rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; backdrop-filter: blur(6px); }
+.sc-body { position: absolute; inset-inline: 0; bottom: 0; padding: 1.25rem 1.4rem 1.4rem; }
+.sc-cta { display: inline-flex; min-height: 2.75rem; align-items: center; gap: 0.35rem; margin-top: 0.75rem; border-radius: 9999px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); padding: 0 1.1rem; font-size: 0.85rem; font-weight: 700; color: #fff; transition: transform 0.25s, box-shadow 0.25s; }
+.sc-cta svg { transition: transform 0.25s; }
+@media (hover: hover) {
+  .sc-card:hover, .sc-card:focus-within { transform: translateY(-8px); box-shadow: 0 32px 60px -28px rgb(var(--glow) / 0.75); }
+  .sc-card:hover .sc-img, .sc-card:focus-within .sc-img { transform: scale(1.08); }
+  .sc-card:hover .sc-shine, .sc-card:focus-within .sc-shine { transform: translateX(120%); transition: transform 1s ease; }
+  .sc-cta:hover { box-shadow: 0 10px 24px -10px rgb(var(--glow2) / 0.9); }
+  .sc-cta:hover svg { transform: translate(2px, -2px); }
+}
+@media (prefers-reduced-motion: reduce) { .sc-card, .sc-img, .sc-shine, .sc-cta, .sc-cta svg { transition: none; } .sc-card:hover, .sc-card:focus-within { transform: none; } .sc-card:hover .sc-img { transform: none; } }
+
 /* ---------- Welcome experience (src/components/intro/WelcomeExperience.jsx): backdrop art. Transforms and opacity only; off for reduced motion. ---------- */
 .we-layer { transform: translate3d(calc(var(--px, 0) * var(--depth, 1) * -9px), calc(var(--py, 0) * var(--depth, 1) * -7px), 0); }
 .we-spin, .we-spin-r, .we-grow, .we-ping { transform-box: fill-box; transform-origin: center; }

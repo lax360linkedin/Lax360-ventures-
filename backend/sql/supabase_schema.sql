@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('b79600be-4c69-43ae-b3cd-aab6a362062f', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('c44cbbd0-b913-4c9e-b8b8-50c3e258158c', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('d528af44-a6ab-43eb-bf1e-e5bc7f56c4ae', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('9520f0a7-62df-4b5b-93be-dbf87f47ca2b', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('815bd051-01c4-4093-98ec-300435aa6a4b', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('5fece024-aa67-48a7-bccc-ee98e5846c0a', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -646,6 +646,88 @@ ALTER TABLE contact_enquiries ADD COLUMN sheets_synced_at TIMESTAMP WITH TIME ZO
 ALTER TABLE demo_requests ADD COLUMN sheets_synced_at TIMESTAMP WITH TIME ZONE;
 
 UPDATE alembic_version SET version_num='0017' WHERE alembic_version.version_num = '0016';
+
+-- Running upgrade 0017 -> 0018
+
+CREATE TABLE contact_channels (
+    id UUID NOT NULL, 
+    kind VARCHAR(10) NOT NULL, 
+    type VARCHAR(20) NOT NULL, 
+    label VARCHAR(120) NOT NULL, 
+    value VARCHAR(1000) NOT NULL, 
+    note VARCHAR(160), 
+    detail TEXT, 
+    icon VARCHAR(30), 
+    locations JSON DEFAULT '[]' NOT NULL, 
+    is_active BOOLEAN DEFAULT true NOT NULL, 
+    sort_order INTEGER DEFAULT 0 NOT NULL, 
+    dedupe_key VARCHAR(400) NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_contact_channels PRIMARY KEY (id), 
+    CONSTRAINT uq_contact_channels_dedupe_key UNIQUE (dedupe_key), 
+    CONSTRAINT ck_contact_channels_kind CHECK (kind in ('social','contact'))
+);
+
+ALTER TABLE public."contact_channels" ENABLE ROW LEVEL SECURITY;
+
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('1b56a5b2-09b2-553f-a434-265591ba9343', 'social', 'instagram', 'Instagram', 'https://www.instagram.com/lax360pvtltd', NULL, '["header", "footer", "contact", "social_band"]', true, 10, 'social:instagram:instagram.com/lax360pvtltd');
+
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('f52e8fbb-3e2c-595b-8f4d-2e445042d2ba', 'social', 'linkedin', 'LinkedIn', 'https://www.linkedin.com/company/lax360-pvt-ltd', NULL, '["header", "footer", "contact", "social_band"]', true, 20, 'social:linkedin:linkedin.com/company/lax360-pvt-ltd');
+
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('59eac3ec-be3d-5fcf-a7d0-3831cadfa66d', 'social', 'x', 'X (Twitter)', 'https://x.com/lax360tech', NULL, '["header", "footer", "contact", "social_band"]', true, 30, 'social:x:x.com/lax360tech');
+
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('2ac41554-2f65-57db-a206-86e919f34785', 'contact', 'phone', 'Phone', '+91 95666 79928', 'Salem & Bangalore', '["header", "footer", "contact"]', true, 40, 'contact:phone:919566679928');
+
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('c5c1c102-d26f-5217-8703-c66ea2b7b2a6', 'contact', 'email', 'Email', 'lax360tech@gmail.com', NULL, '["header", "footer", "contact"]', true, 50, 'contact:email:lax360tech@gmail.com');
+
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('41dc71d7-b45c-59a5-b935-c6369fb8ff00', 'contact', 'phone', 'Phone', '+91 95666 05272', 'Mumbai', '["footer", "contact"]', true, 60, 'contact:phone:919566605272');
+
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('dfa9b8f9-90d6-591e-8420-d59f309f0081', 'contact', 'whatsapp', 'WhatsApp', '+919566679928', NULL, '["header", "footer", "contact"]', true, 70, 'contact:whatsapp:919566679928');
+
+UPDATE alembic_version SET version_num='0018' WHERE alembic_version.version_num = '0017';
+
+-- Running upgrade 0018 -> 0019
+
+ALTER TABLE contact_channels ADD COLUMN owner_type VARCHAR(10) DEFAULT 'global' NOT NULL;
+
+ALTER TABLE contact_channels ADD COLUMN owner_ref VARCHAR(120);
+
+ALTER TABLE contact_channels ADD CONSTRAINT ck_contact_channels_owner CHECK ((owner_type = 'global' AND owner_ref IS NULL) OR (owner_type IN ('branch','partner') AND owner_ref IS NOT NULL));
+
+UPDATE alembic_version SET version_num='0019' WHERE alembic_version.version_num = '0018';
+
+-- Running upgrade 0019 -> 0020
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('9aa37e64-f667-50c8-a02f-d512dd81a980', 'service_carousel_page', 'service-carousel', 'Services & industries carousel settings', '{"enabled": true, "eyebrow": "What we do", "title": "Services &", "title_accent": "Industries", "lead": "Software, AI, marketing and training for the businesses we work with. Swipe or drag to explore.", "scroll": true, "speed": "normal", "pause_on_hover": true}', 'published', 0);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('b183c299-20df-5aa3-87a3-752c8b88272a', 'service_card', 'it-software-development', 'IT & Software Development', '{"tag": "Service", "description": "Custom software, websites, web and mobile apps, CRM and ERP, business systems and e-commerce.", "link": "/services/software", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/services/software.webp", "image_alt": "IT & Software Development"}', 'published', 10);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('c2892c84-2ad2-5224-a326-dc2267c21a95', 'service_card', 'digital-marketing', 'Digital Marketing', '{"tag": "Service", "description": "Social media, Meta and Google Ads, SEO, landing pages, content and marketing strategy.", "link": "/services/growth", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/services/marketing.webp", "image_alt": "Digital Marketing"}', 'published', 20);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('cd1c39ad-2216-5887-b0d2-06a3d0b56fab', 'service_card', 'ai-automation', 'AI & Automation', '{"tag": "Service", "description": "AI applications, chatbots, AI agents, RAG solutions, process automation and AI consulting.", "link": "/services/ai", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/services/ai.webp", "image_alt": "AI & Automation"}', 'published', 30);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('8a0a06ab-26d8-5311-ae25-1d23f536c64b', 'service_card', 'education-training', 'Education & Training', '{"tag": "Service", "description": "Courses and workshops for students and professionals.", "link": "/contact?type=course", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/services/education.webp", "image_alt": "Education & Training"}', 'published', 40);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('b8a9c42f-4bd2-5edf-8a5e-0fea690f4a8d', 'service_card', 'cad-engineering', 'CAD & Engineering', '{"tag": "Industry", "description": "Project, workforce and site-progress tools for contractors and infrastructure teams.", "link": "/industries/construction-infrastructure", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/construction.webp", "image_alt": "CAD & Engineering"}', 'published', 50);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('7a87be00-a5a2-5ea5-b43e-f5b7858e04cf', 'service_card', 'healthcare', 'Healthcare', '{"tag": "Industry", "description": "Digital tools for clinics and hospitals: patients, appointments, records and communication in one connected system.", "link": "/industries/healthcare-medical", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/healthcare.webp", "image_alt": "Healthcare"}', 'published', 60);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('404cb409-6de8-5fe2-8f9a-4dc7c46fde87', 'service_card', 'finance-business', 'Finance & Business', '{"tag": "Industry", "description": "Payment, financial management and integration platforms built with secure, well-documented APIs.", "link": "/industries/banking-fintech", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/finance.webp", "image_alt": "Finance & Business"}', 'published', 70);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('2a59c9d6-afd3-5b58-bb09-9eae0baf4d35', 'service_card', 'e-commerce', 'E-commerce', '{"tag": "Industry", "description": "Billing, inventory, online stores and customer systems that keep shop floor and web orders in step.", "link": "/industries/retail-ecommerce", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/retail.webp", "image_alt": "E-commerce"}', 'published', 80);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('7912b258-9a70-5634-b56c-5e2c992eff2e', 'service_card', 'mobile-business-apps', 'Mobile & Business Apps', '{"tag": "Service", "description": "Booking, field-staff, location tracking, billing and inventory apps, and custom business mobile apps.", "link": "/services/mobile", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/services/mobile.webp", "image_alt": "Mobile & Business Apps"}', 'published', 90);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('944a16e8-7f44-5ca8-9ad6-172de7bd554e', 'service_card', 'manufacturing-industrial', 'Manufacturing & Industrial', '{"tag": "Industry", "description": "Production, quality, inventory and maintenance systems that give plants a real-time operational picture.", "link": "/industries/manufacturing-industrial", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/manufacturing.webp", "image_alt": "Manufacturing & Industrial"}', 'published', 100);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('9f4ee60e-96fe-5e6e-8b7b-aa08dce566fb', 'service_card', 'real-estate-property', 'Real Estate & Property', '{"tag": "Industry", "description": "CRM, listing and booking tools that keep every property enquiry and follow-up on track.", "link": "/industries/real-estate-property", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/realestate.webp", "image_alt": "Real Estate & Property"}', 'published', 110);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('19841edd-2dad-572e-a995-203132996fee', 'service_card', 'logistics-transportation', 'Logistics & Transportation', '{"tag": "Industry", "description": "Fleet, delivery, warehouse and field-team tools that give operations real-time visibility.", "link": "/industries/logistics-transportation", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/logistics.webp", "image_alt": "Logistics & Transportation"}', 'published', 120);
+
+INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('35e07342-0809-5653-983a-e2077883f0f4', 'service_card', 'hospitality-tourism', 'Hospitality & Tourism', '{"tag": "Industry", "description": "Hotel, reservation and guest-experience software that keeps bookings and service running smoothly.", "link": "/industries/hospitality-tourism", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/hospitality.webp", "image_alt": "Hospitality & Tourism"}', 'published', 130);
+
+UPDATE alembic_version SET version_num='0020' WHERE alembic_version.version_num = '0019';
 
 COMMIT;
 

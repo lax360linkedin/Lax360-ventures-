@@ -1,6 +1,6 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, MapPin, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, Layers, MapPin, Share2, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -19,6 +19,7 @@ const Products = lazy(() => import('./pages/Products.jsx'))
 const WebsitesAdmin = lazy(() => import('./pages/Websites.jsx'))
 const WelcomeAdmin = lazy(() => import('./pages/WelcomeAdmin.jsx'))
 const CarouselAdmin = lazy(() => import('./pages/CarouselAdmin.jsx'))
+const ServiceCarouselAdmin = lazy(() => import('./pages/ServiceCarouselAdmin.jsx'))
 const TeamAdmin = lazy(() => import('./pages/TeamAdmin.jsx'))
 const DepartmentsAdmin = () => <TeamAdmin view="departments" />
 const sect = (name) => lazy(() => import('./pages/Sections.jsx').then((m) => ({ default: m[name] })))
@@ -30,6 +31,9 @@ const Staff = lazy(() => import('./pages/Staff.jsx'))
 const Customers = lazy(() => import('./pages/Customers.jsx'))
 const PagesModule = lazy(() => import('./pages/Pages.jsx'))
 const BranchLocations = lazy(() => import('./pages/BranchLocations.jsx'))
+const SocialContact = lazy(() => import('./pages/SocialContact.jsx'))
+const BranchSocial = lazy(() => import('./pages/OwnerSocial.jsx').then((m) => ({ default: m.BranchSocial })))
+const PartnerSocial = lazy(() => import('./pages/OwnerSocial.jsx').then((m) => ({ default: m.PartnerSocial })))
 const Audit = lazy(() => import('./pages/Audit.jsx'))
 const System = lazy(() => import('./pages/System.jsx'))
 
@@ -41,6 +45,7 @@ const NAV = [
   { section: 'Leads & customers', to: '/company-admin/customers', label: 'Registered users', icon: UserCog, module: 'customers', hint: 'Website customers: accounts, enquiry and demo history, activate or deactivate' },
   { section: 'Home page', to: '/company-admin/welcome', label: 'Welcome cards', icon: Sparkles, module: 'content', hint: 'Welcome cards, festival greetings and offers shown after the intro animation' },
   { section: 'Home page', to: '/company-admin/homepage-videos', label: 'Homepage videos', icon: Film, module: 'hero_videos', hint: 'The scheduled background videos of the home page' },
+  { section: 'Home page', to: '/company-admin/service-carousel', label: 'Services carousel', icon: Layers, module: 'content', hint: 'The auto-scrolling services and industries cards below the home header: add, edit, re-order, speed' },
   { section: 'Home page', to: '/company-admin/carousel', label: 'Image carousel', icon: Images, module: 'content', hint: 'The swipeable picture strip on the home page: upload, replace, re-order, delete' },
   { section: 'Home page', to: '/company-admin/testimonials', label: 'Testimonials', icon: Quote, module: 'content', hint: 'What clients and students say: add, edit, replace samples, re-order' },
   { section: 'Home page', to: '/company-admin/clients', label: 'Our clients', icon: Building2, module: 'content', hint: 'The client logos strip: add many logos, replace samples, re-order' },
@@ -48,6 +53,8 @@ const NAV = [
   { section: 'Company', to: '/company-admin/team', label: 'Our team', icon: UsersRound, module: 'content', hint: 'Employees, photographs and the sections of the Our Team page' },
   { section: 'Company', to: '/company-admin/departments', label: 'Departments', icon: Users, module: 'content', hint: 'The departments employees belong to' },
   { section: 'Company', to: '/company-admin/branches', label: 'Branch locations', icon: MapPin, module: 'settings', hint: 'Branches with their address, phone and Google Map: add, edit, enable or delete' },
+  { section: 'Company', to: '/company-admin/social-contact', label: 'Social media & contact', icon: Share2, module: 'settings', hint: 'Every social link, phone, email and address: choose where each one appears, switch on or off, re-order' },
+  { section: 'Company', to: '/company-admin/network/social', label: 'Partner & branch social links', icon: Share2, module: 'settings', hint: 'Social media and contact details of each partner and branch, separate from the LAX360 links' },
   { section: 'Company', to: '/company-admin/network', label: 'Our network', icon: Network, module: 'content', hint: 'Group companies, partners, software distribution and the Our Network page' },
   { section: 'Products & portfolio', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
   { section: 'Products & portfolio', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
@@ -279,6 +286,10 @@ export default function AdminApp() {
           <Route path="pages/*" element={<Guard module={['content', 'services', 'careers', 'navigation', 'settings']}><PagesModule /></Guard>} />
           <Route path="page-images" element={<Navigate to="/company-admin/pages" replace />} />
           <Route path="branches" element={<Guard module="settings"><BranchLocations /></Guard>} />
+          <Route path="social-contact" element={<Guard module="settings"><SocialContact /></Guard>} />
+          <Route path="branches/:slug/social" element={<Guard module="settings"><BranchSocial /></Guard>} />
+          <Route path="network/social" element={<Guard module="settings"><PartnerSocial /></Guard>} />
+          <Route path="network/social/:slug" element={<Guard module="settings"><PartnerSocial /></Guard>} />
           <Route path="customers" element={<Guard module="customers"><Customers /></Guard>} />
           <Route path="content" element={<Guard module={['content', 'services', 'careers', 'navigation']}><Content /></Guard>} />
           <Route path="chatbot" element={<Guard module="chatbot"><Chatbot /></Guard>} />
@@ -286,6 +297,7 @@ export default function AdminApp() {
           <Route path="websites" element={<Guard module="content"><WebsitesAdmin /></Guard>} />
           <Route path="welcome" element={<Guard module="content"><WelcomeAdmin /></Guard>} />
           <Route path="carousel" element={<Guard module="content"><CarouselAdmin /></Guard>} />
+          <Route path="service-carousel" element={<Guard module="content"><ServiceCarouselAdmin /></Guard>} />
           <Route path="team" element={<Guard module="content"><TeamAdmin /></Guard>} />
           <Route path="departments" element={<Guard module="content"><DepartmentsAdmin /></Guard>} />
           <Route path="founder" element={<Guard module="content"><FounderAdmin /></Guard>} />

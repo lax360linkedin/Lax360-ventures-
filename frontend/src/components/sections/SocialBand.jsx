@@ -1,15 +1,14 @@
 import { useLocation } from 'react-router-dom'
-import SocialIcon from '../layout/SocialIcon.jsx'
+import ChannelIcon from '../layout/ChannelIcon.jsx'
+import { BRAND_COLOR } from '../layout/SocialIcon.jsx'
 import { showOnPage, useSiteSettings, useSocial } from '../../hooks/useSite.js'
-
-const COLOR = { instagram: '#e1306c', facebook: '#1877f2', linkedin: '#0a66c2', youtube: '#ff0000', x: '#e5e7eb' }
 
 /** "Stay connected": the social icons float and sway in a staggered wave beside the LAX360 assistant robot (the existing mascot image).
  *  Clicking the robot opens the existing website assistant: it only dispatches the event the chat widget already listens for.
  *  The content sits on the left so the floating assistant launcher (bottom right) never covers it. */
 export default function SocialBand() {
   const settings = useSiteSettings()
-  const social = useSocial()
+  const social = useSocial('social_band')
   const { pathname } = useLocation()
   if (settings.social_band_enabled === false || !showOnPage(settings.contact_bar_pages, pathname) || !social.length) return null
   const robot = settings.social_robot_enabled !== false && settings.chatbot_enabled !== false
@@ -31,11 +30,11 @@ export default function SocialBand() {
             <p className="mt-2 text-sm text-soft">Follow our work, ideas and updates{robot ? ', or tap the robot to chat with our assistant' : ''}.</p>
             <ul className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:justify-start sm:gap-5" aria-label="Social media profiles">
               {social.map((s, i) => (
-                <li key={s.platform + s.href} className="anim-social-float" style={{ '--d': `${i * 0.45}s` }}>
+                <li key={s.id} className="anim-social-float" style={{ '--d': `${i * 0.45}s` }}>
                   <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`}
                     className="grid size-12 place-items-center rounded-2xl border border-edge bg-night/60 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.8)] transition-[transform,border-color,box-shadow] duration-300 hover:scale-110 hover:border-lav group-hover/bot:-translate-y-1 sm:size-14"
-                    style={{ color: COLOR[s.platform] }}>
-                    <SocialIcon platform={s.platform} className="size-6" />
+                    style={{ color: BRAND_COLOR[s.platform] }}>
+                    <ChannelIcon channel={s} className="size-6" />
                   </a>
                 </li>
               ))}

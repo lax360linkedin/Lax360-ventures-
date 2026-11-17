@@ -24,7 +24,7 @@ def test_the_tree_follows_the_websites_real_pages_and_sections(fake, boss):  # n
     keys = [s["key"] for s in home["sections"]]
     assert keys[0] == "header" and "welcome" in keys and "clients" in keys and "gallery" in keys and "testimonials" in keys  # the home sections of the website, welcome sections included
     about = next(p for p in data["pages"] if p["key"] == "about")
-    assert [s["label"] for s in about["sections"]][0] == "About Us" and "Mission & vision" in [s["label"] for s in about["sections"]]  # the About page's own sections
+    assert {"About Us", "Mission & vision", "Page header"} <= {s["label"] for s in about["sections"]}  # the About page's own sections
     assert any(p["key"] == "contact" for p in data["pages"])  # a page without pictures is still listed
     svc = c.post("/api/admin/content/service_category", json={"title": "Brand Design", "status": "published"}, headers=csrf).json()
     data = c.get("/api/admin/page-images").json()
@@ -92,6 +92,6 @@ def test_each_administrator_sees_and_changes_only_what_their_permissions_allow(f
     assert media_only.get("/api/admin/page-images").status_code == 403  # no picture module at all
     content_only, ccsrf, _ = staff(app, db, role="admin", email="content@example.com", permissions=["content"])
     data = content_only.get("/api/admin/page-images").json()
-    assert "site" not in [p["key"] for p in data["pages"]]  # the logo / favicon belong to the settings permission
+    assert "site" not in [i["id"] for p in data["pages"] for sec in p["sections"] for i in sec["items"]]  # the logo / favicon settings belong to the settings permission
     assert content_only.put("/api/admin/page-images/slot", json={"setting": "site_logo", "field": "site_logo", "asset_id": a["id"]}, headers=ccsrf).status_code == 403
     assert content_only.put("/api/admin/page-images/slot", json={"item_id": item["id"], "field": "logo", "asset_id": a["id"]}, headers=ccsrf).status_code == 200

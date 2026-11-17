@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { ExternalLink, Eye, EyeOff, FileText, ImageOff, Pencil, Trash2, UserPlus } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ExternalLink, Share2, Eye, EyeOff, FileText, ImageOff, Pencil, Trash2, UserPlus } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import ModuleManager, { pictureOf } from '../ModuleManager.jsx'
 import { Editor } from './Content.jsx'
@@ -41,7 +42,7 @@ export function NetworkAdmin() {
   return (
     <>
       <PageHeader title="Our network" lead="The companies and partners shown on the Our Network page, the software LAX360 distributes, the categories that group them, and the page's own text. New companies start as drafts so their details can be verified before they go live."
-        actions={<a href="/our-network?cms_preview=1" target="_blank" rel="noopener noreferrer"><span className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-edge-strong bg-glass px-4 text-sm font-semibold hover:border-lav"><ExternalLink className="size-4" aria-hidden="true" /> Preview on the website</span></a>} />
+        actions={<><Link to="/company-admin/network/social" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-edge-strong bg-glass px-4 text-sm font-semibold hover:border-lav"><Share2 className="size-4" aria-hidden="true" /> Partner social media &amp; contact</Link><a href="/our-network?cms_preview=1" target="_blank" rel="noopener noreferrer"><span className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-edge-strong bg-glass px-4 text-sm font-semibold hover:border-lav"><ExternalLink className="size-4" aria-hidden="true" /> Preview on the website</span></a></>} />
       <div role="tablist" aria-label="Our network" className="mb-6 flex flex-wrap gap-2">
         {tabs.map(([id, text]) => <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`inline-flex min-h-11 items-center rounded-full border px-5 text-sm font-semibold transition-colors ${tab === id ? 'border-primary bg-primary text-white' : 'border-edge-strong bg-glass hover:border-lav'}`}>{text}</button>)}
       </div>

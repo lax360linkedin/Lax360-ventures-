@@ -6,7 +6,8 @@
 // /api/admin/preview/* (it needs the admin session; without one it quietly falls back to the public data). Visitors can never see drafts.
 import { api, setAdminBearer } from './apiClient.js'
 
-export const EMPTY = { settings: {}, content: {}, loaded: false, ready: false, preview: false }
+// `channels` = the managed social links and contact details (null until the server has answered; the website then shows its built-in ones)
+export const EMPTY = { settings: {}, channels: null, owned: null, content: {}, loaded: false, ready: false, preview: false }
 let state = EMPTY
 const listeners = new Set()
 const emit = (patch) => { state = { ...state, ...patch }; listeners.forEach((l) => l()) }
@@ -34,7 +35,7 @@ export function loadSite() {
   const preview = wantsPreview()
   const publicSite = () => api('/api/public/site')
   ;(preview ? api('/api/admin/preview/site').catch(publicSite) : publicSite())
-    .then((r) => emit({ settings: r.settings || {}, loaded: true }))
+    .then((r) => emit({ settings: r.settings || {}, channels: Array.isArray(r.channels) ? r.channels : null, owned: r.owned && typeof r.owned === 'object' ? r.owned : null, loaded: true }))
     .catch(() => emit({ loaded: true }))
 }
 

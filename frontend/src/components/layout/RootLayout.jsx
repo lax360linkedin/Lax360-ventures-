@@ -6,6 +6,7 @@ import MobileMenu from './MobileMenu.jsx'
 import MobileBottomBar from './MobileBottomBar.jsx'
 import WhatsAppFloat from './WhatsAppFloat.jsx'
 import TopBar from './TopBar.jsx'
+import ImageOverrides from './ImageOverrides.jsx'
 import SocialBand from '../sections/SocialBand.jsx'
 import { useScrolledPast } from '../../hooks/useScrollDirection.js'
 import PreviewBanner from '../cms/PreviewBanner.jsx'
@@ -91,6 +92,7 @@ export default function RootLayout() {
       </a>
       <ScrollToTop />
       <SiteThemeSync />
+      <ImageOverrides />
       <TopBar />
       <Header onOpenMenu={() => setMenuOpen(true)} menuButtonRef={menuButtonRef} />
       <MobileMenu open={menuOpen} onClose={closeMenu} returnFocusRef={menuButtonRef} />

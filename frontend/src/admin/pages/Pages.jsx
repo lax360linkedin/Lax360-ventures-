@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AlertTriangle, ChevronRight, ExternalLink, ImageOff, ImagePlus, Images, Loader2, Pencil, RefreshCw, Trash2 } from 'lucide-react'
+import { AlertTriangle, ChevronRight, ExternalLink, ImageOff, ImagePlus, Images, Loader2, Pencil, RefreshCw, RotateCcw, Trash2, Undo2 } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import { fmtSize, imageLimit, isImage, uploadImage } from '../ImageUpload.jsx'
 import { Badge, Btn, Card, ConfirmDialog, EmptyState, ErrorState, Input, Modal, PageHeader, Spinner, useFetch, useToast } from '../ui.jsx'
@@ -24,9 +24,11 @@ function Crumbs({ trail }) {
 }
 
 /** One picture slot: a clear preview, and simple Upload / Replace (click, drop or choose) and Remove controls. A chosen picture is previewed against the current one before it is saved. */
-function Slot({ slot, item, busy, onFile, onRemove }) {
+function Slot({ slot, item, busy, onFile, onRemove, onRestore }) {
   const input = useRef(null)
   const [over, setOver] = useState(false)
+  const [size, setSize] = useState('')
+  const site = item.kind === 'site_image' // one of the website's built-in pictures: it can be replaced and put back, never left empty
   const shown = slot.asset_id ? src(slot.asset_id) : slot.builtin
   const has = Boolean(shown)
   return (
@@ -37,18 +39,30 @@ function Slot({ slot, item, busy, onFile, onRemove }) {
         onDragOver={(e) => { e.preventDefault(); setOver(true) }} onDragLeave={() => setOver(false)}
         onDrop={(e) => { e.preventDefault(); setOver(false); const f = [...e.dataTransfer.files].find(isImage); if (f && !busy) onFile(f) }}
         className={`group relative grid aspect-[4/3] cursor-pointer place-items-center overflow-hidden rounded-xl border-2 border-dashed bg-glass transition-colors focus-visible:outline-2 focus-visible:outline-lav ${over ? 'border-lav bg-primary/10' : has ? 'border-transparent ring-1 ring-edge' : 'border-edge-strong hover:border-lav'}`}>
-        {has ? <img src={shown} alt="" loading="lazy" className="size-full object-contain" />
+        {has ? <img src={shown} alt={`${slot.label}: ${item.title}`} loading="lazy" className="size-full object-contain" onLoad={(e) => setSize(`${e.currentTarget.naturalWidth} × ${e.currentTarget.naturalHeight} px`)} />
           : <span className="flex flex-col items-center gap-1 px-2 text-center text-xs text-soft"><ImageOff className="size-6" aria-hidden="true" />{slot.missing ? 'The file is missing' : 'No picture yet'}</span>}
         <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-black/60 py-1.5 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"><ImagePlus className="size-3.5" aria-hidden="true" />{has ? 'Replace' : 'Upload'} or drop a picture</span>
         {busy && <span className="absolute inset-0 grid place-items-center bg-black/55"><Loader2 className="size-6 animate-spin text-white" aria-label="Saving" /></span>}
-        {!slot.asset_id && slot.builtin && <span className="absolute left-1.5 top-1.5 rounded-full bg-black/65 px-2 py-0.5 text-[0.65rem] font-bold text-white">Built-in sample</span>}
+        {!slot.asset_id && slot.builtin && <span className="absolute left-1.5 top-1.5 rounded-full bg-black/65 px-2 py-0.5 text-[0.65rem] font-bold text-white">{site ? 'Original website picture' : 'Built-in sample'}</span>}
+        {site && slot.asset_id && <span className="absolute left-1.5 top-1.5 rounded-full bg-primary px-2 py-0.5 text-[0.65rem] font-bold text-white">Replaced</span>}
         {slot.missing && <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[0.65rem] font-bold text-black"><AlertTriangle className="size-3" aria-hidden="true" />Missing</span>}
       </div>
       <input ref={input} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="sr-only" tabIndex={-1} aria-hidden="true" onChange={(e) => { const f = e.target.files[0]; e.target.value = ''; if (f) onFile(f) }} />
-      <div className="flex gap-2">
-        <Btn className="flex-1" onClick={() => input.current?.click()} disabled={busy}><ImagePlus className="size-4" aria-hidden="true" /> {has ? 'Replace' : 'Upload'}</Btn>
-        {(slot.asset_id || slot.builtin || slot.missing) && <Btn kind="danger" onClick={onRemove} disabled={busy} aria-label={`Remove ${slot.label} of ${item.title}`}><Trash2 className="size-4" aria-hidden="true" /></Btn>}
+      {size && <p className="-mt-1 text-[0.7rem] text-soft">{size}{site ? ' · the website keeps the position and crop of this picture: use a similar shape' : ''}</p>}
+      <div className="flex flex-wrap gap-2">
+        <Btn className="flex-1" onClick={() => input.current?.click()} disabled={busy}><ImagePlus className="size-4" aria-hidden="true" /> {has ? 'Replace image' : 'Upload new image'}</Btn>
+        {!site && (slot.asset_id || slot.builtin || slot.missing) && <Btn kind="danger" onClick={onRemove} disabled={busy} aria-label={`Remove ${slot.label} of ${item.title}`}><Trash2 className="size-4" aria-hidden="true" /></Btn>}
       </div>
+      {site && (slot.previous_id || slot.asset_id) && (
+        <div className="flex flex-wrap items-center gap-2">
+          {slot.previous_id && (
+            <button type="button" disabled={busy} onClick={() => onRestore('restore_previous')} className="flex min-h-9 flex-1 items-center gap-2 rounded-lg border border-edge px-2 text-left text-xs font-semibold transition-colors hover:border-lav disabled:opacity-60">
+              <img src={src(slot.previous_id)} alt="" className="size-7 rounded object-cover" /><RotateCcw className="size-3.5 shrink-0" aria-hidden="true" />Restore previous image
+            </button>
+          )}
+          {slot.asset_id && <button type="button" disabled={busy} onClick={() => onRestore('restore_original')} className="flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border border-edge px-2 text-xs font-semibold transition-colors hover:border-lav disabled:opacity-60"><Undo2 className="size-3.5" aria-hidden="true" />Back to the original</button>}
+        </div>
+      )}
     </div>
   )
 }
@@ -65,7 +79,7 @@ function SectionView({ page, section, reload, base }) {
   const term = search.trim().toLowerCase()
   const items = useMemo(() => section.items.filter((it) => (!term || `${it.title} ${it.subtitle} ${it.slots.map((x) => x.label).join(' ')}`.toLowerCase().includes(term)) && (!onlyEmpty || it.slots.some((x) => !x.asset_id))), [section, term, onlyEmpty])
 
-  const body = (it, slot, asset_id) => (it.id === 'site' ? { setting: slot.field, field: slot.field, asset_id } : { item_id: it.id, field: slot.field, asset_id })
+  const body = (it, slot, asset_id, action = 'replace') => (it.kind === 'site_image' ? { image_key: slot.key, action, asset_id } : it.id === 'site' ? { setting: slot.field, field: slot.field, asset_id } : { item_id: it.id, field: slot.field, asset_id })
   const key = (it, slot) => `${it.id}:${slot.field}`
   const stage = async (it, slot, file) => {
     const max = await imageLimit()
@@ -83,6 +97,14 @@ function SectionView({ page, section, reload, base }) {
       reload()
     } catch (e) { toast(e.fields ? Object.values(e.fields).join(' ') : e.message, 'error') } finally { setBusy('') }
   }
+  const restore = async (it, slot, action) => {
+    setBusy(key(it, slot))
+    try {
+      await api('/api/admin/page-images/slot', { method: 'PUT', body: body(it, slot, null, action) })
+      toast(action === 'restore_previous' ? `${it.title}: the previous picture is back on the website` : `${it.title}: the original picture is back on the website`)
+      reload()
+    } catch (e) { toast(e.fields ? Object.values(e.fields).join(' ') : e.message, 'error') } finally { setBusy('') }
+  }
   const remove = async () => {
     const { it, slot } = removing
     setRemoving(null)
@@ -94,7 +116,7 @@ function SectionView({ page, section, reload, base }) {
   return (
     <>
       <Crumbs trail={[{ label: 'Pages', to: BASE }, { label: page.label, to: `${BASE}/${page.key}` }, { label: section.label }]} />
-      <PageHeader title={section.label} lead={`${page.label} page · ${plural(section.count, 'item')}, ${section.filled} of ${plural(section.slots, 'picture slot')} filled. Upload, replace or remove a picture; it goes live on the website as soon as you save.`}
+      <PageHeader title={section.label} lead={`${page.label} page · ${plural(section.count, 'item')}, ${section.filled} of ${plural(section.slots, 'picture slot')} filled. Every picture here is the one the website shows now. Replace it (you see a before / after preview first); it goes live as soon as you save, and only that picture changes.`}
         actions={<>
           <a href={page.path} target="_blank" rel="noopener noreferrer"><Btn><ExternalLink className="size-4" aria-hidden="true" /> View {page.label} page</Btn></a>
           {section.manage && <Link to={section.manage}><Btn><Pencil className="size-4" aria-hidden="true" /> Add or edit entries</Btn></Link>}
@@ -112,9 +134,9 @@ function SectionView({ page, section, reload, base }) {
         {items.map((it) => (
           <li key={it.id} className="min-w-0">
             <Card className="!p-4">
-              <div className="mb-3 flex items-center gap-2"><div className="min-w-0 flex-1"><h2 className="truncate font-semibold" title={it.title}>{it.title}</h2>{it.subtitle && <p className="truncate text-xs text-soft">{it.subtitle}</p>}</div><Badge value={it.status} /></div>
+              <div className="mb-3 flex items-center gap-2"><div className="min-w-0 flex-1"><h2 className="truncate font-semibold" title={it.title}>{it.title}</h2>{it.subtitle && <p className="text-xs text-soft">{it.subtitle}</p>}{it.also?.length > 0 && <p className="mt-0.5 text-[0.7rem] text-soft">Same picture also in: {it.also.join(' · ')}</p>}</div>{it.kind !== 'site_image' && <Badge value={it.status} />}</div>
               <div className={`grid gap-4 ${it.slots.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                {it.slots.map((slot) => <Slot key={slot.field} slot={slot} item={it} busy={busy === key(it, slot)} onFile={(f) => stage(it, slot, f)} onRemove={() => setRemoving({ it, slot })} />)}
+                {it.slots.map((slot) => <Slot key={slot.field} slot={slot} item={it} busy={busy === key(it, slot)} onFile={(f) => stage(it, slot, f)} onRemove={() => setRemoving({ it, slot })} onRestore={(a) => restore(it, slot, a)} />)}
               </div>
             </Card>
           </li>

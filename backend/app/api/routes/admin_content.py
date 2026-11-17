@@ -16,7 +16,7 @@ from app.core.permissions import has_permission
 from app.db.session import get_db
 from app.models import ContentItem, User
 from app.schemas.admin import ContentCreate, ContentOrder, ContentUpdate
-from app.services import audit_service, content_service as svc, settings_service
+from app.services import audit_service, channel_service, content_service as svc, settings_service
 
 router = APIRouter(prefix="/admin", tags=["admin: content"])
 
@@ -120,4 +120,4 @@ def preview_all(user: User = Depends(staff_user), db: Session = Depends(get_db),
 
 @router.get("/preview/site")
 def preview_site(_: User = Depends(staff_user), db: Session = Depends(get_db), settings: Settings = Depends(get_settings), key: str | None = Query(None)) -> dict:
-    return {"preview": True, "settings": settings_service.public_settings(db, settings)}
+    return {"preview": True, "settings": settings_service.public_settings(db, settings), "channels": channel_service.public_channels(db), "owned": channel_service.public_owned(db)}

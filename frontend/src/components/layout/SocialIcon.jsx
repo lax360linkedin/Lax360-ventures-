@@ -1,8 +1,18 @@
-import { siFacebook, siInstagram, siWhatsapp, siX, siYoutube } from 'simple-icons'
+import { Globe, Link2 } from 'lucide-react'
+import { siDiscord, siFacebook, siGithub, siInstagram, siMedium, siPinterest, siReddit, siSnapchat, siTelegram, siThreads, siWhatsapp, siX, siYoutube } from 'simple-icons'
 
-const BRAND = { instagram: siInstagram, facebook: siFacebook, x: siX, youtube: siYoutube, whatsapp: siWhatsapp }
+const BRAND = {
+  instagram: siInstagram, facebook: siFacebook, x: siX, youtube: siYoutube, whatsapp: siWhatsapp, threads: siThreads, discord: siDiscord, telegram: siTelegram,
+  pinterest: siPinterest, snapchat: siSnapchat, github: siGithub, reddit: siReddit, medium: siMedium,
+}
 
-/** Official platform marks from simple-icons. That package (and Lucide) no longer ship LinkedIn, so its familiar "in" tile is drawn as a plain SVG. */
+/** The brand colour of each platform (used where a coloured mark is wanted, e.g. the animated social section). */
+export const BRAND_COLOR = {
+  instagram: '#e1306c', facebook: '#1877f2', linkedin: '#0a66c2', youtube: '#ff0000', x: '#e5e7eb', whatsapp: '#25d366', threads: '#e5e7eb', discord: '#5865f2', telegram: '#26a5e4',
+  pinterest: '#e60023', snapchat: '#fffc00', github: '#e5e7eb', reddit: '#ff4500', medium: '#e5e7eb',
+}
+
+/** Official platform marks from simple-icons. That package (and Lucide) no longer ship LinkedIn, so its familiar "in" tile is drawn as a plain SVG. An unknown / custom platform gets a neutral globe. */
 export default function SocialIcon({ platform, className = 'size-4' }) {
   if (platform === 'linkedin') {
     return (
@@ -12,6 +22,6 @@ export default function SocialIcon({ platform, className = 'size-4' }) {
     )
   }
   const icon = BRAND[platform]
-  if (!icon) return null
+  if (!icon) return platform === 'custom' ? <Globe className={className} aria-hidden="true" /> : <Link2 className={className} aria-hidden="true" />
   return <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true" focusable="false"><path d={icon.path} /></svg>
 }

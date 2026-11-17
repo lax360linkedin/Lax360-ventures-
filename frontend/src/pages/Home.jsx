@@ -4,6 +4,7 @@ import { openWelcomeExperience, useIntroState, useWelcomePlan } from '../utils/w
 import { useContentReady, useHomeSections } from '../hooks/useSite.js'
 import { useAuth } from '../hooks/useAuth.js'
 import Hero from '../components/sections/Hero.jsx'
+import ServiceCarousel from '../components/sections/ServiceCarousel.jsx'
 import Marquee from '../components/sections/Marquee.jsx'
 import WhoWeAre from '../components/sections/WhoWeAre.jsx'
 import OurServices from '../components/sections/OurServices.jsx'
@@ -56,6 +57,7 @@ export default function Home() {
     >
       {(intro === 'pending' || intro === 'playing' || intro === 'revealing') && <Suspense fallback={null}><WelcomeIntro /></Suspense>}
       <Hero />
+      <ServiceCarousel />{/* services & industries: directly below the header, above the welcome sections */}
       {contactOpen && <Suspense fallback={null}><WelcomeContactCard open={contactOpen} onClose={() => setContactOpen(false)} /></Suspense>}
       {welcome && <Suspense fallback={cardsRoom}><WelcomeCards plan={welcome} /></Suspense>}
       {order.map((key) => <Fragment key={key}>{SECTIONS[key]}</Fragment>)}

@@ -511,6 +511,36 @@ KINDS: dict[str, dict] = {
             F("image_path", "Built-in picture (file path)", max_len=120, help="Only for the pictures shipped with the website (/assets/carousel/name.webp). An uploaded picture above takes priority.", ui="hidden"),
         ],
     },
+    # ---- Services & industries carousel (the auto-scrolling card strip directly below the home header, above the welcome sections) ---------------------------------
+    "service_carousel_page": {
+        "label": "Services & industries carousel settings", "group": "Homepage", "module": "content", "single": True, "slug": "service-carousel", "preview_path": "/",
+        "help": "The heading, introduction, automatic scrolling speed and on/off switch of the card strip below the home header. The cards themselves are managed under Services & industries carousel.",
+        "fields": [
+            F("enabled", "Show the carousel", "bool", default=True),
+            F("eyebrow", "Small label above the title", max_len=60),
+            F("title", "Title", max_len=80), F("title_accent", "Title: highlighted words", max_len=60),
+            F("lead", "Short introduction", "textarea", max_len=300),
+            F("scroll", "Automatic scrolling", "bool", default=True, help="Off keeps the cards still: visitors can still swipe, drag or use the arrows."),
+            F("speed", "Scrolling speed", "select", options=CAROUSEL_SPEEDS, default="normal"),
+            F("pause_on_hover", "Pause when the pointer is over it", "bool", default=True),
+        ],
+    },
+    "service_card": {
+        "label": "Services & industries carousel", "group": "Homepage", "module": "content", "single": False, "preview_path": "/",
+        "help": "The cards of the strip below the home header, in order. Each card has a background picture, a title, a short description and an optional Explore more button. Switch cards on or off, re-order them "
+                "or delete them; save one as a draft to preview it (Preview on the website) before it goes live.",
+        "title_label": "Card title",
+        "fields": [
+            F("image", "Background picture", "image", help="Upload in the media library. A landscape picture of about 1000 x 800 px works best; the card crops it to fill."),
+            F("image_alt", "Picture description (for screen readers)", max_len=160),
+            F("tag", "Small label (e.g. Service or Industry)", max_len=30),
+            F("description", "Short description", "textarea", True, max_len=220),
+            F("link", "Explore more: destination", max_len=300, help="A page like /services/software or a full https:// address. Leave empty for a card without a button."),
+            F("link_label", "Button text", max_len=30, help="Leave empty for “Explore more”."),
+            F("enabled", "Show this card", "bool", default=True),
+            F("builtin_image", "Built-in picture (file path)", max_len=120, help="Only for the pictures shipped with the website. An uploaded picture above takes priority.", ui="hidden"),
+        ],
+    },
     # ---- Welcome Experience (the interactive cards shown after the intro animation) -----------------------------------------------------
     "welcome_page": {
         "label": "Welcome Experience settings", "group": "Welcome Experience", "module": "content", "single": True, "slug": "welcome", "preview_path": "/?welcome=preview",
@@ -613,6 +643,12 @@ KINDS: dict[str, dict] = {
         "title_label": "Page title (search results & browser tab)",
         "fields": [F("page", "Page", "select", True, options=PAGES), F("meta_description", "Meta description", "textarea", max_len=320), F("image", "Social sharing image", "image")],
     },
+    "site_image": {
+        "label": "Replaced website pictures", "group": "Navigation & SEO", "module": "content", "single": False, "slug_field": "key", "hidden": True, "preview_path": "/",
+        "help": "Managed from Pages in the admin panel: a picture that replaces one of the website's built-in pictures (the path of the built-in picture is the key).",
+        "title_label": "Picture",
+        "fields": [F("key", "Built-in picture", "text", True, max_len=110), F("image", "Replacement picture", "image"), F("previous", "Previous replacement", "text", max_len=64)],
+    },
 }
 GROUP_ORDER = ["Homepage", "Services", "Products", "Websites", "Welcome Experience", "Industries", "Insights", "Network", "Team", "Clients", "Testimonials", "About", "Portfolio", "Careers", "Contact", "Navigation & SEO"]
 
@@ -623,8 +659,8 @@ def kinds_for_ui(db: Session, user=None) -> list[dict]:
     out = []
     dynamic: dict[str, list[dict]] = {}
     for kind, spec in KINDS.items():
-        if user is not None and not has_permission(user, spec["module"]):
-            continue
+        if (user is not None and not has_permission(user, spec["module"])) or spec.get("hidden"):
+            continue  # a hidden kind is managed from its own screen (Pages), not from the generic content list
         fields = []
         for f in spec["fields"]:
             f = dict(f)
@@ -705,6 +741,9 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
         elif name == "image_path":
             if value and not re.match(r"^/assets/carousel/[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$", value):
                 errors[name] = "Use a built-in picture path such as /assets/carousel/sample-1.webp, or leave this empty."
+        elif name == "builtin_image":
+            if value and not re.match(r"^/assets/(services|industries|products|about)/[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$", value):
+                errors[name] = "Use a built-in picture path such as /assets/services/software.webp, or leave this empty."
         elif name == "photo_path":
             if value and not re.match(r"^/assets/team/[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$", value):
                 errors[name] = "Use a built-in picture path such as /assets/team/sample-1.webp, or leave this empty."

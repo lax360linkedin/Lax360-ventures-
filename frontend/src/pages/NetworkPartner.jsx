@@ -6,6 +6,7 @@ import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { asCompany, ownershipLabels, pinnedProfiles, relationshipLabels, softwareCategories } from '../data/network.js'
 import { getDivision } from '../data/services.js'
+import OwnerLinks from '../components/layout/OwnerLinks.jsx'
 import { offeringHref } from '../utils/slugify.js'
 import { useContentReady } from '../hooks/useSite.js'
 import { useNetwork, useSoftware } from '../hooks/useCmsPages.js'
@@ -118,6 +119,7 @@ export default function NetworkPartner() {
               {isHttp(c.website) && <div><dt className="text-xs font-semibold uppercase tracking-wider text-soft">Official website</dt><dd><a href={c.website} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1 break-all font-semibold text-lav hover:underline">{c.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}<ArrowUpRight className="size-4 shrink-0" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a></dd></div>}
               {(c.sameLocation || c.location) && <div><dt className="text-xs font-semibold uppercase tracking-wider text-soft">Location</dt><dd className="flex items-start gap-1.5"><MapPin className="mt-1 size-4 shrink-0 text-lav" aria-hidden="true" />{c.location || 'Salem'}</dd></div>}
             </dl>
+            <OwnerLinks type="partner" owner={c.slug} name={c.name} title="Social media & contact" className="mt-5 border-t border-edge pt-4" />
           </Reveal>
         </div>
         {c.products.length > 0 && (

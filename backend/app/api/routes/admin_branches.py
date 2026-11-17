@@ -13,7 +13,9 @@ from sqlalchemy.orm import Session
 from app.api.deps import permission
 from app.core.errors import ApiError
 from app.db.session import get_db
-from app.models import Branch, User
+from sqlalchemy import delete
+
+from app.models import Branch, ContactChannel, User
 from app.schemas.common import ApiModel, OneLine, OptionalText
 from app.services import audit_service, branch_service as svc
 
@@ -71,6 +73,7 @@ def delete_branch(branch_id: uuid.UUID, user: User = Depends(write), db: Session
     """Removes the branch. Enquiries and demo requests that named it are kept (their branch just becomes empty). Disable a branch instead to hide it for a while."""
     b = _get(db, branch_id)
     audit_service.record(db, user, "branch.delete", resource_type="branch", resource_id=b.id, detail={"city": b.city})
+    db.execute(delete(ContactChannel).where(ContactChannel.owner_type == "branch", ContactChannel.owner_ref == b.slug))  # its own social links and contacts go with it
     db.delete(b)
     db.commit()
     return Response(status_code=204)
