@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('c44cbbd0-b913-4c9e-b8b8-50c3e258158c', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('25b73e39-2c8b-4adb-a602-ac1d17249da6', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('9520f0a7-62df-4b5b-93be-dbf87f47ca2b', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('04055663-145a-46bb-bfbc-c3fbbe0e54ed', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('5fece024-aa67-48a7-bccc-ee98e5846c0a', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('ca73b005-f451-4d8d-933a-b33b7f20de4e', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -728,6 +728,10 @@ INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALU
 INSERT INTO content_items (id, kind, slug, title, data, status, sort_order) VALUES ('35e07342-0809-5653-983a-e2077883f0f4', 'service_card', 'hospitality-tourism', 'Hospitality & Tourism', '{"tag": "Industry", "description": "Hotel, reservation and guest-experience software that keeps bookings and service running smoothly.", "link": "/industries/hospitality-tourism", "link_label": "Explore more", "enabled": true, "builtin_image": "/assets/industries/hospitality.webp", "image_alt": "Hospitality & Tourism"}', 'published', 130);
 
 UPDATE alembic_version SET version_num='0020' WHERE alembic_version.version_num = '0019';
+
+-- Running upgrade 0020 -> 0021
+
+UPDATE alembic_version SET version_num='0021' WHERE alembic_version.version_num = '0020';
 
 COMMIT;
 

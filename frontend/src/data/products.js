@@ -2,7 +2,7 @@ import portfolio from './products.json'
 
 // LAX360's own products. `products.json` is the built-in portfolio: it is shown until products are published in the admin panel
 // (Website content > Products), and it is also what `python -m app.cli seed-products` loads into the CMS so each product can be edited there.
-// Only list software that LAX360 develops or owns: never third-party products. Every product starts as "Coming soon"; change a product's status in the
+// Only list software that LAX360 develops or owns: never third-party products. Every product is shown as available (Live); change a product's status in the
 // admin panel only when it has really reached that stage (the demo and access buttons appear only for Live and Beta products).
 export const productCategories = {
   business: 'Business Management',

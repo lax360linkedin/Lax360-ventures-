@@ -17,7 +17,7 @@
     python -m app.cli seed-network [--remove]                   (load the Our Network starter content; designations start unverified; --remove deletes only those)
     python -m app.cli seed-service-demo [--remove]               (load FICTIONAL demo clients and testimonials for every service page; labelled Sample; --remove deletes only those)
     python -m app.cli seed-industries [--remove]               (load the 20-industry content into the CMS so it can be edited; --remove deletes only those)
-    python -m app.cli seed-products [--remove]                  (load the LAX360 product portfolio into the CMS, all as Coming soon, so it can be edited; --remove deletes only those)
+    python -m app.cli seed-products [--remove]                  (load the LAX360 product portfolio into the CMS, all as Live, so it can be edited; --remove deletes only those)
     python -m app.cli seed-faqs [--remove]                      (load the home page FAQ questions and categories into the CMS so they can be edited; --remove deletes only those)
     python -m app.cli seed-sample-testimonials [--remove]       (add / remove the six fictional placeholder testimonials; never touches real ones)
     python -m app.cli seed-sample-clients [--remove]            (add / remove the six placeholder "Our Clients" entries; never touches real clients)
@@ -617,7 +617,7 @@ def seed_faqs(args: argparse.Namespace) -> None:
 
 def seed_products(args: argparse.Namespace) -> None:
     """Load the built-in LAX360 product portfolio (frontend/src/data/products.json) into the CMS so administrators can edit, reorder, publish and delete it.
-    Every product starts as "Coming soon" (change the status in the admin panel as each one is actually built and released). Idempotent: rows are
+    Every product is loaded as Live (available); change a product's status in the admin panel at any time. Idempotent: rows are
     identified by slug and existing rows are never overwritten. --remove deletes only the seeded rows that still have their original slug."""
     import json
     from pathlib import Path
@@ -940,7 +940,7 @@ def main(argv: list[str] | None = None) -> None:
     hst = sub.add_parser("hero-videos-selftest", help="test the real Supabase video storage: config, bucket, upload, public read, delete (one temporary object; secrets never printed)")
     hst.add_argument("--create-bucket", action="store_true", help="create the public bucket if it does not exist")
     hst.set_defaults(func=hero_videos_selftest)
-    sprod = sub.add_parser("seed-products", help="load the LAX360 product portfolio into the CMS (all as Coming soon), or --remove those rows")
+    sprod = sub.add_parser("seed-products", help="load the LAX360 product portfolio into the CMS (all as Live), or --remove those rows")
     sprod.add_argument("--remove", action="store_true")
     sprod.set_defaults(func=seed_products)
     sind = sub.add_parser("seed-industries", help="load the 20-industry content into the CMS, or --remove those rows")

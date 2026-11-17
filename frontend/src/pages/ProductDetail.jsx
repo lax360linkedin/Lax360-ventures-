@@ -77,7 +77,7 @@ export default function ProductDetail() {
                 {p.demoSiteLink && <LinkButton to={p.demoSiteLink} arrow>View live demo</LinkButton>}
                 {live && p.productLink && <LinkButton to={p.productLink} arrow>{p.status === 'beta' ? 'Access the beta' : 'Access the product'}</LinkButton>}
                 {live && p.demoLink && <LinkButton to={p.demoLink} variant="secondary">Request a demo</LinkButton>}
-                <Button href="#enquire" variant={live && (p.productLink || p.demoLink) ? 'secondary' : 'primary'} arrow={!(live && (p.productLink || p.demoLink))} onClick={(e) => { e.preventDefault(); document.getElementById('enquire')?.scrollIntoView({ behavior: 'smooth' }) }}>{p.ctaLabel}</Button>
+                <LinkButton to={`/demo?product=${encodeURIComponent(p.name)}`} variant={live && (p.productLink || p.demoLink) ? 'secondary' : 'primary'} arrow={!(live && (p.productLink || p.demoLink))}>Get a Demo</LinkButton>
               </div>
               <Link to="/products" className="mt-5 inline-flex min-h-11 items-center gap-1.5 text-soft transition-colors hover:text-lav"><ArrowLeft className="size-4" aria-hidden="true" />All products</Link>
             </div>

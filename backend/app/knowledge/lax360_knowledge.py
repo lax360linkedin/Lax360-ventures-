@@ -18,7 +18,7 @@ COMPANY_NAME = "LAX360 Pvt Ltd"
 COMPANY = (
     "The company is LAX360 Pvt Ltd (the legal wording is still to be confirmed by the business). "
     "Tagline: '360° Execution'. One team handles software and IT services, AI and business automation, digital marketing, headless SaaS and API solutions, workflow automation and integration, mobile and business applications, and training. "
-    "LAX360 also publishes its own software and SaaS products on the Products page (/products); the first listed is the LAX360 API Hub, which is coming soon. Never describe third-party software as a LAX360 product and never claim a product is available unless the website says so."
+    "LAX360 also publishes its own software and SaaS products on the Products page (/products); the portfolio includes the LAX360 API Hub, Business CRM, Clinic Management and more; each is shown as an available product. Never describe third-party software as a LAX360 product and never claim a product is available unless the website says so."
 )
 
 DIVISIONS = [

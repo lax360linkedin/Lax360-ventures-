@@ -89,8 +89,8 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
               <div className="rounded-2xl border border-edge bg-glass p-2">
                 <p className="truncate px-3 pt-1 font-semibold text-fg">{user.full_name}</p>
                 <p className="truncate px-3 pb-2 text-sm text-soft">{user.email}</p>
-                <Link to="/user/dashboard" onClick={onClose} className={acct}><UserRound className="size-5 text-lav" aria-hidden="true" /> My Dashboard</Link>
-                <Link to="/demo" onClick={onClose} className={acct}><CalendarCheck className="size-5 text-lav" aria-hidden="true" /> Get a Demo</Link>
+                <Link to="/user/dashboard" onClick={onClose} className={acct}><UserRound className="size-5 text-lav" aria-hidden="true" /> User Profile</Link>
+                <Link to="/demo" onClick={onClose} className={acct}><CalendarCheck className="size-5 text-lav" aria-hidden="true" /> Get Demo</Link>
                 <button type="button" onClick={() => { onClose(); navigate('/'); void signOut() }} className={`${acct} w-full text-left`}><LogOut className="size-5 text-lav" aria-hidden="true" /> Logout</button>
               </div>
             ) : (

@@ -9,7 +9,7 @@ import { useAuth } from '../../hooks/useAuth.js'
  */
 export default function RequireAuth({ children }) {
   const { user, loading } = useAuth()
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   const wasSignedIn = useRef(Boolean(user))
   if (loading) return <div className="wrap section min-h-[50vh]" role="status"><p className="text-soft">Checking your session…</p></div>
   if (user) {
@@ -17,5 +17,5 @@ export default function RequireAuth({ children }) {
     return children
   }
   if (wasSignedIn.current) return <Navigate to="/" replace />
-  return <Navigate to="/login" replace state={{ from: pathname }} />
+  return <Navigate to="/login" replace state={{ from: pathname + search }} />
 }

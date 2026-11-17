@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, MessageCircle } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import FormField from '../components/ui/FormField.jsx'
@@ -39,7 +40,8 @@ function validate(v) {
 export default function DemoRequest() {
   const { user } = useAuth()
   const branches = useBranches()
-  const [values, setValues] = useState({ name: user?.full_name || '', email: user?.email || '', company: '', date: '', interest: '', branch: '', message: '' })
+  const product = (useSearchParams()[0].get('product') || '').trim().slice(0, 120) // arriving from a product's Get a Demo button: the product is already named in the request
+  const [values, setValues] = useState({ name: user?.full_name || '', email: user?.email || '', company: '', date: '', interest: '', branch: '', message: product ? `I would like a demonstration of ${product}.` : '' })
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState('idle') // idle | submitting | success | error
   const [serverError, setServerError] = useState('')
@@ -103,6 +105,7 @@ export default function DemoRequest() {
       <div className="wrap section flex flex-col items-center gap-8">
         <div className="glass w-full max-w-2xl p-6 md:p-8">
           <h1 className="h2">Get a demo</h1>
+          {product && <p className="mt-3 inline-flex rounded-full border border-lav/50 bg-glass px-3 py-1 text-sm font-semibold">Demonstration requested: {product}</p>}
           <p className="mt-3 text-soft">Tell us who you are and when suits you. The team uses this to plan a walkthrough of the services you care about.</p>
 
           {status === 'success' ? (

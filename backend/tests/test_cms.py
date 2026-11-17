@@ -145,7 +145,7 @@ def test_older_uploads_kept_in_the_database_still_work_and_are_not_touched(fake,
 # ---- content kinds, publishing and permissions ------------------------------------------------------------------------------------
 def test_super_admin_manages_every_cms_area_and_ordinary_admins_get_none_by_default(app, db, boss):
     kinds = {k["kind"] for k in boss[0].get("/api/admin/content/kinds").json()["kinds"]}
-    assert kinds == {"hero", "section", "faq_category", "faq", "about_section", "service_category", "service", "about_block", "project", "job", "career_page", "career_perk", "nav_item", "social_link", "seo_page", "contact_page", "industry", "article", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "client", "testimonial", "product", "product_module", "product_resource", "website", "welcome_page", "welcome_card", "carousel_page", "carousel_image"}
+    assert kinds == {"service_carousel_page", "service_card", "hero", "section", "faq_category", "faq", "about_section", "service_category", "service", "about_block", "project", "job", "career_page", "career_perk", "nav_item", "social_link", "seo_page", "contact_page", "industry", "article", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "client", "testimonial", "product", "product_module", "product_resource", "website", "welcome_page", "welcome_card", "carousel_page", "carousel_image"}
     bare, bcsrf, _ = staff(app, db, role="admin", email="plain@example.com", permissions=[])
     assert bare.get("/api/admin/content/kinds").status_code == 403 and bare.get("/api/admin/content/service").status_code == 403
     assert bare.post("/api/admin/content/service", json={"title": "X"}, headers=bcsrf).status_code == 403
@@ -270,13 +270,13 @@ def test_products_are_managed_and_published_through_the_cms(boss, client):
     assert [p["title"] for p in public] == ["Sample Product"] and public[0]["data"]["category"] == "business"
 
 
-def test_seed_products_loads_the_portfolio_as_coming_soon_and_is_idempotent(db, env):
+def test_seed_products_loads_the_portfolio_as_live_and_is_idempotent(db, env):
     from app import cli
 
     cli.main(["seed-products"])
     items = db.scalars(select(ContentItem).where(ContentItem.kind == "product").order_by(ContentItem.sort_order)).all()
     assert len(items) == 11 and items[0].title == "LAX360 Business CRM"
-    assert {i.data["status"] for i in items} == {"soon"}  # nothing is marked Live automatically
+    assert {i.data["status"] for i in items} == {"live"}  # the whole portfolio is shown as available
     assert len({i.slug for i in items}) == 11 and all(i.data["features"] and i.data["problems"] for i in items)
     items[0].data = {**items[0].data, "status": "beta"}  # an administrator's edit is never overwritten by a re-run
     db.commit()

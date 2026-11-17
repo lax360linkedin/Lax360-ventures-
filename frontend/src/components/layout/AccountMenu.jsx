@@ -1,35 +1,13 @@
-import { useEffect, useId, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { CalendarCheck, ChevronDown, LogIn, LogOut, UserRound } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { CalendarCheck, LogIn } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth.js'
-
-const itemCls = 'flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-[0.9375rem] font-medium text-fg transition-colors hover:bg-tint/10 focus-visible:bg-tint/10'
 
 /**
  * Header account control. Signed out: a "Login" button linking to /login.
- * Signed in: an avatar button that opens a menu — My Dashboard, Get a Demo, Logout (ARIA menu button pattern:
- * arrow keys / Home / End move, Esc and outside click close and return focus, Tab closes).
+ * Signed in: a "User Profile" button (the user's dashboard) with a "Get Demo" button right next to it. Logging out is on the profile page and in the mobile menu.
  */
 export default function AccountMenu() {
-  const { user, loading, signOut } = useAuth()
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
-  const [open, setOpen] = useState(false)
-  const wrapRef = useRef(null)
-  const buttonRef = useRef(null)
-  const menuRef = useRef(null)
-  const menuId = useId()
-
-  useEffect(() => setOpen(false), [pathname, user])
-
-  useEffect(() => {
-    if (!open) return undefined
-    menuRef.current?.querySelector('[role="menuitem"]')?.focus()
-    const onPointer = (e) => { if (!wrapRef.current?.contains(e.target)) setOpen(false) }
-    document.addEventListener('pointerdown', onPointer)
-    return () => document.removeEventListener('pointerdown', onPointer)
-  }, [open])
-
+  const { user, loading } = useAuth()
   // While the backend session check runs, reserve the button's space so the header does not shift.
   if (loading) return <span aria-hidden="true" className="inline-block h-11 w-[6.5rem]" />
 
@@ -44,65 +22,18 @@ export default function AccountMenu() {
     )
   }
 
-  const close = (returnFocus = true) => {
-    setOpen(false)
-    if (returnFocus) buttonRef.current?.focus()
-  }
-  const onMenuKey = (e) => {
-    const items = [...menuRef.current.querySelectorAll('[role="menuitem"]')]
-    const i = items.indexOf(document.activeElement)
-    if (e.key === 'Escape') { e.preventDefault(); close() }
-    else if (e.key === 'Tab') setOpen(false)
-    else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus() }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus() }
-    else if (e.key === 'Home') { e.preventDefault(); items[0].focus() }
-    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus() }
-  }
-  const logout = () => {
-    setOpen(false)
-    navigate('/') // leave any protected page first, then end the session on the server
-    void signOut()
-  }
-
+  // The centred menu leaves little room beside it: User Profile is the user's round initial (named for screen readers and as a tooltip) and Get Demo is a round icon that gains its words from 2xl.
+  const pill = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-[0.9375rem] font-semibold transition-[transform,background-color,border-color,box-shadow] duration-200 hover:-translate-y-0.5'
   return (
-    <div ref={wrapRef} className="relative z-40">
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        onKeyDown={(e) => { if (e.key === 'ArrowDown' && !open) { e.preventDefault(); setOpen(true) } }}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={open ? menuId : undefined}
-        aria-label={`Account menu for ${user.full_name}`}
-        className="group inline-flex min-h-11 items-center gap-1.5 rounded-full border border-edge-strong bg-glass py-1 pl-1 pr-3 transition-[background-color,border-color] duration-200 hover:border-lav hover:bg-glass-strong"
-      >
-        <span className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent font-display text-base font-bold text-white" aria-hidden="true">
-          {user.full_name[0]?.toUpperCase()}
-        </span>
-        <ChevronDown className={`size-4 text-soft transition-transform duration-200 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
-      </button>
-
-      {open && (
-        <div
-          ref={menuRef}
-          id={menuId}
-          role="menu"
-          aria-label="Account"
-          onKeyDown={onMenuKey}
-          className="absolute right-0 top-full mt-3 w-64 rounded-2xl border border-edge-strong bg-night/95 p-2 shadow-[0_24px_60px_-20px_rgb(var(--glow)/0.6)] backdrop-blur-xl"
-        >
-          <div className="border-b border-edge px-3 pb-2 pt-1">
-            <p className="truncate font-semibold text-fg">{user.full_name}</p>
-            <p className="truncate text-sm text-soft">{user.email}</p>
-          </div>
-          <div className="pt-2">
-            <Link role="menuitem" to="/user/dashboard" className={itemCls}><UserRound className="size-5 text-lav" aria-hidden="true" /> My Dashboard</Link>
-            <Link role="menuitem" to="/demo" className={itemCls}><CalendarCheck className="size-5 text-lav" aria-hidden="true" /> Get a Demo</Link>
-            <button role="menuitem" type="button" onClick={logout} className={itemCls}><LogOut className="size-5 text-lav" aria-hidden="true" /> Logout</button>
-          </div>
-        </div>
-      )}
+    <div className="flex items-center gap-2">
+      <Link to="/user/dashboard" aria-label={`User Profile: ${user.full_name}`} title="User Profile"
+        className={`${pill} size-11 border border-edge-strong bg-glass text-fg hover:border-lav hover:bg-glass-strong`}>
+        <span className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent font-display text-base font-bold text-white" aria-hidden="true">{user.full_name[0]?.toUpperCase()}</span>
+      </Link>
+      <Link to="/demo" aria-label="Get Demo" title="Get Demo"
+        className={`${pill} size-11 border border-white/10 bg-primary text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] hover:shadow-[0_12px_28px_-10px_rgb(var(--glow)/1)] 2xl:size-auto 2xl:min-h-11 2xl:px-4`}>
+        <CalendarCheck className="size-5 2xl:size-4" aria-hidden="true" /><span className="hidden 2xl:inline">Get Demo</span>
+      </Link>
     </div>
   )
 }
