@@ -2,9 +2,9 @@ import { m, useReducedMotion } from 'framer-motion'
 import { useDocumentHead } from '../../hooks/useDocumentHead.js'
 
 /** Wraps every page: sets the document head and applies a subtle entrance. */
-export default function PageContainer({ title, description, path, jsonLd, noindex, children }) {
+export default function PageContainer({ title, description, path, jsonLd, noindex, ogType, image, keywords, children }) {
   const reduce = useReducedMotion()
-  useDocumentHead({ title, description, path, jsonLd, noindex })
+  useDocumentHead({ title, description, path, jsonLd, noindex, ogType, image, keywords })
   return (
     <m.div
       initial={reduce ? false : { opacity: 0 }}

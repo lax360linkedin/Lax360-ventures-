@@ -1,9 +1,15 @@
 User-agent: *
 Allow: /
+Disallow: /company-admin
+Disallow: /admin
+Disallow: /user
 Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
 Disallow: /profile
 Disallow: /demo
-Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://www.example.com/sitemap.xml
+Sitemap: https://lax360-ventures.vercel.app/sitemap.xml
+Sitemap: https://lax360-ventures.vercel.app/sitemap-content.xml

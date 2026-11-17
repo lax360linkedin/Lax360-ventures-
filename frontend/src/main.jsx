@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { LazyMotion } from 'framer-motion'
 import App from './App.jsx'
 import './styles/index.css'
+import { initAnalytics, trackOutboundClicks } from './utils/analytics.js'
 
 const root = document.getElementById('root')
 
@@ -25,3 +26,7 @@ const app = (
 const clientOnly = root.dataset.route !== (window.location.pathname.replace(/\/+$/, '') || '/')
 if (root.hasChildNodes() && !clientOnly) hydrateRoot(root, app)
 else createRoot(root).render(app)
+
+// Analytics (Google Tag Manager / GA4) loads only when its id is configured, and never for a visitor who sent Do Not Track; see utils/analytics.js
+initAnalytics()
+trackOutboundClicks()

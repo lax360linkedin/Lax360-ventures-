@@ -4,6 +4,7 @@ import portfolio from './data/products.json' with { type: 'json' }
 import industryPortfolio from './data/industries.json' with { type: 'json' }
 import networkPortfolio from './data/network.json' with { type: 'json' }
 import { slugify } from './utils/slugify.js'
+import { branches } from './data/branches.js'
 
 // Single list of indexable routes. Used by the prerender script and the sitemap generator.
 // Keep in sync with src/App.jsx. Redirect aliases (/projects) are excluded.
@@ -28,11 +29,14 @@ export const routes = [
   '/our-network/cadpoint-salem',
   ...networkPortfolio.companies.filter((c) => c.status === 'published' && c.category === 'authorized').map((c) => `/our-network/${c.slug}`), // built-in authorized partners (partners published in the admin panel are rendered in the browser)
   '/our-team',
+  '/websites',
   '/work',
   '/robotics',
   '/blockchain',
   '/career',
   '/contact',
+  '/locations',
+  ...branches.map((b) => `/locations/${b.id}`), // one page per office (an office added in the admin panel gets its page automatically, rendered in the browser)
   '/privacy',
   '/terms',
 ]

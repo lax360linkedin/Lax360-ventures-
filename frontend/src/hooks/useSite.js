@@ -2,6 +2,7 @@ import { useEffect, useMemo, useSyncExternalStore } from 'react'
 import { site as defaults } from '../data/site.js'
 import { EMPTY, getState, loadContent, loadSite, subscribe } from '../services/siteService.js'
 import { pagePathToKey } from '../utils/cms.js'
+import { parseCustomJsonLd } from '../utils/seo.js'
 
 const digits = (v) => String(v || '').replace(/\D/g, '')
 const toTel = (display) => `+${digits(display)}`
@@ -115,14 +116,26 @@ export function useNav(place, fallback) {
   }, [items, place, fallback])
 }
 
-/** Title / description / image set for a page in the admin panel ("Page titles & SEO"), or null to keep the built-in text. */
+/** Everything set for a page in the admin panel (SEO management): title, description, keywords, sharing image, indexing, canonical address and extra structured data. `path` is matched by the page's
+ *  own entry (the main pages) or by the exact path an entry names ("Any other page"). Returns null to keep the built-in text. */
 export function useSeo(path) {
   const items = useContent('seo_page')
   const key = pagePathToKey(path)
   return useMemo(() => {
-    const mine = key && (items || []).find((i) => i.data.page === key)
-    return mine ? { title: mine.title, description: mine.data.meta_description || '', image: mine.data.image || null } : null
-  }, [items, key])
+    const mine = (items || []).find((i) => (i.data.path ? i.data.path === path : key && i.data.page === key))
+    if (!mine) return null
+    const d = mine.data
+    return {
+      title: mine.title, description: d.meta_description || '', image: d.image || null, keywords: d.keywords || '', noindex: d.noindex === true,
+      canonical: d.canonical_url || '', structured: parseCustomJsonLd(d.structured_data),
+    }
+  }, [items, key, path])
+}
+
+/** The redirects set in the admin panel (SEO management > Redirects): [{ from, to, permanent }]. */
+export function useRedirects() {
+  const items = useContent('seo_redirect')
+  return useMemo(() => (items || []).filter((i) => i.data.enabled !== false && i.data.from_path && i.data.to_path).map((i) => ({ from: i.data.from_path, to: i.data.to_path, permanent: i.data.permanent !== false })), [items])
 }
 
 /** Home page sections in display order: the built-in order, re-ordered / hidden by the published "Home page sections" items. */

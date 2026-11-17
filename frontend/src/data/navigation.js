@@ -39,6 +39,7 @@ export const footerColumns = [
       { label: 'Our Team', to: '/our-team' },
       { label: 'Work', to: '/work' },
       { label: 'Careers', to: '/career' },
+      { label: 'Locations', to: '/locations' },
       { label: 'Contact', to: '/contact' },
     ],
   },

@@ -55,7 +55,7 @@ export function useArticles() {
       ? items.map((i, n) => ({
         slug: i.slug, title: i.title, category: i.data.category, publishedOn: i.data.published_on, author: i.data.author, excerpt: i.data.excerpt, body: i.data.body,
         image: i.data.image, imageAlt: i.data.image_alt, featured: i.data.featured === true, tags: String(i.data.tags || '').split(',').map((t) => t.trim()).filter(Boolean),
-        inlineImages: [i.data.inline_image_1, i.data.inline_image_2], seoTitle: i.data.seo_title, metaDescription: i.data.meta_description, order: n,
+        inlineImages: [i.data.inline_image_1, i.data.inline_image_2], seoTitle: i.data.seo_title, metaDescription: i.data.meta_description, seoKeywords: i.data.seo_keywords || '', noindex: i.data.noindex === true, order: n,
       }))
       : articles
     return list.map(normaliseArticle).sort((a, b) => String(b.publishedOn).localeCompare(String(a.publishedOn)))

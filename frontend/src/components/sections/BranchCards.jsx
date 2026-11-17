@@ -1,4 +1,5 @@
-import { ArrowUpRight, MapPin, Phone } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ArrowRight, ArrowUpRight, MapPin, Phone } from 'lucide-react'
 import Reveal from '../ui/Reveal.jsx'
 import { Rise } from '../contact/Motion.jsx'
 import BranchMap from '../ui/BranchMap.jsx'
@@ -22,7 +23,7 @@ export default function BranchCards({ className = '', refined = false }) {
             <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
               <MapPin className="size-6" aria-hidden="true" />
             </span>
-            <h3 className="mt-5 font-display text-2xl font-semibold transition-colors group-hover:text-lav">{b.city}</h3>
+            <h3 className="mt-5 font-display text-2xl font-semibold transition-colors group-hover:text-lav"><Link to={`/locations/${b.id}`} className="hover:underline">{b.city}</Link></h3>
             <p className="mt-1 text-base text-soft">{b.name}</p>
             {b.address && (
               <address className="mt-4 border-t border-edge pt-4 text-sm not-italic leading-relaxed text-soft">
@@ -36,6 +37,7 @@ export default function BranchCards({ className = '', refined = false }) {
             )}
             <OwnerLinks type="branch" owner={b.id} name={`${b.city} branch`} className="mt-3" />
             {b.embed && <BranchMap src={b.embed} title={`Map of the ${b.city} branch`} className="mt-4" />}
+            <Link to={`/locations/${b.id}`} className="mt-3 inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold text-fg transition-colors hover:text-lav">Office page <ArrowRight className="size-4" aria-hidden="true" /></Link>
             {b.mapUrl && (
               <a href={b.mapUrl} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex min-h-11 items-center gap-1.5 self-start pt-1 text-sm font-semibold text-lav hover:underline">
                 View on Google Maps <ArrowUpRight className="size-4" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span>

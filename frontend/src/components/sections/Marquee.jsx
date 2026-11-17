@@ -1,4 +1,4 @@
-import { Bot, Code2, GraduationCap, Smartphone, TrendingUp, Workflow, Boxes, Globe2, PenTool, Cpu, BookOpen } from 'lucide-react'
+import { Bot, Code2, GraduationCap, Smartphone, TrendingUp, Workflow, Boxes, Globe2, Cpu, BookOpen } from 'lucide-react'
 
 // Capability labels only — no partner or customer logos, no partnership claims.
 const rowA = [
@@ -11,7 +11,6 @@ const rowA = [
 ]
 const rowB = [
   { icon: TrendingUp, label: 'Digital Marketing' },
-  { icon: PenTool, label: '2D & 3D Modelling' },
   { icon: Cpu, label: 'Prompt Engineering' },
   { icon: GraduationCap, label: 'College Workshops' },
   { icon: BookOpen, label: 'Python with AI' },

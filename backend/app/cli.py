@@ -546,8 +546,6 @@ SAMPLE_TESTIMONIALS = [  # fictional people and organisations; every entry is fl
      "The AI assistant answers our routine delivery questions from approved information and hands over to a person when needed. Our team now spends its time on the cases that really need them."),
     ("Sana Iqbal", "client", "Marketing Manager", "Brightwave Retail (sample)",
      "Their digital marketing plan was clear and honest about what to expect. Reporting was easy to follow, and the website and campaigns finally worked together."),
-    ("Rohan Menon", "client", "Project Engineer", "Kestrel Engineering (sample)",
-     "We send sketches and markups and get back neat 2D drawings and 3D models. The team is careful with details and quick to clarify anything unclear."),
     ("Karthik R.", "student", "B.E. Computer Science student", "Sample Institute of Technology",
      "The AI tools and prompt engineering workshop was practical from the first hour. We built a small project ourselves instead of only listening to theory."),
     ("Divya S.", "student", "Final-year B.Sc. student", "Sample College of Arts & Science",

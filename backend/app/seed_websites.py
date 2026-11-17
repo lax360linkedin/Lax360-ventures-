@@ -29,9 +29,9 @@ NETLIFY = "Hosted on Netlify (from the web address)"
 ENTRIES = [
     ("cadpoint", "CADPOINT", "Training & Education", "company", "", "https://www.cadpoint.co.in/", 1,
      "Website of the CADPOINT Authorized Training Centre: course areas, registration and contact.",
-     "The CADPOINT website presents the training centre and its course areas: IT, AI, digital marketing, multimedia, engineering and more. Visitors can browse the programme areas, register and contact the centre.",
+     "The CADPOINT website presents the training centre and its course areas: IT, AI, digital marketing, multimedia and more. Visitors can browse the programme areas, register and contact the centre.",
      "Main menu: Home, About, Services, Courses, Ecosystem and Contact, with a Register Now button.\nAdmissions banner: \"Admissions Open 2026\" appears in the header.\nHero actions: Explore Courses and Contact Us.\nContact details: phone number and email address in the page header.\nA form with input fields for registration or enquiries.",
-     "Course departments: lists the programme areas, including Artificial Intelligence, Software Development, Cloud Computing, Cyber Security, Data Science, Finance & Accounting, Digital Marketing, Multimedia & Design, CADD Engineering and Automation & RPA.\nIT & Non-IT career programs: a department card for career courses such as Python, full-stack web development and data analytics.\nCreative department: multimedia, AR and VR development.\nRegistration / contact: a form and a Register Now button.",
+     "Course departments: lists the programme areas, including Artificial Intelligence, Software Development, Cloud Computing, Cyber Security, Data Science, Finance & Accounting, Digital Marketing, Multimedia & Design and Automation & RPA.\nIT & Non-IT career programs: a department card for career courses such as Python, full-stack web development and data analytics.\nCreative department: multimedia, AR and VR development.\nRegistration / contact: a form and a Register Now button.",
      [VITE]),
     ("sdphysiocare", "SDphysiocare", "Healthcare", "client", "", "https://www.sdphysiocare.com/", 3,
      "Physiotherapy clinic website with services, an about section and an appointment form.",

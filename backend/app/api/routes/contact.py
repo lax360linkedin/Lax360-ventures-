@@ -9,7 +9,7 @@ from app.models import User
 from app.core.rate_limit import rate_limit
 from app.db.session import get_db
 from app.schemas.contact import ContactCreate, ContactReceipt
-from app.services import contact_service, sheets_service
+from app.services import contact_service, notify_service, sheets_service
 
 router = APIRouter(prefix="/contact", tags=["contact"])
 
@@ -25,6 +25,7 @@ def submit_contact(body: ContactCreate, response: Response, tasks: BackgroundTas
         response.status_code = 200
     else:  # a copy goes to the Google Spreadsheet after the response (never delays or breaks the submission; a repeated submission is not sent twice)
         tasks.add_task(sheets_service.sync_enquiry, row.id)
+        tasks.add_task(notify_service.notify_enquiry, row.id)  # an e-mail to the team when ENQUIRY_NOTIFY_EMAIL and SMTP are configured
         tasks.add_task(sheets_service.retry_recent)
     return ContactReceipt(id=row.id, status="received", duplicate=duplicate)
 

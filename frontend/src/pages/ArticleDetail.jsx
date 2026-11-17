@@ -96,7 +96,11 @@ export default function ArticleDetail() {
       path={`/insights/${a.slug}`}
       title={a.seoTitle || a.title}
       description={a.metaDescription || a.excerpt}
-      jsonLd={{ '@context': 'https://schema.org', '@type': 'Article', headline: a.title, datePublished: a.publishedOn, author: { '@type': person ? 'Person' : 'Organization', name: a.author }, description: a.metaDescription || a.excerpt, image: a.image || undefined, publisher: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' } }}
+      ogType="article"
+      noindex={a.noindex === true}
+      keywords={a.seoKeywords || (a.tags || []).join(', ')}
+      image={a.image || null}
+      jsonLd={{ '@context': 'https://schema.org', '@type': 'Article', mainEntityOfPage: { '@type': 'WebPage', '@id': `__SITE__/insights/${a.slug}` }, headline: a.title, datePublished: a.publishedOn, author: { '@type': person ? 'Person' : 'Organization', name: a.author }, description: a.metaDescription || a.excerpt, image: a.image ? (/^https?:/.test(a.image) ? a.image : `__SITE__${a.image}`) : undefined, dateModified: a.publishedOn, publisher: { '@type': 'Organization', name: 'LAX360 Pvt Ltd', logo: { '@type': 'ImageObject', url: '__SITE__/assets/logo-shield.png' } } }}
     >
       <article>
         <header className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night">

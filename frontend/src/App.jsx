@@ -25,6 +25,8 @@ const NetworkPartner = lazy(() => import('./pages/NetworkPartner.jsx'))
 const Projects = lazy(() => import('./pages/Projects.jsx'))
 const Career = lazy(() => import('./pages/Career.jsx'))
 const Contact = lazy(() => import('./pages/Contact.jsx'))
+const Locations = lazy(() => import('./pages/Locations.jsx'))
+const Location = lazy(() => import('./pages/Location.jsx'))
 const Privacy = lazy(() => import('./pages/Privacy.jsx'))
 const Terms = lazy(() => import('./pages/Terms.jsx'))
 const Login = lazy(() => import('./pages/Login.jsx'))
@@ -66,6 +68,8 @@ export default function App() {
         <Route path="our-network/:slug" element={<NetworkPartner />} />
         <Route path="robotics" element={<EmergingTech topic="robotics" />} />
         <Route path="blockchain" element={<EmergingTech topic="blockchain" />} />
+        <Route path="locations" element={<Locations />} />
+        <Route path="locations/:slug" element={<Location />} />
         <Route path="websites" element={<Websites />} />
         <Route path="websites/:slug" element={<WebsiteDetail />} />
         <Route path="our-team" element={<Team />} />

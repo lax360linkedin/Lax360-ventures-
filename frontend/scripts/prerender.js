@@ -8,9 +8,11 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { noindexRoutes, routes } from '../src/routes.js'
+import { SITE_TOKEN, postalAddress } from '../src/utils/seo.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const SITE = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://www.example.com').replace(/\/$/, '')
+const SITE = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://lax360-ventures.vercel.app').replace(/\/$/, '')
+if (/example\.com/.test(SITE)) console.warn('!! SITE_URL is not set: canonical links, the sitemap and social previews point at https://www.example.com. Set SITE_URL (the real website address) for the production build.')
 const { render, site } = await import(pathToFileURL(resolve(root, 'dist-server/entry-server.js')).href)
 const template = readFileSync(resolve(root, 'dist/index.html'), 'utf8')
 
@@ -18,16 +20,7 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').repl
 // JSON inside <script> must not contain "</script>" or HTML comment openers.
 const json = (o) => JSON.stringify(o).replace(/</g, '\\u003c')
 
-const REGION = { Salem: 'Tamil Nadu', Bangalore: 'Karnataka', Mumbai: 'Maharashtra' }
-/** Structured-data postal address from a branch's address lines (last line ends with the PIN code). */
-const postal = (b) => ({
-  '@type': 'PostalAddress',
-  streetAddress: b.address.slice(0, -1).join(', '),
-  addressLocality: b.city === 'Bangalore' ? 'Bengaluru' : b.city,
-  addressRegion: REGION[b.city],
-  postalCode: (b.address.at(-1).match(/(\d{6})\s*$/) || [])[1],
-  addressCountry: 'IN',
-})
+const postal = postalAddress
 
 const organization = {
   '@context': 'https://schema.org',
@@ -44,25 +37,36 @@ const organization = {
   sameAs: site.social.map((s) => s.href),
 }
 
+// Search-engine / social verification tags, from the environment (public values): Google Search Console and Bing Webmaster Tools.
+const verification = [
+  process.env.VITE_GSC_VERIFICATION ? `<meta name="google-site-verification" content="${esc(process.env.VITE_GSC_VERIFICATION)}" />` : '',
+  process.env.VITE_BING_VERIFICATION ? `<meta name="msvalidate.01" content="${esc(process.env.VITE_BING_VERIFICATION)}" />` : '',
+].filter(Boolean)
+
 function headTags(head, route) {
-  const url = SITE + (route === '/' ? '' : route)
-  const image = `${SITE}/assets/og-image.png`
+  const url = head.canonical || SITE + (route === '/' ? '' : route)
+  const raw = head.image || '/assets/og-image.png'
+  const image = /^https?:/.test(raw) ? raw : SITE + raw
   const tags = [
     `<title>${esc(head.title)}</title>`,
     `<meta name="description" content="${esc(head.description)}" />`,
+    head.keywords ? `<meta name="keywords" content="${esc(head.keywords)}" />` : '',
     `<link rel="canonical" href="${esc(url)}" />`,
-    head.noindex ? '<meta name="robots" content="noindex" />' : '',
-    '<meta property="og:type" content="website" />',
+    head.noindex ? '<meta name="robots" content="noindex, nofollow" />' : '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />',
+    `<meta property="og:type" content="${esc(head.ogType || 'website')}" />`,
     '<meta property="og:site_name" content="LAX360 Pvt Ltd" />',
+    '<meta property="og:locale" content="en_IN" />',
     `<meta property="og:title" content="${esc(head.title)}" />`,
     `<meta property="og:description" content="${esc(head.description)}" />`,
     `<meta property="og:url" content="${esc(url)}" />`,
     `<meta property="og:image" content="${esc(image)}" />`,
-    '<meta property="og:image:width" content="1200" />',
-    '<meta property="og:image:height" content="630" />',
     '<meta name="twitter:card" content="summary_large_image" />',
-    `<script type="application/ld+json">${json(organization)}</script>`,
-    head.jsonLd ? `<script type="application/ld+json" id="page-jsonld">${json(head.jsonLd)}</script>` : '',
+    `<meta name="twitter:title" content="${esc(head.title)}" />`,
+    `<meta name="twitter:description" content="${esc(head.description)}" />`,
+    `<meta name="twitter:image" content="${esc(image)}" />`,
+    ...verification,
+    head.noindex ? '' : `<script type="application/ld+json">${json(organization)}</script>`,
+    head.jsonLd ? `<script type="application/ld+json" id="page-jsonld">${json(head.jsonLd).split(SITE_TOKEN).join(SITE)}</script>` : '',
   ]
   return tags.filter(Boolean).join('\n    ')
 }
@@ -70,7 +74,7 @@ function headTags(head, route) {
 // Strip the generic defaults from index.html; they are replaced per route.
 const stripped = template
   .replace(/<title>[\s\S]*?<\/title>\s*/i, '')
-  .replace(/<meta\s+(?:name="description"|property="og:[^"]+"|name="twitter:card")[^>]*>\s*/gi, '')
+  .replace(/<meta\s+(?:name="(?:description|twitter:[a-z]+|robots|keywords)"|property="og:[^"]+")[^>]*>\s*/gi, '')
 
 async function build(route, outFile) {
   const { html, head } = await render(route)

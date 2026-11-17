@@ -105,6 +105,7 @@ class Settings(BaseSettings):
     smtp_from: str | None = None  # e.g. "LAX360 Pvt Ltd <no-reply@yourdomain.com>"
     smtp_starttls: bool = True
     password_reset_ttl_minutes: int = 60
+    enquiry_notify_to: str | None = Field(default=None, validation_alias=AliasChoices("ENQUIRY_NOTIFY_EMAIL", "ENQUIRY_NOTIFY_TO"))  # ENQUIRY_NOTIFY_EMAIL: one or more addresses (comma-separated) that get an e-mail for every new enquiry / demo request; needs SMTP_HOST + SMTP_FROM
     # Google Sheets: every enquiry, demo request and franchise / partnership application is also appended to one Google Spreadsheet (3 tabs). BACKEND ONLY: the service-account key never
     # reaches the browser. Share the spreadsheet with the service account's e-mail address (Editor). Without these settings nothing is sent and the website works as before.
     google_sheets_spreadsheet_id: str | None = None  # the long id in https://docs.google.com/spreadsheets/d/<ID>/edit
@@ -163,7 +164,7 @@ class Settings(BaseSettings):
     def _blank_secret_is_none(cls, v):
         return None if isinstance(v, str) and not v.strip() else v
 
-    @field_validator("openai_model", "gemini_model", "smtp_host", "smtp_from", "smtp_username", "google_sheets_spreadsheet_id", "google_service_account_file", "admin_email", "admin_username", "supabase_url", "hero_video_slot_seconds", "database_url", "cookie_domain", "docs_enabled", "cookie_secure", "db_disable_prepared_statements", mode="before")
+    @field_validator("openai_model", "gemini_model", "smtp_host", "smtp_from", "enquiry_notify_to", "smtp_username", "google_sheets_spreadsheet_id", "google_service_account_file", "admin_email", "admin_username", "supabase_url", "hero_video_slot_seconds", "database_url", "cookie_domain", "docs_enabled", "cookie_secure", "db_disable_prepared_statements", mode="before")
     @classmethod
     def _blank_is_none(cls, v):
         return None if isinstance(v, str) and not v.strip() else v

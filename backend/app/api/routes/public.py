@@ -15,7 +15,7 @@ from app.core import pubcache
 from app.db.session import _factory, _read_factory, get_db, get_read_db
 from app.models import HeroVideo
 from app.schemas.common import ApiModel
-from app.services import channel_service, content_service, hero_video_service, media_service, settings_service
+from app.services import channel_service, content_service, hero_video_service, media_service, seo_service, settings_service
 from app.core.errors import ApiError
 
 router = APIRouter(tags=["public"])
@@ -24,6 +24,18 @@ CACHE = {"Cache-Control": "public, max-age=10"}  # short: a published change rea
 
 def _cacheable(settings: Settings) -> bool:
     return settings.app_env != "test"  # tests reset the database underneath the cache
+
+
+@router.get("/public/sitemap-content.xml")
+def sitemap_content(db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
+    """The live sitemap of pages published in the admin panel (articles, products, industries, partners, website demos). See services/seo_service.py."""
+    return Response(content=seo_service.sitemap_xml(db, settings), media_type="application/xml", headers={"Cache-Control": "public, max-age=300"})
+
+
+@router.get("/public/redirects")
+def redirects(db: Session = Depends(get_read_db)) -> JSONResponse:
+    """The active redirects set in the admin panel (SEO management > Redirects)."""
+    return JSONResponse({"redirects": seo_service.redirects(db)}, headers={"Cache-Control": "public, max-age=300"})
 
 
 @router.get("/public/site")

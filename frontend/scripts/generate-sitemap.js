@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { routes } from '../src/routes.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const site = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://www.example.com').replace(/\/$/, '')
+const site = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://lax360-ventures.vercel.app').replace(/\/$/, '')
 
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -23,17 +23,26 @@ for (const dir of ['public', 'dist']) {
     console.warn(`sitemap: could not write to ${dir}`, e.message)
   }
 }
+// robots.txt: everything public is crawlable; account, admin and API paths are not. Two sitemaps: the pages built into the website (this file, rebuilt with each deploy) and the pages published in the
+// admin panel (served live by the backend through the rewrite in vercel.json, so a newly published article / product / industry / partner appears without a deploy).
 const robots = `User-agent: *
 Allow: /
+Disallow: /company-admin
+Disallow: /admin
+Disallow: /user
 Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
 Disallow: /profile
 Disallow: /demo
-Disallow: /admin
 Disallow: /api/
 
 Sitemap: ${site}/sitemap.xml
+Sitemap: ${site}/sitemap-content.xml
 `
 for (const dir of ['public', 'dist']) {
   try { writeFileSync(resolve(root, dir, 'robots.txt'), robots) } catch (e) { console.warn(`robots: could not write to ${dir}`, e.message) }
 }
+if (/example\.com/.test(site)) console.warn('!! SITE_URL is not set: sitemap.xml and robots.txt point at https://www.example.com. Set SITE_URL to the real website address for the production build.')
 console.log(`sitemap.xml written for ${site} (${routes.length} URLs)`)

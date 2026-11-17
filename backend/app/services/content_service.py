@@ -8,6 +8,7 @@ permissions and what the public website may read. Items are stored in `content_i
 from __future__ import annotations
 
 import datetime
+import json
 import re
 import uuid
 
@@ -344,6 +345,8 @@ KINDS: dict[str, dict] = {
             F("url_slug", "Page URL", max_len=80, help="The address of the article: /insights/<this text>. Leave blank to use the title. Changing it later changes the article's link."),
             F("seo_title", "SEO title", max_len=70, help="Shown in search results and the browser tab. Defaults to the article title."),
             F("meta_description", "SEO description", "textarea", max_len=300, help="Shown in search results. Defaults to the short summary."),
+            F("seo_keywords", "SEO keywords", max_len=200, help="Comma-separated, e.g. AI automation, business chatbots."),
+            F("noindex", "Hide from search engines", "bool", default=False, help="Tick to keep this article out of Google (it stays on the website and is left out of the sitemap)."),
         ],
     },
     # ---- Clients --------------------------------------------------------------------------------------------------------------------
@@ -639,9 +642,27 @@ KINDS: dict[str, dict] = {
     },
     "seo_page": {
         "label": "Page titles & SEO", "group": "Navigation & SEO", "module": "navigation", "single": False, "slug_field": "page", "preview_path": "/",
-        "help": "The browser/search title and description for a page. Leave a page unlisted to keep its built-in text.",
+        "help": "The search title, description, keywords, sharing image and indexing of a page (managed from SEO management). Leave a page unlisted to keep its built-in text.",
         "title_label": "Page title (search results & browser tab)",
-        "fields": [F("page", "Page", "select", True, options=PAGES), F("meta_description", "Meta description", "textarea", max_len=320), F("image", "Social sharing image", "image")],
+        "fields": [
+            F("page", "Page", "select", False, options=PAGES), F("path", "Or any other page: its address", max_len=120, help="For a page that is not in the list, e.g. /products/lax360-business-crm or /privacy."),
+            F("meta_description", "Meta description", "textarea", max_len=320), F("image", "Social sharing image", "image"),
+            F("keywords", "Keywords", max_len=200, help="Comma-separated. Search engines give them little weight, but they are kept for your own records and for other tools."),
+            F("noindex", "Hide this page from search engines", "bool", default=False, help="Adds a noindex tag and removes the page from the sitemap."),
+            F("canonical_url", "Canonical address (optional)", max_len=300, help="Only when this page is a copy of another address: its full https:// URL. Leave empty for the page's own address."),
+            F("structured_data", "Extra structured data (JSON-LD, optional)", "textarea", max_len=4000, help="Advanced: a schema.org JSON-LD object added to this page, e.g. an FAQPage. It must be valid JSON with an @context of https://schema.org."),
+        ],
+    },
+    "seo_redirect": {
+        "label": "Redirects", "group": "Navigation & SEO", "module": "navigation", "single": False, "slug_field": "from_path", "preview_path": "/",
+        "help": "Send visitors from an old address to a new one (managed from SEO management). The old address is taken out of the sitemap.",
+        "title_label": "Note (for you)",
+        "fields": [
+            F("from_path", "Old address", "text", True, max_len=110, help="A page path such as /old-page (no domain, no ?query)."),
+            F("to_path", "New address", "text", True, max_len=300, help="A page path such as /new-page, or a full https:// address."),
+            F("permanent", "Permanent move (301)", "bool", default=True, help="Search engines then move the old page's ranking to the new address. Untick for a temporary (302) redirect."),
+            F("enabled", "Active", "bool", default=True),
+        ],
     },
     "site_image": {
         "label": "Replaced website pictures", "group": "Navigation & SEO", "module": "content", "single": False, "slug_field": "key", "hidden": True, "preview_path": "/",
@@ -741,6 +762,28 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
         elif name == "image_path":
             if value and not re.match(r"^/assets/carousel/[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$", value):
                 errors[name] = "Use a built-in picture path such as /assets/carousel/sample-1.webp, or leave this empty."
+        elif name in ("from_path", "to_path"):
+            if name == "from_path" and not re.match(r"^/[A-Za-z0-9/_.~%-]*$", value):
+                errors[name] = "Use a page path such as /old-page (starting with /, no domain, no spaces, no ?query)."
+            elif name == "to_path" and not (re.match(r"^/[A-Za-z0-9/_.~%?=&#-]*$", value) or _LINK.match(value)):
+                errors[name] = "Use a page path such as /new-page or a full https:// address."
+            elif name == "to_path" and value.startswith("//"):
+                errors[name] = "Use a page path such as /new-page or a full https:// address."
+        elif name == "canonical_url":
+            if value and not re.match(r"^https://[^\s]{4,290}$", value):
+                errors[name] = "Enter the full address starting with https://"
+        elif name == "structured_data":
+            if value:
+                try:
+                    parsed = json.loads(value)
+                    nodes = parsed if isinstance(parsed, list) else [parsed]
+                    if not nodes or not all(isinstance(n, dict) and "schema.org" in str(n.get("@context", "")) for n in nodes):
+                        raise ValueError
+                except (ValueError, TypeError):
+                    errors[name] = "Enter valid JSON: an object (or list of objects) with \"@context\": \"https://schema.org\"."
+        elif name == "path":
+            if value and not re.match(r"^/[A-Za-z0-9/_.~%-]*$", value):
+                errors[name] = "Use a page path such as /privacy (starting with /, no domain, no spaces)."
         elif name == "builtin_image":
             if value and not re.match(r"^/assets/(services|industries|products|about)/[A-Za-z0-9._-]+\.(webp|jpg|jpeg|png)$", value):
                 errors[name] = "Use a built-in picture path such as /assets/services/software.webp, or leave this empty."
@@ -770,6 +813,10 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
                 errors[name] = "Use a page path like /contact or a full https:// URL."
         if value:
             clean[name] = value
+    if kind == "seo_page" and not errors.get("page") and not errors.get("path") and not clean.get("page") and not clean.get("path"):
+        errors["page"] = "Choose a page, or enter the address of another page."
+    if kind == "seo_redirect" and clean.get("from_path") and clean.get("from_path") == clean.get("to_path"):
+        errors["to_path"] = "The new address must differ from the old one."
     if kind == "carousel_image" and not errors.get("image") and not clean.get("image") and not clean.get("image_path"):
         errors["image"] = "Choose a picture."
     if kind == "welcome_card" and "end_date" not in errors and "start_date" not in errors and clean.get("start_date") and clean.get("end_date") and clean["end_date"] < clean["start_date"]:

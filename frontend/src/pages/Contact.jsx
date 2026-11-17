@@ -10,6 +10,8 @@ import { Rise as Reveal, Stagger, StaggerItem } from '../components/contact/Moti
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import BranchCards from '../components/sections/BranchCards.jsx'
 import { branchSentence } from '../data/branches.js'
+import { useBranchDirectory } from '../hooks/useBranches.js'
+import { localBusinessSchemas } from '../utils/seo.js'
 import { useContacts, useSite, useSocial } from '../hooks/useSite.js'
 import { useContactPageText } from '../hooks/useCmsPages.js'
 import { courses } from '../data/courses.js'
@@ -20,6 +22,7 @@ const LEAD_TYPES = { project: [], quote: [], ai: ['ai-solutions'], 'website-app'
 export default function Contact() {
   const site = useSite()
   const social = useSocial('contact')
+  const { branches } = useBranchDirectory()
   const contacts = useContacts('contact')
   const addresses = contacts.filter((c) => c.type === 'address')
   const quick = contacts.filter((c) => !['address', 'branch'].includes(c.type)).slice(0, 5)
@@ -36,6 +39,7 @@ export default function Contact() {
   return (
     <PageContainer
       path="/contact"
+      jsonLd={localBusinessSchemas(branches, { email: site.email, logo: '__SITE__/assets/logo-shield.png' })}
       title="Contact"
       description="Tell LAX360 Pvt Ltd about your business and project. Get a quote for software, AI, automation and digital marketing, or reach the team on WhatsApp, phone or email."
     >
