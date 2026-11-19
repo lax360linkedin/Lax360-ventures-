@@ -8,6 +8,8 @@ import WhatsAppFloat from './WhatsAppFloat.jsx'
 import TopBar from './TopBar.jsx'
 import ImageOverrides from './ImageOverrides.jsx'
 import SeoWatcher from './SeoWatcher.jsx'
+import I18nRuntime from '../../i18n/I18nRuntime.jsx'
+import CookieBanner from './CookieBanner.jsx'
 import SocialBand from '../sections/SocialBand.jsx'
 import { useScrolledPast } from '../../hooks/useScrollDirection.js'
 import PreviewBanner from '../cms/PreviewBanner.jsx'
@@ -95,6 +97,7 @@ export default function RootLayout() {
       <SiteThemeSync />
       <ImageOverrides />
       <SeoWatcher />
+      <I18nRuntime />
       <TopBar />
       <Header onOpenMenu={() => setMenuOpen(true)} menuButtonRef={menuButtonRef} />
       <MobileMenu open={menuOpen} onClose={closeMenu} returnFocusRef={menuButtonRef} />
@@ -110,6 +113,7 @@ export default function RootLayout() {
       <MobileBottomBar visible={barVisible} />
       <PreviewBanner />
       <WhatsAppFloat />
+      <CookieBanner />
       {chatReady && settings.chatbot_enabled !== false && (
         <Suspense fallback={null}>
           <ChatWidget raised={barVisible} suppressed={menuOpen || enquiryOpen} />

@@ -7,6 +7,7 @@ import Hero from '../components/sections/Hero.jsx'
 import ServiceCarousel from '../components/sections/ServiceCarousel.jsx'
 import Marquee from '../components/sections/Marquee.jsx'
 import WhoWeAre from '../components/sections/WhoWeAre.jsx'
+import VisionMission from '../components/sections/VisionMission.jsx'
 import OurServices from '../components/sections/OurServices.jsx'
 import WhyChooseUs from '../components/sections/WhyChooseUs.jsx'
 import OurClients from '../components/sections/OurClients.jsx'
@@ -17,9 +18,9 @@ import FaqSection from '../components/sections/FaqSection.jsx'
 import ContactCta from '../components/sections/ContactCta.jsx'
 
 // The built-in home page sections, in their default order. The admin panel can re-order and hide them (Website content > Home page sections).
-const DEFAULT_ORDER = ['marquee', 'whoweare', 'services', 'outcomes', 'clients', 'gallery', 'testimonials', 'process', 'faq', 'contact']
+const DEFAULT_ORDER = ['marquee', 'whoweare', 'purpose', 'services', 'outcomes', 'clients', 'gallery', 'testimonials', 'process', 'faq', 'contact']
 const SECTIONS = {
-  marquee: <Marquee />, whoweare: <WhoWeAre />, services: <OurServices />, outcomes: <WhyChooseUs />, testimonials: <Testimonials />, gallery: <ImageCarousel />, clients: <OurClients />,
+  marquee: <Marquee />, whoweare: <WhoWeAre />, purpose: <VisionMission />, services: <OurServices />, outcomes: <WhyChooseUs />, testimonials: <Testimonials />, gallery: <ImageCarousel />, clients: <OurClients />,
   process: <ProcessWorkflow />, faq: <FaqSection />, contact: <ContactCta />,
 }
 
@@ -37,13 +38,20 @@ export default function Home() {
   const welcome = useWelcomePlan()
   const { user, loading: authLoading } = useAuth()
   const [contactOpen, setContactOpen] = useState(false)
+  const [thanks, setThanks] = useState(false)
   // The flow of a visit: intro animation, then the OPTIONAL contact card (fill it in or skip), then the home page with the welcome cards below its header. The card is offered right after the intro
   // on every page load (or at once when there is no animation); never for a signed-in customer or an admin preview.
   useEffect(() => {
     if ((intro !== 'done' && intro !== 'off') || authLoading || user || contactOffered || new URLSearchParams(window.location.search).get('welcome') === 'preview') return undefined
-    const t = window.setTimeout(() => { contactOffered = true; setContactOpen(true) }, intro === 'done' ? 900 : 1500)
-    return () => window.clearTimeout(t)
+    contactOffered = true
+    setContactOpen(true) // immediately: no waiting period after the intro animation
+    return undefined
   }, [intro, user, authLoading])
+  const closeContact = (result) => { // Skip, close, Esc or a submitted form: the card goes at once and the home page is shown from its top
+    setContactOpen(false)
+    window.scrollTo({ top: 0, behavior: 'instant' })
+    if (result?.sent) { setThanks(true); window.setTimeout(() => setThanks(false), 4500) }
+  }
   // /?welcome=preview (the admin panel's "Preview the experience" button) opens the cards straight away, ignoring the on/off switches
   useEffect(() => {
     if (contentReady && new URLSearchParams(window.location.search).get('welcome') === 'preview') openWelcomeExperience({ preview: true })
@@ -58,7 +66,8 @@ export default function Home() {
       {(intro === 'pending' || intro === 'playing' || intro === 'revealing') && <Suspense fallback={null}><WelcomeIntro /></Suspense>}
       <Hero />
       <ServiceCarousel />{/* services & industries: directly below the header, above the welcome sections */}
-      {contactOpen && <Suspense fallback={null}><WelcomeContactCard open={contactOpen} onClose={() => setContactOpen(false)} /></Suspense>}
+      {contactOpen && <Suspense fallback={null}><WelcomeContactCard open={contactOpen} onClose={closeContact} /></Suspense>}
+      {thanks && <div role="status" className="fixed inset-x-4 bottom-24 z-[1200] mx-auto max-w-sm rounded-2xl border border-edge-strong bg-night/95 px-5 py-3 text-center text-sm font-semibold shadow-2xl backdrop-blur lg:bottom-8">Thank you! We have received your details and will get back to you.</div>}
       {welcome && <Suspense fallback={cardsRoom}><WelcomeCards plan={welcome} /></Suspense>}
       {order.map((key) => <Fragment key={key}>{SECTIONS[key]}</Fragment>)}
     </PageContainer>

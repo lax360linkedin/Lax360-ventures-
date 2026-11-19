@@ -11,7 +11,8 @@ def sitemap(client) -> dict[str, str | None]:
     r = client.get("/api/public/sitemap-content.xml")
     assert r.status_code == 200 and r.headers["content-type"].startswith("application/xml")
     root = ElementTree.fromstring(r.text)
-    return {u.find("s:loc", NS).text: (u.find("s:lastmod", NS).text if u.find("s:lastmod", NS) is not None else None) for u in root.findall("s:url", NS)}
+    out = {u.find("s:loc", NS).text: (u.find("s:lastmod", NS).text if u.find("s:lastmod", NS) is not None else None) for u in root.findall("s:url", NS)}
+    return {k: v for k, v in out.items() if "/ta/" not in k and "/hi/" not in k and not k.endswith(("/ta", "/hi"))}  # the English addresses; every page also has its Tamil and Hindi address (see test_sitemap_lists_every_language)
 
 
 def article(admin, csrf, title="Automation first", **data):
@@ -96,3 +97,13 @@ def test_an_office_added_in_the_admin_gets_its_page_in_the_live_sitemap(app, db,
     assert "http://localhost:5173/locations/chennai" in sitemap(client)
     admin.put(f"/api/admin/branches/{made['id']}", json={"name": made["name"], "city": "Chennai", "address": "Anna Salai", "is_active": False}, headers=csrf)
     assert not any("/locations/" in u for u in sitemap(client))  # a disabled office is not advertised
+
+
+def test_sitemap_lists_every_language_with_hreflang_alternates(app, db, client):
+    admin, csrf, _ = staff(app, db, permissions=["content"])
+    made = article(admin, csrf)
+    xml = client.get("/api/public/sitemap-content.xml").text
+    slug = made["slug"]
+    for lang in ("ta", "hi"):
+        assert f"<loc>http://localhost:5173/{lang}/insights/{slug}</loc>" in xml
+    assert f'hreflang="ta" href="http://localhost:5173/ta/insights/{slug}"' in xml and 'hreflang="x-default"' in xml

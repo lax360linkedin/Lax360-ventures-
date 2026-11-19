@@ -119,12 +119,14 @@ export default function Testimonials() {
         {n > 1 && (
           <div className="mt-6 flex items-center justify-center gap-3">
             <button type="button" className={btn} onClick={() => go(i - 1, 'prev')} aria-label="Previous testimonial"><ChevronLeft className="size-5" aria-hidden="true" /></button>
-            <div className="flex items-center gap-2" role="tablist" aria-label="Choose a testimonial">
+            {n > 12 ? <p className="min-w-16 text-center text-sm font-semibold tabular-nums text-soft" aria-live="polite">{i + 1} / {n}</p> : (
+            <div className="flex min-w-0 flex-wrap items-center justify-center gap-2" role="tablist" aria-label="Choose a testimonial">
               {items.map((x, k) => (
                 <button key={x.id} type="button" role="tab" aria-selected={k === i} aria-label={`${k + 1} of ${n}: ${x.title}`} onClick={() => go(k)}
                   className={`relative h-2 rounded-full transition-all duration-300 after:absolute after:-inset-2 after:content-[''] ${k === i ? 'w-8 bg-lav' : 'w-2 bg-fg/30 hover:bg-fg/60'}`} />
               ))}
             </div>
+          )}
             <button type="button" className={btn} onClick={() => go(i + 1, 'next')} aria-label="Next testimonial"><ChevronRight className="size-5" aria-hidden="true" /></button>
             {!reduce && (
               <button type="button" className={btn} onClick={() => setUserPaused((p) => !p)} aria-pressed={userPaused} aria-label={userPaused ? 'Play automatic sliding' : 'Pause automatic sliding'}>

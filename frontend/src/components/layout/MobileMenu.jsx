@@ -1,3 +1,4 @@
+import LanguageSwitcher from './LanguageSwitcher.jsx'
 import { useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
@@ -96,6 +97,7 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
             ) : (
               <Button to="/login" onClick={onClose}><LogIn className="size-5" aria-hidden="true" /> Login</Button>
             )}
+            <LanguageSwitcher variant="list" />
             <div className="grid grid-cols-2 gap-3">
               <Button variant="secondary" href={whatsappLink()}><MessageCircle className="size-5" aria-hidden="true" /> WhatsApp</Button>
               <Button variant="secondary" href={`tel:${site.phones[0].tel}`}><Phone className="size-5" aria-hidden="true" /> Call</Button>

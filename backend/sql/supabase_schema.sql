@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('09b25c84-f2de-4476-b053-e33ac346b2fc', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('5480a837-4b77-478c-91a0-8c71b05387f1', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('f6c266a2-4fb3-4ac9-ae63-6a030f77a406', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('f479d531-30c4-4fb3-b296-53f1478e32c1', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('d06b93cb-d107-4958-ab03-7a826f5e5007', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('b7b891ce-1fb1-419f-8a88-e212b00d5a00', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -738,6 +738,26 @@ UPDATE alembic_version SET version_num='0022' WHERE alembic_version.version_num 
 -- Running upgrade 0022 -> 0023
 
 UPDATE alembic_version SET version_num='0023' WHERE alembic_version.version_num = '0022';
+
+-- Running upgrade 0023 -> 0024
+
+CREATE TABLE translations (
+    id UUID NOT NULL, 
+    lang VARCHAR(8) NOT NULL, 
+    source_hash VARCHAR(64) NOT NULL, 
+    source TEXT NOT NULL, 
+    value TEXT NOT NULL, 
+    updated_by UUID, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_translations PRIMARY KEY (id), 
+    CONSTRAINT uq_translations_lang_source_hash UNIQUE (lang, source_hash), 
+    CONSTRAINT fk_translations_updated_by_users FOREIGN KEY(updated_by) REFERENCES users (id) ON DELETE SET NULL
+);
+
+ALTER TABLE public."translations" ENABLE ROW LEVEL SECURITY;
+
+UPDATE alembic_version SET version_num='0024' WHERE alembic_version.version_num = '0023';
 
 COMMIT;
 

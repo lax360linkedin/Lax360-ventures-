@@ -112,3 +112,17 @@ Left as they are, because they are real names, not services: the partner **CADPO
 **Database changes in this work.** Migrations: 0018 (social and contact list), 0019 (branch and partner owners), 0020 (services carousel), 0021 (products shown as Live), 0022 (CAD removal), 0023 (carousel wording). All were applied to your Supabase database with `alembic upgrade head`; nothing was deployed.
 
 **Not verified.** No Google indexing or ranking is claimed. Search Console, URL Inspection, Rich Results Test and PageSpeed need the deployed site and your Google account.
+
+## Multilingual support (English, Tamil, Hindi)
+
+**How it works.** English stays the default at the normal addresses. Tamil lives under `/ta/...` and Hindi under `/hi/...`; they are the same pages, so every existing link, menu and button works unchanged. The language switcher (globe icon) is in the top contact bar and in the mobile menu. Choosing a language changes the address, re-renders the page in place (no full reload) and is remembered in the browser (`localStorage`, key `lax360-language`); a visitor who returns to an unprefixed address is sent to their saved language. Admin, login and other private pages are never redirected.
+
+**Translations.** The text of each page is looked up in a dictionary (English text to translation) that ships with the website (`src/i18n/catalogs/ta.json`, `hi.json`) and is overridden by what an administrator saves in **Admin > Translations** (stored in the `translations` table, live at once). A text with no translation shows in English, so nothing is ever empty. Admin > Translations lists every text of every page grouped by page and section, shows which are missing, and lets you add a text that is not listed (for example the title of a new article).
+
+**SEO.** Every page is prerendered once per language with a translated title and description, `<html lang>`, a language-specific canonical, `og:locale`, and `hreflang` alternates for `en`, `ta`, `hi` and `x-default`. The static and live sitemaps list every language with `xhtml:link` alternates. `npm run seo:audit` and `npm run seo:links` now cover the `/ta` and `/hi` pages too.
+
+**Fonts and layout.** Noto Sans Tamil and Noto Sans Devanagari are loaded for those languages with adjusted line height and heading sizes; the header menu is set a little smaller in Tamil and Hindi so it stays on one row at 1024px and wider. Checked at 1024, 1280 and 375px.
+
+**Adding a language.** Add it to `src/i18n/languages.js`, create `src/i18n/catalogs/<code>.json`, add the code to `LANGUAGES` in `backend/app/services/translation_service.py`, and add a font and an `html:lang(<code>)` rule in `src/styles/index.css` if the script needs one. Rebuild.
+
+**Honest limits.** The Tamil and Hindi texts were written for this website and have not been reviewed by a native speaker; please have them reviewed (Admin > Translations makes corrections easy). Home, About, Contact, the menu, footer, pop-ups, forms and validation messages are translated. Services, Products, Industries, Insights, Our Network, Our Team and Careers are only partly translated and fall back to English for the rest; text that comes from the database (articles, products, partners) is translated only when its exact English text is added in Admin > Translations. The mobile menu's language list is hidden if the top bar is turned off. Database change: migration 0024 (`translations` table), applied locally; the backend must be restarted to serve `/api/public/translations/{lang}`. Nothing was committed or deployed.

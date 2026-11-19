@@ -15,6 +15,7 @@ from sqlalchemy import select
 
 from app.core.config import Settings
 from app.models import Branch
+from app.services import translation_service
 from app.services import content_service as cs
 
 # content kind -> the public path of one item
@@ -74,9 +75,17 @@ def sitemap_urls(db: Session) -> list[tuple[str, str | None]]:
 
 
 def sitemap_xml(db: Session, settings: Settings) -> str:
+    """The sitemap of published content, every page in every language (the English address and /ta/..., /hi/... ), each with its hreflang alternates."""
     base = settings.frontend_origin.rstrip("/")
-    rows = "\n".join(f"  <url><loc>{escape(base + path)}</loc>{f'<lastmod>{last}</lastmod>' if last else ''}</url>" for path, last in sitemap_urls(db))
-    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{rows}\n</urlset>\n'
+    langs = ["en", *translation_service.LANGUAGES]
+    url = lambda lang, path: base + ("" if lang == "en" else f"/{lang}") + ("" if path == "/" and lang != "en" else path)  # noqa: E731
+    rows = []
+    for path, last in sitemap_urls(db):
+        alts = "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{escape(url(l, path))}"/>' for l in langs) + f'<xhtml:link rel="alternate" hreflang="x-default" href="{escape(url("en", path))}"/>'
+        for lang in langs:
+            rows.append(f"  <url><loc>{escape(url(lang, path))}</loc>{f'<lastmod>{last}</lastmod>' if last else ''}{alts}</url>")
+    head = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+    return head + "\n".join(rows) + "\n</urlset>\n"
 
 
 def redirects(db: Session) -> list[dict]:

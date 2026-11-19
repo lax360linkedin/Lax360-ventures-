@@ -11,15 +11,17 @@ const dist = join(root, 'dist')
 const problems = []
 const warnings = []
 const rows = []
-const titles = new Map()
-const descriptions = new Map()
+const LANGS = ['ta', 'hi'] // the translated copies of every page (src/i18n/languages.js)
+const seen = {} // per language: titles and descriptions already used, so a translated page is compared with the pages of its own language
+const maps = (lang) => (seen[lang] ||= { titles: new Map(), descriptions: new Map() })
 
 const pageFile = (route) => (route === '/' ? join(dist, 'index.html') : join(dist, route.slice(1), 'index.html'))
 const attr = (tag, name) => (new RegExp(`${name}="([^"]*)"`, 'i').exec(tag) || [])[1]
 const meta = (html, key, value) => { const m = new RegExp(`<meta[^>]*${key}="${value}"[^>]*>`, 'i').exec(html); return m ? attr(m[0], 'content') : undefined }
 const decode = (s) => String(s || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&#39;/g, "'")
 
-function audit(route, { indexable }) {
+function audit(route, { indexable, lang = 'en' }) {
+  const { titles, descriptions } = maps(lang)
   const file = pageFile(route)
   if (!existsSync(file)) { problems.push(`${route}: not prerendered (${relative(root, file)} missing)`); return }
   const html = readFileSync(file, 'utf8')
@@ -58,11 +60,18 @@ function audit(route, { indexable }) {
   if (noAlt) issues.push(`${noAlt} image(s) without an alt attribute`)
   const sample = (/<link[^>]*rel="canonical"[^>]*href="([^"]*)"/i.exec(html) || [])[1] || ''
   if (indexable && /example\.com/.test(sample)) issues.push('canonical points at the placeholder domain (set SITE_URL for the build)')
+  if (lang !== 'en') {
+    const lc = (/<html[^>]*lang="([^"]*)"/i.exec(html) || [])[1]
+    if (lc !== lang) issues.push(`<html lang> is "${lc}", expected "${lang}" (${html.slice(0, 40).replace(/s+/g, " ")})`)
+    if (indexable && !new RegExp(`rel="canonical"[^>]*href="[^"]*/${lang}(/|")`, 'i').test(html)) issues.push(`canonical does not point at the /${lang} address`)
+  }
+  if (indexable) for (const l of ['en', ...LANGS, 'x-default']) if (!new RegExp(`<link[^>]*hreflang="${l}"`, 'i').test(html)) issues.push(`missing hreflang="${l}" alternate`)
   issues.forEach((i) => problems.push(`${route}: ${i}`))
   rows.push({ route, title: title.slice(0, 48), desc: desc.length, h1, ld: types.join(',') || '-', ok: issues.length === 0 })
 }
 
 routes.forEach((r) => audit(r, { indexable: true }))
+for (const lang of LANGS) routes.forEach((r) => audit(`/${lang}${r === '/' ? '' : r}`, { indexable: true, lang }))
 noindexRoutes.forEach((r) => audit(r, { indexable: false }))
 if (existsSync(join(dist, '404.html'))) { const h = readFileSync(join(dist, '404.html'), 'utf8'); if (!/noindex/i.test(h)) problems.push('/404: the not-found page must be noindex') } else problems.push('dist/404.html is missing')
 

@@ -31,7 +31,7 @@ export default function WelcomeContactCard({ open, onClose }) {
   const [status, setStatus] = useState('idle') // idle | sending | sent | error
   const [serverError, setServerError] = useState('')
   const set = (k) => (e) => { setV((s) => ({ ...s, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })); setErrors((er) => ({ ...er, [k]: undefined })) }
-  const close = useCallback(() => onClose(), [onClose])
+  const close = useCallback(() => onClose(), [onClose]) // Skip, the close button, Esc and a click outside: the card is gone at once and the home page is there
 
   useEffect(() => { if (open && user) setV((s) => ({ ...s, name: s.name || user.full_name || '', email: s.email || user.email || '' })) }, [open, user])
 
@@ -43,7 +43,7 @@ export default function WelcomeContactCard({ open, onClose }) {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     root.setAttribute('data-contact-card', '')
-    const t = setTimeout(() => panelRef.current?.querySelector('input[name="name"]')?.focus(), 350)
+    const t = setTimeout(() => panelRef.current?.querySelector('input[name="name"]')?.focus({ preventScroll: true }), 30)
     const onKey = (e) => {
       if (e.key === 'Escape') { close(); return }
       if (e.key !== 'Tab' || !panelRef.current) return
@@ -78,6 +78,7 @@ export default function WelcomeContactCard({ open, onClose }) {
         message: v.note.trim() || `Contact request from the website welcome card. Interested in: ${label}.`,
       })
       setStatus('sent')
+      onClose({ sent: true }) // the home page is shown at once; it confirms with a short thank-you
     } catch (err) {
       const f = err.fields || {}
       setErrors({ name: f.name, email: f.email, phone: f.phone, note: f.message, consent: f.consent })
@@ -92,13 +93,13 @@ export default function WelcomeContactCard({ open, onClose }) {
     <AnimatePresence>
       {open && (
         <m.div className="fixed inset-0 z-[1100] flex items-end justify-center overflow-y-auto bg-[rgba(6,10,16,0.62)] p-3 backdrop-blur-md sm:items-center sm:p-6"
-          initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduce ? undefined : { opacity: 0 }} transition={{ duration: 0.3 }}
+          initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}
           onMouseDown={(e) => e.target === e.currentTarget && close()}>
           <m.div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby="wc-title" aria-describedby="wc-desc"
             className="relative my-auto grid w-full max-w-[56rem] overflow-hidden rounded-[1.75rem] bg-white text-[#0b0b0f] shadow-[0_44px_100px_-34px_rgb(var(--glow)/0.7),0_20px_46px_-26px_rgba(0,0,0,0.6)] ring-1 ring-black/5 md:grid-cols-[0.82fr_1.18fr] md:rounded-[2rem]"
-            initial={reduce ? false : { opacity: 0, y: 70, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduce ? undefined : { opacity: 0, y: 40, scale: 0.97 }} transition={{ duration: 0.6, ease: EASE }}>
-            <button type="button" onClick={close} aria-label="Close and continue to the website" className="absolute right-3 top-3 z-10 inline-flex size-10 items-center justify-center rounded-full border border-slate-300 bg-white/90 text-slate-600 transition-colors hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-              <X className="size-5" aria-hidden="true" />
+            initial={reduce ? false : { opacity: 0, y: 24, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.22, ease: EASE }}>
+            <button type="button" onClick={close} aria-label="Skip and continue to the website" className="absolute right-3 top-3 z-10 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-slate-300 bg-white/95 px-4 text-sm font-bold text-slate-700 shadow-sm transition-colors hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              Skip <X className="size-4" aria-hidden="true" />
             </button>
 
             {/* the brand panel */}
@@ -130,7 +131,7 @@ export default function WelcomeContactCard({ open, onClose }) {
               ) : (
                 <form onSubmit={submit} noValidate aria-busy={status === 'sending'} className="space-y-3 sm:space-y-3.5">
                   <div className="pr-10">
-                    <h2 className="font-display text-[1.25rem] font-bold leading-tight md:hidden">Let&apos;s build something great together.</h2>
+                    <h2 className="mb-2 font-display text-[1.25rem] font-bold leading-tight md:hidden">Let&apos;s build something great together.</h2>
                     <p className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-primary md:mt-0">Get in touch</p>
                     <p className="mt-1 text-[1.15rem] font-bold leading-snug text-slate-800 md:text-[1.3rem]">Share your contact details <span className="font-medium text-slate-500">(optional)</span></p>
                   </div>

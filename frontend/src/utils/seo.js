@@ -37,14 +37,14 @@ export function fitDescription(text, max = 160) {
 }
 
 /** BreadcrumbList for a path: Home > section > ... > this page. Returns null for the home page and for pages that are not indexable. */
-export function breadcrumbList(path, leafName, origin = SITE_TOKEN) {
+export function breadcrumbList(path, leafName, origin = SITE_TOKEN, t = (x) => x, prefix = '') {
   const parts = path.split('/').filter(Boolean)
   if (!parts.length) return null
-  const items = [{ name: 'Home', url: `${origin}/` }]
+  const items = [{ name: t('Home'), url: `${origin}${prefix}/` }]
   parts.forEach((seg, i) => {
-    const url = `${origin}/${parts.slice(0, i + 1).join('/')}`
+    const url = `${origin}${prefix}/${parts.slice(0, i + 1).join('/')}`
     const last = i === parts.length - 1
-    items.push({ name: last ? leafName || CRUMB[seg] || titleCase(seg) : CRUMB[seg] || titleCase(seg), url })
+    items.push({ name: t(last ? leafName || CRUMB[seg] || titleCase(seg) : CRUMB[seg] || titleCase(seg)), url })
   })
   return {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',

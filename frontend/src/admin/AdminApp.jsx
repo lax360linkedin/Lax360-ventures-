@@ -1,6 +1,6 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, Layers, MapPin, Share2, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, Languages, Layers, MapPin, Share2, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -31,6 +31,7 @@ const Staff = lazy(() => import('./pages/Staff.jsx'))
 const Customers = lazy(() => import('./pages/Customers.jsx'))
 const PagesModule = lazy(() => import('./pages/Pages.jsx'))
 const BranchLocations = lazy(() => import('./pages/BranchLocations.jsx'))
+const TranslationsAdmin = lazy(() => import('./pages/Translations.jsx'))
 const SeoAdmin = lazy(() => import('./pages/SeoAdmin.jsx'))
 const SocialContact = lazy(() => import('./pages/SocialContact.jsx'))
 const BranchSocial = lazy(() => import('./pages/OwnerSocial.jsx').then((m) => ({ default: m.BranchSocial })))
@@ -59,6 +60,7 @@ const NAV = [
   { section: 'Company', to: '/company-admin/network', label: 'Our network', icon: Network, module: 'content', hint: 'Group companies, partners, software distribution and the Our Network page' },
   { section: 'Products & portfolio', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
   { section: 'Products & portfolio', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
+  { section: 'Pages & settings', to: '/company-admin/translations', label: 'Translations', icon: Languages, module: 'content', hint: 'The website in Tamil, Hindi and other languages: edit each page and section' },
   { section: 'Pages & settings', to: '/company-admin/seo', label: 'SEO management', icon: Search, module: ['navigation', 'content'], hint: 'Search titles, descriptions, sharing images, indexing, redirects and the sitemap' },
   { section: 'Pages & settings', to: '/company-admin/content', label: 'All website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'], hint: 'Every other page, section, list and text of the public website' },
   { section: 'Pages & settings', to: '/company-admin/media', label: 'Media library', icon: ImageIcon, module: 'media', hint: 'Images, PDFs and videos used on the website' },
@@ -288,6 +290,7 @@ export default function AdminApp() {
           <Route path="pages/*" element={<Guard module={['content', 'services', 'careers', 'navigation', 'settings']}><PagesModule /></Guard>} />
           <Route path="page-images" element={<Navigate to="/company-admin/pages" replace />} />
           <Route path="branches" element={<Guard module="settings"><BranchLocations /></Guard>} />
+          <Route path="translations" element={<Guard module="content"><TranslationsAdmin /></Guard>} />
           <Route path="seo" element={<Guard module="navigation"><SeoAdmin /></Guard>} />
           <Route path="social-contact" element={<Guard module="settings"><SocialContact /></Guard>} />
           <Route path="branches/:slug/social" element={<Guard module="settings"><BranchSocial /></Guard>} />

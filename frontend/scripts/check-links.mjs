@@ -13,14 +13,16 @@ const DYNAMIC = ['/services/', '/products/', '/industries/', '/insights/', '/our
 const bad = new Map()
 let checked = 0
 
-const ok = (p) => {
+const ok = (p0) => {
+  const p = p0.replace(/^\/(ta|hi)(?=\/|$)/, '') || '/' // a translated address is the same page under /ta or /hi
   const path = p.length > 1 ? p.replace(/\/+$/, '') : p
   if (known.has(path)) return true
   if (existsSync(join(dist, path)) || existsSync(join(root, 'public', path))) return true
   return DYNAMIC.some((d) => path.startsWith(d)) // a page created from managed content (checked at run time by the website)
 }
 
-for (const route of [...routes, ...noindexRoutes]) {
+const pages = [...routes, ...noindexRoutes]
+for (const route of [...pages, ...['ta', 'hi'].flatMap((l) => routes.map((r) => `/${l}${r === '/' ? '' : r}`))]) {
   const file = route === '/' ? join(dist, 'index.html') : join(dist, route.slice(1), 'index.html')
   if (!existsSync(file)) continue
   const html = readFileSync(file, 'utf8')

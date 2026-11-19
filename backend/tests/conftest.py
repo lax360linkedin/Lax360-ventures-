@@ -35,7 +35,7 @@ from app.core.config import Settings, get_settings  # noqa: E402
 Settings.model_config["env_file"] = None
 
 BACKEND = Path(__file__).resolve().parents[1]
-TABLES = "users, auth_sessions, demo_requests, contact_enquiries, chat_sessions, chat_messages, ai_usage, enquiry_notes, site_settings, content_items, media_assets, audit_logs, hero_video_config, hero_videos, contact_channels"
+TABLES = "users, auth_sessions, demo_requests, contact_enquiries, chat_sessions, chat_messages, ai_usage, enquiry_notes, site_settings, content_items, media_assets, audit_logs, hero_video_config, hero_videos, contact_channels, translations"
 PASSWORD = "correct-horse-battery"
 
 

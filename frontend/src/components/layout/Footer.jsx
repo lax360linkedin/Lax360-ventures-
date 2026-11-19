@@ -1,11 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowUp, ArrowUpRight, ChevronRight, MapPin, Phone, RotateCcw } from 'lucide-react'
+import { ArrowUp, ArrowUpRight, ChevronRight, MapPin, Phone, RotateCcw, ShieldCheck } from 'lucide-react'
 import ChannelIcon, { opensNewTab } from './ChannelIcon.jsx'
 import Logo from './Logo.jsx'
 import OwnerLinks from './OwnerLinks.jsx'
 import { footerColumns, legalLinks } from '../../data/navigation.js'
 import { useBranchDirectory } from '../../hooks/useBranches.js'
 import { useContacts, useNav, useSite, useSocial } from '../../hooks/useSite.js'
+import { openCookieSettings } from '../../utils/consent.js'
 import { openWelcomeExperience, replayIntro } from '../../utils/welcomeIntro.js'
 
 const ico = { strokeWidth: 1.75, 'aria-hidden': 'true' }
@@ -142,10 +143,26 @@ export default function Footer() {
           </ul>
         </section>
 
+        <section aria-labelledby="footer-privacy" className="border-t border-edge py-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-3.5">
+              <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-lav ring-1 ring-edge"><ShieldCheck className="size-4" {...ico} /></span>
+              <div>
+                <h2 id="footer-privacy" className="font-sans text-xs font-bold uppercase tracking-[0.18em] text-fg">Privacy Policy</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-soft">The details you share with us are used only to respond to your enquiry. Read how LAX360 Pvt Ltd handles personal data, cookies and your choices.</p>
+              </div>
+            </div>
+            <ul className="flex flex-wrap items-center gap-3">
+              <li><Link to="/privacy" className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-edge-strong bg-glass px-5 text-sm font-semibold transition-colors hover:border-lav hover:text-lav">Read our Privacy Policy<ChevronRight className="size-4" {...ico} /></Link></li>
+              <li><button type="button" onClick={openCookieSettings} className="inline-flex min-h-11 items-center rounded-full px-3 text-sm font-semibold text-soft underline underline-offset-4 transition-colors hover:text-lav">Cookie settings</button></li>
+            </ul>
+          </div>
+        </section>
+
         <div className="flex flex-col gap-3 border-t border-edge py-6 text-sm text-soft md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} {site.legalEntity}. {String(site.legalLine || '').replace(/\.$/, '') === site.legalEntity ? 'All rights reserved.' : site.legalLine}</p>
           <ul className="flex flex-wrap items-center gap-x-6">
-            {legalLinks.map((l) => (
+            {legalLinks.filter((l) => l.to !== '/privacy').map((l) => ( // the Privacy Policy has its own section above
               <li key={l.to}><Link to={l.to} className="inline-flex min-h-10 items-center transition-colors hover:text-lav focus-visible:text-lav">{l.label}</Link></li>
             ))}
             <li><button type="button" onClick={replay} className="inline-flex min-h-10 items-center gap-1.5 transition-colors hover:text-lav focus-visible:text-lav"><RotateCcw className="size-3.5" {...ico} />Replay welcome intro</button></li>

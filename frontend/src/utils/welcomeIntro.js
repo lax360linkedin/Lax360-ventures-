@@ -21,7 +21,7 @@ const saveData = () => Boolean(typeof navigator !== 'undefined' && navigator.con
 const wantsPreview = () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('welcome') === 'preview'
 
 function initial() {
-  if (typeof window === 'undefined' || window.location.pathname !== '/' || wantsPreview()) return 'off' // only when the page load itself is the homepage (a preview of the cards skips the animation)
+  if (typeof window === 'undefined' || !/^\/([a-z]{2})?\/?$/.test(window.location.pathname) || wantsPreview()) return 'off' // only when the page load itself is the homepage (a preview of the cards skips the animation)
   return prefersReducedMotion() || saveData() ? 'off' : 'pending' // keep in sync with the inline script in index.html
 }
 

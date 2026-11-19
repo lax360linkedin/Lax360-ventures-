@@ -38,7 +38,7 @@ CAROUSEL_SPEEDS = [{"value": "slow", "label": "Slow"}, {"value": "normal", "labe
 WELCOME_CARD_TYPES = [{"value": v, "label": l} for v, l in (("regular", "Regular welcome card"), ("festival", "Festival greeting"), ("announcement", "Special announcement"), ("offer", "Company offer / promotion"))]
 DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("ai", "AI & Business Automation"), ("growth", "Digital Marketing"), ("headless", "Headless SaaS & API Solutions"), ("automation", "Workflow Automation & Integration"), ("mobile", "Mobile & Business Applications"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
-    ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
+    ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("purpose", "Our Vision & Our Mission"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
     ("process", "How we work"), ("gallery", "Image carousel (between Testimonials and Our Clients)"),
     ("faq", "FAQ"), ("contact", "Contact call-to-action"))]
 ABOUT_SECTIONS = [{"value": v, "label": l} for v, l in (

@@ -4,14 +4,21 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { routes } from '../src/routes.js'
+import { LANGUAGES, pathIn, prefixOf } from '../src/i18n/languages.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const site = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://lax360-ventures.vercel.app').replace(/\/$/, '')
 
 
+// Every page in every language, each with its hreflang alternates (the same page in the other languages and the English as the default)
+const urlOf = (lang, r) => `${site}${r === '/' ? prefixOf(lang) : pathIn(lang, r)}`
+const entry = (lang, r) => {
+  const alts = [...LANGUAGES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l.htmlLang}" href="${urlOf(l.code, r)}" />`), `    <xhtml:link rel="alternate" hreflang="x-default" href="${urlOf('en', r)}" />`].join('\n')
+  return `  <url>\n    <loc>${urlOf(lang, r)}</loc>\n${alts}\n  </url>`
+}
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${routes.map((r) => `  <url><loc>${site}${r === '/' ? '' : r}</loc></url>`).join('\n')}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${LANGUAGES.flatMap((l) => routes.map((r) => entry(l.code, r))).join('\n')}
 </urlset>
 `
 
@@ -45,4 +52,4 @@ for (const dir of ['public', 'dist']) {
   try { writeFileSync(resolve(root, dir, 'robots.txt'), robots) } catch (e) { console.warn(`robots: could not write to ${dir}`, e.message) }
 }
 if (/example\.com/.test(site)) console.warn('!! SITE_URL is not set: sitemap.xml and robots.txt point at https://www.example.com. Set SITE_URL to the real website address for the production build.')
-console.log(`sitemap.xml written for ${site} (${routes.length} URLs)`)
+console.log(`sitemap.xml written for ${site} (${routes.length * LANGUAGES.length} URLs: ${routes.length} pages in ${LANGUAGES.length} languages)`)
