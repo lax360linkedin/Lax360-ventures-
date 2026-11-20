@@ -27,7 +27,7 @@ class BranchIn(ApiModel):
     name: OneLine = Field(min_length=2, max_length=160)
     city: OneLine = Field(min_length=2, max_length=80)
     address: OptionalText = Field(default=None, max_length=600)  # one line per row
-    phone: OptionalText = Field(default=None, max_length=32)
+    phone: OptionalText = Field(default=None, max_length=80)
     map: str | None = Field(default=None, max_length=4000)  # an iframe code or the embed address; stored as the address only
     is_active: bool = True
     sort_order: int = Field(default=0, ge=0, le=100000)

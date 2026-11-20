@@ -14,6 +14,7 @@ export const site = {
   // Official branch phone numbers (see data/branches.js for the full address of each branch).
   phones: [
     { display: '+91 95666 79928', tel: '+919566679928', label: 'Salem & Bangalore' },
+    { display: '+91 86676 30258', tel: '+918667630258', label: 'Salem' },
     { display: '+91 95666 05272', tel: '+919566605272', label: 'Mumbai' },
   ],
   // Where the Headless SaaS & API Solutions "Explore the API Hub" button goes. Set VITE_API_HUB_URL to the API Hub product page when it is live;

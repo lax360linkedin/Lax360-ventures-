@@ -89,8 +89,8 @@ class Settings(BaseSettings):
 
     # --- chatbot behaviour and limits --------------------------------------------------------
     chat_max_input_chars: int = 1000
-    chat_max_output_tokens: int = 500
-    chat_context_messages: int = 10
+    chat_max_output_tokens: int = 900
+    chat_context_messages: int = 16
     chat_max_messages_per_session: int = 40
     chat_retention_days: int = 30
     chat_daily_token_budget: int = 0  # 0 = no application-side budget

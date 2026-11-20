@@ -8,8 +8,8 @@ import { noindexRoutes, routes } from '../src/routes.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const dist = join(root, 'dist')
-const known = new Set([...routes, ...noindexRoutes, '/demo', '/user/dashboard', '/profile', '/company-admin', '/admin', '/projects'])
-const DYNAMIC = ['/services/', '/products/', '/industries/', '/insights/', '/our-network/', '/our-team/', '/websites/']
+const known = new Set([...routes, ...noindexRoutes, '/demo', '/user/dashboard', '/profile', '/company-admin', '/admin', '/projects', '/play-zone'])
+const DYNAMIC = ['/services/', '/products/', '/industries/', '/insights/', '/our-network/', '/our-team/', '/websites/', '/play-zone/']
 const bad = new Map()
 let checked = 0
 

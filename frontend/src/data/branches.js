@@ -4,13 +4,15 @@
 // so keep both in step when they change.
 const mapUrl = (query) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 
-export const branches = [
+import { phoneList } from '../utils/phones.js'
+
+const list = [
   {
     id: 'salem',
     city: 'Salem',
     name: 'LAX360 Pvt Ltd — Salem Branch',
     address: ['1st Floor, 16, CPS Tower', 'Advaitha Ashram Road, Fairlands', 'Salem, Tamil Nadu – 636004'],
-    phone: '+91 95666 79928',
+    phone: '+91 95666 79928, +91 86676 30258',
     tel: '+919566679928',
     mapUrl: mapUrl('1st Floor, 16, CPS Tower, Advaitha Ashram Road, Fairlands, Salem, Tamil Nadu 636004'),
   },
@@ -33,6 +35,8 @@ export const branches = [
     mapUrl: mapUrl('Level 4, Dynasty Business Park, Andheri-Kurla Road, A-Wing, J. B. Nagar, Andheri East, Mumbai, Maharashtra 400059'),
   },
 ]
+
+export const branches = list.map((b) => ({ ...b, phones: phoneList(b.phone) }))
 
 export const branchCities = branches.map((b) => b.city)
 /** "Salem · Bangalore · Mumbai" */

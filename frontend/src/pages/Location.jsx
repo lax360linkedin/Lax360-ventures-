@@ -36,7 +36,7 @@ export default function Location() {
   const path = `/locations/${b.id}`
   const faq = [
     { q: `Where is the LAX360 Pvt Ltd office in ${b.city}?`, a: `${b.name.replace('LAX360 Pvt Ltd — ', 'LAX360 Pvt Ltd, ')} is at ${addressText || b.city}.` },
-    ...(b.phone ? [{ q: `How can I contact LAX360 in ${b.city}?`, a: `Call ${b.phone}${site.email ? ` or write to ${site.email}` : ''}. You can also message the team on WhatsApp or send an enquiry through the contact page.` }] : []),
+    ...(b.phone ? [{ q: `How can I contact LAX360 in ${b.city}?`, a: `Call ${(b.phones || []).map((p) => p.display).join(' or ')}${site.email ? ` or write to ${site.email}` : ''}. You can also message the team on WhatsApp or send an enquiry through the contact page.` }] : []),
     { q: `What can I enquire about at the ${b.city} office?`, a: `${allDivisions.map((d) => d.name).join(', ')}, and technology training. Tell us about your requirement and the team will come back with a clear next step.` },
   ]
   const jsonLd = [
@@ -47,7 +47,7 @@ export default function Location() {
     <PageContainer
       path={path}
       title={`LAX360 ${b.city}: Office, Contact & Directions`}
-      description={`Visit LAX360 Pvt Ltd in ${b.city}${place ? `: ${place}` : ''}. ${b.phone ? `Call ${b.phone} for ` : 'Enquire about '}software, AI automation, digital marketing and training.`}
+      description={`Visit LAX360 Pvt Ltd in ${b.city}${place ? `: ${place}` : ''}. ${b.phones?.length ? `Call ${b.phones.map((p) => p.display).join(' or ')} for ` : 'Enquire about '}software, AI automation, digital marketing and training.`}
       jsonLd={jsonLd}
     >
       <section className="relative overflow-hidden border-b border-edge">
@@ -65,7 +65,7 @@ export default function Location() {
             Our {b.city} office{place ? ` is at ${place}` : ''}. Visit us, call or message the team to talk about software, AI and business automation, digital marketing or technology training for your business.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            {b.phone && <Button href={`tel:${b.tel}`}><Phone className="size-5" aria-hidden="true" /> Call {b.phone}</Button>}
+            {(b.phones || []).map((p, i) => <Button key={p.tel} href={`tel:${p.tel}`} variant={i ? 'secondary' : undefined}><Phone className="size-5" aria-hidden="true" /> Call {p.display}</Button>)}
             <Button href={whatsappLink(`Hi LAX360 Pvt Ltd, I would like to talk to the ${b.city} office.`)} variant="secondary"><MessageCircle className="size-5" aria-hidden="true" /> WhatsApp</Button>
             {b.mapUrl && <Button href={b.mapUrl} variant="secondary"><MapPin className="size-5" aria-hidden="true" /> Get directions</Button>}
           </div>
@@ -81,7 +81,7 @@ export default function Location() {
               <p className="mt-3 space-y-1 text-soft">{(b.address || []).map((l) => <span key={l} className="block">{l}</span>)}</p>
             </address>
             <ul className="mt-5 space-y-1">
-              {b.phone && <li><a href={`tel:${b.tel}`} className="inline-flex min-h-11 items-center gap-2 font-semibold hover:text-lav"><Phone className="size-4 text-lav" aria-hidden="true" />{b.phone}</a></li>}
+              {(b.phones || []).map((p) => <li key={p.tel}><a href={`tel:${p.tel}`} className="inline-flex min-h-11 items-center gap-2 font-semibold hover:text-lav"><Phone className="size-4 text-lav" aria-hidden="true" />{p.display}</a></li>)}
               {site.email && <li><a href={`mailto:${site.email}`} className="inline-flex min-h-11 items-center gap-2 break-all font-semibold hover:text-lav"><Mail className="size-4 shrink-0 text-lav" aria-hidden="true" />{site.email}</a></li>}
               {b.mapUrl && <li><a href={b.mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 font-semibold text-lav hover:underline">View on Google Maps<ArrowUpRight className="size-4" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a></li>}
             </ul>

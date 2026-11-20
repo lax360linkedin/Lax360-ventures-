@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useSyncExternalStore } from 'react'
 import { adminLogin, adminLogout, fetchAdminSession } from '../services/adminAuthService.js'
 import { onSessionExpired, setAdminBearer, setCsrfToken } from '../services/apiClient.js'
+import { waitForBackend } from '../services/backendWake.js'
 
 // Company-admin session store. Completely separate from the public website's useAuth: signing in or out of one never touches the other.
 // The state comes from the backend (`GET /api/admin/auth/session`), never from browser storage, so editing localStorage grants nothing.
@@ -30,9 +31,26 @@ onSessionExpired((code) => { setCsrfToken(null, 'admin'); keepBearer(null); set(
 const COOKIE_NOT_KEPT = 'You were signed in, but this browser did not keep the session, so the admin panel cannot load your data. '
   + 'Allow cookies for this site and sign in again, or ask whoever deploys it to serve the API through the website\'s own domain.'
 
-async function signIn({ email, password }) {
+const COLD = new Set(['timeout', 'network', 'backend_unavailable'])
+const NOT_WAKING = 'The server did not start within two minutes. It may be down or misconfigured (not just asleep): please try again in a moment, and if it keeps happening ask whoever hosts the site to check the backend service logs.'
+
+/** One sign-in request; when the server does not answer (asleep, starting or unreachable) wait for its health check, showing progress, then try once more. A wrong password is never retried. */
+async function loginWithWake(email, password, onStatus) {
   try {
-    const login = await adminLogin(email, password)
+    return await adminLogin(email, password)
+  } catch (e) {
+    if (!COLD.has(e.code)) throw e
+    onStatus?.('The server is starting up. This can take up to a minute when it has been idle; please keep this page open.')
+    const up = await waitForBackend({ onProgress: ({ seconds }) => onStatus?.(`The server is starting up… ${seconds}s. This can take up to a minute when it has been idle; please keep this page open.`) })
+    if (!up) throw Object.assign(new Error(NOT_WAKING), { code: 'backend_down' })
+    onStatus?.('Signing in…')
+    return adminLogin(email, password)
+  }
+}
+
+async function signIn({ email, password, onStatus }) {
+  try {
+    const login = await loginWithWake(email, password, onStatus)
     const sessionToken = login.session_token
     const identity = split(login)
     // Prove the session really works before showing the panel. First choice: the HttpOnly cookie (JavaScript never sees a token).

@@ -64,10 +64,12 @@ export async function api(path, { method = 'GET', body, rawBody, contentType, as
   try { data = await res.json() } catch { /* non-JSON body: handled below */ }
   if (!res.ok) {
     const e = data?.error
+    // 502/503/504 without our JSON error body come from the proxy in front of the API (Vercel / Render) while the backend is asleep, restarting or unreachable.
+    const proxyDown = !e && (res.status === 502 || res.status === 503 || res.status === 504)
     const error = new ApiError({
       status: res.status,
-      code: e?.code || 'http_error',
-      message: e?.message || (res.status >= 500 ? 'Something went wrong on our side. Please try again.' : 'That request could not be completed.'),
+      code: proxyDown ? 'backend_unavailable' : e?.code || 'http_error',
+      message: proxyDown ? 'The server is starting up or temporarily unavailable.' : e?.message || (res.status >= 500 ? 'Something went wrong on our side. Please try again.' : 'That request could not be completed.'),
       fields: e?.fields || null,
       details: e?.details || null,
     })

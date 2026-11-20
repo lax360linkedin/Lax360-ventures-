@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { fetchBranches } from '../services/branchService.js'
 import { branches as staticBranches } from '../data/branches.js'
 import { mapOpenUrl } from '../utils/mapEmbed.js'
+import { phoneList } from '../utils/phones.js'
 
 let cache = null
 
@@ -21,7 +22,7 @@ export function useBranchDirectory() {
   return {
     live: true,
     branches: state.list.map((b) => ({
-      id: b.slug, city: b.city, name: b.name, address: b.address_lines?.length ? b.address_lines : null, phone: b.phone, tel: b.phone ? b.phone.replace(/[^\d+]/g, '') : null, embed: b.map_embed_url || null,
+      id: b.slug, city: b.city, name: b.name, address: b.address_lines?.length ? b.address_lines : null, phone: b.phone, phones: phoneList(b.phone), tel: phoneList(b.phone)[0]?.tel || null, embed: b.map_embed_url || null,
       mapUrl: mapOpenUrl(b.map_embed_url, `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place(b))}`), // the branch's saved Google Maps location when it has one, else a search for its address
     })),
   }

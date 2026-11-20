@@ -75,7 +75,7 @@ export function localBusinessSchemas(branches, { email, logo, social = {}, origi
     '@context': 'https://schema.org', '@type': 'LocalBusiness', '@id': `${origin}/contact#${b.id}`,
     name: b.name || `${SITE_NAME} — ${b.city}`, parentOrganization: { '@type': 'Organization', name: SITE_NAME, url: `${origin}/` },
     url: `${origin}/contact`, ...(logo ? { image: logo } : {}), ...(email ? { email } : {}),
-    ...(b.tel ? { telephone: b.tel } : {}), address: postalAddress(b), ...(b.mapUrl ? { hasMap: b.mapUrl } : {}),
+    ...(b.phones?.length ? { telephone: b.phones.length > 1 ? b.phones.map((p) => p.tel) : b.phones[0].tel } : b.tel ? { telephone: b.tel } : {}), address: postalAddress(b), ...(b.mapUrl ? { hasMap: b.mapUrl } : {}),
     ...((social[b.id] || []).length ? { sameAs: social[b.id] } : {}),
   }))
 }

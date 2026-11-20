@@ -1,3 +1,4 @@
+import OptimizedImage from '../components/ui/OptimizedImage.jsx'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
@@ -91,7 +92,7 @@ export default function TeamDepartment() {
             <div className="lead mt-6 max-w-3xl space-y-4 text-soft">{overview.map((t) => <p key={t}>{t}</p>)}</div>
             <p className="mt-6 text-soft"><span className="font-semibold text-fg">{mine.length}</span> {mine.length === 1 ? 'team member' : 'team members'}</p>
           </Reveal>
-          {d.image && <Reveal delay={0.1} className="lg:col-span-5"><img src={d.image} alt={d.imageAlt || ''} width="900" height="600" decoding="async" className="aspect-[3/2] w-full rounded-2xl border border-edge object-cover" /></Reveal>}
+          {d.image && <Reveal delay={0.1} className="lg:col-span-5"><OptimizedImage src={d.image} alt={d.imageAlt || ''} width="900" height="600" sizes="(min-width: 1024px) 40vw, 100vw" priority className="aspect-[3/2] w-full rounded-2xl border border-edge object-cover" /></Reveal>}
         </div>
       </section>
 

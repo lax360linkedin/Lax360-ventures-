@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLayoutEffect, useRef } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { Gamepad2 } from 'lucide-react'
 import ChannelIcon, { opensNewTab } from './ChannelIcon.jsx'
 import LanguageSwitcher from './LanguageSwitcher.jsx'
 import { showOnPage, useContacts, useSiteSettings, useSocial } from '../../hooks/useSite.js'
@@ -14,7 +15,7 @@ export default function TopBar() {
   const ref = useRef(null)
   const visible = settings.contact_bar_enabled !== false && showOnPage(settings.contact_bar_pages, pathname)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement
     if (!visible || !ref.current) { root.style.setProperty('--topbar-h', '0px'); root.style.setProperty('--topbar-offset', '0px'); return undefined }
     const el = ref.current
@@ -42,6 +43,9 @@ export default function TopBar() {
   const mobile = new Set(shown.filter((c) => c.type !== 'email').slice(0, 2).map((c) => c.id))
   const text = (c) => (c.type === 'whatsapp' ? 'WhatsApp' : c.type === 'other' || c.type === 'enquiry' || c.type === 'branch' ? c.label : c.value)
   return (
+    <>
+    {/* The bar is 33px tall (min-h-8 + border). Declaring it in the HTML itself means the page is laid out correctly on the very first paint instead of jumping down by 33px when the script measures it. */}
+    <style>{':root{--topbar-h:33px;--topbar-offset:33px}'}</style>
     <div ref={ref} data-topbar className="fixed inset-x-0 top-0 z-[41] border-b border-edge/60 bg-night/80 text-xs text-soft backdrop-blur-md">
       <div className="wrap flex min-h-8 items-center justify-between gap-3">
         <ul className="flex items-center gap-x-4" aria-label="Contact">
@@ -69,9 +73,11 @@ export default function TopBar() {
               ))}
             </ul>
           )}
+          <Link to="/play-zone" className="mr-1 hidden min-h-8 items-center gap-1.5 rounded-full border border-edge-strong bg-glass px-2.5 font-semibold text-fg transition-colors hover:border-lav hover:text-lav sm:inline-flex" aria-label="Play Zone"><Gamepad2 className="size-3.5 text-lav" aria-hidden="true" /><span>Play Zone</span></Link>
           <LanguageSwitcher />
         </div>
       </div>
     </div>
+    </>
   )
 }

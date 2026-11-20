@@ -2,7 +2,7 @@ import LanguageSwitcher from './LanguageSwitcher.jsx'
 import { useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
-import { CalendarCheck, LogIn, LogOut, MessageCircle, Phone, UserRound, X } from 'lucide-react'
+import { CalendarCheck, Gamepad2, LogIn, LogOut, MessageCircle, Phone, UserRound, X } from 'lucide-react'
 import Logo from './Logo.jsx'
 import Button from '../ui/Button.jsx'
 import ThemeToggle from '../ui/ThemeToggle.jsx'
@@ -97,6 +97,7 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
             ) : (
               <Button to="/login" onClick={onClose}><LogIn className="size-5" aria-hidden="true" /> Login</Button>
             )}
+            <Button variant="secondary" to="/play-zone" onClick={onClose}><Gamepad2 className="size-5" aria-hidden="true" /> Play Zone</Button>
             <LanguageSwitcher variant="list" />
             <div className="grid grid-cols-2 gap-3">
               <Button variant="secondary" href={whatsappLink()}><MessageCircle className="size-5" aria-hidden="true" /> WhatsApp</Button>

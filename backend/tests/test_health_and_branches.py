@@ -35,7 +35,7 @@ def test_branches_are_the_three_cities_with_their_official_details(client):
     data = client.get("/api/branches").json()
     assert [b["city"] for b in data] == ["Salem", "Bangalore", "Mumbai"]
     by_city = {b["city"]: b for b in data}
-    assert by_city["Salem"]["address_lines"] == ["1st Floor, 16, CPS Tower", "Advaitha Ashram Road, Fairlands", "Salem, Tamil Nadu – 636004"] and by_city["Salem"]["phone"] == "+91 95666 79928"
+    assert by_city["Salem"]["address_lines"] == ["1st Floor, 16, CPS Tower", "Advaitha Ashram Road, Fairlands", "Salem, Tamil Nadu – 636004"] and by_city["Salem"]["phone"] == "+91 95666 79928, +91 86676 30258"
     assert by_city["Bangalore"]["address_lines"][-1] == "Bengaluru, Karnataka – 560034" and by_city["Bangalore"]["phone"] == "+91 95666 79928"
     assert by_city["Mumbai"]["address_lines"][0] == "Level 4, Dynasty Business Park" and by_city["Mumbai"]["address_lines"][-1] == "Andheri East, Mumbai, Maharashtra – 400059" and by_city["Mumbai"]["phone"] == "+91 95666 05272"
 

@@ -4,18 +4,26 @@
 import { api } from './apiClient.js'
 
 export const WELCOME_MESSAGE =
-  "Hi there! I'm the LAX360 Pvt Ltd AI Assistant. I can help you explore our services, AI solutions, branches and how to request a demo. What would you like to know?"
+  "Hi there! I'm the LAX360 Pvt Ltd AI Assistant: your friendly companion, trainer and business growth advisor. Ask me about our services, get ideas to grow your business, learn something new, or just have a chat. What's on your mind?"
 
-export const SUGGESTED_QUESTIONS = [
+// Every chip the assistant can offer (the server names the follow-up ones by id).
+const ALL_QUESTIONS = [
   { id: 'services', label: 'Explore Our Services' },
   { id: 'software', label: 'I Need Custom Software' },
   { id: 'ai', label: 'Tell Me About AI Solutions' },
   { id: 'training', label: 'Explore Training Courses' },
   { id: 'project', label: 'Discuss My Project' },
+  { id: 'ideas', label: 'Help Me Grow My Business' },
+  { id: 'trainer', label: 'Train Me on Something' },
+  { id: 'chat', label: "Let's Just Chat" },
+  { id: 'support', label: 'I Need Some Motivation' },
 ]
 
+// What the visitor sees first: what the assistant can do for them.
+export const SUGGESTED_QUESTIONS = ['ideas', 'trainer', 'chat', 'support', 'services', 'project'].map((id) => ALL_QUESTIONS.find((q) => q.id === id))
+
 export const topicFollowUps = (ids = []) =>
-  ids.map((id) => SUGGESTED_QUESTIONS.find((q) => q.id === id)).filter(Boolean)
+  ids.map((id) => ALL_QUESTIONS.find((q) => q.id === id)).filter(Boolean)
 
 let conversation = { id: null, token: null }
 

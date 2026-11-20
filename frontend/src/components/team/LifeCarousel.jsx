@@ -1,3 +1,4 @@
+import OptimizedImage from '../ui/OptimizedImage.jsx'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { CalendarDays, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
@@ -64,7 +65,7 @@ export default function LifeCarousel({ items, chip }) {
             return (
               <Reveal as="li" key={g.slug} delay={(i % 4) * 0.04} className="w-[80vw] shrink-0 snap-start sm:w-[22rem] lg:w-[24rem]">
                 <figure className="group relative m-0 aspect-[4/3] overflow-hidden rounded-3xl border border-edge shadow-[0_22px_44px_-30px_rgba(0,0,0,0.6)] transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1 hover:border-lav hover:shadow-[0_30px_54px_-28px_rgb(var(--glow)/0.7)]">
-                  <img src={g.image} alt={g.alt} width="800" height="600" loading="lazy" decoding="async" draggable="false" className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />
+                  <OptimizedImage src={g.image} alt={g.alt} width="800" height="600" sizes="(min-width: 1024px) 30rem, 85vw" draggable="false" className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />
                   <figcaption className="media-dark absolute inset-x-0 bottom-0 bg-gradient-to-t from-night/95 via-night/70 to-transparent p-4 pt-14 text-white">
                     <span className="inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[0.64rem] font-bold uppercase tracking-wider text-white backdrop-blur">{labelOf(g)}</span>
                     {g.caption && <p className="mt-1.5 font-display text-lg font-semibold leading-tight">{g.caption}</p>}

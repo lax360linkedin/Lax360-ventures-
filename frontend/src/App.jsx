@@ -35,6 +35,10 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'))
 const Profile = lazy(() => import('./pages/Profile.jsx'))
 const DemoRequest = lazy(() => import('./pages/DemoRequest.jsx'))
+const PlayZoneHome = lazy(() => import('./playzone/pages/PlayZoneHome.jsx')) // LAX360 Play Zone (Milestone 1): its own chunks, loaded only when a visitor opens /play-zone
+const PlayZoneGame = lazy(() => import('./playzone/pages/PlayZoneGame.jsx'))
+const PlayZoneLeaderboard = lazy(() => import('./playzone/pages/PlayZoneLeaderboard.jsx'))
+const PlayZoneProfile = lazy(() => import('./playzone/pages/PlayZoneProfile.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 const AdminApp = lazy(() => import('./admin/AdminApp.jsx')) // separate chunk: public visitors never download it
 
@@ -86,6 +90,10 @@ export default function App() {
         <Route path="user" element={<Navigate to="/user/dashboard" replace />} />
         <Route path="profile" element={<Navigate to="/user/dashboard" replace />} />
         <Route path="demo" element={<RequireAuth><DemoRequest /></RequireAuth>} />
+        <Route path="play-zone" element={<PlayZoneHome />} />
+        <Route path="play-zone/leaderboard" element={<PlayZoneLeaderboard />} />
+        <Route path="play-zone/profile" element={<PlayZoneProfile />} />
+        <Route path="play-zone/:game" element={<PlayZoneGame />} />
         <Route path="privacy" element={<Privacy />} />
         <Route path="terms" element={<Terms />} />
         {/* Names used in the brief map onto the planning document's canonical URLs. */}

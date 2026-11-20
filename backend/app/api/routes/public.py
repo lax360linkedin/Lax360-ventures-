@@ -19,7 +19,9 @@ from app.services import channel_service, content_service, hero_video_service, m
 from app.core.errors import ApiError
 
 router = APIRouter(tags=["public"])
-CACHE = {"Cache-Control": "public, max-age=10"}  # short: a published change reaches visitors within seconds (no browser-side stale window: an edit must show on the next reload)
+CACHE = {"Cache-Control": "public, max-age=10, s-maxage=15, stale-while-revalidate=600"}  # short: a published change reaches visitors within seconds (no browser-side stale window: an edit must show on the next reload)
+# s-maxage / stale-while-revalidate are for the CDN in front of the API (Vercel's rewrite): it can answer visitors from its copy (at most ~15 s old, so an edit still shows quickly) and, while this
+# server is asleep or restarting, keep serving the last copy for up to 10 minutes while it wakes. Browsers still only keep a response for 10 s.
 
 
 def _cacheable(settings: Settings) -> bool:

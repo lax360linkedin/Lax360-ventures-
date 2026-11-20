@@ -1,3 +1,4 @@
+import OptimizedImage from '../ui/OptimizedImage.jsx'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
@@ -79,7 +80,7 @@ export default function MemberProfile({ person, department, onClose }) {
                     {pics.map((src, i) => (
                       <li key={src + i}>
                         <button type="button" onClick={() => setShot(i)} aria-label={`${person.name} ${i + 1}`} aria-current={i === shot || undefined} className={`block size-14 overflow-hidden rounded-xl border-2 transition-all ${i === shot ? 'border-lav opacity-100' : 'border-transparent opacity-70 hover:opacity-100'}`}>
-                          <img src={src} alt="" width="112" height="112" loading="lazy" decoding="async" className="size-full object-cover object-top" />
+                          <OptimizedImage src={src} alt="" width="112" height="112" sizes="112px" className="size-full object-cover object-top" />
                         </button>
                       </li>
                     ))}

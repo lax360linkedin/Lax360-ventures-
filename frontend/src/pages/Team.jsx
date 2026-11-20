@@ -6,6 +6,7 @@ import PageContainer from '../components/layout/PageContainer.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import Button from '../components/ui/Button.jsx'
+import OptimizedImage from '../components/ui/OptimizedImage.jsx'
 import { Avatar, EmptyNote, SkillTags, Social } from '../components/team/TeamBits.jsx'
 import MemberProfile from '../components/team/MemberProfile.jsx'
 import LifeCarousel from '../components/team/LifeCarousel.jsx'
@@ -37,7 +38,7 @@ function FounderSpotlight({ p, onOpen }) {
           <div className="relative grid size-[12.5rem] place-items-center sm:size-[14.5rem] md:size-[16rem]">
             <span aria-hidden="true" className="fd-ring absolute -inset-3 rounded-full opacity-90" style={{ background: 'conic-gradient(from 0deg, rgb(var(--glow)), transparent 30%, rgb(var(--glow2)) 55%, transparent 80%, rgb(var(--glow)))', WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))', mask: 'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))' }} />
             <figure className="relative m-0 size-full overflow-hidden rounded-full border-[3px] border-white/30 shadow-[0_24px_60px_-22px_rgb(var(--glow)/0.65)]">
-              <Avatar person={p} className="size-full !aspect-auto" sizes="(min-width: 768px) 16rem, 14.5rem" />
+              <Avatar person={p} className="size-full !aspect-auto" sizes="(min-width: 768px) 16rem, 14.5rem" priority />
               <span aria-hidden="true" className="fd-sheen pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
             </figure>
           </div>
@@ -135,7 +136,7 @@ export default function Team() {
       <section className={`relative overflow-hidden border-b border-edge ${page.hero_image ? 'media-dark' : ''}`}>
         {page.hero_image && (
           <>
-            <img src={page.hero_image} alt={page.hero_image_alt || ''} width="1600" height="900" decoding="async" fetchPriority="high" className="absolute inset-0 size-full object-cover" />
+            <OptimizedImage src={page.hero_image} alt={page.hero_image_alt || ''} width="1600" height="900" sizes="100vw" priority className="absolute inset-0 size-full object-cover" />
             <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-night/80 via-night/60 to-night" />
           </>
         )}
@@ -179,7 +180,7 @@ export default function Team() {
                   <div key={d?.slug || 'other'} id={`dept-${d?.slug || 'other'}`} className="scroll-mt-28">
                     <Reveal className="mb-8 flex flex-col gap-5 md:flex-row md:items-center">
                       {d?.image
-                        ? <img src={d.image} alt={d.imageAlt || ''} width="480" height="270" loading="lazy" decoding="async" className="aspect-[16/9] w-full max-w-[17rem] rounded-2xl border border-edge object-cover" />
+                        ? <OptimizedImage src={d.image} alt={d.imageAlt || ''} width="480" height="270" sizes="17rem" className="aspect-[16/9] w-full max-w-[17rem] rounded-2xl border border-edge object-cover" />
                         : d && <span aria-hidden="true" className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white"><Icon className="size-8" strokeWidth={1.5} /></span>}
                       <div className="min-w-0">
                         <h3 className="font-display text-3xl font-semibold leading-tight">{d?.name || 'Other team members'}</h3>

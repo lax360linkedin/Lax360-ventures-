@@ -130,8 +130,10 @@ export default function Footer() {
                     <address className="mt-2 not-italic text-sm leading-relaxed text-soft">{(b.address || []).map((line) => <span key={line} className="block">{line}</span>)}</address>
                   </div>
                 </div>
-                {b.phone && (
-                  <a href={`tel:${b.tel}`} className="mt-4 inline-flex min-h-10 items-center gap-2 self-start text-[0.95rem] font-semibold transition-colors hover:text-lav"><Phone className="size-4 text-lav" {...ico} />{b.phone}</a>
+                {b.phones?.length > 0 && (
+                  <ul className="mt-4 space-y-0.5">
+                    {b.phones.map((p) => <li key={p.tel}><a href={`tel:${p.tel}`} className="inline-flex min-h-10 items-center gap-2 self-start text-[0.95rem] font-semibold transition-colors hover:text-lav"><Phone className="size-4 text-lav" {...ico} />{p.display}</a></li>)}
+                  </ul>
                 )}
                 <OwnerLinks type="branch" owner={b.id} name={`${b.city} branch`} socialOnly className="mt-3" />
                 <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-edge pt-4 text-sm font-semibold">

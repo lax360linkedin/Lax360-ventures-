@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('5480a837-4b77-478c-91a0-8c71b05387f1', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('4c23975c-8053-4cf3-bc9f-1cd2a1ef5b5e', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('f479d531-30c4-4fb3-b296-53f1478e32c1', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('a73de0bf-0519-4b9c-af1a-29cdf1def7c7', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('b7b891ce-1fb1-419f-8a88-e212b00d5a00', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('46cb35ff-1545-4ec1-83d4-0d8f9b4ee954', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -758,6 +758,16 @@ CREATE TABLE translations (
 ALTER TABLE public."translations" ENABLE ROW LEVEL SECURITY;
 
 UPDATE alembic_version SET version_num='0024' WHERE alembic_version.version_num = '0023';
+
+-- Running upgrade 0024 -> 0025
+
+ALTER TABLE branches ALTER COLUMN phone TYPE VARCHAR(80);
+
+UPDATE branches SET phone = '+91 95666 79928, +91 86676 30258' WHERE slug = 'salem' AND phone = '+91 95666 79928';
+
+INSERT INTO contact_channels (id, owner_type, owner_ref, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) SELECT CAST('3d5f0f0e-5b6e-5a39-9a43-8667630258aa' AS uuid), 'global', NULL, 'contact', 'phone', 'Phone', '+91 86676 30258', 'Salem', CAST('["footer", "contact"]' AS json), true, COALESCE((SELECT MAX(sort_order) FROM contact_channels WHERE owner_type = 'global'), 0) + 10, 'contact:phone:918667630258' WHERE NOT EXISTS (SELECT 1 FROM contact_channels WHERE dedupe_key = 'contact:phone:918667630258');
+
+UPDATE alembic_version SET version_num='0025' WHERE alembic_version.version_num = '0024';
 
 COMMIT;
 

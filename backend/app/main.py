@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 import os
+import threading
+import time
 from urllib.parse import urlparse
 import uuid
 from contextlib import asynccontextmanager
@@ -16,6 +18,7 @@ from app.core.errors import envelope, install_error_handlers
 from app.core.logging import configure_logging
 
 log = logging.getLogger("app")
+SLOW_REQUEST_MS = 1500
 
 
 class BodyLimitMiddleware:
@@ -155,7 +158,9 @@ def create_app() -> FastAPI:
         _warn_cross_site_cookies(settings)
         _log_video_storage(settings)
         _log_google_sheets(settings)
-        _provision_admin(settings)
+        # The initial-admin check talks to the database (and hashes a password), which can take many seconds when the database is slow or still waking up. It must never
+        # delay start-up: Render only routes traffic once the app accepts connections, so a slow step here makes every first visit time out. Run it in the background.
+        threading.Thread(target=_provision_admin, args=(settings,), name="provision-admin", daemon=True).start()
         if not settings.ai_configured:
             log.warning("AI provider '%s' is not configured (set %s_API_KEY and %s_MODEL): /api/chat will return a safe fallback.", settings.ai_provider, settings.ai_provider.upper(), settings.ai_provider.upper())
         yield
@@ -181,7 +186,12 @@ def create_app() -> FastAPI:
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
+        started = time.perf_counter()
         response = await call_next(request)
+        elapsed_ms = (time.perf_counter() - started) * 1000
+        response.headers.setdefault("Server-Timing", f"app;dur={elapsed_ms:.0f}")  # visible in the browser's Network panel: how long the API itself took
+        if elapsed_ms > SLOW_REQUEST_MS and request.url.path != "/health":
+            log.warning("Slow request: %s %s took %.0f ms (status %s)", request.method, request.url.path, elapsed_ms, response.status_code)  # path only: no query string, body or headers
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")

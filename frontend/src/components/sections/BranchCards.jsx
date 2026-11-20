@@ -30,10 +30,12 @@ export default function BranchCards({ className = '', refined = false }) {
                 {b.address.map((line) => <span key={line} className="block">{line}</span>)}
               </address>
             )}
-            {b.phone && (
-              <a href={`tel:${b.tel}`} className="mt-3 inline-flex min-h-11 items-center gap-2 self-start font-semibold text-fg hover:text-lav">
-                <Phone className="size-4 text-lav" aria-hidden="true" /> {b.phone}
-              </a>
+            {b.phones?.length > 0 && (
+              <ul className="mt-3 space-y-0.5">
+                {b.phones.map((p) => (
+                  <li key={p.tel}><a href={`tel:${p.tel}`} className="inline-flex min-h-11 items-center gap-2 self-start font-semibold text-fg hover:text-lav"><Phone className="size-4 text-lav" aria-hidden="true" /> {p.display}</a></li>
+                ))}
+              </ul>
             )}
             <OwnerLinks type="branch" owner={b.id} name={`${b.city} branch`} className="mt-3" />
             {b.embed && <BranchMap src={b.embed} title={`Map of the ${b.city} branch`} className="mt-4" />}

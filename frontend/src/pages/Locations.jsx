@@ -20,7 +20,7 @@ export default function Locations() {
                 <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white"><MapPin className="size-6" aria-hidden="true" /></span>
                 <span className="font-display text-2xl font-semibold transition-colors group-hover:text-lav">LAX360 {b.city}</span>
                 {b.address && <address className="not-italic text-sm text-soft">{b.address.map((l) => <span key={l} className="block">{l}</span>)}</address>}
-                {b.phone && <span className="inline-flex items-center gap-2 text-sm font-semibold"><Phone className="size-4 text-lav" aria-hidden="true" />{b.phone}</span>}
+                {b.phones?.length > 0 && <span className="flex flex-col gap-0.5 text-sm font-semibold">{b.phones.map((p) => <span key={p.tel} className="inline-flex items-center gap-2"><Phone className="size-4 text-lav" aria-hidden="true" />{p.display}</span>)}</span>}
                 <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold text-lav">Office details and directions <ArrowRight className="size-4" aria-hidden="true" /></span>
               </Link>
             </Reveal>

@@ -10,6 +10,14 @@
       "destination": "/index.html"
     },
     {
+      "source": "/play-zone",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/play-zone/:path*",
+      "destination": "/index.html"
+    },
+    {
       "source": "/:lang(ta|hi)/:path*",
       "destination": "/index.html"
     },
@@ -118,6 +126,47 @@
           "value": "noindex, nofollow"
         }
       ]
+    },
+    {
+      "source": "/assets/(.*)\\.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)\\.css",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
-  ]
+  ],
+  "images": {
+    "sizes": [
+      320,
+      480,
+      640,
+      800,
+      960,
+      1280,
+      1600
+    ],
+    "formats": [
+      "image/avif",
+      "image/webp"
+    ],
+    "minimumCacheTTL": 31536000,
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "*.supabase.co",
+        "pathname": "/storage/v1/object/public/**"
+      }
+    ]
+  }
 }

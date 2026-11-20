@@ -1,0 +1,101 @@
+/* LAX360 Play Zone: its own visual identity (pastel purple, blue, pink and gold on a midnight scene), scoped under .pz so nothing else on the website is touched.
+   This file is imported only by the Play Zone pages, so it is downloaded only when a visitor opens them. All motion is transform / opacity and is switched off for reduced motion. */
+
+.pz {
+  --pz-purple: #a78bfa; --pz-blue: #7dd3fc; --pz-pink: #f9a8d4; --pz-gold: #fcd34d; --pz-cyan: #22d3ee;
+  --pz-ink: #120c2e; --pz-ink2: #1d1450; --pz-text: #f5f3ff; --pz-soft: rgba(245, 243, 255, 0.72);
+  position: relative; isolation: isolate; overflow: hidden; color: var(--pz-text);
+  background:
+    radial-gradient(60rem 36rem at 12% -8%, rgba(167, 139, 250, 0.38), transparent 60%),
+    radial-gradient(48rem 30rem at 92% 8%, rgba(125, 211, 252, 0.26), transparent 62%),
+    radial-gradient(50rem 34rem at 50% 108%, rgba(249, 168, 212, 0.26), transparent 62%),
+    linear-gradient(180deg, var(--pz-ink2), var(--pz-ink));
+}
+.pz a { text-decoration: none; }
+.pz :focus-visible { outline: 3px solid var(--pz-gold); outline-offset: 3px; border-radius: 0.75rem; }
+.pz-soft { color: var(--pz-soft); }
+.pz-gold-text { background: linear-gradient(90deg, #fde68a, #fcd34d 40%, #f9a8d4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pz-eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pz-blue); }
+.pz-eyebrow::before { content: ''; width: 1.6rem; height: 2px; background: linear-gradient(90deg, transparent, currentColor); }
+.pz-h1 { font-family: var(--font-display); font-weight: 700; line-height: 1.02; letter-spacing: -0.02em; font-size: clamp(2.6rem, 7vw, 5.4rem); }
+.pz-h2 { font-family: var(--font-display); font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; font-size: clamp(1.8rem, 4vw, 3rem); }
+
+.pz-glass {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 1.5rem; backdrop-filter: blur(14px);
+  box-shadow: 0 28px 60px -34px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+.pz-chip { display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.08); padding: 0.28rem 0.8rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.pz-chip-gold { border-color: rgba(252, 211, 77, 0.6); background: rgba(252, 211, 77, 0.14); color: #fde68a; }
+.pz-chip-dev { border-style: dashed; border-color: rgba(249, 168, 212, 0.7); background: rgba(249, 168, 212, 0.14); color: #fbcfe8; }
+
+.pz-btn { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; gap: 0.55rem; border-radius: 9999px; padding: 0 1.5rem; font-weight: 800; font-size: 0.98rem; transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s, background 0.25s, border-color 0.25s; cursor: pointer; border: 1px solid transparent; }
+.pz-btn:active { transform: scale(0.97); }
+.pz-btn-primary { color: #2b1b00; background: linear-gradient(180deg, #fde68a, #fbbf24); box-shadow: 0 14px 30px -12px rgba(251, 191, 36, 0.8), inset 0 2px 0 rgba(255, 255, 255, 0.6); }
+.pz-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 36px -12px rgba(251, 191, 36, 0.9), inset 0 2px 0 rgba(255, 255, 255, 0.6); }
+.pz-btn-ghost { color: var(--pz-text); background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.28); backdrop-filter: blur(8px); }
+.pz-btn-ghost:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.5); transform: translateY(-2px); }
+.pz-btn[disabled], .pz-btn[aria-disabled='true'] { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ---- scene art ---- */
+.pz-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pz-float { animation: pz-float 6s ease-in-out infinite; }
+.pz-float-b { animation: pz-float 7.5s ease-in-out -2s infinite; }
+.pz-float-c { animation: pz-float 9s ease-in-out -4s infinite; }
+.pz-twinkle { animation: pz-twinkle 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.pz-twinkle:nth-child(2n) { animation-delay: -1.1s; } .pz-twinkle:nth-child(3n) { animation-delay: -2.2s; }
+.pz-drift { animation: pz-drift 38s linear infinite; }
+.pz-spin { animation: pz-spin 40s linear infinite; transform-origin: center; }
+.pz-scan { animation: pz-scan 5s linear infinite; }
+.pz-bob { animation: pz-float 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.pz-bob:nth-child(2n) { animation-duration: 6.4s; animation-delay: -1.5s; } .pz-bob:nth-child(3n) { animation-duration: 7.6s; animation-delay: -3s; }
+@keyframes pz-float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -12px, 0); } }
+@keyframes pz-twinkle { 0%, 100% { opacity: 0.35; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.15); } }
+@keyframes pz-drift { from { transform: translate3d(-8%, 0, 0); } to { transform: translate3d(8%, 0, 0); } }
+@keyframes pz-spin { to { transform: rotate(360deg); } }
+@keyframes pz-scan { from { transform: translate3d(0, -120%, 0); } to { transform: translate3d(0, 520%, 0); } }
+@keyframes pz-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes pz-rise { from { opacity: 0; transform: translate3d(0, 18px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+.pz-rise { animation: pz-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ---- mascot ---- */
+.pz-bot { position: relative; display: inline-block; }
+.pz-bot .bot { width: 100%; height: auto; }
+.pz-bot-glow { position: absolute; left: 50%; bottom: -4%; width: 90%; height: 14%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, var(--bot-glow), transparent); filter: blur(6px); opacity: 0.85; }
+.pz-bot-acc { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+
+/* ---- showcase card ---- */
+.pz-card { position: relative; display: block; overflow: hidden; border-radius: 1.75rem; border: 1px solid rgba(255, 255, 255, 0.2); background: #1a1245; transform-style: preserve-3d; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s, border-color 0.35s; box-shadow: 0 30px 60px -34px rgba(0, 0, 0, 0.8); }
+.pz-card:hover, .pz-card:focus-within { border-color: var(--accent, #fcd34d); box-shadow: 0 36px 70px -30px var(--accent, #fcd34d); }
+.pz-card-art { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+.pz-card-art > .pz-art { transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1); }
+.pz-card:hover .pz-card-art > .pz-art, .pz-card:focus-within .pz-card-art > .pz-art { transform: scale(1.07); }
+.pz-card-bot { position: absolute; right: 6%; bottom: -4%; width: 34%; transform: translateZ(40px); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.pz-card:hover .pz-card-bot, .pz-card:focus-within .pz-card-bot { transform: translateZ(40px) translateY(-6px) scale(1.05); }
+.pz-card-shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%); transform: translateX(-120%); }
+.pz-card:hover .pz-card-shine { transform: translateX(120%); transition: transform 1s ease; }
+
+/* ---- stage / skeleton ---- */
+.pz-stage { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 1.75rem; border: 1px solid rgba(255, 255, 255, 0.22); background: #140d36; }
+@media (max-width: 640px) { .pz-stage { aspect-ratio: 3 / 4; min-height: 30rem; } }
+@media (max-width: 900px) and (orientation: landscape) { .pz-stage { aspect-ratio: 16 / 9; min-height: 0; } }
+.pz-skeleton { position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.08); border-radius: 0.75rem; }
+.pz-skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent); animation: pz-shimmer 1.4s linear infinite; }
+
+/* ---- form controls on the dark scene ---- */
+.pz input[type='range'] { accent-color: var(--pz-gold); }
+.pz-tab { min-height: 2.75rem; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.07); padding: 0 1.1rem; font-weight: 700; font-size: 0.92rem; color: var(--pz-text); transition: background 0.2s, border-color 0.2s, color 0.2s; cursor: pointer; }
+.pz-tab:hover { background: rgba(255, 255, 255, 0.16); }
+.pz-tab[aria-pressed='true'], .pz-tab[aria-selected='true'] { background: linear-gradient(180deg, #fde68a, #fbbf24); color: #2b1b00; border-color: transparent; }
+.pz details > summary { list-style: none; cursor: pointer; }
+.pz details > summary::-webkit-details-marker { display: none; }
+.pz details[open] .pz-chev { transform: rotate(180deg); }
+.pz-chev { transition: transform 0.25s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pz *, .pz *::before, .pz *::after { animation: none !important; transition: none !important; }
+  .pz-card { transform: none !important; }
+}
+
+/* While a level is being played on a touch screen the floating assistant would sit on the jump button, so it is hidden until the game is paused or left. */
+body[data-pz-playing] [data-chat-launcher] { display: none; }

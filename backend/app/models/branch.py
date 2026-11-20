@@ -15,7 +15,7 @@ class Branch(UUIDPk, Timestamps, Base):
     name: Mapped[str] = mapped_column(String(160))
     city: Mapped[str] = mapped_column(String(80), unique=True)
     address: Mapped[str | None] = mapped_column(Text)  # newline-separated lines
-    phone: Mapped[str | None] = mapped_column(String(32))
+    phone: Mapped[str | None] = mapped_column(String(80))  # one number, or several separated by commas (e.g. Salem has two)
     map_embed_url: Mapped[str | None] = mapped_column(String(1500))  # https://www.google.com/maps/embed?... only (validated by branch_service.parse_map_embed)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     sort_order: Mapped[int] = mapped_column(Integer, default=0, server_default="0")

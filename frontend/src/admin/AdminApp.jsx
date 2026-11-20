@@ -1,10 +1,11 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, Languages, Layers, MapPin, Share2, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, Gamepad2, Languages, Layers, MapPin, Share2, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
 import { api } from '../services/apiClient.js'
+import { warmBackend } from '../services/backendWake.js'
 import { Badge, Btn, Card, ErrorState, Field, Input, Spinner, ToastProvider, cx, useFetch } from './ui.jsx'
 
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
@@ -32,6 +33,7 @@ const Customers = lazy(() => import('./pages/Customers.jsx'))
 const PagesModule = lazy(() => import('./pages/Pages.jsx'))
 const BranchLocations = lazy(() => import('./pages/BranchLocations.jsx'))
 const TranslationsAdmin = lazy(() => import('./pages/Translations.jsx'))
+const PlayZoneAdmin = lazy(() => import('./pages/PlayZoneAdmin.jsx'))
 const SeoAdmin = lazy(() => import('./pages/SeoAdmin.jsx'))
 const SocialContact = lazy(() => import('./pages/SocialContact.jsx'))
 const BranchSocial = lazy(() => import('./pages/OwnerSocial.jsx').then((m) => ({ default: m.BranchSocial })))
@@ -60,6 +62,7 @@ const NAV = [
   { section: 'Company', to: '/company-admin/network', label: 'Our network', icon: Network, module: 'content', hint: 'Group companies, partners, software distribution and the Our Network page' },
   { section: 'Products & portfolio', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
   { section: 'Products & portfolio', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
+  { section: 'Play Zone', to: '/company-admin/play-zone', label: 'Play Zone', icon: Gamepad2, module: 'content', hint: 'Games, players, leaderboards, achievements and settings (interface preview: backend not connected yet)' },
   { section: 'Pages & settings', to: '/company-admin/translations', label: 'Translations', icon: Languages, module: 'content', hint: 'The website in Tamil, Hindi and other languages: edit each page and section' },
   { section: 'Pages & settings', to: '/company-admin/seo', label: 'SEO management', icon: Search, module: ['navigation', 'content'], hint: 'Search titles, descriptions, sharing images, indexing, redirects and the sitemap' },
   { section: 'Pages & settings', to: '/company-admin/content', label: 'All website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'], hint: 'Every other page, section, list and text of the public website' },
@@ -228,7 +231,8 @@ function AdminLogin() {
   const location = useLocation()
   const [values, setValues] = useState({ email: '', password: '' })
   const [show, setShow] = useState(false)
-  const [state, setState] = useState({ busy: false, error: '', fields: {} })
+  const [state, setState] = useState({ busy: false, error: '', fields: {}, status: '' })
+  useEffect(() => { warmBackend() }, []) // wake a sleeping backend while the person types their password
   if (!loading && user) return <Navigate to={typeof location.state?.from === 'string' && location.state.from.startsWith('/company-admin') ? location.state.from : '/company-admin/dashboard'} replace />
 
   const submit = async (e) => {
@@ -238,9 +242,9 @@ function AdminLogin() {
     if (!values.email.trim()) fields.email = 'Enter your email or username.'
     if (!values.password) fields.password = 'Enter your password.'
     if (Object.keys(fields).length) return setState({ busy: false, error: '', fields })
-    setState({ busy: true, error: '', fields: {} })
-    const r = await signIn({ email: values.email.trim(), password: values.password })
-    if (!r.ok) setState({ busy: false, error: r.fields ? '' : r.error, fields: r.fields || {} })
+    setState({ busy: true, error: '', fields: {}, status: '' })
+    const r = await signIn({ email: values.email.trim(), password: values.password, onStatus: (status) => setState((s) => ({ ...s, status })) })
+    if (!r.ok) setState({ busy: false, error: r.fields ? '' : r.error, fields: r.fields || {}, status: '' })
     // On success the admin session store updates and this page redirects to the dashboard (see the guard above).
   }
 
@@ -256,6 +260,7 @@ function AdminLogin() {
           {notice === 'expired' && <p role="status" className="mb-4 rounded-lg border border-edge bg-glass-strong p-3 text-sm">Your session expired. Please sign in again.</p>}
           {notice === 'lost' && <p role="status" className="mb-4 rounded-lg border border-edge bg-glass-strong p-3 text-sm">The server no longer recognises your admin session (it may have ended or been signed out elsewhere). Please sign in again.</p>}
           <form onSubmit={submit} noValidate className="space-y-4" aria-busy={state.busy}>
+            {state.busy && state.status && <p role="status" aria-live="polite" className="rounded-lg border border-edge bg-surface/60 p-3 text-sm font-medium">{state.status}</p>}
             {state.error && <p role="alert" className="rounded-lg border border-error/40 bg-error/10 p-3 text-sm font-medium text-error">{state.error}</p>}
             <Field label="Email or username" required error={state.fields.email}>{(p) => <Input {...p} type="text" autoComplete="username" autoCapitalize="none" spellCheck={false} placeholder="admin@example.com" value={values.email} onChange={(e) => setValues({ ...values, email: e.target.value })} />}</Field>
             <Field label="Password" required error={state.fields.password}>
@@ -291,6 +296,7 @@ export default function AdminApp() {
           <Route path="page-images" element={<Navigate to="/company-admin/pages" replace />} />
           <Route path="branches" element={<Guard module="settings"><BranchLocations /></Guard>} />
           <Route path="translations" element={<Guard module="content"><TranslationsAdmin /></Guard>} />
+          <Route path="play-zone" element={<Guard module="content"><PlayZoneAdmin /></Guard>} />
           <Route path="seo" element={<Guard module="navigation"><SeoAdmin /></Guard>} />
           <Route path="social-contact" element={<Guard module="settings"><SocialContact /></Guard>} />
           <Route path="branches/:slug/social" element={<Guard module="settings"><BranchSocial /></Guard>} />

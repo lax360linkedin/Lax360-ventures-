@@ -69,10 +69,11 @@ const ChatLauncher = forwardRef(function ChatLauncher({ open, onOpen, raised }, 
 
   return (
     <div
+      data-chat-launcher
       className={`fixed right-3 z-40 flex flex-col items-end gap-3 md:right-5 lg:right-6 ${raised ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom))]' : 'bottom-[calc(0.75rem+env(safe-area-inset-bottom))] md:bottom-5'} lg:bottom-6`}
     >
       {showCallout && (
-        <div role="status" className="glass relative max-w-[16rem] p-4 pr-10 text-base leading-snug">
+        <div role="status" className="glass absolute bottom-full right-0 mb-3 w-max max-w-[16rem] p-4 pr-10 text-base leading-snug">
           <p>Hi there! I&apos;m your LAX360 AI Assistant. Need help exploring our services?</p>
           <button type="button" onClick={dismiss} aria-label="Dismiss message" className="absolute right-1 top-1 inline-flex size-10 items-center justify-center rounded-full text-soft hover:text-fg">
             <X className="size-4" aria-hidden="true" />

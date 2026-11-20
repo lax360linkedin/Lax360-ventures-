@@ -1,3 +1,4 @@
+import { optimizeImageFile } from '../utils/optimizeUpload.js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckCircle2, ImagePlus, Loader2, RotateCcw, X } from 'lucide-react'
 import { api, upload } from '../services/apiClient.js'
@@ -71,7 +72,10 @@ export function usePasteImages(onFiles, { disabled = false, hot } = {}) {
 export const readSize = (url) => new Promise((resolve) => { const img = new Image(); img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight }); img.onerror = () => resolve(null); img.src = url })
 
 /** Upload one picture to the media library. Resolves with the library item (its `id` is what content fields store). */
-export const uploadImage = (file, onProgress) => upload(`/api/admin/media?filename=${encodeURIComponent(file.name)}&public=true`, file, { onProgress })
+export const uploadImage = async (original, onProgress) => {
+  const file = await optimizeImageFile(original) // big PNG/JPEG photographs become smaller WebP files before they are stored
+  return upload(`/api/admin/media?filename=${encodeURIComponent(file.name)}&public=true`, file, { onProgress })
+}
 
 let limitsCache = null
 export async function imageLimit() {

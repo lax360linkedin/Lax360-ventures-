@@ -1,3 +1,4 @@
+import { optimizeImageFile } from '../utils/optimizeUpload.js'
 import { useRef, useState } from 'react'
 import { FileText, Film, ImageOff, Search, Upload } from 'lucide-react'
 import { api, upload } from '../services/apiClient.js'
@@ -36,7 +37,8 @@ export function useUploader({ onUploaded, limits }) {
       setJobs((cur) => [...cur, { id, name: file.name, progress: 0, state: 'uploading', message: '' }])
       if (max && file.size > max) { patch(id, { state: 'error', message: `Too large (${fmtSize(file.size)}); the limit is ${fmtSize(max)}.` }); continue }
       try {
-        const asset = await upload(`/api/admin/media?filename=${encodeURIComponent(file.name)}${isPublic ? '&public=true' : ''}`, file, { onProgress: (p) => patch(id, { progress: p }) })
+        const toSend = await optimizeImageFile(file)
+        const asset = await upload(`/api/admin/media?filename=${encodeURIComponent(toSend.name)}${isPublic ? '&public=true' : ''}`, toSend, { onProgress: (p) => patch(id, { progress: p }) })
         patch(id, { progress: 1, state: asset.duplicate ? 'duplicate' : 'done', message: asset.duplicate ? 'This exact file was already in the library, so it was reused.' : 'Uploaded and saved permanently.' })
         onUploaded?.(asset)
       } catch (e) {
