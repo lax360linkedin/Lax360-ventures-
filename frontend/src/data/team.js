@@ -11,6 +11,7 @@ export const teamText = {
   departmentsLead: 'Our people, organised by the department they work in.',
   directoryTitle: 'Meet Our Team',
   directoryLead: 'The specialists who plan, build and support what we deliver.',
+  cultureEyebrow: 'Life at LAX360',
   cultureTitle: 'Our People & Culture',
   cultureLead: 'How we work, learn and celebrate together.',
   expertiseTitle: 'Our Expertise',
@@ -48,4 +49,8 @@ export const cultureCategories = [
   { value: 'knowledge', label: 'Knowledge-sharing sessions' },
   { value: 'learning', label: 'Learning & development' },
   { value: 'achievements', label: 'Employee achievements' },
+  { value: 'games', label: 'Games & fun activities' },
+  { value: 'functions', label: 'Company functions' },
+  { value: 'outings', label: 'Team outings & gatherings' },
+  { value: 'events', label: 'Office events & special occasions' },
 ]

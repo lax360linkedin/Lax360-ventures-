@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { m, useReducedMotion } from 'framer-motion'
-import { ArrowRight, Briefcase, Bot, Brain, Cloud, Code2, GraduationCap, Layers, Megaphone, Search, Server, Sparkles, Workflow } from 'lucide-react'
+import { ArrowRight, Plus, Briefcase, Bot, Brain, Cloud, Code2, GraduationCap, Layers, Megaphone, Search, Server, Sparkles, Workflow } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import Button from '../components/ui/Button.jsx'
 import { Avatar, EmptyNote, SkillTags, Social } from '../components/team/TeamBits.jsx'
+import MemberProfile from '../components/team/MemberProfile.jsx'
+import LifeCarousel from '../components/team/LifeCarousel.jsx'
 import { useJobs } from '../components/cms/CmsJobs.jsx'
-import { cultureCategories, defaultExpertise, leaderRank, roleLabels, roleRank, teamText } from '../data/team.js'
+import { defaultExpertise, leaderRank, roleLabels, roleRank, teamText } from '../data/team.js'
 import { useTeam, useDepartmentList, useTeamExpertise, useTeamGallery, useTeamPageText, useTeamSections } from '../hooks/useCmsPages.js'
 
 const ICONS = { code: Code2, server: Server, sparkles: Sparkles, brain: Brain, layers: Layers, cloud: Cloud, workflow: Workflow, megaphone: Megaphone, bot: Bot, briefcase: Briefcase }
@@ -16,72 +18,70 @@ const ICONS = { code: Code2, server: Server, sparkles: Sparkles, brain: Brain, l
 const SampleTag = ({ className = '' }) => <span className={`inline-flex w-fit items-center rounded-full border border-dashed border-edge-strong bg-glass px-2.5 py-0.5 text-[0.66rem] font-bold uppercase tracking-wider text-soft ${className}`}>Sample profile</span>
 
 /**
- * The founder (Founder, CEO and Managing Director are one person: shown once). The photograph is centred and prominent inside a slowly rotating ring of light, floats gently, and
- * enters with a soft rise; the name, designation and a short introduction follow below it. All motion is CSS transform / opacity (cheap on the GPU) and is off for reduced motion.
+ * The founder (Founder, CEO and Managing Director are one person: shown once). A centred, compact portrait inside a single slowly turning ring of light, then the name, designation and introduction.
+ * Everything animates with transform / opacity only (cheap on the GPU) and the motion is off for reduced motion.
  */
-function FounderSpotlight({ p }) {
+function FounderSpotlight({ p, onOpen }) {
   const reduce = useReducedMotion()
-  const rise = (delay = 0) => (reduce ? {} : { initial: { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-60px' }, transition: { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] } })
+  const rise = (delay = 0) => (reduce ? {} : { initial: { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-50px' }, transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] } })
   return (
     <section id="leadership" aria-labelledby="founder-name" className="relative scroll-mt-24 overflow-hidden border-b border-edge">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="fd-glow absolute left-1/2 top-[18%] size-[46rem] max-w-[140vw] -translate-x-1/2 rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow)/0.28), transparent 70%)' }} />
-        <div className="absolute -left-32 bottom-0 size-[28rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow2)/0.18), transparent 70%)' }} />
-        <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)', backgroundSize: '56px 56px', maskImage: 'radial-gradient(60% 60% at 50% 35%, #000, transparent)', WebkitMaskImage: 'radial-gradient(60% 60% at 50% 35%, #000, transparent)' }} />
+        <div className="fd-glow absolute left-1/2 top-[8%] size-[34rem] max-w-[130vw] -translate-x-1/2 rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow)/0.22), transparent 70%)' }} />
+        <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)', backgroundSize: '22px 22px', maskImage: 'radial-gradient(55% 70% at 50% 30%, #000, transparent)', WebkitMaskImage: 'radial-gradient(55% 70% at 50% 30%, #000, transparent)' }} />
       </div>
-      <div className="wrap relative flex flex-col items-center px-4 pb-16 pt-14 text-center md:pb-24 md:pt-20">
+      <div className="wrap relative flex flex-col items-center px-4 pb-12 pt-10 text-center md:pb-16 md:pt-14">
         <m.p {...rise()} className="eyebrow flex items-center gap-3 text-lav"><span aria-hidden="true" className="h-px w-8 bg-gradient-to-r from-transparent to-current" />Founder<span aria-hidden="true" className="h-px w-8 bg-gradient-to-l from-transparent to-current" /></m.p>
 
-        <m.div {...(reduce ? {} : { initial: { opacity: 0, scale: 0.88, y: 36 }, whileInView: { opacity: 1, scale: 1, y: 0 }, viewport: { once: true, margin: '-40px' }, transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] } })} className="relative mt-10">
-          <div className="relative grid size-[17rem] place-items-center sm:size-[20rem] md:size-[23rem]">
-            <span aria-hidden="true" className="fd-ring absolute -inset-4 rounded-full opacity-90" style={{ background: 'conic-gradient(from 0deg, rgb(var(--glow)), transparent 30%, rgb(var(--glow2)) 55%, transparent 80%, rgb(var(--glow)))', WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px))', mask: 'radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px))' }} />
-            <span aria-hidden="true" className="fd-orbit absolute -inset-10"><span className="absolute left-1/2 top-0 size-3 -translate-x-1/2 rounded-full bg-primary shadow-[0_0_18px_rgb(var(--glow))]" /></span>
-            <span aria-hidden="true" className="fd-orbit-r absolute -inset-14"><span className="absolute bottom-0 left-1/2 size-2.5 -translate-x-1/2 rounded-full bg-accent shadow-[0_0_16px_rgb(var(--glow2))]" /></span>
-            <figure className="fd-float relative m-0 size-full overflow-hidden rounded-full border-4 border-white/25 shadow-[0_30px_80px_-20px_rgb(var(--glow)/0.7)]">
-              <Avatar person={p} className="size-full !aspect-auto" sizes="(min-width: 768px) 23rem, 20rem" />
+        <m.div {...(reduce ? {} : { initial: { opacity: 0, scale: 0.92, y: 24 }, whileInView: { opacity: 1, scale: 1, y: 0 }, viewport: { once: true, margin: '-40px' }, transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } })} className="relative mt-7">
+          <div className="relative grid size-[12.5rem] place-items-center sm:size-[14.5rem] md:size-[16rem]">
+            <span aria-hidden="true" className="fd-ring absolute -inset-3 rounded-full opacity-90" style={{ background: 'conic-gradient(from 0deg, rgb(var(--glow)), transparent 30%, rgb(var(--glow2)) 55%, transparent 80%, rgb(var(--glow)))', WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))', mask: 'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))' }} />
+            <figure className="relative m-0 size-full overflow-hidden rounded-full border-[3px] border-white/30 shadow-[0_24px_60px_-22px_rgb(var(--glow)/0.65)]">
+              <Avatar person={p} className="size-full !aspect-auto" sizes="(min-width: 768px) 16rem, 14.5rem" />
               <span aria-hidden="true" className="fd-sheen pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
             </figure>
           </div>
         </m.div>
 
-        <m.h2 {...rise(0.15)} id="founder-name" className="mt-14 font-display text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">{p.name}</m.h2>
-        <m.p {...rise(0.25)} className="mt-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-lg font-semibold text-transparent md:text-2xl">{p.designation}</m.p>
-        {p.sample && <m.div {...rise(0.3)} className="mt-3"><SampleTag /></m.div>}
-        <m.span {...rise(0.3)} aria-hidden="true" className="mt-6 block h-px w-24 bg-gradient-to-r from-transparent via-edge-strong to-transparent" />
-        {p.bio && <m.p {...rise(0.35)} className="mt-6 max-w-2xl text-lg leading-relaxed text-soft md:text-xl">{p.bio}</m.p>}
-        <m.div {...rise(0.4)} className="mt-6 flex flex-col items-center"><SkillTags items={p.expertise} label={`${p.name}: skills`} className="justify-center" /><Social person={p} /></m.div>
+        <m.h2 {...rise(0.12)} id="founder-name" className="mt-8 font-display text-3xl font-semibold leading-[1.1] tracking-tight md:text-5xl">{p.name}</m.h2>
+        <m.p {...rise(0.2)} className="mt-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-base font-semibold text-transparent md:text-xl">{p.designation}</m.p>
+        {p.sample && <m.div {...rise(0.25)} className="mt-3"><SampleTag /></m.div>}
+        {p.bio && (
+          <m.blockquote {...rise(0.3)} className="relative mt-6 max-w-2xl rounded-2xl border border-edge bg-glass px-5 py-5 text-left text-[0.95rem] leading-relaxed text-soft shadow-[0_18px_40px_-28px_rgb(var(--glow)/0.5)] backdrop-blur sm:text-center md:px-8 md:py-6 md:text-base">
+            <span aria-hidden="true" className="absolute -top-3 left-6 grid size-7 place-items-center rounded-full bg-gradient-to-br from-primary to-accent font-display text-lg leading-none text-white">“</span>
+            {p.bio}
+          </m.blockquote>
+        )}
+        <m.div {...rise(0.38)} className="mt-5 flex flex-col items-center"><SkillTags items={p.expertise} label={`${p.name}: skills`} className="justify-center" /><Social person={p} />
+          <button type="button" onClick={() => onOpen(p)} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-edge-strong bg-glass px-5 text-sm font-semibold transition-colors hover:border-lav hover:bg-glass-strong">View full profile <ArrowRight className="size-4" aria-hidden="true" /></button></m.div>
       </div>
     </section>
   )
 }
 
-/** An employee card: one photo size, name, designation, department (when shown), a short bio and skills. Cards are the same size whatever the content. */
-function MemberCard({ p, i, deptName }) {
+/**
+ * A team member in the gallery: the photograph only. The name is read by screen readers and the whole tile is a button that opens the full profile. On hover the photograph zooms gently,
+ * a ring of light draws round it and a small "open" mark appears. Every tile is the same size whatever the photograph.
+ */
+function PhotoTile({ p, i, onOpen }) {
   return (
     <Reveal as="li" delay={(i % 4) * 0.05}>
-      <article className="glass-flat lift group flex h-full flex-col overflow-hidden">
-        <div className="relative overflow-hidden">
-          <Avatar person={p} className="aspect-[4/5]" sizes="(min-width: 1024px) 20rem, (min-width: 640px) 45vw, 100vw" />
-          {(p.isHead || p.role === 'team_lead') && <span className="absolute left-3 top-3 rounded-full bg-night/80 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-white backdrop-blur">{roleLabels[p.role]}</span>}
-          {p.sample && <span className="absolute right-3 top-3 rounded-full border border-dashed border-white/50 bg-night/70 px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-white backdrop-blur">Sample</span>}
-        </div>
-        <div className="flex flex-1 flex-col gap-1 p-5">
-          <h3 className="font-display text-xl font-semibold leading-tight">{p.name}</h3>
-          <p className="text-sm font-semibold text-lav">{p.designation}</p>
-          {deptName && <p className="text-xs font-semibold uppercase tracking-wider text-soft">{deptName}</p>}
-          {p.bio && <p className="mt-2 line-clamp-4 text-sm text-soft">{p.bio}</p>}
-          <SkillTags items={p.expertise} max={4} label={`${p.name}: skills`} className="mt-3" />
-          <div className="mt-auto"><Social person={p} /></div>
-        </div>
-      </article>
+      <button type="button" onClick={() => onOpen(p)} aria-haspopup="dialog" aria-label={`${p.name}, ${p.designation}`} className="group relative block w-full overflow-hidden rounded-3xl border border-edge bg-glass text-left outline-none transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1.5 hover:border-lav hover:shadow-[0_26px_50px_-26px_rgb(var(--glow)/0.7)] focus-visible:ring-2 focus-visible:ring-lav">
+        <Avatar person={p} className="aspect-[4/5]" sizes="(min-width: 1024px) 19rem, (min-width: 640px) 45vw, 90vw" />
+        <span aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 ring-1 ring-inset ring-white/40 transition-opacity duration-500 group-hover:opacity-100" />
+        <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-night/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        <span aria-hidden="true" className="absolute bottom-3 right-3 grid size-10 translate-y-2 place-items-center rounded-full bg-white/90 text-night opacity-0 shadow-lg transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 max-sm:translate-y-0 max-sm:opacity-100"><Plus className="size-5" /></span>
+        {(p.isHead || p.role === 'team_lead') && <span aria-hidden="true" className="absolute left-3 top-3 rounded-full bg-night/80 px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.14em] text-white backdrop-blur">{roleLabels[p.role]}</span>}
+        {p.sample && <span aria-hidden="true" className="absolute right-3 top-3 rounded-full border border-dashed border-white/50 bg-night/70 px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-white backdrop-blur">Sample</span>}
+      </button>
     </Reveal>
   )
 }
 
 /** Cards in rows of a steady width: a team of three looks as balanced as a team of thirty. */
-const Gallery = ({ people, deptName, label }) => (
-  <ul aria-label={label} className="grid justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,15.5rem),19.5rem))]">
-    {people.map((p, i) => <MemberCard key={p.slug} p={p} i={i} deptName={deptName?.(p)} />)}
+const Gallery = ({ people, label, onOpen }) => (
+  <ul aria-label={label} className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5">
+    {people.map((p, i) => <PhotoTile key={p.slug} p={p} i={i} onOpen={onOpen} />)}
   </ul>
 )
 
@@ -100,7 +100,7 @@ export default function Team() {
   const show = useTeamSections()
   const jobs = useJobs()
   const [query, setQuery] = useState('')
-  const [shot, setShot] = useState('all')
+  const [openPerson, setOpenPerson] = useState(null) // the team member whose profile is open
 
   const deptByslug = useMemo(() => Object.fromEntries(departments.map((d) => [d.slug, d])), [departments])
   // Founder, CEO and Managing Director are one person: only the first one marked is shown as the founder (any other is listed with the team, never twice)
@@ -119,11 +119,8 @@ export default function Team() {
   const flat = useMemo(() => [...staff].sort((a, b) => (a.isLeader ? -1 : 0) - (b.isLeader ? -1 : 0) || a.order - b.order), [staff])
   const searchable = flat.length >= 12
   const shown = flat.filter((p) => !q || [p.name, p.designation, p.bio, deptByslug[p.department]?.name, p.expertise.join(' ')].join(' ').toLowerCase().includes(q))
-  const deptName = (p) => deptByslug[p.department]?.name || ''
 
   const expertise = cmsExpertise || defaultExpertise
-  const shotCats = cultureCategories.filter((c) => gallery.some((g) => g.category === c.value))
-  const shots = gallery.filter((g) => shot === 'all' || g.category === shot)
   const openings = jobs.length
   const hasPeople = leaders.length + staff.length > 0
   const chip = (on) => `inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-semibold transition-colors ${on ? 'border-primary bg-primary text-white' : 'border-edge-strong bg-glass hover:border-lav hover:bg-glass-strong'}`
@@ -143,7 +140,7 @@ export default function Team() {
           </>
         )}
         {!page.hero_image && <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 size-[32rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow)/0.28), transparent)' }} />}
-        <div className="wrap relative grid gap-10 pb-12 pt-12 md:pb-16 md:pt-20">
+        <div className="wrap relative grid gap-8 pb-10 pt-10 md:pb-12 md:pt-16">
           <Reveal y={12} className="max-w-4xl">
             <p className="eyebrow mb-6 flex items-center gap-3 text-lav"><span aria-hidden="true" className="h-px w-10 bg-current" />{page.hero_eyebrow || teamText.heroEyebrow}</p>
             <h1 className="h1 !text-[clamp(2.5rem,5.6vw,5.5rem)]">{page.hero_title || teamText.heroTitle}</h1>
@@ -159,7 +156,7 @@ export default function Team() {
       </section>
 
       {/* The founder */}
-      {leaders.length > 0 && <FounderSpotlight p={leaders[0]} />}
+      {leaders.length > 0 && <FounderSpotlight p={leaders[0]} onOpen={setOpenPerson} />}
 
       {!hasPeople && (
         <section className="wrap section"><EmptyNote>Our team profiles are being added. Check back soon to meet the people behind LAX360 Pvt Ltd.</EmptyNote></section>
@@ -190,7 +187,7 @@ export default function Team() {
                         {d && (d.overview || d.roles.length > 0) && <Link to={`/our-team/${d.slug}`} className="mt-3 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-lav hover:underline">About this department <ArrowRight className="size-4" aria-hidden="true" /></Link>}
                       </div>
                     </Reveal>
-                    <Gallery people={list} label={`${d?.name || 'Other team members'}: people`} />
+                    <Gallery people={list} label={`${d?.name || 'Other team members'}: people`} onOpen={setOpenPerson} />
                   </div>
                 )
               })}
@@ -201,7 +198,9 @@ export default function Team() {
 
       {/* Departments off (or none created yet): every other employee in one gallery */}
       {!grouped && show.directory && flat.length > 0 && (
-        <section id="team" className="wrap section scroll-mt-24" aria-labelledby="directory-title">
+        <section id="team" className="relative scroll-mt-24 overflow-hidden" aria-labelledby="directory-title">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)', backgroundSize: '24px 24px', maskImage: 'linear-gradient(to bottom, #000, transparent 70%)', WebkitMaskImage: 'linear-gradient(to bottom, #000, transparent 70%)' }} />
+          <div className="wrap section relative">
           <SectionHeading id="directory-title" eyebrow="The team" title={page.directory_title || teamText.directoryTitle} lead={page.directory_lead || teamText.directoryLead} />
           {searchable && (
             <label className="relative mt-8 block w-full sm:max-w-xs">
@@ -211,39 +210,20 @@ export default function Team() {
             </label>
           )}
           <div className="mt-10" aria-live="polite">
-            {shown.length > 0 ? <Gallery people={shown} deptName={deptName} label="Team members" /> : <EmptyNote>No team members match your search.</EmptyNote>}
+            {shown.length > 0 ? <Gallery people={shown} label="Team members" onOpen={setOpenPerson} /> : <EmptyNote>No team members match your search.</EmptyNote>}
+          </div>
           </div>
         </section>
       )}
 
-      {/* Culture photographs (only when there are some) */}
+      {/* Life at LAX360: one common carousel of games, functions, celebrations and other events (not part of any profile) */}
       {show.culture && gallery.length > 0 && (
-        <section id="culture" className="border-y border-edge bg-base2/60" aria-labelledby="culture-title">
-          <div className="wrap section">
-            <SectionHeading id="culture-title" eyebrow="Culture" title={page.culture_title || teamText.cultureTitle} lead={page.culture_lead || teamText.cultureLead} />
-            {shotCats.length > 1 && (
-              <div role="group" aria-label="Filter photographs" className="mt-8 flex flex-wrap gap-2">
-                <button type="button" aria-pressed={shot === 'all'} onClick={() => setShot('all')} className={chip(shot === 'all')}>All</button>
-                {shotCats.map((c) => <button key={c.value} type="button" aria-pressed={shot === c.value} onClick={() => setShot(c.value)} className={chip(shot === c.value)}>{c.label}</button>)}
-              </div>
-            )}
-            <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {shots.map((g, i) => (
-                <Reveal as="li" key={g.slug} delay={(i % 3) * 0.05}>
-                  <figure className="group relative overflow-hidden rounded-2xl border border-edge">
-                    <img src={g.image} alt={g.alt} width="800" height="600" loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
-                    {(g.caption || g.text) && (
-                      <figcaption className="media-dark absolute inset-x-0 bottom-0 bg-gradient-to-t from-night/90 to-transparent p-4 pt-10">
-                        <p className="text-xs font-bold uppercase tracking-wider text-lav">{cultureCategories.find((c) => c.value === g.category)?.label}</p>
-                        {g.caption && <p className="font-display text-lg font-semibold text-fg">{g.caption}</p>}
-                        {g.text && <p className="mt-1 text-sm text-soft">{g.text}</p>}
-                      </figcaption>
-                    )}
-                  </figure>
-                </Reveal>
-              ))}
-            </ul>
+        <section id="culture" className="relative overflow-hidden border-y border-edge bg-base2/60" aria-labelledby="culture-title">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-24 top-10 size-[26rem] rounded-full" style={{ background: 'radial-gradient(closest-side, rgb(var(--glow2)/0.14), transparent 70%)' }} />
+          <div className="wrap section relative">
+            <SectionHeading id="culture-title" eyebrow={teamText.cultureEyebrow} title={page.culture_title || teamText.cultureTitle} lead={page.culture_lead || teamText.cultureLead} />
           </div>
+          <LifeCarousel items={gallery} chip={chip} />
         </section>
       )}
 
@@ -298,6 +278,7 @@ export default function Team() {
           </div>
         </section>
       )}
+      <MemberProfile person={openPerson} department={openPerson ? deptByslug[openPerson.department]?.name : ''} onClose={() => setOpenPerson(null)} />
     </PageContainer>
   )
 }

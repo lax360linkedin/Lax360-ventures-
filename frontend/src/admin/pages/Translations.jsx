@@ -8,6 +8,8 @@ const bundled = import.meta.glob('../../i18n/catalogs/*.json')
 const SHARED = '__shared'
 const POPUPS = '__popups'
 const CUSTOM = '__custom'
+const CONTENT = '__content'
+const KIND = { article: 'Article', product: 'Product', industry: 'Industry', network_partner: 'Network partner', website: 'Website demo', team_member: 'Team member', service_card: 'Service', testimonial: 'Testimonial', career_role: 'Career role', faq: 'FAQ' }
 
 /**
  * Translations: the website's texts in each language, edited per language, page by page and section by section. The list of texts comes from the built website (/i18n-strings.json, written by every
@@ -27,10 +29,13 @@ export default function Translations() {
   const [onlyMissing, setOnlyMissing] = useState(false)
   const [busy, setBusy] = useState(false)
   const [custom, setCustom] = useState({ source: '', value: '' })
+  const [contentList, setContentList] = useState([]) // texts of the content managed in the admin panel (articles, products, team members, websites…)
 
   useEffect(() => {
     fetch('/i18n-strings.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error('The list of the website’s texts has not been built yet. Run a production build (npm run build) and reload.')))).then((c) => { setCatalog(c); setLang((l) => l || c.languages[0]?.code || '') }).catch(setError)
   }, [])
+
+  useEffect(() => { api('/api/admin/translations/content-strings').then((r) => setContentList(r.strings || [])).catch(() => setContentList([])) }, [])
 
   const load = async (code) => {
     const file = bundled[`../../i18n/catalogs/${code}.json`]
@@ -45,6 +50,7 @@ export default function Translations() {
     return new Set([...catalog.shared.map((s) => s.s), ...catalog.pages.flatMap((p) => p.strings.map((s) => s.s))])
   }, [catalog])
 
+  const contentSet = useMemo(() => new Set(contentList.map((c) => c.s)), [contentList])
   const current = (s) => (edits[s] !== undefined ? edits[s] : saved[s] ?? shipped[s] ?? '')
   const statusOf = (s) => (edits[s] !== undefined ? 'edited' : saved[s] ? 'admin' : shipped[s] ? 'built-in' : 'missing')
 
@@ -52,9 +58,10 @@ export default function Translations() {
     if (!catalog) return []
     if (page === SHARED) return catalog.shared
     if (page === POPUPS) return Object.keys(shipped).filter((k) => !known.has(k)).map((s) => ({ s, section: '' }))
-    if (page === CUSTOM) return Object.keys(saved).filter((k) => !known.has(k) && shipped[k] === undefined).map((s) => ({ s, section: '' }))
+    if (page === CONTENT) return contentList.map((c) => ({ s: c.s, section: `${KIND[c.kind] || c.kind}: ${c.title}` }))
+    if (page === CUSTOM) return Object.keys(saved).filter((k) => !known.has(k) && shipped[k] === undefined && !contentSet.has(k)).map((s) => ({ s, section: '' }))
     return catalog.pages.find((p) => p.route === page)?.strings || []
-  }, [catalog, page, shipped, saved, known])
+  }, [catalog, page, shipped, saved, known, contentList, contentSet])
 
   const progress = (list) => { const total = list.length; const done = list.filter((r) => saved[r.s] || shipped[r.s]).length; return { total, done } }
   const shown = rows.filter((r) => (!onlyMissing || statusOf(r.s) === 'missing') && (!search.trim() || `${r.s} ${current(r.s)}`.toLowerCase().includes(search.trim().toLowerCase())))
@@ -77,7 +84,7 @@ export default function Translations() {
 
   if (error) return <ErrorState error={error} onRetry={() => window.location.reload()} />
   if (!catalog) return <Spinner />
-  const pages = [{ key: SHARED, label: 'Menu, footer & shared texts', list: catalog.shared }, ...catalog.pages.map((p) => ({ key: p.route, label: p.route === '/' ? 'Home page' : p.route, list: p.strings })), { key: POPUPS, label: 'Pop-ups, forms & messages', list: Object.keys(shipped).filter((k) => !known.has(k)).map((s) => ({ s })) }, { key: CUSTOM, label: 'Added texts (articles, products…)', list: Object.keys(saved).filter((k) => !known.has(k) && shipped[k] === undefined).map((s) => ({ s })) }]
+  const pages = [{ key: SHARED, label: 'Menu, footer & shared texts', list: catalog.shared }, ...catalog.pages.map((p) => ({ key: p.route, label: p.route === '/' ? 'Home page' : p.route, list: p.strings })), { key: POPUPS, label: 'Pop-ups, forms & messages', list: Object.keys(shipped).filter((k) => !known.has(k)).map((s) => ({ s })) }, { key: CONTENT, label: 'Content managed in admin (articles, products, team…)', list: contentList.map((c) => ({ s: c.s })) }, { key: CUSTOM, label: 'Other added texts', list: Object.keys(saved).filter((k) => !known.has(k) && shipped[k] === undefined && !contentSet.has(k)).map((s) => ({ s })) }]
   const total = progress(rows)
 
   return (
@@ -93,7 +100,7 @@ export default function Translations() {
         <p className="min-h-10 text-sm text-soft">{total.done} of {total.total} translated on this page</p>
       </div>
 
-      {rows.length === 0 && <Card><EmptyState title="Nothing here yet">{page === CUSTOM ? 'Texts you add below (for example the title of an article) appear here.' : 'This page has no texts.'}</EmptyState></Card>}
+      {rows.length === 0 && <Card><EmptyState title="Nothing here yet">{page === CUSTOM ? 'Texts you add below that are not part of the website or of the content you manage appear here.' : page === CONTENT ? 'Publish some content (articles, products, team members…) and its texts appear here.' : 'This page has no texts.'}</EmptyState></Card>}
       <ul className="space-y-3">
         {shown.map((r, i) => {
           const st = statusOf(r.s)

@@ -32,6 +32,12 @@ def list_translations(lang: str = Query(..., max_length=8), _: User = Depends(re
     return {"lang": lang, "languages": [{"code": c, "name": n} for c, n in svc.LANGUAGES.items()], "counts": svc.counts(db), "strings": svc.strings(db, lang)}
 
 
+@router.get("/content-strings")
+def content_strings(_: User = Depends(read), db: Session = Depends(get_db)) -> dict:
+    """The texts of the content managed in the admin panel (articles, products, team members, websites, partners…), so they can be translated here too."""
+    return {"strings": svc.content_strings(db)}
+
+
 @router.put("")
 def save(body: SaveIn, user: User = Depends(write), db: Session = Depends(get_db)) -> dict:
     result = svc.save_many(db, user, [i.model_dump() for i in body.items])

@@ -14,7 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.errors import ApiError
-from app.models import Translation, User
+from app.models import ContentItem, Translation, User
 
 LANGUAGES = {"ta": "Tamil", "hi": "Hindi"}  # code -> English name; keep in step with frontend/src/i18n/languages.js
 MAX_SOURCE = 4000
@@ -76,3 +76,31 @@ def counts(db: Session) -> dict[str, int]:
     for t in db.scalars(select(Translation.lang)):
         out[t] = out.get(t, 0) + 1
     return out
+
+
+_SKIP_KEYS = re.compile(r"(url|href|link|src|image|img|icon|slug|path|color|colour|email|phone|id|key|token|date|time|lang|status|kind|type|order|sort)$", re.I)
+_LETTERS = re.compile(r"[A-Za-z]{3}")
+
+
+def _leaf_strings(value, key: str = ""):
+    """Every readable text inside a content item's data (the text a visitor can see): skips links, ids, colours and other machine values."""
+    if isinstance(value, str):
+        text = norm(value)
+        if _LETTERS.search(text) and len(text) <= MAX_SOURCE and not _SKIP_KEYS.search(key or "") and not re.match(r"^(https?:|/|#|mailto:|tel:)", text) and "@" not in text.split(" ")[0]:
+            yield text
+    elif isinstance(value, dict):
+        for k, v in value.items():
+            yield from _leaf_strings(v, str(k))
+    elif isinstance(value, list):
+        for v in value:
+            yield from _leaf_strings(v, key)
+
+
+def content_strings(db: Session) -> list[dict]:
+    """The texts of published, administrator-managed content (articles, products, team, websites…), each with the kind of content it belongs to, so each can be translated in the admin panel."""
+    seen: dict[str, dict] = {}
+    for item in db.scalars(select(ContentItem).where(ContentItem.status == "published").order_by(ContentItem.kind, ContentItem.sort_order)):
+        for text in [norm(item.title), *_leaf_strings(item.data or {})]:
+            if text and _LETTERS.search(text) and text not in seen:
+                seen[text] = {"s": text, "kind": item.kind, "title": item.title}
+    return list(seen.values())

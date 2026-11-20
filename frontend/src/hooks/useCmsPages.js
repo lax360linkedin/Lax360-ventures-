@@ -119,6 +119,8 @@ export function useTeam() {
       slug: i.slug, name: i.title, designation: d.designation || '', bio: d.bio || '', photo: d.photo || d.photo_path || '', photoAlt: d.photo_alt || '', role, order, sample: d.sample === true,
       department: d.department || '', expertise: csv(d.expertise), isLeader: role in leaderRank, isHead: role === 'department_head',
       links: d.linkedin_link ? [{ platform: 'linkedin', href: d.linkedin_link }] : [],
+      experience: d.experience || '', achievements: lines(d.achievements), certifications: lines(d.certifications), awards: lines(d.awards),
+      photos: [d.photo_2, d.photo_3, d.photo_4, d.photo_5].filter(Boolean), // more pictures for the profile that opens when the photograph is clicked
     }
   }), [items])
 }
@@ -140,7 +142,7 @@ export function useDepartmentList() {
 /** Genuine team & culture photographs published in the admin panel. */
 export function useTeamGallery() {
   const items = useContent('team_gallery')
-  return useMemo(() => (items || []).filter((i) => i.data.image).map((i) => ({ slug: i.slug, caption: i.data.caption || '', category: i.data.category || 'activities', image: i.data.image, alt: i.data.image_alt || i.data.caption || '', text: i.data.description || '' })), [items])
+  return useMemo(() => (items || []).filter((i) => i.data.image).map((i) => ({ slug: i.slug, caption: i.data.caption || '', category: i.data.category || 'activities', custom: (i.data.category_custom || '').trim(), date: i.data.event_date || '', image: i.data.image, alt: i.data.image_alt || i.data.caption || '', text: i.data.description || '' })), [items])
 }
 
 /** Expertise groups published in the admin panel, or null to use the built-in list. */

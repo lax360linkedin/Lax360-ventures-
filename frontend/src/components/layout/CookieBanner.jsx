@@ -50,6 +50,7 @@ export default function CookieBanner() {
 
   return (
     <section ref={ref} tabIndex={-1} role="region" aria-label="Cookie consent" data-cookie-banner
+      data-cookie-banner
       className="fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-[1050] mx-auto max-w-3xl rounded-2xl border border-edge-strong bg-night/95 p-4 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)] outline-none backdrop-blur-xl sm:p-5 lg:bottom-5 lg:left-5 lg:right-24 lg:mx-0">
       <div className="flex items-start gap-3.5">
         <span className="mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-lav ring-1 ring-edge"><Cookie className="size-5" strokeWidth={1.75} aria-hidden="true" /></span>

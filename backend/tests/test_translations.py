@@ -35,3 +35,19 @@ def test_unknown_languages_and_bad_input_are_refused_and_permissions_enforced(ap
     media, mcsrf, _ = staff(app, db, email="media-only@example.com", permissions=["media"])
     assert media.put("/api/admin/translations", json={"items": [{"lang": "ta", "source": "a", "value": "b"}]}, headers=mcsrf).status_code == 403
     assert client.put("/api/admin/translations", json={"items": []}).status_code in (401, 403, 422)
+
+
+def test_texts_of_published_admin_content_are_listed_for_translation(app, db):
+    from app.models import ContentItem
+
+    admin, _, _ = staff(app, db, permissions=["content"])
+    db.add_all([
+        ContentItem(kind="article", slug="a1", title="Plan the first month", status="published", data={"summary": "A short guide for new teams.", "image": "https://example.com/a.png", "slug": "plan", "tags": ["Planning", "ok"]}),
+        ContentItem(kind="article", slug="a2", title="A draft nobody sees", status="draft", data={"summary": "Hidden draft text."}),
+    ])
+    db.commit()
+    got = admin.get("/api/admin/translations/content-strings").json()["strings"]
+    texts = {g["s"] for g in got}
+    assert {"Plan the first month", "A short guide for new teams.", "Planning"} <= texts
+    assert "Hidden draft text." not in texts and not any(t.startswith("http") for t in texts)  # only published text; links are not translatable
+    assert all(g["kind"] == "article" for g in got)

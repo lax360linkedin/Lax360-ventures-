@@ -70,7 +70,8 @@ TEAM_ROLE_LEVELS = [{"value": v, "label": l} for v, l in (("founder", "Founder")
 TEAM_LEADERSHIP = ("founder", "ceo", "managing_director")  # shown in the Leadership section
 CAREER_ICONS = (("sparkles", "Sparkles"), ("rocket", "Rocket"), ("graduation", "Learning"), ("users", "Team"), ("laptop", "Technology"), ("heart", "Care"), ("trending", "Growth"), ("clock", "Time"), ("map", "Location"))
 TEAM_GALLERY_CATEGORIES = [{"value": v, "label": l} for v, l in (("activities", "Team activities"), ("office", "Office environment"), ("celebrations", "Team celebrations"), ("workshops", "Technical workshops"),
-                                                                ("knowledge", "Knowledge-sharing sessions"), ("learning", "Learning & development"), ("achievements", "Employee achievements"))]
+                                                                ("knowledge", "Knowledge-sharing sessions"), ("learning", "Learning & development"), ("achievements", "Employee achievements"),
+                                                                ("games", "Games & fun activities"), ("functions", "Company functions"), ("outings", "Team outings & gatherings"), ("events", "Office events & special occasions"))]
 ARTICLE_CATEGORIES =[{"value": v, "label": l} for v, l in (("ai", "Artificial Intelligence & Generative AI"), ("software", "Software Development & Technology"), ("automation", "Business Automation"),
                                                           ("saas", "SaaS & API Innovations"), ("transformation", "Digital Transformation"), ("webmobile", "Web & Mobile Application Development"),
                                                           ("marketing", "Digital Marketing"), ("trends", "Technology Trends & Updates"))]
@@ -268,6 +269,12 @@ KINDS: dict[str, dict] = {
             F("bio", "Short professional bio (optional)", "textarea", max_len=800),
             F("expertise", "Skills", "textarea", max_len=400, help="Comma-separated, e.g. React, FastAPI, SEO."),
             F("photo", "Photograph", "image", help="A real, professional photograph (portrait, about 600 x 750 px). Without one the card shows the person's initials."), F("photo_alt", "Photo description", max_len=160, help="Short description for screen readers."),
+            F("experience", "Experience (optional)", max_len=160, help="Shown in the profile that opens when the photograph is clicked, e.g. “5+ years in digital marketing”."),
+            F("achievements", "Achievements (optional)", "textarea", max_len=1200, help="One achievement per line. Shown in the profile that opens when the photograph is clicked."),
+            F("certifications", "Certifications (optional)", "textarea", max_len=1000, help="One certification per line."),
+            F("awards", "Awards & recognition (optional)", "textarea", max_len=1000, help="One award per line."),
+            F("photo_2", "Additional photograph 1 (optional)", "image", help="More pictures for the profile: they appear as a small gallery when the profile is opened."), F("photo_3", "Additional photograph 2 (optional)", "image"),
+            F("photo_4", "Additional photograph 3 (optional)", "image"), F("photo_5", "Additional photograph 4 (optional)", "image"),
             F("linkedin_link", "LinkedIn profile (optional)", max_len=300, help="The person's full LinkedIn address, e.g. https://www.linkedin.com/in/name. No other contact details are shown on the website."),
             F("active", "Show on the website", "bool", default=True, help="Untick to hide the profile from the website without deleting it."),
             F("sample", "Temporary sample profile", "bool", default=False, help="Marks demonstration content: the website shows a “Sample profile” label on it. Untick it once you have entered the real details and photograph."),
@@ -291,12 +298,13 @@ KINDS: dict[str, dict] = {
     },
     "team_gallery": {
         "label": "Team & culture gallery", "group": "Team", "module": "content", "single": False, "preview_path": "/our-team#culture",
-        "help": "Genuine LAX360 photographs only (team activities, office, celebrations, workshops, learning, achievements). Nothing is shown until you publish photos.",
+        "help": "The “Life at LAX360” carousel of the Our Team page: genuine LAX360 photographs of games, functions, celebrations, outings, events, workshops and achievements, each with an optional title, description and date. Nothing is shown until you publish photos.",
         "title_label": "Photo name (for you)",
         "fields": [
             F("category", "Category", "select", True, options=TEAM_GALLERY_CATEGORIES), F("image", "Photograph", "image", True),
-            F("caption", "Caption shown on the website (optional)", max_len=120, help="Leave empty to show the photograph alone."),
-            F("image_alt", "Photo description", max_len=160, help="Short description for screen readers."), F("description", "Details (optional)", "textarea", max_len=300, ui="optional"),
+            F("category_custom", "Your own category (optional)", max_len=40, help="Type a new category name (for example “Sports Day”) to use it instead of the one chosen above. Photographs with the same name are grouped together."),
+            F("caption", "Event title shown on the website (optional)", max_len=120, help="Leave empty to show the photograph alone."), F("event_date", "Event date (optional)", max_len=10, ui="date"),
+            F("image_alt", "Photo description", max_len=160, help="Short description for screen readers."), F("description", "Short description (optional)", "textarea", max_len=300, ui="optional"),
         ],
     },
     "team_expertise": {

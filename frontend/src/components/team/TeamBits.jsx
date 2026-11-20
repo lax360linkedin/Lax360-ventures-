@@ -32,7 +32,8 @@ export function Social({ person }) {
 }
 
 export function SkillTags({ items, label, className = '', max }) {
-  const list = max ? items?.slice(0, max) : items
+  const clean = items?.map((t) => String(t).replace(/^[-*•]\s*/, '').trim()).filter(Boolean) // entries typed as a list ("- SEO") show without the bullet character
+  const list = max ? clean?.slice(0, max) : clean
   if (!list?.length) return null
   return <ul className={`flex flex-wrap gap-2 ${className}`} aria-label={label}>{list.map((t) => <li key={t} className="rounded-full border border-edge bg-glass px-3 py-1 text-xs font-semibold">{t}</li>)}</ul>
 }

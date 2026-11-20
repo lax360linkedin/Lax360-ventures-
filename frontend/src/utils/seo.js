@@ -12,7 +12,8 @@ const CRUMB = {
 const titleCase = (slug) => slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
 /** Shorten a built-in title to about `max` characters without losing the brand: "Long phrase — more | LAX360 Pvt Ltd" keeps the brand suffix and trims the phrase. */
-export function fitTitle(title, max = 76) {
+export function fitTitle(title, limit = 76) {
+  const max = title && /[^\x00-\u024F]/.test(title) ? Math.max(limit, 110) : limit // Tamil and Hindi words run longer than English ones: trimming at 76 characters would drop the part that tells two similar pages apart
   if (!title || title.length <= max) return title
   const m = / \| LAX360 Pvt Ltd$/.exec(title)
   const suffix = m ? m[0] : ''

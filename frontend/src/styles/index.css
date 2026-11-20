@@ -374,14 +374,18 @@ html[data-intro-skip] :is(.a-rise, .a-pop, .a-fade) { animation-duration: 0.01s 
 .gal-track { backface-visibility: hidden; }
 
 /* ---------- Services & industries carousel (components/sections/ServiceCarousel.jsx): picture cards. Transform / opacity only; hover effects only where hover exists; off for reduced motion. ---------- */
-.sc-card { position: relative; display: block; overflow: hidden; width: min(80vw, 21rem); height: 25rem; border-radius: 1.5rem; border: 1px solid var(--color-edge-strong); background: var(--img-shade); box-shadow: 0 20px 44px -26px rgba(0, 0, 0, 0.7); transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s; }
-@media (min-width: 640px) { .sc-card { width: 22rem; height: 27rem; } }
-@media (min-width: 1024px) { .sc-card { width: 24rem; height: 28rem; } }
+.sc-card { position: relative; display: block; overflow: hidden; width: min(70vw, 16.5rem); height: 19.5rem; border-radius: 1.3rem; border: 1px solid var(--color-edge-strong); background: var(--img-shade); box-shadow: 0 20px 44px -26px rgba(0, 0, 0, 0.7); transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s; }
+@media (min-width: 640px) { .sc-card { width: 17.5rem; height: 21.5rem; } }
+@media (min-width: 1024px) { .sc-card { width: 18rem; height: 21.5rem; } }
 .sc-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
 .sc-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8, 10, 16, 0.92) 0%, rgba(8, 10, 16, 0.55) 42%, rgba(8, 10, 16, 0.05) 75%); }
 .sc-shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%); transform: translateX(-120%); }
-.sc-tag { position: absolute; left: 1rem; top: 1rem; border-radius: 9999px; background: rgba(8, 10, 16, 0.55); padding: 0.25rem 0.7rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; backdrop-filter: blur(6px); }
-.sc-body { position: absolute; inset-inline: 0; bottom: 0; padding: 1.25rem 1.4rem 1.4rem; }
+.sc-tag { position: absolute; left: 0.85rem; top: 0.85rem; border-radius: 9999px; background: rgba(8, 10, 16, 0.55); padding: 0.25rem 0.7rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; backdrop-filter: blur(6px); }
+.sc-body { position: absolute; inset-inline: 0; bottom: 0; padding: 0.95rem 1.1rem 1.1rem; }
+.sc-body h3 { font-size: 1.05rem; }
+.sc-body p { font-size: 0.78rem; }
+@media (min-width: 640px) { .sc-body h3 { font-size: 1.15rem; } }
+@media (min-width: 1024px) { .sc-body h3 { font-size: 1.18rem; } }
 .sc-cta { display: inline-flex; min-height: 2.75rem; align-items: center; gap: 0.35rem; margin-top: 0.75rem; border-radius: 9999px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); padding: 0 1.1rem; font-size: 0.85rem; font-weight: 700; color: #fff; transition: transform 0.25s, box-shadow 0.25s; }
 .sc-cta svg { transition: transform 0.25s; }
 @media (hover: hover) {
@@ -573,6 +577,10 @@ html:lang(ta) :is(h3, h4, .eyebrow), html:lang(hi) :is(h3, h4, .eyebrow) { line-
 /* Indic words are wider than Latin ones: headlines are set a size smaller so a long word never runs under the picture beside it */
 html:lang(ta) h1, html:lang(ta) .h1, html:lang(hi) h1, html:lang(hi) .h1 { font-size: clamp(1.9rem, 3.9vw, 3.4rem) !important; }
 html:lang(ta) h2, html:lang(ta) .h2, html:lang(hi) h2, html:lang(hi) .h2 { font-size: clamp(1.6rem, 3.2vw, 2.6rem) !important; }
+/* the cookie banner and the top bar keep their compact sizes in Tamil and Hindi (the larger page headings above would otherwise cover most of a phone screen) */
+html:lang(ta) [data-cookie-banner] h2, html:lang(hi) [data-cookie-banner] h2 { font-size: 1.05rem !important; line-height: 1.4; }
+html:lang(ta) [data-cookie-banner] :is(p, a, button), html:lang(hi) [data-cookie-banner] :is(p, a, button) { font-size: 0.8125rem; line-height: 1.6; }
+html:lang(ta) [data-topbar] :is(a, button, span), html:lang(hi) [data-topbar] :is(a, button, span) { white-space: nowrap; }
 html:lang(ta) .eyebrow, html:lang(hi) .eyebrow { text-transform: none; font-size: 0.95em; }
 html:lang(ta) :is(p, li, dd, span, label), html:lang(hi) :is(p, li, dd, span, label) { overflow-wrap: break-word; }
 /* the header menu: words in these languages are wider, so the menu is set a little smaller at each width and keeps to one row */
