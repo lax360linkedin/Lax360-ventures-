@@ -25,6 +25,27 @@ class ConfigError(RuntimeError):
         self.variable = variable
 
 
+_INVISIBLE = re.compile(r"[​-‏‪-‮⁠﻿\s]")  # zero-width / direction marks (they survive a copy-paste) and whitespace
+_SUPABASE_HOST = re.compile(r"(?i)([a-z0-9][a-z0-9-]*\.supabase\.(?:co|com|in))")
+
+
+def normalize_supabase_url(value: str) -> str:
+    """Turn whatever was pasted into SUPABASE_URL into https://<host> (no path, no trailing slash). Returns "" for an empty value."""
+    v = _INVISIBLE.sub("", value).strip("\"'`")
+    if not v:
+        return ""
+    found = _SUPABASE_HOST.search(v)
+    if found:  # a hosted Supabase project: always https, whatever surrounded the host
+        return f"https://{found.group(1).lower()}"
+    scheme = "http" if v.lower().startswith("http://") else "https"  # self-hosted / local Supabase keeps an explicit http://
+    v = re.sub(r"(?i)^(?:https?)?:?/{0,2}", "", v).rstrip("/")
+    for tail in ("/storage/v1", "/rest/v1", "/auth/v1"):
+        if v.lower().endswith(tail):
+            v = v[: -len(tail)]
+    return f"{scheme}://{v}" if v else ""
+
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", populate_by_name=True)
 
@@ -117,6 +138,16 @@ class Settings(BaseSettings):
 
     # --- rate limiting (in-memory, per process) ---------------------------------------------
     rate_limit_enabled: bool = True
+    pz_start_rate_limit_max: int = 40  # Play Zone: game sessions started per IP per window
+    pz_start_rate_limit_window_seconds: int = 60
+    pz_complete_rate_limit_max: int = 40  # results submitted per IP per window
+    pz_complete_rate_limit_window_seconds: int = 60
+    pz_write_rate_limit_max: int = 30  # profile, progress and challenge writes per IP per window
+    pz_write_rate_limit_window_seconds: int = 60
+    pz_public_rate_limit_max: int = 120  # public leaderboard / challenge reads per IP per window
+    pz_public_rate_limit_window_seconds: int = 60
+    pz_admin_rate_limit_max: int = 120  # Play Zone administration writes per IP per window
+    pz_admin_rate_limit_window_seconds: int = 60
     login_rate_limit_max: int = 5
     login_rate_limit_window_seconds: int = 300
     register_rate_limit_max: int = 5
@@ -140,16 +171,9 @@ class Settings(BaseSettings):
     @field_validator("supabase_url", mode="before")
     @classmethod
     def _clean_supabase_url(cls, v):
-        """Hosting dashboards often keep quotes or stray spaces, or a pasted API path: SUPABASE_URL is always just https://<project-ref>.supabase.co."""
-        if not isinstance(v, str):
-            return v
-        v = v.strip().strip("\"'").strip().rstrip("/")
-        for tail in ("/storage/v1", "/rest/v1", "/auth/v1"):
-            if v.endswith(tail):
-                v = v[: -len(tail)]
-        if v and "://" not in v:
-            v = f"https://{v}"
-        return v
+        """Hosting dashboards keep quotes, stray or invisible characters (a zero-width space from a copy), a pasted API path, or a half-typed scheme ("https:/x", "//x", no scheme):
+        every one of those made the HTTP client fail with UnsupportedProtocol. SUPABASE_URL is always just https://<project-ref>.supabase.co, so it is rebuilt to exactly that."""
+        return normalize_supabase_url(v) if isinstance(v, str) else v
 
     @field_validator("supabase_service_role_key", mode="before")
     @classmethod

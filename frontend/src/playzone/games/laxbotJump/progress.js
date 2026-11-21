@@ -51,3 +51,21 @@ export function resetProgress() { save(empty()) }
 
 export const subscribeProgress = (cb) => { listeners.add(cb); return () => listeners.delete(cb) }
 export const useProgress = () => useSyncExternalStore(subscribeProgress, read, () => EMPTY)
+
+/**
+ * Cloud sync (signed-in players): fold the server's copy into this device, FORWARD ONLY: a level stays completed, stars and bests only go up. Nothing local is ever overwritten by
+ * an older value, and the cloud copy is never trusted for more than progress (scores are verified by the server separately).
+ */
+export function mergeRemote(remoteLevels) {
+  const data = read()
+  const levels = { ...data.levels }
+  let changed = false
+  for (const [id, r] of Object.entries(remoteLevels || {})) {
+    if (!r || typeof r !== 'object') continue
+    const cur = levels[id] || { best: 0, stars: 0, plays: 0 }
+    const next = { ...cur, completed: !!cur.completed || r.completed === true, stars: Math.max(cur.stars || 0, r.stars || 0), best: Math.max(cur.best || 0, r.local_best || 0, r.verified_best || 0) }
+    if (next.completed !== !!cur.completed || next.stars !== (cur.stars || 0) || next.best !== (cur.best || 0)) { levels[id] = next; changed = true }
+  }
+  if (changed) save({ ...data, levels })
+  return changed
+}

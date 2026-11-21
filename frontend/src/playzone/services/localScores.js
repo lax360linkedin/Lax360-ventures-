@@ -47,3 +47,12 @@ export function recordResult(slug, result) {
 
 export const subscribeLocal = (cb) => { listeners.add(cb); return () => listeners.delete(cb) }
 export const useLocal = () => useSyncExternalStore(subscribeLocal, read, () => empty())
+
+/** Cloud sync: raise this device's personal best to the cloud value (never lowers it). */
+export function mergeRemoteBest(slug, best) {
+  const data = read()
+  const g = data.games[slug] || { best: 0, plays: 0, golden: 0, diamonds: 0, lastScore: 0 }
+  if (!(best > (g.best || 0))) return false
+  save({ ...data, games: { ...data.games, [slug]: { ...g, best } } })
+  return true
+}

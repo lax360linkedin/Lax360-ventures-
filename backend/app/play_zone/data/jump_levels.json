@@ -1,0 +1,68 @@
+{
+ "levels": [
+  {
+   "id": "cloud-kingdom",
+   "index": 0,
+   "par": 80,
+   "coins": 27,
+   "crystals": 3,
+   "stars": 1,
+   "checkpoints": 2,
+   "distance": 78.4255060551094,
+   "world": "Cloud Kingdom"
+  },
+  {
+   "id": "candy-island",
+   "index": 1,
+   "par": 110,
+   "coins": 23,
+   "crystals": 3,
+   "stars": 1,
+   "checkpoints": 2,
+   "distance": 104.6,
+   "world": "Candy Island"
+  },
+  {
+   "id": "crystal-valley",
+   "index": 2,
+   "par": 120,
+   "coins": 27,
+   "crystals": 3,
+   "stars": 1,
+   "checkpoints": 2,
+   "distance": 109.02866595533493,
+   "world": "Crystal Valley"
+  },
+  {
+   "id": "neon-city",
+   "index": 3,
+   "par": 120,
+   "coins": 21,
+   "crystals": 3,
+   "stars": 1,
+   "checkpoints": 2,
+   "distance": 114.70435911507462,
+   "world": "Neon City"
+  },
+  {
+   "id": "space-garden",
+   "index": 4,
+   "par": 140,
+   "coins": 25,
+   "crystals": 3,
+   "stars": 1,
+   "checkpoints": 3,
+   "distance": 120.00104166214555,
+   "world": "Space Garden"
+  }
+ ],
+ "scoring": {
+  "coin": 10,
+  "crystal": 50,
+  "star": 200,
+  "life": 100,
+  "complete": 500,
+  "timePerSecond": 5
+ },
+ "lives": 3
+}

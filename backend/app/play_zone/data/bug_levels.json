@@ -1,0 +1,131 @@
+{
+ "levels": [
+  {
+   "id": "code-garden",
+   "world": 1,
+   "par": 120,
+   "byType": {
+    "normal": 4,
+    "speed": 1,
+    "rare": 0,
+    "shield": 0
+   },
+   "totalBugs": 5,
+   "needCaptures": 4,
+   "stations": 1,
+   "needRepairs": 1,
+   "boss": null,
+   "orbs": 6,
+   "challenge": {
+    "kind": "nodamage",
+    "text": "Finish without taking damage"
+   },
+   "distance": 35
+  },
+  {
+   "id": "circuit-city",
+   "world": 2,
+   "par": 170,
+   "byType": {
+    "normal": 4,
+    "speed": 2,
+    "rare": 1,
+    "shield": 1
+   },
+   "totalBugs": 8,
+   "needCaptures": 7,
+   "stations": 2,
+   "needRepairs": 2,
+   "boss": null,
+   "orbs": 10,
+   "challenge": {
+    "kind": "allbugs",
+    "text": "Capture every bug"
+   },
+   "distance": 45
+  },
+  {
+   "id": "data-ocean",
+   "world": 3,
+   "par": 260,
+   "byType": {
+    "normal": 2,
+    "speed": 2,
+    "rare": 2,
+    "shield": 0
+   },
+   "totalBugs": 6,
+   "needCaptures": 6,
+   "stations": 2,
+   "needRepairs": 2,
+   "boss": "crab",
+   "orbs": 10,
+   "challenge": {
+    "kind": "time",
+    "seconds": 250,
+    "text": "Finish in under 4 minutes 10"
+   },
+   "distance": 45
+  },
+  {
+   "id": "cyber-tower",
+   "world": 4,
+   "par": 220,
+   "byType": {
+    "normal": 1,
+    "speed": 2,
+    "rare": 1,
+    "shield": 2
+   },
+   "totalBugs": 6,
+   "needCaptures": 6,
+   "stations": 3,
+   "needRepairs": 3,
+   "boss": null,
+   "orbs": 6,
+   "challenge": {
+    "kind": "nodeath",
+    "text": "Climb without losing a life"
+   },
+   "distance": 16.560495161679196
+  },
+  {
+   "id": "core-defender",
+   "world": 5,
+   "par": 320,
+   "byType": {
+    "normal": 3,
+    "speed": 3,
+    "rare": 2,
+    "shield": 2
+   },
+   "totalBugs": 10,
+   "needCaptures": 10,
+   "stations": 2,
+   "needRepairs": 2,
+   "boss": "core",
+   "orbs": 8,
+   "challenge": {
+    "kind": "nodeath",
+    "text": "Defeat the Corruptor without losing a life"
+   },
+   "distance": 41
+  }
+ ],
+ "score": {
+  "normal": 10,
+  "speed": 20,
+  "rare": 30,
+  "shield": 40,
+  "repair": 100,
+  "challenge": 200,
+  "boss": 500,
+  "orb": 5,
+  "healthLeft": 30,
+  "timePerSecond": 2
+ },
+ "maxHealth": 5,
+ "lives": 3,
+ "walk": 6,
+ "sprint": 9.4
+}

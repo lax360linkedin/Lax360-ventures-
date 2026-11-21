@@ -15,7 +15,7 @@ export default function PrefsPanel() {
   return (
     <section aria-labelledby="pz-prefs-title" className="pz-glass p-5 sm:p-7">
       <h3 id="pz-prefs-title" className="font-display text-xl font-bold">Sound & graphics</h3>
-      <p className="pz-soft mt-1 text-sm">Saved on this device only. The games will use these settings when they launch.</p>
+      <p className="pz-soft mt-1 text-sm">Saved on this device only and used by every game.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <Toggle id="pz-sound" icon={Volume2} label="Sound effects" checked={p.sound} onChange={(v) => set('sound', v)} />
         <Toggle id="pz-music" icon={Music} label="Music" checked={p.music} onChange={(v) => set('music', v)} />
@@ -28,11 +28,11 @@ export default function PrefsPanel() {
       <fieldset className="mt-4">
         <legend className="flex items-center gap-2 font-semibold"><Gauge className="size-5 text-[var(--pz-blue)]" aria-hidden="true" />Graphics quality</legend>
         <div className="mt-2 flex flex-wrap gap-2" role="group">
-          {[['auto', 'Auto'], ['high', 'High'], ['low', 'Battery saver']].map(([v, label]) => (
+          {[['auto', 'Auto'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']].map(([v, label]) => (
             <button key={v} type="button" aria-pressed={p.graphics === v} onClick={() => set('graphics', v)} className="pz-tab">{label}</button>
           ))}
         </div>
-        <p className="pz-soft mt-2 text-xs">“Battery saver” will reduce effects for slower phones. Reduced-motion settings on your device are always respected.</p>
+        <p className="pz-soft mt-2 text-xs">Auto picks a level for your device. Low turns off shadows and anti-aliasing and renders at normal pixel density (best for older phones and battery life); High is the sharpest. Reduced-motion settings on your device are always respected.</p>
       </fieldset>
     </section>
   )

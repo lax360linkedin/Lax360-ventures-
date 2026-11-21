@@ -22,7 +22,9 @@ BACKEND = Path(__file__).resolve().parents[2]
 
 
 def _client() -> httpx.Client:  # a function so tests can substitute a fake Storage server
-    return httpx.Client(timeout=httpx.Timeout(180.0, connect=15.0))
+    # retries=3: a failed TCP/TLS connect (a brief network or Supabase hiccup) is retried by the transport before an error is reported. trust_env=False: the connection to Supabase never goes
+    # through a proxy configured by environment variables (a malformed proxy variable is another way to get UnsupportedProtocol).
+    return httpx.Client(timeout=httpx.Timeout(180.0, connect=15.0), transport=httpx.HTTPTransport(retries=3), trust_env=False)
 
 
 def backend(settings: Settings) -> str:

@@ -20,6 +20,16 @@ MODULES: dict[str, str] = {
     "careers": "Careers",
     "navigation": "Navigation & SEO",
     "settings": "Website settings",
+    # Play Zone (Milestone 7): granular, so a role can be given just what it needs
+    "pz_analytics": "Play Zone: overview and analytics",
+    "pz_games": "Play Zone: manage games",
+    "pz_players": "Play Zone: manage players",
+    "pz_moderation": "Play Zone: moderate leaderboards",
+    "pz_achievements": "Play Zone: manage achievements",
+    "pz_challenges": "Play Zone: manage daily challenges",
+    "pz_media": "Play Zone: manage game media",
+    "pz_settings": "Play Zone: manage settings",
+    "pz_audit": "Play Zone: view audit logs",
 }
 SUPER_ONLY = ("users", "audit", "system")
 STAFF_ROLES = ("admin", "super_admin")

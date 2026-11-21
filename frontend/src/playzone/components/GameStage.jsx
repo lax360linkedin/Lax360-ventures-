@@ -5,6 +5,8 @@ import GameArt from './GameArt.jsx'
 import LaxBotPlayer from './LaxBotPlayer.jsx'
 import { loadGameEngine } from '../engine/index.js'
 import { LoadingState, StatusChip } from './parts.jsx'
+import ErrorBoundary from '../../components/ErrorBoundary.jsx'
+import { webglSupported } from '../../utils/webgl.js'
 
 /**
  * The future gameplay container. It owns the 16:10 stage, the loading / error / ready states and the mount point (`data-game-mount`) where a game engine draws, and it is the only place that
@@ -21,6 +23,7 @@ export default function GameStage({ game }) {
 
   useEffect(() => {
     if (game.status !== 'live') return undefined
+    if (!webglSupported()) { setPhase('nowebgl'); return undefined } // no 3D on this device: say so instead of letting the 3D library throw
     const ctrl = new AbortController()
     setPhase('loading')
     loadGameEngine(game.slug)
@@ -32,13 +35,25 @@ export default function GameStage({ game }) {
   return (
     <section aria-label={`${game.title} game area`} className="pz-stage" style={{ '--accent': game.accent }}>
       <GameArt slug={game.slug} />
-      <div data-game-mount={game.slug} className="absolute inset-0">{Game && <Game game={game} onExit={() => navigate('/play-zone')} />}</div>
+      <div data-game-mount={game.slug} className="absolute inset-0">{Game && (
+        <ErrorBoundary resetKey={attempt} fallback={(_, reset) => (
+          <div role="alert" className="absolute inset-0 z-10 grid place-items-center bg-[#0b0724]/80 p-4"><div className="pz-glass max-w-md p-6 text-center"><p className="font-display text-xl font-semibold">The game stopped unexpectedly</p><p className="pz-soft mt-2">The rest of the website is fine. Your scores that were already saved are safe.</p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2"><button type="button" className="pz-btn pz-btn-primary" onClick={reset}>Try again</button><button type="button" className="pz-btn pz-btn-ghost" onClick={() => navigate('/play-zone')}>Back to Play Zone</button></div></div></div>
+        )}>
+          <Game game={game} onExit={() => navigate('/play-zone')} />
+        </ErrorBoundary>
+      )}</div>
       {phase !== 'ready' && (
         <div className="absolute inset-0 grid place-items-center bg-[#0b0724]/55 p-4 backdrop-blur-[2px]">
           {phase === 'loading' && <div className="w-full max-w-sm"><LoadingState label={`Loading ${game.title}`} rows={3} /></div>}
           {phase === 'error' && (
             <div role="alert" className="pz-glass max-w-md p-6 text-center"><p className="font-display text-xl font-semibold">The game could not start</p><p className="pz-soft mt-2">Please try again.</p>
               <button type="button" className="pz-btn pz-btn-primary mt-4" onClick={() => setAttempt((n) => n + 1)}>Try again</button></div>
+          )}
+          {phase === 'nowebgl' && (
+            <div role="alert" className="pz-glass max-w-md p-6 text-center"><p className="font-display text-xl font-semibold">This device cannot run the 3D games</p>
+              <p className="pz-soft mt-2">Your browser did not provide WebGL, which the Play Zone games need. Turning on hardware acceleration in the browser settings, or trying another browser or device, usually fixes it. The rest of the Play Zone, the leaderboards and your profile still work.</p>
+              <div className="mt-4 flex flex-wrap justify-center gap-2"><button type="button" className="pz-btn pz-btn-primary" onClick={() => navigate('/play-zone/leaderboard')}>See the leaderboard</button><button type="button" className="pz-btn pz-btn-ghost" onClick={() => navigate('/play-zone')}>Back to Play Zone</button></div></div>
           )}
           {phase === 'idle' && (
             <div className="pz-glass flex max-w-lg flex-col items-center gap-3 p-6 text-center sm:p-8">
@@ -54,7 +69,7 @@ export default function GameStage({ game }) {
           )}
         </div>
       )}
-      <p aria-live="polite" className="sr-only">{phase === 'idle' ? `${game.title} is coming soon.` : phase === 'loading' ? 'Loading the game.' : ''}</p>
+      <p aria-live="polite" className="sr-only">{phase === 'idle' ? `${game.title} is coming soon.` : phase === 'nowebgl' ? 'This device cannot run the 3D games.' : phase === 'loading' ? 'Loading the game.' : ''}</p>
     </section>
   )
 }

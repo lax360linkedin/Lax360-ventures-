@@ -135,6 +135,12 @@ def _log_google_sheets(settings) -> None:
 
 def _log_video_storage(settings) -> None:
     """Say at start-up where homepage videos are kept, and shout when that would lose them (no network call here: the admin page runs the real check)."""
+    if settings.supabase_url:
+        from app.services.hero_video_service import url_problem
+
+        problem = url_problem(settings)
+        if problem:
+            log.error("Supabase address problem (this is what causes UnsupportedProtocol): %s", problem)
     if bool(settings.supabase_url) != bool(settings.supabase_service_role_key):
         log.error("Homepage video storage is only partly configured: %s is missing. Videos fall back to this server's disk, which Render wipes on restart. "
                   "Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_VIDEO_BUCKET.", "SUPABASE_SERVICE_ROLE_KEY" if settings.supabase_url else "SUPABASE_URL")

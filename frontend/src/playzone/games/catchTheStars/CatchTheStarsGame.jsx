@@ -1,3 +1,4 @@
+import SaveStatus from '../../components/SaveStatus.jsx'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ArrowLeft, ArrowRight, Heart, Pause, Play, RotateCcw, Trophy, Volume2, VolumeX, LogOut, Sparkles } from 'lucide-react'
@@ -102,14 +103,14 @@ export default function CatchTheStarsGame({ game, onExit }) {
         <Canvas
           camera={{ fov: 42, position: [0, 4.5, 14], near: 0.1, far: 120 }} dpr={dpr} shadows={quality !== 'low'} frameloop="always"
           gl={{ antialias: quality !== 'low', powerPreference: 'high-performance' }}
-          onCreated={({ gl }) => { gl.domElement.addEventListener('webglcontextlost', (e) => { e.preventDefault(); setGlFailed(true) }); controller.markReady() }}
+          onCreated={({ gl }) => { gl.domElement.addEventListener('webglcontextlost', (e) => { e.preventDefault(); controller.autoPause?.(); setGlFailed(true) }); controller.markReady() }}
           aria-label="Catch the Stars 3D game"
         >
           <Scene controller={controller} quality={quality} shadows={quality !== 'low'} />
         </Canvas>
       )}
       {glFailed && (
-        <div role="alert" className="absolute inset-0 grid place-items-center p-4"><div className="pz-glass max-w-md p-6 text-center"><p className="font-display text-xl font-semibold">The 3D view stopped</p><p className="pz-soft mt-2">Your device could not keep the 3D graphics running. Reload the page to try again, or set Graphics to Low in the Play Zone settings.</p></div></div>
+        <div role="alert" className="absolute inset-0 grid place-items-center p-4"><div className="pz-glass max-w-md p-6 text-center"><p className="font-display text-xl font-semibold">The 3D view stopped</p><p className="pz-soft mt-2">Your device could not keep the 3D graphics running. Reload the page to try again, or set Graphics to Low in the Play Zone settings.</p><button type="button" className="pz-btn pz-btn-primary mt-4" onClick={() => setGlFailed(false)}>Restart the 3D view</button></div></div>
       )}
 
       <div ref={popups} aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden" />
@@ -201,7 +202,7 @@ function Results({ r, controller, onExit }) {
         {[['Stars caught', r.stars + r.golden], ['Diamonds', r.diamonds], ['Survival time', `${r.survived.toFixed(1)} s`], ['Personal best', fmt(r.best)]].map(([k, v]) => <div key={k} className="rounded-xl bg-white/10 px-3 py-2"><dt className="text-[0.65rem] font-bold uppercase tracking-wider opacity-75">{k}</dt><dd className="text-lg font-extrabold tabular-nums">{v}</dd></div>)}
       </dl>
       {r.unlocked?.length > 0 && <ul className="mt-3 space-y-1" role="status">{r.unlocked.map((id) => <li key={id} className="text-sm font-bold text-emerald-200">🏅 Achievement unlocked: {achTitle(id)}</li>)}</ul>}
-      <p className="pz-soft mt-3 text-xs">Local · this device only. Not ranked on the leaderboard.</p>
+      <SaveStatus game="catch-the-stars" localHint="Personal best kept on this device." />
       <div className="mt-4 flex flex-wrap justify-center gap-2.5">
         <button type="button" className="pz-btn pz-btn-primary" onClick={controller.restart} autoFocus><RotateCcw className="size-5" aria-hidden="true" />Play again</button>
         <button type="button" className="pz-btn pz-btn-ghost" onClick={onExit}><LogOut className="size-5" aria-hidden="true" />Back to Play Zone</button>

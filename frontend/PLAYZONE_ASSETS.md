@@ -1,0 +1,18 @@
+
+## Milestone 5: Bug Hunter, Cyber Rescue (playable) — hand-over notes
+
+**Files** (`frontend/src/playzone/games/bugHunter/`): `config.js` (tuning and scores), `puzzles.js` (the five repair puzzles, pure code), `logic.js` (simulation: movement, net, bug AI, hazards, power-ups, stations, bosses, scoring), `levels.js` (five worlds as data), `progress.js` (local progress and checkpoints, the service boundary), `controller.js` (state machine, input, sound), `Scene.jsx`, `HunterBot.jsx`, `creatures.js` (3D), `PuzzlePanel.jsx`, `BugHunterGame.jsx` (HUD, controls, overlays). Tests: `frontend/scripts/test-bug-hunter.mjs` (run by `npm run test:game`). `catchTheStars/audio.js` gained effects and a boss-music mode.
+
+**Controls.** W A S D move, Shift sprint, Space jump, drag the mouse or the screen (or the arrow keys) to turn the camera, left click / F throw the energy net, E repair at a console, P or Esc pause. Touch: joystick, camera drag on the right of the screen, NET / jump / interact buttons. The game takes keys only while a level is playing, paused or being repaired.
+
+**Net and bugs.** The target ring follows the bug nearest the camera direction (green = in range). The net costs 20 energy (10 when thrown at nothing), has a cooldown, travels 0.28 s and can be dodged by quick bugs; energy regenerates. Bugs: Normal (+10, flees slowly), Speed (+20, fast, jukes, can dodge), Rare (+30, blinks away, smaller capture range, can dodge), Shield (+40, patrols, chases and bumps; the first net only breaks the shield). Each bug pays once. Bugs on raised platforms stay on them. AI is a small state machine per bug (idle, patrol, wander, detect, escape, chase, attack, stunned, frozen, captured, defeated).
+
+**Repairs (+100 each).** Circuit (rotate tiles to connect source and socket), Align (linked dials, limited moves), Nodes (repeat the pattern, 3 tries), Switches (lowest to highest voltage, 3 tries), Power (real-time: keep three drifting bars in the band for 3 s, 3 tries). Each puzzle is built from its solution, so it is always solvable. The world is paused while a puzzle is open. Multi-stage worlds chain stations (`requires`).
+
+**Bosses.** Glitch Crab (World 3, 4 hits, 2 phases) and Core Corruptor (World 5, 6 hits, 3 phases, after three bug waves and the final repair). Every attack is telegraphed (a red lane, a ring, a warning beam) for at least a second; after an attack the boss is dazed and its weak point glows for about 3 seconds: only a net thrown then hurts it. Phases add orb rings and a sweeping beam LAXBOT can jump. +500 on defeat.
+
+**Scoring (one place: `SCORE` in `config.js`).** Bugs 10 / 20 / 30 / 40, repair 100, boss 500, challenge 200, energy orb 5, hearts left x 30 at the exit, 2 per second under the par time. Stars: finish = 1, plus the level challenge = 2, plus every bug = 3.
+
+**Progress.** `localStorage` key `lax360-playzone-bug-hunter-v1` through `progress.js` only: completion, best score, stars, best time, and a checkpoint snapshot (captured bugs, solved repairs, collected items, score) so "Continue from checkpoint" resumes honestly. A world opens when the previous one is completed. Replace the bodies of `getProgress`, `saveLevelResult`, `saveCheckpoint`, `getCheckpoint` for a backend later. Nothing is ranked or sent anywhere.
+
+**LAXBOT, the bugs and the bosses are PLACEHOLDERS** built from primitive shapes in code (not production models); the replacement process is the same as in the other Play Zone notes. Sound is synthesised (no files to license). **Awaiting the backend:** server-side progress and cloud save, official leaderboards and validated scores.

@@ -1,6 +1,6 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, Gamepad2, Languages, Layers, MapPin, Share2, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { Activity, BarChart3, Medal, Target, Trophy, Gamepad2, Languages, Layers, MapPin, Share2, PanelsTopLeft, UserCog, AlertTriangle, Bot, Building2, Crown, Globe, Network, Quote, Images, Package, Search, Sparkles, UsersRound, CalendarCheck, ExternalLink, Eye, EyeOff, FileText, Film, Image as ImageIcon, Inbox, LayoutDashboard, LogIn, LogOut, Menu, ScrollText, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import ThemeToggle from '../components/ui/ThemeToggle.jsx'
 import { useAdminAuth } from '../hooks/useAdminAuth.js'
 import { useDocumentHead } from '../hooks/useDocumentHead.js'
@@ -33,7 +33,16 @@ const Customers = lazy(() => import('./pages/Customers.jsx'))
 const PagesModule = lazy(() => import('./pages/Pages.jsx'))
 const BranchLocations = lazy(() => import('./pages/BranchLocations.jsx'))
 const TranslationsAdmin = lazy(() => import('./pages/Translations.jsx'))
-const PlayZoneAdmin = lazy(() => import('./pages/PlayZoneAdmin.jsx'))
+const PzOverview = lazy(() => import('./playzone/Overview.jsx'))
+const PzGames = lazy(() => import('./playzone/Games.jsx'))
+const PzPlayers = lazy(() => import('./playzone/Players.jsx'))
+const PzLeaderboards = lazy(() => import('./playzone/Leaderboards.jsx'))
+const PzAchievements = lazy(() => import('./playzone/Achievements.jsx'))
+const PzChallenges = lazy(() => import('./playzone/Challenges.jsx'))
+const PzMedia = lazy(() => import('./playzone/GameMedia.jsx'))
+const PzAnalytics = lazy(() => import('./playzone/Analytics.jsx'))
+const PzSettings = lazy(() => import('./playzone/PzSettings.jsx'))
+const PzAudit = lazy(() => import('./playzone/PzAudit.jsx'))
 const SeoAdmin = lazy(() => import('./pages/SeoAdmin.jsx'))
 const SocialContact = lazy(() => import('./pages/SocialContact.jsx'))
 const BranchSocial = lazy(() => import('./pages/OwnerSocial.jsx').then((m) => ({ default: m.BranchSocial })))
@@ -62,7 +71,16 @@ const NAV = [
   { section: 'Company', to: '/company-admin/network', label: 'Our network', icon: Network, module: 'content', hint: 'Group companies, partners, software distribution and the Our Network page' },
   { section: 'Products & portfolio', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
   { section: 'Products & portfolio', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
-  { section: 'Play Zone', to: '/company-admin/play-zone', label: 'Play Zone', icon: Gamepad2, module: 'content', hint: 'Games, players, leaderboards, achievements and settings (interface preview: backend not connected yet)' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/overview', label: 'Overview', icon: LayoutDashboard, module: 'pz_analytics', hint: 'Play Zone numbers, charts and moderation alerts' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/games', label: 'Games', icon: Gamepad2, module: 'pz_games', hint: 'Enable, disable, order and configure the four games' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/players', label: 'Players', icon: Users, module: 'pz_players', hint: 'Player directory, history and Play Zone suspension' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/leaderboards', label: 'Leaderboards', icon: Trophy, module: 'pz_moderation', hint: 'Review flagged scores and moderate leaderboards' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/achievements', label: 'Achievements', icon: Medal, module: 'pz_achievements', hint: 'Create and manage achievement badges' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/challenges', label: 'Daily challenges', icon: Target, module: 'pz_challenges', hint: 'Create, schedule and review daily challenges' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/media', label: 'Game media', icon: ImageIcon, module: 'pz_media', hint: 'Thumbnails, banners, icons and artwork for the games' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/analytics', label: 'Analytics & reports', icon: BarChart3, module: 'pz_analytics', hint: 'Charts, tables and CSV exports' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/settings', label: 'Play Zone settings', icon: SettingsIcon, module: 'pz_settings', hint: 'Maintenance, guest play, nickname rules and display' },
+  { section: 'Play Zone', to: '/company-admin/play-zone/audit', label: 'Play Zone audit logs', icon: ScrollText, module: 'pz_audit', hint: 'Who changed what in the Play Zone' },
   { section: 'Pages & settings', to: '/company-admin/translations', label: 'Translations', icon: Languages, module: 'content', hint: 'The website in Tamil, Hindi and other languages: edit each page and section' },
   { section: 'Pages & settings', to: '/company-admin/seo', label: 'SEO management', icon: Search, module: ['navigation', 'content'], hint: 'Search titles, descriptions, sharing images, indexing, redirects and the sitemap' },
   { section: 'Pages & settings', to: '/company-admin/content', label: 'All website content', icon: FileText, module: ['content', 'services', 'careers', 'navigation'], hint: 'Every other page, section, list and text of the public website' },
@@ -296,7 +314,17 @@ export default function AdminApp() {
           <Route path="page-images" element={<Navigate to="/company-admin/pages" replace />} />
           <Route path="branches" element={<Guard module="settings"><BranchLocations /></Guard>} />
           <Route path="translations" element={<Guard module="content"><TranslationsAdmin /></Guard>} />
-          <Route path="play-zone" element={<Guard module="content"><PlayZoneAdmin /></Guard>} />
+          <Route path="play-zone" element={<Navigate to="/company-admin/play-zone/overview" replace />} />
+          <Route path="play-zone/overview" element={<Guard module="pz_analytics"><PzOverview /></Guard>} />
+          <Route path="play-zone/games" element={<Guard module="pz_games"><PzGames /></Guard>} />
+          <Route path="play-zone/players" element={<Guard module="pz_players"><PzPlayers /></Guard>} />
+          <Route path="play-zone/leaderboards" element={<Guard module="pz_moderation"><PzLeaderboards /></Guard>} />
+          <Route path="play-zone/achievements" element={<Guard module="pz_achievements"><PzAchievements /></Guard>} />
+          <Route path="play-zone/challenges" element={<Guard module="pz_challenges"><PzChallenges /></Guard>} />
+          <Route path="play-zone/media" element={<Guard module="pz_media"><PzMedia /></Guard>} />
+          <Route path="play-zone/analytics" element={<Guard module="pz_analytics"><PzAnalytics /></Guard>} />
+          <Route path="play-zone/settings" element={<Guard module="pz_settings"><PzSettings /></Guard>} />
+          <Route path="play-zone/audit" element={<Guard module="pz_audit"><PzAudit /></Guard>} />
           <Route path="seo" element={<Guard module="navigation"><SeoAdmin /></Guard>} />
           <Route path="social-contact" element={<Guard module="settings"><SocialContact /></Guard>} />
           <Route path="branches/:slug/social" element={<Guard module="settings"><BranchSocial /></Guard>} />

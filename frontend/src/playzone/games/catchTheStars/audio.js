@@ -12,6 +12,7 @@ export function createAudio(getPrefs) {
   let nextNote = 0
   let step = 0
   let noiseBuf = null
+  let boss = false // Bug Hunter boss fights switch the music to a faster, darker pattern
 
   const prefs = () => getPrefs()
   const ready = () => ctx && ctx.state !== 'closed'
@@ -72,6 +73,19 @@ export function createAudio(getPrefs) {
     coin: fx(() => { tone({ freq: 988, dur: 0.07, type: 'square', gain: 0.1 }); tone({ freq: 1319, dur: 0.16, type: 'square', gain: 0.1, at: 0.06 }) }),
     checkpoint: fx(() => { [523, 659, 784, 1046].forEach((f, i) => tone({ freq: f, dur: 0.18, type: 'triangle', gain: 0.16, at: i * 0.08 })) }),
     bounce: fx(() => tone({ freq: 260, to: 780, dur: 0.22, type: 'sine', gain: 0.22 })),
+    // Bug Hunter reuses this synthesiser
+    netThrow: fx(() => { tone({ freq: 420, to: 1500, dur: 0.18, type: 'sine', gain: 0.14 }); noise({ dur: 0.12, freq: 2000, gain: 0.08 }) }),
+    capture: fx(() => { [660, 880, 1175, 1568].forEach((f, i) => tone({ freq: f, dur: 0.16, type: 'triangle', gain: 0.16, at: i * 0.05 })) }),
+    shieldPop: fx(() => { tone({ freq: 1200, to: 300, dur: 0.2, type: 'square', gain: 0.1 }); noise({ dur: 0.15, freq: 1500, gain: 0.2 }) }),
+    skitter: fx(() => { tone({ freq: 1800 + Math.random() * 600, dur: 0.03, type: 'square', gain: 0.03 }) }),
+    zap: fx(() => { noise({ dur: 0.25, freq: 2500, gain: 0.3 }); tone({ freq: 90, dur: 0.25, type: 'sawtooth', gain: 0.2 }) }),
+    alarm: fx(() => { tone({ freq: 500, dur: 0.12, type: 'square', gain: 0.1 }); tone({ freq: 380, dur: 0.14, type: 'square', gain: 0.1, at: 0.14 }) }),
+    // Puzzle Pop reuses this synthesiser
+    select: fx(() => tone({ freq: 880, to: 1100, dur: 0.07, type: 'sine', gain: 0.16 })),
+    bad: fx(() => { tone({ freq: 220, to: 150, dur: 0.18, type: 'sawtooth', gain: 0.12 }) }),
+    rocket: fx(() => { tone({ freq: 300, to: 1800, dur: 0.35, type: 'sawtooth', gain: 0.1 }); noise({ dur: 0.3, freq: 1200, gain: 0.15 }) }),
+    boom: fx(() => { noise({ dur: 0.4, freq: 450, gain: 0.5 }); tone({ freq: 140, to: 50, dur: 0.35, type: 'sine', gain: 0.35 }) }),
+    rainbowFx: fx(() => { [523, 659, 784, 988, 1175, 1568].forEach((f, i) => tone({ freq: f, dur: 0.25, type: 'triangle', gain: 0.14, at: i * 0.05 })) }),
     gameOver: fx(() => { [440, 392, 330, 262].forEach((f, i) => tone({ freq: f, dur: 0.28, type: 'triangle', gain: 0.22, at: i * 0.18 })) }),
   }
 
@@ -81,12 +95,12 @@ export function createAudio(getPrefs) {
     applyVolume()
     while (nextNote < ctx.currentTime + 0.35) {
       const bar = Math.floor(step / 8)
-      const root = [57, 53, 55, 52][bar % 4]
+      const root = (boss ? [50, 50, 53, 48] : [57, 53, 55, 52])[bar % 4]
       const n = root + SCALE[(step * 3 + (bar % 2)) % SCALE.length]
       const t0 = nextNote - ctx.currentTime
-      tone({ freq: midi(n), dur: 0.42, type: 'sine', gain: 0.055, at: Math.max(0, t0), attack: 0.02 })
+      tone({ freq: midi(n), dur: boss ? 0.24 : 0.42, type: boss ? 'sawtooth' : 'sine', gain: boss ? 0.04 : 0.055, at: Math.max(0, t0), attack: 0.02 })
       if (step % 8 === 0) tone({ freq: midi(root - 12), dur: 1.4, type: 'triangle', gain: 0.06, at: Math.max(0, t0), attack: 0.05 })
-      nextNote += 0.25; step += 1
+      nextNote += boss ? 0.17 : 0.25; step += 1
     }
   }
   function startMusic() {
@@ -96,8 +110,9 @@ export function createAudio(getPrefs) {
   }
   function stopMusic() { clearInterval(musicTimer); musicTimer = null }
 
+  const pop = (n = 1) => { if (prefs().sound && ready()) { applyVolume(); const f = 520 * 2 ** (Math.min(n, 8) / 12 * 2); tone({ freq: f, to: f * 1.5, dur: 0.13, type: 'triangle', gain: 0.2 }); tone({ freq: f * 2, dur: 0.1, type: 'sine', gain: 0.08, at: 0.04 }) } }
   return {
-    unlock, startMusic, stopMusic, applyVolume, ...effects,
+    setBoss(on) { boss = !!on }, pop, unlock, startMusic, stopMusic, applyVolume, ...effects,
     suspend() { stopMusic(); if (ready() && ctx.state === 'running') ctx.suspend().catch(() => {}) },
     resume() { if (ready() && ctx.state === 'suspended') ctx.resume().catch(() => {}) },
     dispose() { stopMusic(); if (ctx && ctx.state !== 'closed') ctx.close().catch(() => {}); ctx = null; master = null },

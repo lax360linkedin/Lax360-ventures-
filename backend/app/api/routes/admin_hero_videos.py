@@ -102,6 +102,8 @@ def _state(db: Session, settings: Settings, force_check: bool = False) -> dict:
 
 @router.get("")
 def list_videos(_: User = Depends(read), db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> dict:
+    if svc.recheck_errors(db, settings):  # an old storage error is re-checked now, so the panel never shows a stale failure
+        db.commit()
     out = _state(db, settings)
     db.rollback()  # reading must not leave a schedule row half-created
     return out

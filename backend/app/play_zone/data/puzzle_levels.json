@@ -1,0 +1,1433 @@
+[
+ {
+  "id": "w1-l1",
+  "world": 1,
+  "index": 1,
+  "name": "First Sparkles",
+  "moves": 14,
+  "objectives": [
+   {
+    "type": "score",
+    "target": 1000
+   }
+  ],
+  "colors": 5,
+  "hint": true,
+  "tip": "Swap two neighbouring crystals so that three or more of the same colour line up."
+ },
+ {
+  "id": "w1-l2",
+  "world": 1,
+  "index": 2,
+  "name": "Ruby Rush",
+  "moves": 14,
+  "objectives": [
+   {
+    "type": "collect",
+    "color": 0,
+    "count": 14
+   }
+  ],
+  "colors": 5,
+  "hint": true,
+  "tip": "Collect ruby crystals: match them to clear them from the board."
+ },
+ {
+  "id": "w1-l3",
+  "world": 1,
+  "index": 3,
+  "name": "Twin Gems",
+  "moves": 16,
+  "objectives": [
+   {
+    "type": "collect",
+    "color": 1,
+    "count": 12
+   },
+   {
+    "type": "collect",
+    "color": 2,
+    "count": 12
+   }
+  ],
+  "colors": 6,
+  "hint": true,
+  "tip": "Four in a line makes a Rocket crystal that clears a whole row or column."
+ },
+ {
+  "id": "w1-l4",
+  "world": 1,
+  "index": 4,
+  "name": "Garden Party",
+  "moves": 16,
+  "objectives": [
+   {
+    "type": "score",
+    "target": 2000
+   },
+   {
+    "type": "collect",
+    "color": 3,
+    "count": 16
+   }
+  ],
+  "colors": 6,
+  "hint": true,
+  "tip": "Five in a line makes a Rainbow crystal. A T or L shape makes a Bomb."
+ },
+ {
+  "id": "w1-l5",
+  "world": 1,
+  "index": 5,
+  "name": "Bloom Master",
+  "moves": 16,
+  "objectives": [
+   {
+    "type": "score",
+    "target": 3000
+   },
+   {
+    "type": "special",
+    "count": 3
+   }
+  ],
+  "colors": 6,
+  "hint": true,
+  "tip": "Match a power-up with other crystals, or swap it, to set it off."
+ },
+ {
+  "id": "w2-l1",
+  "world": 2,
+  "index": 1,
+  "name": "Pearl Dive",
+  "moves": 26,
+  "objectives": [
+   {
+    "type": "treasure"
+   }
+  ],
+  "colors": 6,
+  "treasures": [
+   [
+    4,
+    2
+   ],
+   [
+    4,
+    5
+   ]
+  ],
+  "tip": "Clear the crystals under each chest so it sinks to the bottom row."
+ },
+ {
+  "id": "w2-l2",
+  "world": 2,
+  "index": 2,
+  "name": "Chest Hunt",
+  "moves": 32,
+  "objectives": [
+   {
+    "type": "treasure"
+   },
+   {
+    "type": "score",
+    "target": 1000
+   }
+  ],
+  "colors": 6,
+  "treasures": [
+   [
+    3,
+    1
+   ],
+   [
+    4,
+    4
+   ],
+   [
+    3,
+    6
+   ]
+  ]
+ },
+ {
+  "id": "w2-l3",
+  "world": 2,
+  "index": 3,
+  "name": "Coral Crunch",
+  "moves": 20,
+  "objectives": [
+   {
+    "type": "blocks"
+   }
+  ],
+  "colors": 6,
+  "blocks": [
+   [
+    5,
+    1,
+    1
+   ],
+   [
+    5,
+    3,
+    1
+   ],
+   [
+    5,
+    4,
+    1
+   ],
+   [
+    5,
+    6,
+    1
+   ]
+  ],
+  "tip": "Matches next to a coral block chip it. A power-up can hit it too."
+ },
+ {
+  "id": "w2-l4",
+  "world": 2,
+  "index": 4,
+  "name": "Deep Reef",
+  "moves": 28,
+  "objectives": [
+   {
+    "type": "blocks"
+   },
+   {
+    "type": "treasure"
+   }
+  ],
+  "colors": 6,
+  "blocks": [
+   [
+    5,
+    1,
+    2
+   ],
+   [
+    5,
+    3,
+    2
+   ],
+   [
+    5,
+    5,
+    2
+   ],
+   [
+    4,
+    6,
+    2
+   ]
+  ],
+  "treasures": [
+   [
+    3,
+    2
+   ],
+   [
+    3,
+    5
+   ]
+  ]
+ },
+ {
+  "id": "w2-l5",
+  "world": 2,
+  "index": 5,
+  "name": "Sunken Vault",
+  "moves": 32,
+  "objectives": [
+   {
+    "type": "treasure"
+   },
+   {
+    "type": "blocks"
+   },
+   {
+    "type": "score",
+    "target": 2200
+   }
+  ],
+  "colors": 6,
+  "blocks": [
+   [
+    4,
+    1,
+    2
+   ],
+   [
+    4,
+    3,
+    1
+   ],
+   [
+    4,
+    4,
+    1
+   ],
+   [
+    4,
+    6,
+    2
+   ],
+   [
+    6,
+    2,
+    1
+   ]
+  ],
+  "treasures": [
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    3,
+    6
+   ]
+  ]
+ },
+ {
+  "id": "w3-l1",
+  "world": 3,
+  "index": 1,
+  "name": "Thin Ice",
+  "moves": 20,
+  "objectives": [
+   {
+    "type": "ice"
+   }
+  ],
+  "colors": 6,
+  "ice": [
+   [
+    6,
+    2,
+    1
+   ],
+   [
+    6,
+    3,
+    1
+   ],
+   [
+    6,
+    4,
+    1
+   ],
+   [
+    6,
+    5,
+    1
+   ],
+   [
+    7,
+    2,
+    1
+   ],
+   [
+    7,
+    3,
+    1
+   ],
+   [
+    7,
+    4,
+    1
+   ],
+   [
+    7,
+    5,
+    1
+   ]
+  ],
+  "tip": "Clear a crystal that sits on ice to crack it. Clear every iced tile."
+ },
+ {
+  "id": "w3-l2",
+  "world": 3,
+  "index": 2,
+  "name": "Frost Field",
+  "moves": 24,
+  "objectives": [
+   {
+    "type": "ice"
+   }
+  ],
+  "colors": 6,
+  "ice": [
+   [
+    5,
+    1,
+    1
+   ],
+   [
+    5,
+    2,
+    1
+   ],
+   [
+    5,
+    3,
+    1
+   ],
+   [
+    5,
+    4,
+    1
+   ],
+   [
+    5,
+    5,
+    1
+   ],
+   [
+    5,
+    6,
+    1
+   ],
+   [
+    6,
+    1,
+    1
+   ],
+   [
+    6,
+    2,
+    1
+   ],
+   [
+    6,
+    3,
+    1
+   ],
+   [
+    6,
+    4,
+    1
+   ],
+   [
+    6,
+    5,
+    1
+   ],
+   [
+    6,
+    6,
+    1
+   ],
+   [
+    7,
+    1,
+    1
+   ],
+   [
+    7,
+    2,
+    1
+   ],
+   [
+    7,
+    3,
+    1
+   ],
+   [
+    7,
+    4,
+    1
+   ],
+   [
+    7,
+    5,
+    1
+   ],
+   [
+    7,
+    6,
+    1
+   ]
+  ]
+ },
+ {
+  "id": "w3-l3",
+  "world": 3,
+  "index": 3,
+  "name": "Double Glaze",
+  "moves": 30,
+  "objectives": [
+   {
+    "type": "ice"
+   }
+  ],
+  "colors": 6,
+  "ice": [
+   [
+    5,
+    1,
+    2
+   ],
+   [
+    5,
+    2,
+    2
+   ],
+   [
+    5,
+    3,
+    2
+   ],
+   [
+    5,
+    4,
+    2
+   ],
+   [
+    5,
+    5,
+    2
+   ],
+   [
+    5,
+    6,
+    2
+   ],
+   [
+    6,
+    1,
+    2
+   ],
+   [
+    6,
+    2,
+    2
+   ],
+   [
+    6,
+    3,
+    2
+   ],
+   [
+    6,
+    4,
+    2
+   ],
+   [
+    6,
+    5,
+    2
+   ],
+   [
+    6,
+    6,
+    2
+   ]
+  ],
+  "tip": "Thick ice has two layers: it takes two clears."
+ },
+ {
+  "id": "w3-l4",
+  "world": 3,
+  "index": 4,
+  "name": "Ice Checkers",
+  "moves": 28,
+  "objectives": [
+   {
+    "type": "ice"
+   },
+   {
+    "type": "collect",
+    "color": 4,
+    "count": 12
+   }
+  ],
+  "colors": 6,
+  "ice": [
+   [
+    4,
+    0,
+    1
+   ],
+   [
+    4,
+    2,
+    1
+   ],
+   [
+    4,
+    4,
+    1
+   ],
+   [
+    4,
+    6,
+    1
+   ],
+   [
+    5,
+    1,
+    1
+   ],
+   [
+    5,
+    3,
+    1
+   ],
+   [
+    5,
+    5,
+    1
+   ],
+   [
+    5,
+    7,
+    1
+   ],
+   [
+    6,
+    0,
+    1
+   ],
+   [
+    6,
+    2,
+    1
+   ],
+   [
+    6,
+    4,
+    1
+   ],
+   [
+    6,
+    6,
+    1
+   ],
+   [
+    7,
+    1,
+    1
+   ],
+   [
+    7,
+    3,
+    1
+   ],
+   [
+    7,
+    5,
+    1
+   ],
+   [
+    7,
+    7,
+    1
+   ]
+  ]
+ },
+ {
+  "id": "w3-l5",
+  "world": 3,
+  "index": 5,
+  "name": "Palace Vault",
+  "moves": 36,
+  "objectives": [
+   {
+    "type": "ice"
+   },
+   {
+    "type": "score",
+    "target": 2600
+   }
+  ],
+  "colors": 6,
+  "ice": [
+   [
+    4,
+    0,
+    1
+   ],
+   [
+    4,
+    1,
+    1
+   ],
+   [
+    4,
+    2,
+    1
+   ],
+   [
+    4,
+    3,
+    1
+   ],
+   [
+    4,
+    4,
+    1
+   ],
+   [
+    4,
+    5,
+    1
+   ],
+   [
+    4,
+    6,
+    1
+   ],
+   [
+    4,
+    7,
+    1
+   ],
+   [
+    5,
+    0,
+    1
+   ],
+   [
+    5,
+    1,
+    1
+   ],
+   [
+    5,
+    2,
+    1
+   ],
+   [
+    5,
+    3,
+    1
+   ],
+   [
+    5,
+    4,
+    1
+   ],
+   [
+    5,
+    5,
+    1
+   ],
+   [
+    5,
+    6,
+    1
+   ],
+   [
+    5,
+    7,
+    1
+   ],
+   [
+    6,
+    1,
+    2
+   ],
+   [
+    6,
+    2,
+    2
+   ],
+   [
+    6,
+    3,
+    2
+   ],
+   [
+    6,
+    4,
+    2
+   ],
+   [
+    6,
+    5,
+    2
+   ],
+   [
+    6,
+    6,
+    2
+   ],
+   [
+    7,
+    1,
+    2
+   ],
+   [
+    7,
+    2,
+    2
+   ],
+   [
+    7,
+    3,
+    2
+   ],
+   [
+    7,
+    4,
+    2
+   ],
+   [
+    7,
+    5,
+    2
+   ],
+   [
+    7,
+    6,
+    2
+   ]
+  ]
+ },
+ {
+  "id": "w4-l1",
+  "world": 4,
+  "index": 1,
+  "name": "Spark Plug",
+  "moves": 14,
+  "objectives": [
+   {
+    "type": "special",
+    "count": 3
+   }
+  ],
+  "colors": 6,
+  "specials": [
+   [
+    7,
+    3,
+    "rocketH"
+   ]
+  ]
+ },
+ {
+  "id": "w4-l2",
+  "world": 4,
+  "index": 2,
+  "name": "Chain Reaction",
+  "moves": 15,
+  "objectives": [
+   {
+    "type": "chain",
+    "size": 3
+   },
+   {
+    "type": "score",
+    "target": 1500
+   }
+  ],
+  "colors": 6
+ },
+ {
+  "id": "w4-l3",
+  "world": 4,
+  "index": 3,
+  "name": "Double Trouble",
+  "moves": 16,
+  "objectives": [
+   {
+    "type": "combos",
+    "count": 1
+   },
+   {
+    "type": "score",
+    "target": 2000
+   }
+  ],
+  "colors": 6,
+  "specials": [
+   [
+    7,
+    2,
+    "rocketH"
+   ],
+   [
+    7,
+    3,
+    "bomb"
+   ]
+  ]
+ },
+ {
+  "id": "w4-l4",
+  "world": 4,
+  "index": 4,
+  "name": "Power Hour",
+  "moves": 18,
+  "objectives": [
+   {
+    "type": "special",
+    "count": 6
+   },
+   {
+    "type": "collect",
+    "color": 2,
+    "count": 14
+   }
+  ],
+  "colors": 6,
+  "specials": [
+   [
+    7,
+    1,
+    "bomb"
+   ],
+   [
+    6,
+    5,
+    "rocketV"
+   ]
+  ]
+ },
+ {
+  "id": "w4-l5",
+  "world": 4,
+  "index": 5,
+  "name": "Sky High",
+  "moves": 20,
+  "objectives": [
+   {
+    "type": "combos",
+    "count": 2
+   },
+   {
+    "type": "chain",
+    "size": 3
+   },
+   {
+    "type": "score",
+    "target": 3000
+   }
+  ],
+  "colors": 6,
+  "specials": [
+   [
+    7,
+    1,
+    "rocketH"
+   ],
+   [
+    7,
+    2,
+    "bomb"
+   ],
+   [
+    7,
+    5,
+    "rocketV"
+   ],
+   [
+    7,
+    6,
+    "bomb"
+   ]
+  ]
+ },
+ {
+  "id": "w5-l1",
+  "world": 5,
+  "index": 1,
+  "name": "Star Dust",
+  "moves": 18,
+  "objectives": [
+   {
+    "type": "score",
+    "target": 2800
+   },
+   {
+    "type": "special",
+    "count": 4
+   }
+  ],
+  "colors": 6,
+  "specials": [
+   [
+    7,
+    0,
+    "bomb"
+   ],
+   [
+    7,
+    7,
+    "rocketV"
+   ]
+  ]
+ },
+ {
+  "id": "w5-l2",
+  "world": 5,
+  "index": 2,
+  "name": "Rainbow Road",
+  "moves": 20,
+  "objectives": [
+   {
+    "type": "rainbow",
+    "count": 2
+   },
+   {
+    "type": "collect",
+    "color": 5,
+    "count": 18
+   }
+  ],
+  "colors": 6,
+  "specials": [
+   [
+    7,
+    1,
+    "rainbow"
+   ],
+   [
+    7,
+    6,
+    "rainbow"
+   ]
+  ],
+  "tip": "Swap a Rainbow crystal with any neighbour to clear that colour, or with a power-up for a bigger blast."
+ },
+ {
+  "id": "w5-l3",
+  "world": 5,
+  "index": 3,
+  "name": "Nebula Vault",
+  "moves": 30,
+  "objectives": [
+   {
+    "type": "ice"
+   },
+   {
+    "type": "blocks"
+   },
+   {
+    "type": "treasure"
+   }
+  ],
+  "colors": 6,
+  "ice": [
+   [
+    5,
+    2,
+    1
+   ],
+   [
+    5,
+    3,
+    1
+   ],
+   [
+    5,
+    4,
+    1
+   ],
+   [
+    5,
+    5,
+    1
+   ],
+   [
+    6,
+    2,
+    1
+   ],
+   [
+    6,
+    3,
+    1
+   ],
+   [
+    6,
+    4,
+    1
+   ],
+   [
+    6,
+    5,
+    1
+   ],
+   [
+    7,
+    2,
+    1
+   ],
+   [
+    7,
+    3,
+    1
+   ],
+   [
+    7,
+    4,
+    1
+   ],
+   [
+    7,
+    5,
+    1
+   ]
+  ],
+  "blocks": [
+   [
+    4,
+    1,
+    1
+   ],
+   [
+    4,
+    6,
+    1
+   ]
+  ],
+  "treasures": [
+   [
+    3,
+    3
+   ],
+   [
+    3,
+    4
+   ]
+  ],
+  "specials": [
+   [
+    7,
+    3,
+    "rainbow"
+   ]
+  ]
+ },
+ {
+  "id": "w5-l4",
+  "world": 5,
+  "index": 4,
+  "name": "Comet Crash",
+  "moves": 38,
+  "objectives": [
+   {
+    "type": "combos",
+    "count": 2
+   },
+   {
+    "type": "ice"
+   }
+  ],
+  "colors": 6,
+  "ice": [
+   [
+    5,
+    0,
+    1
+   ],
+   [
+    5,
+    1,
+    1
+   ],
+   [
+    5,
+    2,
+    1
+   ],
+   [
+    5,
+    3,
+    1
+   ],
+   [
+    5,
+    4,
+    1
+   ],
+   [
+    5,
+    5,
+    1
+   ],
+   [
+    5,
+    6,
+    1
+   ],
+   [
+    5,
+    7,
+    1
+   ],
+   [
+    6,
+    0,
+    1
+   ],
+   [
+    6,
+    1,
+    1
+   ],
+   [
+    6,
+    2,
+    1
+   ],
+   [
+    6,
+    3,
+    1
+   ],
+   [
+    6,
+    4,
+    1
+   ],
+   [
+    6,
+    5,
+    1
+   ],
+   [
+    6,
+    6,
+    1
+   ],
+   [
+    6,
+    7,
+    1
+   ],
+   [
+    7,
+    0,
+    1
+   ],
+   [
+    7,
+    1,
+    1
+   ],
+   [
+    7,
+    2,
+    1
+   ],
+   [
+    7,
+    3,
+    1
+   ],
+   [
+    7,
+    4,
+    1
+   ],
+   [
+    7,
+    5,
+    1
+   ],
+   [
+    7,
+    6,
+    1
+   ],
+   [
+    7,
+    7,
+    1
+   ]
+  ],
+  "specials": [
+   [
+    7,
+    1,
+    "rainbow"
+   ],
+   [
+    7,
+    2,
+    "bomb"
+   ],
+   [
+    7,
+    5,
+    "rocketH"
+   ],
+   [
+    7,
+    6,
+    "rocketV"
+   ]
+  ]
+ },
+ {
+  "id": "w5-l5",
+  "world": 5,
+  "index": 5,
+  "name": "Galaxy Heart",
+  "moves": 34,
+  "objectives": [
+   {
+    "type": "score",
+    "target": 4500
+   },
+   {
+    "type": "treasure"
+   },
+   {
+    "type": "ice"
+   },
+   {
+    "type": "blocks"
+   },
+   {
+    "type": "combos",
+    "count": 1
+   }
+  ],
+  "colors": 6,
+  "ice": [
+   [
+    5,
+    1,
+    1
+   ],
+   [
+    5,
+    2,
+    1
+   ],
+   [
+    5,
+    3,
+    1
+   ],
+   [
+    5,
+    4,
+    1
+   ],
+   [
+    5,
+    5,
+    1
+   ],
+   [
+    5,
+    6,
+    1
+   ],
+   [
+    6,
+    1,
+    1
+   ],
+   [
+    6,
+    2,
+    1
+   ],
+   [
+    6,
+    3,
+    1
+   ],
+   [
+    6,
+    4,
+    1
+   ],
+   [
+    6,
+    5,
+    1
+   ],
+   [
+    6,
+    6,
+    1
+   ],
+   [
+    7,
+    1,
+    1
+   ],
+   [
+    7,
+    2,
+    1
+   ],
+   [
+    7,
+    3,
+    1
+   ],
+   [
+    7,
+    4,
+    1
+   ],
+   [
+    7,
+    5,
+    1
+   ],
+   [
+    7,
+    6,
+    1
+   ]
+  ],
+  "blocks": [
+   [
+    4,
+    2,
+    1
+   ],
+   [
+    4,
+    5,
+    1
+   ],
+   [
+    6,
+    0,
+    1
+   ]
+  ],
+  "treasures": [
+   [
+    3,
+    1
+   ],
+   [
+    3,
+    6
+   ],
+   [
+    2,
+    3
+   ]
+  ],
+  "specials": [
+   [
+    7,
+    3,
+    "rainbow"
+   ],
+   [
+    7,
+    4,
+    "bomb"
+   ]
+  ]
+ }
+]

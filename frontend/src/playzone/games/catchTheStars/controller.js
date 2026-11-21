@@ -3,6 +3,8 @@ import { advance, createGame, multiplierLeft, summary } from './logic.js'
 import { createAudio } from './audio.js'
 import { getLocalBest, recordResult } from '../../services/localScores.js'
 import { getPrefs, setPref } from '../../prefs.js'
+import { gpuInfo } from '../../../utils/webgl.js'
+import { begin as beginRun, finish as finishRun } from '../../services/officialRun.js'
 
 // The game controller: the state machine (loading → ready → playing ⇄ paused → game over → results), the input, the audio and the bridge between the rules (logic.js) and the screen.
 // The scene calls `tick(dt)` once per frame; the React screens subscribe to `getSnapshot()`, which changes only when a number the player SEES changes (score, a life, a second, a stage...),
@@ -14,12 +16,15 @@ const GAME_OVER_SECONDS = 1.9
 export const PHASES = ['loading', 'ready', 'playing', 'paused', 'gameover', 'results']
 
 export function detectQuality(pref) {
-  if (pref === 'low') return 'low'
-  if (pref === 'high') return 'high'
+  if (pref === 'low' || pref === 'medium' || pref === 'high') return pref
+  // Auto: conservative. Software rendering gets Low; integrated / mobile GPUs never get High; unknown hardware is treated as capable.
   const coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches
   const cores = navigator.hardwareConcurrency || 4
   const mem = navigator.deviceMemory || 4
-  if (coarse && (cores <= 4 || mem <= 3)) return 'low'
+  const gpu = gpuInfo()
+  if (gpu.software) return 'low'
+  if (coarse && (cores <= 4 || mem <= 3 || gpu.weak)) return 'low'
+  if (gpu.weak) return 'medium'
   return coarse ? 'medium' : cores >= 8 ? 'high' : 'medium'
 }
 
@@ -73,6 +78,7 @@ export function createController() {
     start() {
       audio.unlock()
       c.sim = createGame(); c.results = null; c.fx.length = 0; c.bot.catchT = 0; c.bot.hurtT = 0; c.overT = 0; c.lastSecond = ROUND_SECONDS; c.input.target = null
+      beginRun(GAME) // official run for signed-in players (background request; never delays the round)
       audio.go()
       audio.startMusic()
       setPhase('playing')
@@ -136,6 +142,7 @@ export function createController() {
       const s = summary(c.sim)
       const saved = recordResult(GAME, s) // local record only (this device)
       c.results = { ...s, ...saved }
+      finishRun(GAME, s) // the server verifies and records the official score; the results screen shows the save status
       setPhase('results')
     },
 

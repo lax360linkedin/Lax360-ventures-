@@ -1,3 +1,4 @@
+import SaveStatus from '../../components/SaveStatus.jsx'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ArrowUp, ChevronRight, Flag, Gem, Heart, Lock, LogOut, Pause, Play, RotateCcw, Star, Timer, Trophy, Volume2, VolumeX, Coins } from 'lucide-react'
@@ -94,11 +95,11 @@ export default function LaxbotJumpGame({ onExit }) {
     <div ref={wrap} tabIndex={0} aria-label="LAXBOT Jump 3D platform game" className="absolute inset-0 select-none overflow-hidden outline-none" style={{ touchAction: 'none' }}>
       {!glFailed && (
         <Canvas camera={{ fov: 46, position: [0, 6, 10], near: 0.1, far: 260 }} dpr={dpr} shadows={quality !== 'low'} gl={{ antialias: quality !== 'low', powerPreference: 'high-performance' }}
-          onCreated={({ gl }) => { gl.domElement.addEventListener('webglcontextlost', (e) => { e.preventDefault(); setGlFailed(true) }); controller.markReady() }}>
+          onCreated={({ gl }) => { gl.domElement.addEventListener('webglcontextlost', (e) => { e.preventDefault(); controller.autoPause?.(); setGlFailed(true) }); controller.markReady() }}>
           <Scene key={hud.levelId} controller={controller} quality={quality} shadows={quality !== 'low'} />
         </Canvas>
       )}
-      {glFailed && <div role="alert" className="absolute inset-0 grid place-items-center p-4"><div className="pz-glass max-w-md p-6 text-center"><p className="font-display text-xl font-semibold">The 3D view stopped</p><p className="pz-soft mt-2">Your device could not keep the 3D graphics running. Reload the page, or set Graphics to Low in the Play Zone settings.</p></div></div>}
+      {glFailed && <div role="alert" className="absolute inset-0 grid place-items-center p-4"><div className="pz-glass max-w-md p-6 text-center"><p className="font-display text-xl font-semibold">The 3D view stopped</p><p className="pz-soft mt-2">Your device could not keep the 3D graphics running. Reload the page, or set Graphics to Low in the Play Zone settings.</p><button type="button" className="pz-btn pz-btn-primary mt-4" onClick={() => setGlFailed(false)}>Restart the 3D view</button></div></div>}
 
       {/* HUD */}
       {(inGame || phase === 'gameover') && (
@@ -244,7 +245,8 @@ function Complete({ r, hud, controller, onExit }) {
         <tr><td className="pt-2 text-left font-display text-base font-extrabold" colSpan={2}>Total score</td><td className="pt-2 text-right font-display text-xl font-extrabold tabular-nums text-amber-200">{fmt(r.score)}</td></tr>
       </tbody></table>
       {r.unlockedNext && <p className="mt-2 text-sm font-bold text-emerald-200" role="status">🔓 Unlocked: {LEVELS.find((l) => l.id === r.unlockedNext)?.world}</p>}
-      <p className="pz-soft mt-2 text-[0.7rem]">★★ 75% of the coins · ★★★ also every crystal and the hidden star. Saved on this device only, not ranked on the leaderboard.</p>
+      <p className="pz-soft mt-2 text-[0.7rem]">★★ 75% of the coins · ★★★ also every crystal and the hidden star.</p>
+      <SaveStatus game="laxbot-jump" localHint="Progress is saved on this device." />
       <div className="mt-3 flex flex-wrap justify-center gap-2">
         {hud.hasNext && <button type="button" className="pz-btn pz-btn-primary" onClick={controller.next} autoFocus>Next level<ChevronRight className="size-5" aria-hidden="true" /></button>}
         <button type="button" className={`pz-btn ${hud.hasNext ? 'pz-btn-ghost' : 'pz-btn-primary'}`} onClick={controller.restart} autoFocus={!hud.hasNext}><RotateCcw className="size-5" aria-hidden="true" />Replay</button>

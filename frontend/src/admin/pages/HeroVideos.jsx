@@ -234,6 +234,7 @@ export default function HeroVideos() {
                     <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-soft">
                       <span className={cx('font-medium', v.verify_status === 'ok' ? 'text-success' : v.verify_status === 'unknown' ? '' : 'text-error')}>File: {v.verify_status === 'ok' ? 'verified' : v.verify_status === 'unknown' ? 'not checked yet' : v.verify_status}{v.verified_at ? ` (${when(v.verified_at)})` : ''}</span>
                       <span>{v.storage === 'supabase' ? `Stored permanently (${v.bucket || 'bucket'})` : 'On the server disk (temporary): upload it again'}</span>
+                      {v.size_bytes > 5 * 1024 * 1024 && <span className="text-amber-600 dark:text-amber-400">Large file ({size(v.size_bytes)}): on slow connections it can buffer. A background video of 3 to 4 MB (720p, no sound) loads much faster.</span>}
                       {v.last_play_ok_at && <span>Last played by a visitor: {when(v.last_play_ok_at)}</span>}
                       {v.last_play_error && <span className="text-error">Last playback problem: {v.last_play_error}{v.last_play_error_at ? ` (${when(v.last_play_error_at)})` : ''}</span>}
                       {v.is_fallback && <span className="font-medium text-lav">Fallback video</span>}

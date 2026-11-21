@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, ChevronDown, Gamepad2, ListChecks, Lock, Target, Trophy } from 'lucide-react'
+import { ArrowRight, ChevronDown, Gamepad2, ListChecks, Trophy } from 'lucide-react'
 import PzPage from './PzPage.jsx'
 import GameArt from '../components/GameArt.jsx'
 import LaxBotPlayer from '../components/LaxBotPlayer.jsx'
 import GameShowcase from '../components/GameShowcase.jsx'
 import LeaderboardView from '../components/LeaderboardView.jsx'
+import LazyMount from '../components/LazyMount.jsx'
+import { AchievementsPanel, ChallengesPanel } from '../components/PlayerPanels.jsx'
 import { PzHeading, StatusChip } from '../components/parts.jsx'
-import { BOT_VARIANTS, faq, games, plannedAchievements, plannedChallenges } from '../data/games.js'
+import { BOT_VARIANTS, faq, games as allGames } from '../data/games.js'
+import { applyConfig, unavailableReason, usePlayZoneConfig } from '../hooks.js'
 
 function Hero() {
   return (
@@ -16,12 +19,12 @@ function Hero() {
         <div className="pz-rise">
           <p className="pz-eyebrow">LAX360 Play Zone</p>
           <h1 id="pz-hero-title" className="pz-h1 mt-4">Play. Explore. <span className="pz-gold-text">Win.</span></h1>
-          <p className="pz-soft mt-6 max-w-xl text-lg leading-relaxed sm:text-xl">Four little worlds, one cheerful robot. Meet LAXBOT, explore the games and get ready to climb the leaderboard. Catch the Stars and LAXBOT Jump are open now; the other games open one by one as they are finished.</p>
+          <p className="pz-soft mt-6 max-w-xl text-lg leading-relaxed sm:text-xl">Four little worlds, one cheerful robot. Meet LAXBOT, explore the games and get ready to climb the leaderboard. All four games are open now.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href="#games" className="pz-btn pz-btn-primary">Explore Games <ChevronDown className="size-5" aria-hidden="true" /></a>
             <Link to="/play-zone/leaderboard" className="pz-btn pz-btn-ghost"><Trophy className="size-5" aria-hidden="true" />Leaderboard</Link>
           </div>
-          <p className="mt-5"><StatusChip status="live" /> <span className="pz-soft ml-1 text-sm">Catch the Stars and LAXBOT Jump are playable now. The other games are coming soon.</span></p>
+          <p className="mt-5"><StatusChip status="live" /> <span className="pz-soft ml-1 text-sm">All four games are playable now.</span></p>
         </div>
         <div className="relative mx-auto grid w-full max-w-md place-items-center py-6" aria-hidden="true">
           <span className="pz-spin absolute size-[88%] rounded-full border border-dashed border-white/25" />
@@ -43,15 +46,19 @@ function Section({ id, labelledBy, className = '', children }) {
 }
 
 export default function PlayZoneHome() {
-  const featured = games[0]
+  const cfg = usePlayZoneConfig()
+  const games = applyConfig(allGames, cfg)
+  const featured = games[0] || allGames[0]
+  const notice = cfg && (!cfg.enabled || cfg.maintenance) ? unavailableReason(cfg, '') : null
   return (
     <PzPage path="/play-zone" title="LAX360 Play Zone" description="LAX360 Play Zone: four little game worlds with LAXBOT. Explore the games, the leaderboard and daily challenges. Games open as they are finished.">
+      {notice && <div role="status" className="wrap pt-4"><p className="pz-glass px-5 py-3 text-center font-semibold">{notice} The leaderboards and your profile stay available.</p></div>}
       <Hero />
 
       <Section id="games" labelledBy="pz-games-title">
         <PzHeading id="pz-games-title" eyebrow="Choose your world" title="Four games, four worlds" lead="Each world has its own look, rules and LAXBOT outfit. Tap a game to see its story, controls and scoring." />
         <ul className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {games.map((g) => <li key={g.slug}><GameShowcase game={g} /></li>)}
+          {games.map((g) => <li key={g.slug}>{g.adminConfig && unavailableReason(cfg, g.slug) ? <div className="relative"><GameShowcase game={g} /><span className="pz-chip absolute right-3 top-3">{g.adminConfig.maintenance ? 'Maintenance' : 'Unavailable'}</span></div> : <GameShowcase game={g} />}</li>)}
         </ul>
       </Section>
 
@@ -83,34 +90,14 @@ export default function PlayZoneHome() {
       </Section>
 
       <Section id="leaderboard" labelledBy="pz-lb-title">
-        <PzHeading id="pz-lb-title" eyebrow="Leaderboard preview" title="Where the best players will shine" lead="Leaderboards open together with the games. Until then this shows the honest state: no scores, and no made-up rankings." />
-        <div className="mt-8"><LeaderboardView compact /></div>
+        <PzHeading id="pz-lb-title" eyebrow="Leaderboard" title="Where the best players shine" lead="Real, server-verified scores from signed-in players. Guests can browse every board; sign in and play to join them." />
+        <div className="mt-8"><LazyMount minHeight={420}><LeaderboardView compact /></LazyMount></div>
         <div className="mt-6"><Link to="/play-zone/leaderboard" className="pz-btn pz-btn-ghost">Open the full leaderboard <ArrowRight className="size-5" aria-hidden="true" /></Link></div>
       </Section>
 
       <Section labelledBy="pz-ach-title" className="!pt-4">
-        <PzHeading id="pz-ach-title" eyebrow="Player achievements" title="Badges to collect" lead="A preview of the planned achievements. They are locked for everyone until gameplay is live." />
-        <ul className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
-          {plannedAchievements.map((a) => (
-            <li key={a.id} className="pz-glass flex items-start gap-3 !rounded-2xl p-4">
-              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/10 text-[var(--pz-gold)]"><Lock className="size-5" aria-hidden="true" /></span>
-              <div><p className="font-display font-bold leading-tight">{a.title}</p><p className="pz-soft mt-1 text-sm">{a.text}</p><span className="pz-chip pz-chip-dev mt-2 !py-0.5 !text-[0.62rem]">Planned · locked</span></div>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section labelledBy="pz-dc-title" className="!pt-4">
-        <PzHeading id="pz-dc-title" eyebrow="Daily challenges" title="A new goal every day" lead="Daily challenges will refresh each day once the games are live. These are the kinds of goals planned; none is active yet." />
-        <ul className="mt-8 grid gap-4 md:grid-cols-3">
-          {plannedChallenges.map((c) => (
-            <li key={c.id} className="pz-glass flex flex-col gap-2 p-5">
-              <span className="grid size-11 place-items-center rounded-2xl bg-white/10"><Target className="size-5 text-[var(--pz-pink)]" aria-hidden="true" /></span>
-              <p className="font-display text-lg font-bold">{c.title}</p><p className="pz-soft text-sm">{c.text}</p>
-              <span className="pz-chip pz-chip-dev mt-auto w-fit !text-[0.62rem]">Planned · not active</span>
-            </li>
-          ))}
-        </ul>
+        <PzHeading id="pz-ach-title" eyebrow="Achievements & daily challenges" title="Badges to earn, goals to hit" lead="Sign in to earn badges and complete today's challenges. Both are awarded by the server from verified runs, so guests can look but not claim." />
+        <div className="mt-8"><LazyMount minHeight={360}><div className="grid gap-6 md:grid-cols-2"><AchievementsPanel headingId="pz-ach-h" /><ChallengesPanel headingId="pz-dc-h" /></div></LazyMount></div>
       </Section>
 
       <Section id="faq" labelledBy="pz-faq-title">

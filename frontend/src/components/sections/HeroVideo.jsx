@@ -25,7 +25,8 @@ const SCHEDULE_RETRY_MS = [2000, 4000, 8000, 15000, 30000]
 const PLAY_RETRY_MS = [400, 1200, 3000, 7000, 15000] // bounded: five tries, then wait for a gesture / visibility / intro event
 const MAX_SOURCE_RETRIES = 3
 const START_WATCHDOG_MS = 25000 // no data at all after this long: reload the source
-const STALL_WATCHDOG_MS = 12000 // buffering for this long: reload the source
+const STALL_WATCHDOG_MS = 12000 // buffering for this long with NO new data: reload the source
+const STALL_MAX_MS = 60000 // ... or after this long in total, even when data trickles in
 
 const warn = (...args) => console.warn(TAG, ...args) // eslint-disable-line no-console
 const fail = (...args) => console.error(TAG, ...args) // eslint-disable-line no-console
@@ -154,7 +155,20 @@ function Layer({ layer, hold, resumeSignal, onPlaying, onFail, onFaded }) {
       on(el, 'waiting', () => {
         state('buffering')
         clearTimeout(timers.stall)
-        timers.stall = window.setTimeout(() => { if (!s.dead && el.readyState < 3 && !s.hold) { warn('the video has been buffering too long', describe(el)); reloadSource('stalled') } }, STALL_WATCHDOG_MS)
+        // A slow connection that is still downloading is not a failure: reloading would throw the buffered part away and start again. Only reload when the buffer has stopped growing
+        // (or after STALL_MAX_MS in total).
+        const began = Date.now()
+        const bufferedEnd = () => { const b = el.buffered; return b.length ? b.end(b.length - 1) : 0 }
+        const arm = (lastEnd) => {
+          timers.stall = window.setTimeout(() => {
+            if (s.dead || s.hold || el.readyState >= 3) return
+            const end = bufferedEnd()
+            if (end > lastEnd + 0.4 && Date.now() - began < STALL_MAX_MS) { arm(end); return } // still receiving data
+            warn('the video has been buffering too long', describe(el))
+            reloadSource('stalled')
+          }, STALL_WATCHDOG_MS)
+        }
+        arm(bufferedEnd())
       }),
       on(el, 'stalled', () => warn('the network stalled while loading the video', describe(el))),
       on(el, 'pause', () => { // a pause we did not ask for (power saving, an overlay, the browser): ask again

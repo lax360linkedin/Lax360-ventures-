@@ -60,6 +60,10 @@ async function updateName(fullName) {
   return user
 }
 
+/** Non-hook read of the session store (for services that run outside React, e.g. the Play Zone run recorder). */
+export const getAuthUser = () => state.user
+export const subscribeAuth = (cb) => { listeners.add(cb); return () => listeners.delete(cb) }
+
 export function useAuth() {
   const snapshot = useSyncExternalStore(subscribe, () => state, () => INITIAL)
   useEffect(() => { load() }, [])

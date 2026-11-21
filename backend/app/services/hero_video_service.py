@@ -67,7 +67,53 @@ def is_available(settings: Settings, video: HeroVideo) -> bool:
 
 # ---- durable object storage (Supabase Storage) ------------------------------------------------------------------------------------------
 def _client() -> httpx.Client:  # a function so tests can substitute a fake Storage server
-    return httpx.Client(timeout=httpx.Timeout(180.0, connect=15.0))
+    # retries=3: a failed TCP/TLS connect (a brief network or Supabase hiccup) is retried by the transport before an error is reported. trust_env=False: the connection to Supabase never goes
+    # through a proxy configured by environment variables (a malformed proxy variable is another way to get UnsupportedProtocol).
+    return httpx.Client(timeout=httpx.Timeout(180.0, connect=15.0), transport=httpx.HTTPTransport(retries=3), trust_env=False)
+
+
+_PERMANENT = (httpx.UnsupportedProtocol, httpx.InvalidURL)  # a wrong address never fixes itself: do not retry these
+_TRANSIENT_TRIES = 3
+
+
+def url_problem(settings: Settings) -> str | None:
+    """None when SUPABASE_URL is a usable https://<host> address; otherwise a plain-language reason (no secret is shown: the address of a Supabase project is public)."""
+    from urllib.parse import urlsplit
+
+    raw = settings.supabase_url or ""
+    parts = urlsplit(raw)
+    if parts.scheme not in ("https", "http") or not parts.hostname:
+        return f"SUPABASE_URL is not a complete web address (the server read it as {raw[:60]!r}). It must look like https://<project-ref>.supabase.co, with https:// at the start and nothing else."
+    if parts.scheme == "http" and parts.hostname not in ("localhost", "127.0.0.1"):
+        return "SUPABASE_URL uses http://; a hosted Supabase project must use https://."
+    return None
+
+
+def explain(exc: BaseException, settings: Settings) -> str:
+    """A safe, actionable sentence for a storage connection error."""
+    name = type(exc).__name__
+    if isinstance(exc, _PERMANENT):
+        why = url_problem(settings) or "The storage address was rejected by the HTTP client; check SUPABASE_URL on the server (it must look like https://<project-ref>.supabase.co) and that no HTTP proxy variable is set."
+        return f"Could not reach storage: {name} ({str(exc)[:100]}). {why}"
+    if isinstance(exc, httpx.TimeoutException):
+        return f"Could not reach storage: {name}. Supabase did not answer in time; this is usually temporary, the check is repeated automatically."
+    if isinstance(exc, httpx.ConnectError):
+        return f"Could not reach storage: {name}. The server could not open a connection to Supabase (network or DNS problem, or a wrong project address); this is usually temporary."
+    return f"Could not reach storage: {name}."
+
+
+def _with_retries(call):
+    """Run `call()` (one storage request); repeat a few times with a short pause when the network hiccups. A malformed address is raised at once."""
+    last = None
+    for attempt in range(_TRANSIENT_TRIES):
+        try:
+            return call()
+        except _PERMANENT:
+            raise
+        except httpx.TransportError as exc:
+            last = exc
+            time.sleep(0.4 * (attempt + 1))
+    raise last
 
 
 def _storage_headers(settings: Settings, content_type: str | None = None) -> dict[str, str]:
@@ -161,7 +207,7 @@ def verify_remote(settings: Settings, key: str, expected_size: int | None, bucke
 
     try:
         with _client() as http:
-            auth = http.get(f"{_storage_base(settings)}/object/authenticated/{bucket}/{key}", headers={**_storage_headers(settings), **rng})
+            auth = _with_retries(lambda: http.get(f"{_storage_base(settings)}/object/authenticated/{bucket}/{key}", headers={**_storage_headers(settings), **rng}))
             if auth.status_code == 404 or (auth.status_code == 400 and "not found" in auth.text.lower()):
                 return "missing", "The file is not in the storage bucket."
             if auth.status_code not in (200, 206):
@@ -169,11 +215,13 @@ def verify_remote(settings: Settings, key: str, expected_size: int | None, bucke
             size = total(auth)
             if expected_size and size is not None and size != expected_size:
                 return "error", f"The stored file is {size} bytes but {expected_size} bytes were uploaded (corrupt or incomplete)."
-            pub = http.get(public_url(settings, key) if bucket == settings.hero_video_bucket else f"{_storage_base(settings)}/object/public/{bucket}/{key}", headers=rng)
+            pub_url = public_url(settings, key) if bucket == settings.hero_video_bucket else f"{_storage_base(settings)}/object/public/{bucket}/{key}"
+            pub = _with_retries(lambda: http.get(pub_url, headers=rng))
             if pub.status_code not in (200, 206):
                 return "error", f"The file exists but is not publicly readable (HTTP {pub.status_code}). Make the bucket “{bucket}” public in Supabase Storage."
-    except httpx.HTTPError as exc:
-        return "error", f"Could not reach storage: {type(exc).__name__}."
+    except (httpx.HTTPError, httpx.InvalidURL) as exc:
+        log.warning("Hero video storage check failed: %s", type(exc).__name__)
+        return "error", explain(exc, settings)
     return "ok", f"Stored and publicly readable{f' ({size} bytes)' if size else ''}."
 
 
@@ -214,10 +262,10 @@ def _probe_storage(settings: Settings) -> dict:
     bucket = settings.hero_video_bucket
     try:
         with _client() as http:
-            r = http.get(f"{_storage_base(settings)}/bucket/{bucket}", headers=_storage_headers(settings), timeout=10.0)
-    except httpx.HTTPError as exc:
+            r = _with_retries(lambda: http.get(f"{_storage_base(settings)}/bucket/{bucket}", headers=_storage_headers(settings), timeout=10.0))
+    except (httpx.HTTPError, httpx.InvalidURL) as exc:
         log.error("Supabase Storage is unreachable (%s). Check SUPABASE_URL (%s) and the network.", type(exc).__name__, (settings.supabase_url or "")[:60])
-        return {"status": "unreachable", "detail": "Supabase Storage could not be reached. Check that SUPABASE_URL is the project's https://<project-ref>.supabase.co address."}
+        return {"status": "unreachable" if not isinstance(exc, _PERMANENT) else "bad_url", "detail": explain(exc, settings)}
     if r.status_code in (401, 403):
         log.error("Supabase Storage rejected the service role key (HTTP %s). Check SUPABASE_SERVICE_ROLE_KEY and SUPABASE_URL belong to the same project.", r.status_code)
         return {"status": "auth_failed", "detail": "Supabase rejected the credentials. SUPABASE_SERVICE_ROLE_KEY must be the project's service_role key (not the anon key) and belong to the project in SUPABASE_URL."}
@@ -743,6 +791,26 @@ def restore_deleted(db: Session, settings: Settings, video: HeroVideo) -> None:
     video.position = next_position(db)
 
 
+RECHECK_AFTER_SECONDS = 300
+
+
+def recheck_errors(db: Session, settings: Settings, limit: int = 3) -> int:
+    """Self-healing: a video whose last storage check ended in an error (a network hiccup, or a configuration that has since been fixed) is checked again when the admin page loads,
+    at most every few minutes, so the panel shows the CURRENT state instead of an old failure. Returns how many were re-checked."""
+    now = now_utc()
+    rows = db.scalars(select(HeroVideo).where(HeroVideo.verify_status == "error", HeroVideo.deleted_at.is_(None)).limit(limit)).all()
+    done = 0
+    for v in rows:
+        if v.verified_at is not None and (now - v.verified_at).total_seconds() < RECHECK_AFTER_SECONDS:
+            continue
+        try:
+            verify_video(settings, v)
+            done += 1
+        except Exception:  # noqa: BLE001 - never let a diagnostic break the page
+            log.warning("Re-check of hero video %s failed unexpectedly", v.id)
+    return done
+
+
 def record_playback(db: Session, settings: Settings, video_id: uuid.UUID, ok: bool, code: str | None) -> bool:
     """Store what a visitor's browser reported for the video that is playing or next. Returns True when a failure should be verified server-side."""
     res = resolve(db, settings)
@@ -753,6 +821,8 @@ def record_playback(db: Session, settings: Settings, video_id: uuid.UUID, ok: bo
     now = now_utc()
     if ok:
         video.last_play_ok_at, video.last_play_error = now, None
+        if video.verify_status != "ok":  # a real playback is the best proof the file is stored and readable: a stale "error" from an earlier hiccup must not linger in the admin panel
+            video.verify_status, video.verified_at, video.verify_detail = "ok", now, "Played successfully in a visitor's browser."
         return False
     video.last_play_error, video.last_play_error_at = (code or "error")[:120], now
     return video.verified_at is None or (now - video.verified_at).total_seconds() > 60

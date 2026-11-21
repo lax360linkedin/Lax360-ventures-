@@ -6,6 +6,7 @@ import { createAudio } from '../catchTheStars/audio.js'
 import { detectQuality } from '../catchTheStars/controller.js'
 import { getPrefs, setPref } from '../../prefs.js'
 import { getProgress, saveLevelResult } from './progress.js'
+import { begin as beginRun, finish as finishRun } from '../../services/officialRun.js'
 
 // The LAXBOT Jump controller: the state machine (loading → menu → select → ready → playing ⇄ paused → level complete / game over), the input, the sound and the bridge between the rules
 // (logic.js) and the screen. The scene calls `tick(dt)` every frame; React screens subscribe to `getSnapshot()`, which changes only when a number the player SEES changes, so React re-renders
@@ -58,7 +59,7 @@ export function createController() {
       if (index > 0 && !getProgress().levels[LEVELS[index - 1].id]?.completed) return false
       load(index); setPhase('ready'); return true
     },
-    start() { audio.unlock(); resetInput(); c.sim = createGame(LEVELS[c.levelIndex]); c.fx.length = 0; c.results = null; c.endT = 0; audio.go(); audio.startMusic(); setPhase('playing') },
+    start() { audio.unlock(); resetInput(); c.sim = createGame(LEVELS[c.levelIndex]); c.fx.length = 0; c.results = null; c.endT = 0; beginRun('laxbot-jump', LEVELS[c.levelIndex].id); audio.go(); audio.startMusic(); setPhase('playing') },
     restart() { api.start() },
     next() { if (c.levelIndex + 1 < LEVELS.length) { load(c.levelIndex + 1); api.start() } },
     pause() { if (c.phase !== 'playing') return; resetInput(); audio.stopMusic(); setPhase('paused') },
@@ -118,6 +119,7 @@ export function createController() {
       const s = summary(c.sim)
       const saved = saveLevelResult(s)
       c.results = { ...s, ...saved }
+      finishRun('laxbot-jump', s) // server verification + official score; status shows on the results screen
       setPhase('complete')
     },
     drainFx() { if (!c.fx.length) return c.fx; const out = c.fx.slice(); c.fx.length = 0; return out },

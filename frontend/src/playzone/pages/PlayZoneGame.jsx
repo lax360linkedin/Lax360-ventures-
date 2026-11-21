@@ -1,4 +1,9 @@
+import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth.js'
+import { syncGame } from '../services/cloudSync.js'
+import { flushPending } from '../services/officialRun.js'
+import { unavailableReason, usePlayZoneConfig } from '../hooks.js'
 import { ArrowRight, Keyboard, ListChecks, Medal, Smartphone, Trophy } from 'lucide-react'
 import PzPage from './PzPage.jsx'
 import NotFound from '../../pages/NotFound.jsx'
@@ -17,11 +22,17 @@ const List = ({ items, icon: Icon, tint }) => (
 
 /**
  * A game's introduction page: themed header with its LAXBOT outfit, the (non-functional) game stage, the story, controls, objectives and scoring, the sound and graphics preferences and links.
- * Milestone 1 has no gameplay: the stage says "Coming soon" and the scoring lines describe the planned design.
+ * A game that is not live shows an honest "coming soon" stage; live games load their engine lazily and are verified by the server when a signed-in player finishes a round.
  */
 export default function PlayZoneGame() {
   const { game: slug } = useParams()
   const game = gameBySlug(slug)
+  const { user, loading: authLoading } = useAuth()
+  const cfg = usePlayZoneConfig()
+  const blocked = game ? unavailableReason(cfg, game.slug) : null
+  const needsSignIn = !!cfg && cfg.guest_play === false && !user && !authLoading
+  // Signed-in players: send unsaved runs and sync progress when a game page opens (quiet, bounded, never blocks the game).
+  useEffect(() => { if (user && game) { flushPending(); syncGame(game.slug) } }, [user?.id, game?.slug]) // eslint-disable-line react-hooks/exhaustive-deps
   if (!game) return <NotFound />
   const bot = BOT_VARIANTS.find((b) => b.id === game.bot)
   const index = games.indexOf(game)
@@ -44,7 +55,9 @@ export default function PlayZoneGame() {
       </section>
 
       <div className="wrap space-y-10 pb-16 md:space-y-14 md:pb-24">
-        <GameStage game={game} />
+        {blocked ? <div role="status" className="pz-glass px-6 py-12 text-center"><h2 className="font-display text-2xl font-semibold">Not available right now</h2><p className="pz-soft mt-2">{blocked}</p></div>
+          : needsSignIn ? <div role="status" className="pz-glass px-6 py-12 text-center"><h2 className="font-display text-2xl font-semibold">Sign in to play</h2><p className="pz-soft mt-2">Guest play is switched off at the moment. Sign in with your LAX360 account to play.</p><Link to="/login" state={{ from: `/play-zone/${game.slug}` }} className="pz-btn pz-btn-primary mt-4">Sign in</Link></div>
+            : <GameStage game={game} />}
 
         <div className="grid gap-6 lg:grid-cols-2">
           <section aria-labelledby="pz-story" className="pz-glass p-6 sm:p-8">
@@ -56,7 +69,7 @@ export default function PlayZoneGame() {
             <h2 id="pz-obj" className="font-display text-2xl font-bold">Objectives & scoring</h2>
             <h3 className="mt-4 text-sm font-bold uppercase tracking-wider" style={{ color: game.accent }}>Objectives</h3><List items={game.objectives} icon={ListChecks} tint={game.accent} />
             <h3 className="mt-5 text-sm font-bold uppercase tracking-wider" style={{ color: game.accent }}>{game.status === 'live' ? 'Scoring' : 'Scoring (planned design)'}</h3><List items={game.scoring} icon={Medal} tint={game.accent} />
-            <p className="pz-soft mt-4 text-xs">{game.status === 'live' ? 'Scores are saved on this device only. Official ranked scores need a server check and arrive in a later milestone.' : 'Final scoring values are set when the game is built.'}</p>
+            <p className="pz-soft mt-4 text-xs">{game.status === 'live' ? 'Guests keep personal bests on this device. Signed-in players also get server-verified scores, leaderboard places, achievements and cloud progress.' : 'Final scoring values are set when the game is built.'}</p>
           </section>
         </div>
 

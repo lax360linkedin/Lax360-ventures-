@@ -6,6 +6,7 @@ import { loadDictionary } from './i18n/dictionary.js'
 import { translateTree } from './i18n/translator.js'
 import { LazyMotion } from 'framer-motion'
 import App from './App.jsx'
+import ErrorBoundary, { SiteCrashPage } from './components/ErrorBoundary.jsx'
 import './styles/index.css'
 import { connectConsent, trackOutboundClicks } from './utils/analytics.js'
 
@@ -17,7 +18,9 @@ function Root() {
   const lang = useLang()
   return (
     <BrowserRouter key={lang} basename={prefixOf(lang)}>
-      <App />
+      <ErrorBoundary fallback={(error, reset) => <SiteCrashPage error={error} reset={reset} />}>
+        <App />
+      </ErrorBoundary>
     </BrowserRouter>
   )
 }
