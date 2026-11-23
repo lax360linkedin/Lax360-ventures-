@@ -406,17 +406,6 @@
       "has": [
         {
           "type": "host",
-          "value": "www.lax360.in"
-        }
-      ],
-      "destination": "https://lax360.in/$1",
-      "permanent": true
-    },
-    {
-      "source": "/((?!api/|_vercel/).*)",
-      "has": [
-        {
-          "type": "host",
           "value": "lax360-ventures.vercel.app"
         }
       ],
