@@ -280,11 +280,11 @@ function AdminLogin() {
           <form onSubmit={submit} noValidate className="space-y-4" aria-busy={state.busy}>
             {state.busy && state.status && <p role="status" aria-live="polite" className="rounded-lg border border-edge bg-surface/60 p-3 text-sm font-medium">{state.status}</p>}
             {state.error && <p role="alert" className="rounded-lg border border-error/40 bg-error/10 p-3 text-sm font-medium text-error">{state.error}</p>}
-            <Field label="Email or username" required error={state.fields.email}>{(p) => <Input {...p} type="text" autoComplete="username" autoCapitalize="none" spellCheck={false} placeholder="admin@example.com" value={values.email} onChange={(e) => setValues({ ...values, email: e.target.value })} />}</Field>
+            <Field label="Email or username" required error={state.fields.email}>{(p) => <Input {...p} type="text" autoComplete="username" autoCapitalize="none" spellCheck={false} value={values.email} onChange={(e) => setValues({ ...values, email: e.target.value })} />}</Field>
             <Field label="Password" required error={state.fields.password}>
               {(p) => (
                 <div className="relative">
-                  <Input {...p} type={show ? 'text' : 'password'} autoComplete="current-password" placeholder="Enter your password" className="pr-11" value={values.password} onChange={(e) => setValues({ ...values, password: e.target.value })} />
+                  <Input {...p} type={show ? 'text' : 'password'} autoComplete="current-password" className="pr-11" value={values.password} onChange={(e) => setValues({ ...values, password: e.target.value })} />
                   <button type="button" aria-label={show ? 'Hide password' : 'Show password'} aria-pressed={show} onClick={() => setShow((s) => !s)} className="absolute right-1 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-soft hover:text-fg">{show ? <EyeOff className="size-4" aria-hidden="true" /> : <Eye className="size-4" aria-hidden="true" />}</button>
                 </div>
               )}
