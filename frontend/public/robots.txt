@@ -11,5 +11,5 @@ Disallow: /profile
 Disallow: /demo
 Disallow: /api/
 
-Sitemap: https://lax360-ventures.vercel.app/sitemap.xml
-Sitemap: https://lax360-ventures.vercel.app/sitemap-content.xml
+Sitemap: https://lax360.in/sitemap.xml
+Sitemap: https://lax360.in/sitemap-content.xml

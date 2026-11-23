@@ -60,6 +60,8 @@ function audit(route, { indexable, lang = 'en' }) {
   if (noAlt) issues.push(`${noAlt} image(s) without an alt attribute`)
   const sample = (/<link[^>]*rel="canonical"[^>]*href="([^"]*)"/i.exec(html) || [])[1] || ''
   if (indexable && /example\.com/.test(sample)) issues.push('canonical points at the placeholder domain (set SITE_URL for the build)')
+  if (indexable && sample && !/^https:\/\/lax360\.in(\/|$)/.test(sample)) issues.push(`canonical is not on https://lax360.in (${sample.slice(0, 60)})`)
+  if (/lax360-ventures\.vercel\.app/.test(html.replace(/<link[^>]*rel="(?:preconnect|dns-prefetch)"[^>]*>/gi, ''))) issues.push('the old Vercel address appears in the page HTML')
   if (lang !== 'en') {
     const lc = (/<html[^>]*lang="([^"]*)"/i.exec(html) || [])[1]
     if (lc !== lang) issues.push(`<html lang> is "${lc}", expected "${lang}" (${html.slice(0, 40).replace(/s+/g, " ")})`)
@@ -81,9 +83,15 @@ const urls = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
 if (!urls.length) problems.push('sitemap.xml has no URLs')
 if (new Set(urls).size !== urls.length) problems.push('sitemap.xml lists a URL twice')
 if (urls.some((u) => /example\.com/.test(u))) problems.push('sitemap.xml uses the placeholder domain (set SITE_URL for the build)')
+if (urls.some((u) => !u.startsWith('https://lax360.in'))) problems.push('sitemap.xml has a URL that is not on https://lax360.in')
 for (const bad of [...noindexRoutes, '/company-admin', '/user', '/demo']) if (urls.some((u) => u.endsWith(bad))) problems.push(`sitemap.xml lists ${bad}`)
+const vj = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'))
+for (const f of ['/sitemap.xml', '/sitemap-content.xml']) if (!vj.headers.some((h) => h.source === f && h.headers.some((x) => x.key === 'X-Robots-Tag' && /^noindex$/i.test(x.value)))) problems.push(`vercel.json must send X-Robots-Tag: noindex for ${f} (keeps the sitemap out of search results, still readable by crawlers)`)
 const robots = existsSync(join(dist, 'robots.txt')) ? readFileSync(join(dist, 'robots.txt'), 'utf8') : ''
 if (!/Sitemap:\s*https?:\/\//.test(robots)) problems.push('robots.txt has no Sitemap line')
+if (!robots.includes('Sitemap: https://lax360.in/sitemap.xml')) problems.push('robots.txt must list Sitemap: https://lax360.in/sitemap.xml')
+if (/Disallow:\s*\/sitemap/i.test(robots)) problems.push('robots.txt must not block the sitemap')
+if (/vercel\.app/.test(robots)) problems.push('robots.txt still mentions the old Vercel address')
 for (const p of ['/company-admin', '/user', '/api/']) if (!robots.includes(`Disallow: ${p}`)) problems.push(`robots.txt does not disallow ${p}`)
 
 const pad = (s, n) => String(s).padEnd(n).slice(0, n)

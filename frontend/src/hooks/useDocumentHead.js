@@ -5,7 +5,8 @@ import { LANGUAGES, langOf, pathIn, prefixOf } from '../i18n/languages.js'
 import { useLang } from '../i18n/store.js'
 import { tr } from '../i18n/translator.js'
 
-const SITE_URL = (import.meta.env.VITE_SITE_URL || '').replace(/\/$/, '')
+// The canonical origin. In a production build it falls back to the company domain, so a page served from the old Vercel address or the www host still declares https://lax360.in as canonical.
+const SITE_URL = (import.meta.env.VITE_SITE_URL || (import.meta.env.PROD ? 'https://lax360.in' : '')).replace(/\/$/, '')
 const DEFAULT_TITLE = 'LAX360 Pvt Ltd — Software, AI, Digital Growth & Training'
 
 function upsert(selector, tag, attrs) {

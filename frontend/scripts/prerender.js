@@ -13,7 +13,7 @@ import { LANGUAGES, pathIn, prefixOf } from '../src/i18n/languages.js'
 import { norm, setDictionary } from '../src/i18n/translator.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const SITE = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://lax360-ventures.vercel.app').replace(/\/$/, '')
+const SITE = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://lax360.in').replace(/\/$/, '')
 if (/example\.com/.test(SITE)) console.warn('!! SITE_URL is not set: canonical links, the sitemap and social previews point at https://www.example.com. Set SITE_URL (the real website address) for the production build.')
 const { render, site, setDictionary: setSsrDictionary } = await import(pathToFileURL(resolve(root, 'dist-server/entry-server.js')).href)
 const template = readFileSync(resolve(root, 'dist/index.html'), 'utf8')
@@ -27,6 +27,7 @@ const postal = postalAddress
 const organization = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
+  '@id': `${SITE}/#organization`,
   name: 'LAX360 Pvt Ltd',
   legalName: site.legalEntity,
   url: SITE,
@@ -38,6 +39,9 @@ const organization = {
   location: site.branches.map((b) => ({ '@type': 'Place', name: b.name, telephone: b.tel, hasMap: b.mapUrl, address: postal(b) })),
   sameAs: site.social.map((s) => s.href),
 }
+
+// WebSite entity (home page only): names the site and its publisher. No SearchAction: the website has no site-search page, and structured data must not describe features that do not exist.
+const websiteLd = (lang) => ({ '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE}/#website`, name: 'LAX360 Pvt Ltd', url: `${SITE}/`, inLanguage: lang, publisher: { '@id': `${SITE}/#organization` } })
 
 // Search-engine / social verification tags, from the environment (public values): Google Search Console and Bing Webmaster Tools.
 const verification = [
@@ -69,6 +73,7 @@ function headTags(head, route, lang = 'en') {
     ...(head.noindex || route === '/404' ? [] : [...LANGUAGES.map((l) => `<link rel="alternate" hreflang="${l.htmlLang}" href="${esc(SITE + (route === '/' ? prefixOf(l.code) : pathIn(l.code, route)))}" />`), `<link rel="alternate" hreflang="x-default" href="${esc(SITE + (route === '/' ? '' : route))}" />`]),
     ...verification,
     head.noindex ? '' : `<script type="application/ld+json">${json(organization)}</script>`,
+    !head.noindex && route === '/' ? `<script type="application/ld+json">${json(websiteLd(lang))}</script>` : '',
     head.jsonLd ? `<script type="application/ld+json" id="page-jsonld">${json(head.jsonLd).split(SITE_TOKEN).join(SITE)}</script>` : '',
   ]
   return tags.filter(Boolean).join('\n    ')

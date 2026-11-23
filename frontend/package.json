@@ -13,6 +13,7 @@
     "test:gesture": "node scripts/test-scroll-gesture.mjs",
     "test:game": "node scripts/test-catch-the-stars.mjs && node scripts/test-laxbot-jump.mjs && node scripts/test-puzzle-pop.mjs && node scripts/test-bug-hunter.mjs",
     "seo:audit": "node scripts/seo-audit.mjs",
+    "seo:routes": "node scripts/check-vercel-routes.mjs",
     "seo:links": "node scripts/check-links.mjs"
   },
   "dependencies": {

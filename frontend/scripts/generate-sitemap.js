@@ -7,7 +7,7 @@ import { routes } from '../src/routes.js'
 import { LANGUAGES, pathIn, prefixOf } from '../src/i18n/languages.js'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const site = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://lax360-ventures.vercel.app').replace(/\/$/, '')
+const site = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://lax360.in').replace(/\/$/, '')
 
 
 // Every page in every language, each with its hreflang alternates (the same page in the other languages and the English as the default)

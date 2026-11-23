@@ -1,12 +1,436 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/careers",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/careers/",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/Careers",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/Careers/",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/Career",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/Career/",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/jobs",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/jobs/",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/career.html",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/career.html/",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/careers.html",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/careers.html/",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/career-opportunities",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/career-opportunities/",
+      "destination": "https://lax360.in/career",
+      "permanent": true
+    },
+    {
+      "source": "/about-us",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/about-us/",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/aboutus",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/aboutus/",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/About",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/About/",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/about.html",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/about.html/",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/about-us.html",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/about-us.html/",
+      "destination": "https://lax360.in/about",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us/",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contactus",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contactus/",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/Contact",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/Contact/",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contact.html",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contact.html/",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us.html",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us.html/",
+      "destination": "https://lax360.in/contact",
+      "permanent": true
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "https://lax360.in/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/privacy-policy/",
+      "destination": "https://lax360.in/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/privacy.html",
+      "destination": "https://lax360.in/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/privacy.html/",
+      "destination": "https://lax360.in/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/terms-and-conditions",
+      "destination": "https://lax360.in/terms",
+      "permanent": true
+    },
+    {
+      "source": "/terms-and-conditions/",
+      "destination": "https://lax360.in/terms",
+      "permanent": true
+    },
+    {
+      "source": "/terms-conditions",
+      "destination": "https://lax360.in/terms",
+      "permanent": true
+    },
+    {
+      "source": "/terms-conditions/",
+      "destination": "https://lax360.in/terms",
+      "permanent": true
+    },
+    {
+      "source": "/terms-of-service",
+      "destination": "https://lax360.in/terms",
+      "permanent": true
+    },
+    {
+      "source": "/terms-of-service/",
+      "destination": "https://lax360.in/terms",
+      "permanent": true
+    },
+    {
+      "source": "/terms.html",
+      "destination": "https://lax360.in/terms",
+      "permanent": true
+    },
+    {
+      "source": "/terms.html/",
+      "destination": "https://lax360.in/terms",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "https://lax360.in/insights",
+      "permanent": true
+    },
+    {
+      "source": "/blog/",
+      "destination": "https://lax360.in/insights",
+      "permanent": true
+    },
+    {
+      "source": "/blogs",
+      "destination": "https://lax360.in/insights",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/",
+      "destination": "https://lax360.in/insights",
+      "permanent": true
+    },
+    {
+      "source": "/news",
+      "destination": "https://lax360.in/insights",
+      "permanent": true
+    },
+    {
+      "source": "/news/",
+      "destination": "https://lax360.in/insights",
+      "permanent": true
+    },
+    {
+      "source": "/articles",
+      "destination": "https://lax360.in/insights",
+      "permanent": true
+    },
+    {
+      "source": "/articles/",
+      "destination": "https://lax360.in/insights",
+      "permanent": true
+    },
+    {
+      "source": "/our-services",
+      "destination": "https://lax360.in/services",
+      "permanent": true
+    },
+    {
+      "source": "/our-services/",
+      "destination": "https://lax360.in/services",
+      "permanent": true
+    },
+    {
+      "source": "/service",
+      "destination": "https://lax360.in/services",
+      "permanent": true
+    },
+    {
+      "source": "/service/",
+      "destination": "https://lax360.in/services",
+      "permanent": true
+    },
+    {
+      "source": "/Services",
+      "destination": "https://lax360.in/services",
+      "permanent": true
+    },
+    {
+      "source": "/Services/",
+      "destination": "https://lax360.in/services",
+      "permanent": true
+    },
+    {
+      "source": "/services.html",
+      "destination": "https://lax360.in/services",
+      "permanent": true
+    },
+    {
+      "source": "/services.html/",
+      "destination": "https://lax360.in/services",
+      "permanent": true
+    },
+    {
+      "source": "/team",
+      "destination": "https://lax360.in/our-team",
+      "permanent": true
+    },
+    {
+      "source": "/team/",
+      "destination": "https://lax360.in/our-team",
+      "permanent": true
+    },
+    {
+      "source": "/our-team.html",
+      "destination": "https://lax360.in/our-team",
+      "permanent": true
+    },
+    {
+      "source": "/our-team.html/",
+      "destination": "https://lax360.in/our-team",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio",
+      "destination": "https://lax360.in/work",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/",
+      "destination": "https://lax360.in/work",
+      "permanent": true
+    },
+    {
+      "source": "/our-work",
+      "destination": "https://lax360.in/work",
+      "permanent": true
+    },
+    {
+      "source": "/our-work/",
+      "destination": "https://lax360.in/work",
+      "permanent": true
+    },
+    {
+      "source": "/product",
+      "destination": "https://lax360.in/products",
+      "permanent": true
+    },
+    {
+      "source": "/product/",
+      "destination": "https://lax360.in/products",
+      "permanent": true
+    },
+    {
+      "source": "/Products",
+      "destination": "https://lax360.in/products",
+      "permanent": true
+    },
+    {
+      "source": "/Products/",
+      "destination": "https://lax360.in/products",
+      "permanent": true
+    },
+    {
+      "source": "/index.html",
+      "destination": "https://lax360.in/",
+      "permanent": true
+    },
+    {
+      "source": "/index.html/",
+      "destination": "https://lax360.in/",
+      "permanent": true
+    },
+    {
+      "source": "/home",
+      "destination": "https://lax360.in/",
+      "permanent": true
+    },
+    {
+      "source": "/home/",
+      "destination": "https://lax360.in/",
+      "permanent": true
+    },
+    {
+      "source": "/home.html",
+      "destination": "https://lax360.in/",
+      "permanent": true
+    },
+    {
+      "source": "/home.html/",
+      "destination": "https://lax360.in/",
+      "permanent": true
+    },
+    {
+      "source": "/((?!api/|_vercel/).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.lax360.in"
+        }
+      ],
+      "destination": "https://lax360.in/$1",
+      "permanent": true
+    },
+    {
+      "source": "/((?!api/|_vercel/).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "lax360-ventures.vercel.app"
+        }
+      ],
+      "destination": "https://lax360.in/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/sitemap-content.xml",
       "destination": "https://lax360-ventures.onrender.com/api/public/sitemap-content.xml"
     },
     {
-      "source": "/locations/:slug",
+      "source": "/locations/:slug([a-z0-9-]{1,80})",
       "destination": "/index.html"
     },
     {
@@ -26,7 +450,7 @@
       "destination": "https://lax360-ventures.onrender.com/api/:path*"
     },
     {
-      "source": "/services/:slug",
+      "source": "/services/:slug([a-z0-9-]{1,80})",
       "destination": "/index.html"
     },
     {
@@ -55,6 +479,34 @@
     },
     {
       "source": "/profile",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/products/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/industries/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/insights/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/our-network/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/websites/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/services/:slug([a-z0-9-]{1,80})/:service([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/our-team/:dept([a-z0-9-]{1,80})",
       "destination": "/index.html"
     },
     {
@@ -142,6 +594,24 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap-content.xml",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
         }
       ]
     }
