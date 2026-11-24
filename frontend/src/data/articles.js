@@ -102,6 +102,7 @@ Decide how you will know it worked: hours saved, errors reduced, faster response
     title: 'What to watch in technology: trends business owners should keep an eye on',
     category: 'trends', publishedOn: '2026-08-25', author: 'LAX360 Team', image: '/assets/insights/tech-watch.webp',
     excerpt: 'Four lasting shifts that matter more than any single headline.',
+    metaDescription: 'Four lasting shifts in technology that matter more than any single headline, and what business owners can do about each one this year.',
     body: `Technology news moves quickly, and most of it will not matter to your business. These four longer-running shifts are worth keeping an eye on.
 
 ## AI inside everyday tools
@@ -123,6 +124,7 @@ We will keep this page updated with practical notes as these areas develop.`,
     title: 'Website, web app or mobile app: which should you build first?',
     category: 'webmobile', publishedOn: '2026-08-11', author: 'LAX360 Team', image: '/assets/insights/mobile-apps.webp',
     excerpt: 'A short guide to choosing the right starting point for your idea.',
+    metaDescription: 'A short guide to choosing between a website, a web app and a mobile app: who will use it, how often, and which starting point suits your idea.',
     body: `Many ideas start with the question "should we build an app?" The honest answer depends on who will use it and how often.
 
 ## A website

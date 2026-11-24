@@ -29,9 +29,10 @@ const organization = {
   '@type': 'Organization',
   '@id': `${SITE}/#organization`,
   name: 'LAX360 Pvt Ltd',
+  alternateName: 'LAX360',
   legalName: site.legalEntity,
   url: SITE,
-  logo: `${SITE}/assets/logo-shield.png`,
+  logo: `${SITE}/favicon-192.png`, // a square image, as search engines require for a logo
   email: site.email,
   telephone: site.phones.map((p) => p.tel),
   address: postal(site.branches[0]),
@@ -41,7 +42,7 @@ const organization = {
 }
 
 // WebSite entity (home page only): names the site and its publisher. No SearchAction: the website has no site-search page, and structured data must not describe features that do not exist.
-const websiteLd = (lang) => ({ '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE}/#website`, name: 'LAX360 Pvt Ltd', url: `${SITE}/`, inLanguage: lang, publisher: { '@id': `${SITE}/#organization` } })
+const websiteLd = (lang) => ({ '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE}/#website`, name: 'LAX360', alternateName: ['LAX360 Pvt Ltd'], url: `${SITE}/`, inLanguage: lang, publisher: { '@id': `${SITE}/#organization` } })
 
 // Search-engine / social verification tags, from the environment (public values): Google Search Console and Bing Webmaster Tools.
 const verification = [

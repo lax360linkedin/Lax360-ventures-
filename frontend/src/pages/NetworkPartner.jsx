@@ -77,7 +77,7 @@ export default function NetworkPartner() {
     <PageContainer
       path={path}
       title={`${c.name} — ${kindLabel} | Our Network`}
-      description={(c.description || '').slice(0, 300)}
+      description={((c.description || '').length < 70 ? `${(c.description || '').trim()} See the partnership details and how to get in touch on the LAX360 Our Network page.` : c.description).slice(0, 300)}
       jsonLd={{ '@context': 'https://schema.org', '@type': 'Organization', name: c.name, description: c.description, ...(isHttp(c.website) ? { url: c.website } : {}) }}
     >
       <section className="relative overflow-hidden border-b border-edge">

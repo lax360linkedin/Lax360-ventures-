@@ -77,6 +77,16 @@ for (const lang of LANGS) routes.forEach((r) => audit(`/${lang}${r === '/' ? '' 
 noindexRoutes.forEach((r) => audit(r, { indexable: false }))
 if (existsSync(join(dist, '404.html'))) { const h = readFileSync(join(dist, '404.html'), 'utf8'); if (!/noindex/i.test(h)) problems.push('/404: the not-found page must be noindex') } else problems.push('dist/404.html is missing')
 
+// crawlability: every indexable page must be reachable from the home page by plain links (no orphans), and the favicon files search engines need must exist
+{
+  const pageHtml = (r) => { const f = join(dist, r === '/' ? '' : r, 'index.html'); return existsSync(f) ? readFileSync(f, 'utf8') : '' }
+  const linksOf = (r) => new Set([...(/<body[\s\S]*<\/body>/.exec(pageHtml(r)) || [''])[0].matchAll(/<a [^>]*href="(\/[^"#?]*)/g)].map((m) => m[1].replace(/\/$/, '') || '/'))
+  const seen = new Set(['/']); const queue = ['/']
+  while (queue.length) for (const t of linksOf(queue.shift())) if (!seen.has(t) && routes.includes(t)) { seen.add(t); queue.push(t) }
+  for (const r of routes) if (!seen.has(r)) problems.push(`${r}: orphan page (no crawlable link path from the home page)`)
+  for (const f of ['favicon.ico', 'favicon-48.png', 'favicon-192.png', 'apple-touch-icon.png']) if (!existsSync(join(dist, f))) problems.push(`missing ${f}`)
+}
+
 // sitemap and robots
 const sm = existsSync(join(dist, 'sitemap.xml')) ? readFileSync(join(dist, 'sitemap.xml'), 'utf8') : ''
 const urls = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])

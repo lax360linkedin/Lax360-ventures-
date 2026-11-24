@@ -18,6 +18,9 @@ const crumb = 'inline-flex min-h-9 items-center transition-colors hover:text-lav
  * /services/<category>/<service> — one page per individual service: summary and photo, what it is, what we provide, the problems it addresses,
  * key capabilities, practical benefits, examples, related services and an enquiry call to action. Copy comes from data/serviceDetails.js.
  */
+// A short division label for the page title: keeps titles within what search results show, and keeps two services with the same name in different divisions distinct.
+const DIVISION_SHORT = { software: 'Software', ai: 'AI', growth: 'Marketing', headless: 'SaaS & API', automation: 'Automation', mobile: 'Mobile Apps' }
+
 export default function ServiceItem() {
   const { slug, service } = useParams()
   const s = getOffering(slug, service)
@@ -35,7 +38,7 @@ export default function ServiceItem() {
   return (
     <PageContainer
       path={path}
-      title={`${s.name} — ${d.name}`}
+      title={`${s.name} — ${DIVISION_SHORT[d.slug] || d.name}`}
       description={`${s.intro} ${s.about?.[0] || ''}`.slice(0, 300)}
       jsonLd={{ '@context': 'https://schema.org', '@type': 'Service', name: s.name, description: s.intro, provider: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' }, category: d.name }}
     >

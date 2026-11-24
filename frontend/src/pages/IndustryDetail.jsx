@@ -139,7 +139,7 @@ export default function IndustryDetail() {
     <PageContainer
       path={`/industries/${ind.slug}`}
       title={ind.seoTitle || `${ind.name} technology solutions`}
-      description={ind.metaDescription || ind.summary}
+      description={ind.metaDescription || ((ind.summary || '').length < 80 ? `${(ind.summary || '').trim()} See the challenges, solutions and LAX360 services for this industry.` : ind.summary)}
       jsonLd={{ '@context': 'https://schema.org', '@type': 'WebPage', name: ind.name, description: ind.summary, about: ind.name, publisher: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' } }}
     >
       <Hero ind={ind} />

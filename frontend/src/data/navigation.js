@@ -38,6 +38,8 @@ export const footerColumns = [
       { label: 'Our Network', to: '/our-network' },
       { label: 'Our Team', to: '/our-team' },
       { label: 'Work', to: '/work' },
+      { label: 'Robotics', to: '/robotics' },
+      { label: 'Blockchain', to: '/blockchain' },
       { label: 'Careers', to: '/career' },
       { label: 'Locations', to: '/locations' },
       { label: 'Play Zone', to: '/play-zone' },
