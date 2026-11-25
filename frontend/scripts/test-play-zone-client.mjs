@@ -69,4 +69,13 @@ await test('every game in the catalogue is live and has a route in the app', () 
   assert.ok(games.every((g) => g.status === 'live'))
 })
 console.log(`\n${passed} client tests passed`)
+await test('the Education course catalogue holds all 20 IT courses of the supplied document, numbered 1-20, each shown once', async () => {
+  const { IT_COURSES, IT_GROUPS, NON_IT_COURSES } = await vite.ssrLoadModule('/src/data/educationCourses.js')
+  const { EDU } = await vite.ssrLoadModule('/src/data/educationFranchise.js')
+  assert.deepEqual(IT_COURSES.map((c) => c.no), Array.from({ length: 20 }, (_, i) => i + 1))
+  assert.equal(IT_COURSES[0].name, 'Python Programming'); assert.equal(IT_COURSES[19].name, 'Microsoft Office & Advanced Excel'); assert.equal(new Set(IT_COURSES.map((c) => c.name)).size, 20)
+  assert.deepEqual(IT_GROUPS.flatMap((g) => g.nos).sort((a, b) => a - b), IT_COURSES.map((c) => c.no)) // the on-screen grouping drops and repeats nothing
+  assert.equal(NON_IT_COURSES.length, 0) // the document gives no Non-IT list: none is invented
+  assert.equal(EDU.faqs.length, 10); assert.equal(EDU.documents.length, 24); assert.equal(EDU.onboarding.length, 9); assert.equal(EDU.packages.length, 3); assert.equal(EDU.crm.rows.length, 10); assert.equal(EDU.infrastructure.length, 10); assert.equal(EDU.responsibilities.length, 12)
+})
 process.exit(process.exitCode || 0) // Vite's dev server keeps handles open; the tests are finished

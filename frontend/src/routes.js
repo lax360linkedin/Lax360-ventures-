@@ -5,6 +5,7 @@ import industryPortfolio from './data/industries.json' with { type: 'json' }
 import networkPortfolio from './data/network.json' with { type: 'json' }
 import { slugify } from './utils/slugify.js'
 import { branches } from './data/branches.js'
+import { CATEGORIES as PARTNER_CATEGORIES, DIVISIONS as PARTNER_DIVISIONS, PARTNER_PAGES } from './data/partnership.js'
 
 // Single list of indexable routes. Used by the prerender script and the sitemap generator.
 // Keep in sync with src/App.jsx. Redirect aliases (/projects) are excluded.
@@ -34,6 +35,9 @@ export const routes = [
   '/robotics',
   '/blockchain',
   '/career',
+  PARTNER_PAGES.overview.path, PARTNER_PAGES.apply.path, PARTNER_PAGES.faq.path, PARTNER_PAGES.privacy.path, PARTNER_PAGES.terms.path, // Partner With Us
+  ...PARTNER_CATEGORIES.map((c) => c.path), // /franchise, /authorized-partner, /referral-partner
+  ...PARTNER_CATEGORIES.flatMap((c) => PARTNER_DIVISIONS.map((d) => `${c.path}/${d.slug}`)), // the nine opportunity pages
   '/contact',
   '/locations',
   ...branches.map((b) => `/locations/${b.id}`), // one page per office (an office added in the admin panel gets its page automatically, rendered in the browser)

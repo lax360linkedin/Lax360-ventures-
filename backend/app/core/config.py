@@ -156,6 +156,10 @@ class Settings(BaseSettings):
     reset_rate_limit_window_seconds: int = 3600
     contact_rate_limit_max: int = 5
     contact_rate_limit_window_seconds: int = 3600
+    partner_rate_limit_max: int = 6  # partnership applications per address per window
+    partner_rate_limit_window_seconds: int = 3600
+    partner_admin_rate_limit_max: int = 120
+    partner_admin_rate_limit_window_seconds: int = 60
     contact_upload_rate_limit_max: int = 12  # project documents attached to an enquiry
     contact_upload_rate_limit_window_seconds: int = 3600
     demo_rate_limit_max: int = 10

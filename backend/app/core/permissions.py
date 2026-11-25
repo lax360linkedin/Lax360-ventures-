@@ -20,6 +20,7 @@ MODULES: dict[str, str] = {
     "careers": "Careers",
     "navigation": "Navigation & SEO",
     "settings": "Website settings",
+    "partnerships": "Partnerships: applications and page content",
     # Play Zone (Milestone 7): granular, so a role can be given just what it needs
     "pz_analytics": "Play Zone: overview and analytics",
     "pz_games": "Play Zone: manage games",

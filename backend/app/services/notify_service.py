@@ -53,3 +53,30 @@ def notify_demo(demo_id: uuid.UUID) -> None:
                                        f"Branch: {d.branch.city if d.branch else '-'}", "", (d.message or "")[:1500]])
     except Exception:  # noqa: BLE001
         log.exception("could not send the demo request notification")
+
+
+
+def notify_application(application_id: uuid.UUID) -> None:
+    """E-mail the team about a new partnership application (to ENQUIRY_NOTIFY_EMAIL plus the addresses set in Partnership settings) and, when enabled, acknowledge the applicant.
+    Runs after the response; a failure here never affects the application, which is already saved."""
+    try:
+        from app.models import PartnershipApplication
+        from app.services import partnership_service as ps
+
+        settings = get_settings()
+        with _factory()() as db:
+            a = db.get(PartnershipApplication, application_id)
+            if a is None or not email_service.configured(settings):
+                return
+            cfg = ps.get_settings_map(db)
+            team = {*_recipients(settings), *cfg["notify_emails"]}
+            where = ", ".join(x for x in (a.city, a.state, a.country) if x)
+            lines = [f"Reference: {a.reference}", f"Type: {a.category} / {a.division}", f"Name: {a.full_name}", f"Email: {a.email}", f"Phone: {a.phone}", f"Location: {where}"]
+            for address in sorted(team):
+                email_service.send(settings, address, f"New partnership application {a.reference}", "\n".join(lines) + "\n\nOpen Partnerships in the admin panel to follow up.")
+            if cfg["acknowledgement_enabled"]:
+                body = (f"Hello {a.full_name},\n\nThank you for your interest in partnering with LAX360. Your application ({a.reference}) has been received. Our team will review your details "
+                        "and contact you to discuss the next steps. Submitting this form does not make you a partner: approval follows consultation, verification and an agreement.\n\nLAX360 Pvt Ltd")
+                email_service.send(settings, a.email, "We received your LAX360 partnership application", body)
+    except Exception:  # noqa: BLE001
+        log.exception("could not send the partnership notification")

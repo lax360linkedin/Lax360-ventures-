@@ -491,6 +491,18 @@
       "destination": "/index.html"
     },
     {
+      "source": "/franchise/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/authorized-partner/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/referral-partner/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
       "source": "/services/:slug([a-z0-9-]{1,80})/:service([a-z0-9-]{1,80})",
       "destination": "/index.html"
     },

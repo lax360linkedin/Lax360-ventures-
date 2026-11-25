@@ -1,8 +1,9 @@
 import LanguageSwitcher from './LanguageSwitcher.jsx'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { usePartnerMenu } from '../../services/partnershipService.js'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
-import { CalendarCheck, Gamepad2, LogIn, LogOut, MessageCircle, Phone, UserRound, X } from 'lucide-react'
+import { CalendarCheck, ChevronDown, Gamepad2, Handshake, LogIn, LogOut, MessageCircle, Phone, UserRound, X } from 'lucide-react'
 import Logo from './Logo.jsx'
 import Button from '../ui/Button.jsx'
 import ThemeToggle from '../ui/ThemeToggle.jsx'
@@ -17,7 +18,10 @@ const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1
 /** Frosted full-screen sheet for < 1024px: staggered items, focus trapped, Esc closes, body scroll locked. */
 export default function MobileMenu({ open, onClose, returnFocusRef }) {
   const site = useSite()
-  const nav = useNav('header', primaryNav)
+  const nav = useNav('header', primaryNav).filter((n) => n.to !== '/partner-with-us')
+  const { categories, refresh } = usePartnerMenu()
+  const [pOpen, setPOpen] = useState(false)
+  const [pCat, setPCat] = useState(null)
   const panelRef = useRef(null)
   const closeRef = useRef(null)
   const { pathname } = useLocation()
@@ -86,6 +90,28 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
 
           <div className="wrap grid gap-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2">
             <ThemeToggle showLabel className="w-full" />
+            {/* Partner With Us: touch-friendly expandable list (programs, then their business divisions) */}
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-r from-accent to-primary text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)]">
+              <div className="flex items-stretch">
+                <Link to="/partner-with-us" onClick={onClose} className="flex min-h-12 flex-1 items-center gap-3 px-4 font-semibold"><Handshake className="size-5" aria-hidden="true" /> Partner With Us</Link>
+                <button type="button" aria-expanded={pOpen} aria-controls="m-partner" aria-label={pOpen ? 'Collapse Partner With Us' : 'Expand Partner With Us'} onClick={() => { setPOpen((o) => { if (!o) refresh(); return !o }); setPCat(null) }} className="grid min-h-12 w-14 place-items-center border-l border-white/25">
+                  <ChevronDown className={`size-5 transition-transform duration-200 ${pOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                </button>
+              </div>
+              <div id="m-partner" hidden={!pOpen} className="bg-night/95 p-2 text-fg">
+                {categories.map((c) => (
+                  <div key={c.slug}>
+                    <div className="flex items-stretch">
+                      <Link to={c.path} onClick={onClose} className="flex min-h-12 flex-1 items-center rounded-xl px-3 font-semibold">{c.label}</Link>
+                      <button type="button" aria-expanded={pCat === c.slug} aria-label={`${c.label}: show business divisions`} onClick={() => setPCat(pCat === c.slug ? null : c.slug)} className="grid min-h-12 w-12 place-items-center text-soft"><ChevronDown className={`size-4 transition-transform duration-200 ${pCat === c.slug ? 'rotate-180' : ''}`} aria-hidden="true" /></button>
+                    </div>
+                    <ul hidden={pCat !== c.slug} className="mb-1 ml-3 border-l border-edge pl-2">
+                      {c.items.map((d) => <li key={d.slug}><Link to={d.path} onClick={onClose} className="flex min-h-12 items-center rounded-xl px-3 text-fg/90 hover:bg-glass">{d.label}</Link></li>)}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
             {loading ? null : user ? (
               <div className="rounded-2xl border border-edge bg-glass p-2">
                 <p className="truncate px-3 pt-1 font-semibold text-fg">{user.full_name}</p>

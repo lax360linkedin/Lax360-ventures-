@@ -4,13 +4,14 @@ import { Menu } from 'lucide-react'
 import Logo from './Logo.jsx'
 import HeaderBot from './HeaderBot.jsx'
 import AccountMenu from './AccountMenu.jsx'
+import PartnerMenu from './PartnerMenu.jsx'
 import ThemeToggle from '../ui/ThemeToggle.jsx'
 import { primaryNav } from '../../data/navigation.js'
 import { useNav } from '../../hooks/useSite.js'
 import { useScrolledPast } from '../../hooks/useScrollDirection.js'
 import { useMediaQuery } from '../../hooks/useMediaQuery.js'
 
-const linkCls = 'relative z-10 inline-flex min-h-11 items-center px-2.5 text-sm xl:px-4 xl:text-[0.9375rem] 2xl:px-[1.125rem] font-medium tracking-tight transition-colors duration-200'
+const linkCls = 'relative z-10 inline-flex min-h-11 items-center whitespace-nowrap px-1.5 text-[0.8125rem] min-[1140px]:px-2 min-[1140px]:text-sm xl:px-2.5 xl:text-[0.9375rem] 2xl:px-[1.125rem] font-medium tracking-tight transition-colors duration-200'
 
 /**
  * The one shared header. It is `position: fixed` on every page and never hides on scroll; its height is constant
@@ -25,7 +26,7 @@ const linkCls = 'relative z-10 inline-flex min-h-11 items-center px-2.5 text-sm 
  */
 export default function Header({ onOpenMenu, menuButtonRef }) {
   const { pathname } = useLocation()
-  const nav = useNav('header', primaryNav) // the admin panel can replace the menu
+  const nav = useNav('header', primaryNav).filter((n) => n.to !== '/partner-with-us') // the admin panel can replace the menu; Partner With Us is its own CTA (PartnerMenu)
   const scrolled = useScrolledPast(24)
   const wide = useMediaQuery('(min-width: 1024px)')
   const [indicator, setIndicator] = useState(null)
@@ -37,7 +38,7 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
 
 
   // The nav item for the page being viewed (Services also covers /services/*). Null on Home (the bot stands on the "A" of LAX360 there, even though Home is now a menu link) and on pages outside the nav.
-  const activeTo = nav.find((n) => !n.external && n.to !== '/' && (pathname === n.to || pathname.startsWith(`${n.to}/`)))?.to ?? null
+  const activeTo = nav.find((n) => !n.external && n.to !== '/' && (pathname === n.to || pathname.startsWith(`${n.to}/`)))?.to ?? (/^\/(partner-with-us|franchise|authorized-partner|referral-partner)(\/|$)/.test(pathname) ? 'partner' : null) // partnership pages: the bot rests on the Partner With Us button
 
   // ---- glass highlight under the current / hovered link (relative to the nav pill) ----
   const measure = useCallback((el) => {
@@ -60,6 +61,15 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
   // The bot is positioned inside the header, which sits below the fixed contact bar, so viewport measurements are made relative to the header's top edge.
   const headerTop = () => headerRef.current?.getBoundingClientRect().top || 0
   const measureLink = useCallback((path) => {
+    // The Partner With Us button and its dropdown / nested items carry data-bot keys: the bot stands above the button, or inside the row of a menu item (at its right end, clear of the text).
+    const item = path.startsWith('partner') ? headerRef.current?.querySelector(`[data-bot="${path}"]`) : null
+    if (item) {
+      const r = item.getBoundingClientRect()
+      if (!r.width) return null
+      const h = headerTop()
+      if (item.dataset.botAt === 'row') return { x: r.right - (item.dataset.pmCat ? 38 : 22), y: r.top + r.height / 2 + 15 - h }
+      return { x: r.left + r.width / 2, y: r.top - 1 - h }
+    }
     const a = navRef.current?.querySelector(`a[href="${path}"]`)
     if (!a || a.offsetParent === null) return null // nav is hidden below lg
     const range = document.createRange()
@@ -119,10 +129,10 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
       className={`a-drop fixed inset-x-0 top-[var(--topbar-offset,0px)] z-40 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${scrolled ? 'border-edge bg-night/75 shadow-[0_10px_40px_-18px_rgb(var(--glow)/0.5)] backdrop-blur-xl' : 'border-edge/60 bg-night/40 backdrop-blur-md [[data-theme=light]_&]:bg-night/85' /* light mode: solid enough to read over the vivid hero video */}`}
       style={{ '--d': '0.1s' }}
     >
-      <div className="wrap flex h-[72px] items-center justify-between gap-3 pt-2 lg:grid lg:h-[92px] lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-6 lg:pt-3">
+      <div className="wrap flex h-[72px] items-center justify-between gap-3 pt-2 lg:grid lg:h-[92px] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-2 min-[1140px]:gap-4 xl:gap-6 lg:pt-3">
         <Logo aRef={aRef} className="lg:justify-self-start" />
 
-        <nav aria-label="Primary" className="a-fade hidden items-center lg:flex" style={{ '--d': '0.75s' }}>
+        <nav aria-label="Primary" className="a-fade hidden items-center lg:flex lg:justify-self-center" style={{ '--d': '0.75s' }}>
           <div
             ref={navRef}
             className="relative flex items-center rounded-full border border-edge bg-glass px-1.5"
@@ -153,8 +163,9 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
           </div>
         </nav>
 
-        <div className="a-fade ml-auto flex items-center gap-2 sm:gap-3 lg:justify-self-end" style={{ '--d': '0.85s' }}>
+        <div className="a-fade ml-auto flex items-center gap-2 sm:gap-3 lg:gap-2 xl:gap-3 lg:justify-self-end" style={{ '--d': '0.85s' }}>
           <ThemeToggle />
+          <div className="hidden lg:block"><PartnerMenu bot={botRef} /></div>
           <div className="hidden lg:block"><AccountMenu /></div>
           <button
             ref={menuButtonRef}
@@ -169,7 +180,7 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
       </div>
 
       {/* the mini-bot: decorative overlay, never intercepts the pointer */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-30">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[60]">
         <HeaderBot ref={botRef} active={activeTo} measureRest={measureRest} measureLink={measureLink} size={wide ? 26 : 20} />
       </div>
     </header>

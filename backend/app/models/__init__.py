@@ -10,11 +10,12 @@ from app.models.contact_enquiry import ContactEnquiry
 from app.models.demo_request import DemoRequest
 from app.models.hero_video import HeroVideo, HeroVideoConfig
 from app.models.play_zone import AchievementDef, ChallengeProgress, ChallengeTemplate, DailyChallenge, GameConfig, GameConfigVersion, GameProgress, GameSession, MediaLink, ModerationEvent, PlayerAchievement, PlayerProfile, PlaySetting, VerifiedScore
+from app.models.partnership import PartnershipMenuItem, ApplicationEvent, PartnershipApplication, PartnershipFaq, PartnershipPage, PartnershipPolicy, PartnershipSetting
 from app.models.translation import Translation
 from app.models.user import AuthSession, User, UserProfile
 
 __all__ = [
-    "AchievementDef", "ChallengeProgress", "ChallengeTemplate", "DailyChallenge", "GameConfig", "GameConfigVersion", "GameProgress", "GameSession", "MediaLink", "ModerationEvent", "PlaySetting", "PlayerAchievement", "PlayerProfile", "VerifiedScore",
+    "AchievementDef", "ApplicationEvent", "PartnershipMenuItem", "PartnershipApplication", "PartnershipFaq", "PartnershipPage", "PartnershipPolicy", "PartnershipSetting", "ChallengeProgress", "ChallengeTemplate", "DailyChallenge", "GameConfig", "GameConfigVersion", "GameProgress", "GameSession", "MediaLink", "ModerationEvent", "PlaySetting", "PlayerAchievement", "PlayerProfile", "VerifiedScore",
     "AiUsage", "AuditLog", "AuthSession", "Branch", "ChatMessage", "ChatSession", "ContactChannel", "ContactEnquiry", "ContentItem",
     "DemoRequest", "EnquiryFollowup", "EnquiryNote", "HeroVideo", "HeroVideoConfig", "MediaAsset", "SiteSetting", "Translation", "User", "UserProfile",
 ]

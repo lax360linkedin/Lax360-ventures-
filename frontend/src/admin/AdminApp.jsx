@@ -33,6 +33,14 @@ const Customers = lazy(() => import('./pages/Customers.jsx'))
 const PagesModule = lazy(() => import('./pages/Pages.jsx'))
 const BranchLocations = lazy(() => import('./pages/BranchLocations.jsx'))
 const TranslationsAdmin = lazy(() => import('./pages/Translations.jsx'))
+const Pt = (name) => lazy(() => import('./partnerships/PartnershipAdmin.jsx').then((m) => ({ default: m[name] }))) // Partnership Management: one lazy chunk for its screens
+const PtOverview = Pt('PtOverview')
+const PtApplications = Pt('PtApplications')
+const PtPages = Pt('PtPages')
+const PtFaqs = Pt('PtFaqs')
+const PtPolicies = Pt('PtPolicies')
+const PtSettings = Pt('PtSettings')
+const PtMenu = Pt('PtMenu')
 const PzOverview = lazy(() => import('./playzone/Overview.jsx'))
 const PzGames = lazy(() => import('./playzone/Games.jsx'))
 const PzPlayers = lazy(() => import('./playzone/Players.jsx'))
@@ -71,6 +79,13 @@ const NAV = [
   { section: 'Company', to: '/company-admin/network', label: 'Our network', icon: Network, module: 'content', hint: 'Group companies, partners, software distribution and the Our Network page' },
   { section: 'Products & portfolio', to: '/company-admin/products', label: 'Products', icon: Package, module: 'content', hint: 'Software products: details, modules, screenshots, demos and downloads' },
   { section: 'Products & portfolio', to: '/company-admin/websites', label: 'Website portfolio', icon: Globe, module: 'content', hint: 'Company websites, client websites and live demos shown on the public site' },
+  { section: 'Partnerships', to: '/company-admin/partnerships/overview', label: 'Overview', icon: LayoutDashboard, module: 'partnerships', hint: 'Applications and activity of the Partner With Us programs' },
+  { section: 'Partnerships', to: '/company-admin/partnerships/applications', label: 'Applications & enquiries', icon: Inbox, module: 'partnerships', hint: 'Review applications, update status, assign and add notes' },
+  { section: 'Partnerships', to: '/company-admin/partnerships/menu', label: 'Navigation menu', icon: Network, module: 'partnerships', hint: 'The Partner With Us header menu: add, rename, reorder, enable or disable divisions and services' },
+  { section: 'Partnerships', to: '/company-admin/partnerships/pages', label: 'Opportunity pages', icon: FileText, module: 'partnerships', hint: 'Content, images, brochures, commercial information and SEO of the partnership pages' },
+  { section: 'Partnerships', to: '/company-admin/partnerships/faqs', label: 'Partnership FAQs', icon: Quote, module: 'partnerships', hint: 'Questions and answers shown on the partnership pages' },
+  { section: 'Partnerships', to: '/company-admin/partnerships/policies', label: 'Policies & agreements', icon: ScrollText, module: 'partnerships', hint: 'Versioned partnership policies; drafts stay private' },
+  { section: 'Partnerships', to: '/company-admin/partnerships/settings', label: 'Partnership settings', icon: SettingsIcon, module: 'partnerships', hint: 'Intake switch, notifications, partner portal link and brochure' },
   { section: 'Play Zone', to: '/company-admin/play-zone/overview', label: 'Overview', icon: LayoutDashboard, module: 'pz_analytics', hint: 'Play Zone numbers, charts and moderation alerts' },
   { section: 'Play Zone', to: '/company-admin/play-zone/games', label: 'Games', icon: Gamepad2, module: 'pz_games', hint: 'Enable, disable, order and configure the four games' },
   { section: 'Play Zone', to: '/company-admin/play-zone/players', label: 'Players', icon: Users, module: 'pz_players', hint: 'Player directory, history and Play Zone suspension' },
@@ -314,6 +329,14 @@ export default function AdminApp() {
           <Route path="page-images" element={<Navigate to="/company-admin/pages" replace />} />
           <Route path="branches" element={<Guard module="settings"><BranchLocations /></Guard>} />
           <Route path="translations" element={<Guard module="content"><TranslationsAdmin /></Guard>} />
+          <Route path="partnerships" element={<Navigate to="/company-admin/partnerships/overview" replace />} />
+          <Route path="partnerships/overview" element={<Guard module="partnerships"><PtOverview /></Guard>} />
+          <Route path="partnerships/applications" element={<Guard module="partnerships"><PtApplications /></Guard>} />
+          <Route path="partnerships/menu" element={<Guard module="partnerships"><PtMenu /></Guard>} />
+          <Route path="partnerships/pages" element={<Guard module="partnerships"><PtPages /></Guard>} />
+          <Route path="partnerships/faqs" element={<Guard module="partnerships"><PtFaqs /></Guard>} />
+          <Route path="partnerships/policies" element={<Guard module="partnerships"><PtPolicies /></Guard>} />
+          <Route path="partnerships/settings" element={<Guard module="partnerships"><PtSettings /></Guard>} />
           <Route path="play-zone" element={<Navigate to="/company-admin/play-zone/overview" replace />} />
           <Route path="play-zone/overview" element={<Guard module="pz_analytics"><PzOverview /></Guard>} />
           <Route path="play-zone/games" element={<Guard module="pz_games"><PzGames /></Guard>} />

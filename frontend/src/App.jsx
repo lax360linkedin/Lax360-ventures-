@@ -24,6 +24,11 @@ const TeamDepartment = lazy(() => import('./pages/TeamDepartment.jsx'))
 const NetworkPartner = lazy(() => import('./pages/NetworkPartner.jsx'))
 const Projects = lazy(() => import('./pages/Projects.jsx'))
 const Career = lazy(() => import('./pages/Career.jsx'))
+const PartnerHub = lazy(() => import('./pages/PartnerHub.jsx')) // Partner With Us: its own chunks, loaded only on the partnership routes
+const PartnerCategory = lazy(() => import('./pages/PartnerCategory.jsx'))
+const PartnerOpportunity = lazy(() => import('./pages/PartnerOpportunity.jsx'))
+const PartnerApply = lazy(() => import('./pages/PartnerApply.jsx'))
+const PartnerInfo = lazy(() => import('./pages/PartnerInfo.jsx'))
 const Contact = lazy(() => import('./pages/Contact.jsx'))
 const Locations = lazy(() => import('./pages/Locations.jsx'))
 const Location = lazy(() => import('./pages/Location.jsx'))
@@ -80,6 +85,17 @@ export default function App() {
         <Route path="our-team/:dept" element={<TeamDepartment />} />
         <Route path="work" element={<Projects />} />
         <Route path="career" element={<Career />} />
+        <Route path="partner-with-us" element={<PartnerHub />} />
+        <Route path="partner-with-us/apply" element={<PartnerApply />} />
+        <Route path="partner-with-us/faq" element={<PartnerInfo kind="faq" />} />
+        <Route path="partner-with-us/privacy-policy" element={<PartnerInfo kind="privacy" />} />
+        <Route path="partner-with-us/terms-and-conditions" element={<PartnerInfo kind="terms" />} />
+        <Route path="franchise" element={<PartnerCategory category="franchise" />} />
+        <Route path="franchise/:division" element={<PartnerOpportunity category="franchise" />} />
+        <Route path="authorized-partner" element={<PartnerCategory category="authorized-partner" />} />
+        <Route path="authorized-partner/:division" element={<PartnerOpportunity category="authorized-partner" />} />
+        <Route path="referral-partner" element={<PartnerCategory category="referral-partner" />} />
+        <Route path="referral-partner/:division" element={<PartnerOpportunity category="referral-partner" />} />
         <Route path="contact" element={<Contact />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />

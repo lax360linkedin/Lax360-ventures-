@@ -42,6 +42,7 @@ export const footerColumns = [
       { label: 'Blockchain', to: '/blockchain' },
       { label: 'Careers', to: '/career' },
       { label: 'Locations', to: '/locations' },
+      { label: 'Partner With Us', to: '/partner-with-us' },
       { label: 'Play Zone', to: '/play-zone' },
       { label: 'Contact', to: '/contact' },
     ],

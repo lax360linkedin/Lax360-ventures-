@@ -71,6 +71,20 @@ def sitemap_urls(db: Session) -> list[tuple[str, str | None]]:
         if b.slug not in BUILT_IN_BRANCHES and path not in skip and path not in seen:
             seen.add(path)
             out.append((path, b.updated_at.date().isoformat() if b.updated_at else None))
+    try:  # published, administrator-created Partner With Us pages (the built-in partnership pages are in the main sitemap)
+        from app.models import PartnershipPage
+        from app.services import partnership_service as ps
+
+        pages = {p.slug: p for p in db.scalars(select(PartnershipPage))}
+        for items in ps.menu_items(db).values():
+            for x in items:
+                slug = x["path"].lstrip("/")
+                p = pages.get(slug)
+                if not x["builtin"] and slug not in seen and (p is None or (p.published and not p.noindex)):
+                    seen.add(slug)
+                    out.append((x["path"], p.updated_at.date().isoformat() if p is not None and p.updated_at else None))
+    except Exception:  # noqa: BLE001  (the partnership tables may not be migrated yet: the sitemap must still render)
+        db.rollback()
     return out
 
 
