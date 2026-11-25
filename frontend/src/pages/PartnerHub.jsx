@@ -6,7 +6,7 @@ import { CoursesButton } from '../components/partner/CourseCatalogue.jsx'
 import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import { Block, Checklist, ComparisonTable, Cta, Crumbs, Faqs, PartnerHero, PartnerTabs, Steps } from '../components/partner/PartnerUI.jsx'
-import { CATEGORIES, DIVISIONS, ECOSYSTEM, GENERAL_FAQS, JOURNEY, PARTNER_PAGES, PARTNER_POLICIES, WHO_CAN_APPLY, WHY, opportunityPath } from '../data/partnership.js'
+import { CATEGORIES, DIVISIONS, ECOSYSTEM, GENERAL_FAQS, JOURNEY, PARTNER_PAGES, PARTNER_POLICIES, WHO_CAN_APPLY, WHY, opportunityPath, webPageLd } from '../data/partnership.js'
 import { pageOverride, usePartnerContent } from '../services/partnershipService.js'
 import { warmBackend } from '../services/backendWake.js'
 
@@ -19,8 +19,8 @@ export default function PartnerHub() {
   const o = pageOverride(data, 'overview')
   const faqs = [...(data?.faqs?.overview || []), ...(data?.faqs?.general || []), ...GENERAL_FAQS].filter((f, i, a) => a.findIndex((x) => x.q === f.q) === i)
   return (
-    <PageContainer path={meta.path} title={o.seo_title || meta.seoTitle} description={o.seo_description || meta.seoDescription} noindex={!!o.noindex} keywords="franchise opportunities, authorized partner program, referral partner program, business partnership opportunities in India">
-      <PartnerHero eyebrow="Partner With Us" title={o.content?.hero_heading || 'Partner With LAX360. Grow With Us.'} accent="#6d5efc" imageUrl={o.hero_url} imageAlt={o.hero_alt}
+    <PageContainer path={meta.path} title={o.seo_title || meta.seoTitle} description={o.seo_description || meta.seoDescription} noindex={!!o.noindex} jsonLd={webPageLd(meta.title, o.seo_description || meta.seoDescription)} keywords="franchise opportunities, authorized partner program, referral partner program, business partnership opportunities in India">
+      <PartnerHero eyebrow="Partner With Us" title={o.content?.hero_heading || 'Partner With LAX360. Grow With Us.'} accent="var(--color-primary)" imageUrl={o.hero_url} imageAlt={o.hero_alt}
         lead={o.content?.hero_lead || 'Build your business, explore new opportunities and collaborate with LAX360 across Education, Digital Marketing and Information Technology through our franchise and partnership programs.'}>
         <Button href="#programs" arrow>Explore Opportunities</Button>
         <Button to="/partner-with-us/apply" variant="secondary">Become a Partner</Button>
@@ -55,7 +55,7 @@ export default function PartnerHub() {
             </Reveal>
             <Reveal delay={0.08} className="lg:col-span-7">
               <ul className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-3">
-                {DIVISIONS.map((d) => <li key={d.slug} className="bg-bg"><Link to={opportunityPath(c.slug, d.slug)} className="group flex h-full min-h-28 flex-col justify-between p-5 transition-colors hover:bg-glass"><span className="font-display text-lg font-semibold">{d.label}</span><span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold" style={{ color: d.accent }}>View details<ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span></Link></li>)}
+                {DIVISIONS.map((d) => <li key={d.slug} className="bg-night"><Link to={opportunityPath(c.slug, d.slug)} className="group flex h-full min-h-28 flex-col justify-between p-5 transition-colors hover:bg-glass"><span className="font-display text-lg font-semibold">{d.label}</span><span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold" style={{ color: d.accent }}>View details<ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span></Link></li>)}
               </ul>
               <div className="mt-5"><Button to={c.path} variant="secondary">{c.slug === 'franchise' ? 'Explore Franchise Opportunities' : c.slug === 'authorized-partner' ? 'Explore Authorized Partnership' : 'Explore Referral Partnership'}</Button></div>
             </Reveal>
@@ -66,7 +66,7 @@ export default function PartnerHub() {
       <Block id="divisions" eyebrow="Our business divisions" title="Where you can build with LAX360" lead="Only services LAX360 offers or has approved for publication are described here." tint>
         <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge lg:grid-cols-3">
           {DIVISIONS.map((d) => { const Icon = ICON[d.icon]; return (
-            <article key={d.slug} className="bg-bg p-7">
+            <article key={d.slug} className="bg-night p-7">
               <div className="mb-5 h-1.5 w-16 rounded-full" style={{ background: d.accent }} />
               <Icon className="size-7" style={{ color: d.accent }} aria-hidden="true" />
               <h3 className="mt-4 font-display text-2xl font-semibold">{d.long}</h3>
@@ -95,7 +95,7 @@ export default function PartnerHub() {
       <Block id="ecosystem" eyebrow="Support" title="Partner support ecosystem" lead="Which of these apply depends on the program and your agreement."><Checklist items={ECOSYSTEM} cols /></Block>
 
       <Block id="commercial" eyebrow="Commercial policies" title="How authorized and referral partners are rewarded" lead="Public summary of the approved model. Rates and internal terms are not published." tint>
-        <dl className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2">{PARTNER_POLICIES.map(([k, v]) => <div key={k} className="bg-bg p-5"><dt className="font-semibold">{k}</dt><dd className="mt-1 text-soft">{v}</dd></div>)}</dl>
+        <dl className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2">{PARTNER_POLICIES.map(([k, v]) => <div key={k} className="bg-night p-5"><dt className="font-semibold">{k}</dt><dd className="mt-1 text-soft">{v}</dd></div>)}</dl>
       </Block>
 
       <Block id="faq" eyebrow="FAQ" title="Frequently asked questions"><Faqs items={faqs.slice(0, 8)} /><p className="mt-5"><Link to="/partner-with-us/faq" className="link-underline font-semibold">See all partnership FAQs</Link></p></Block>

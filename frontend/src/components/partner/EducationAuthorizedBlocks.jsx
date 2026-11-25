@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import { Block, Checklist, Facts } from './PartnerUI.jsx'
-import { CoursesButton } from './CourseCatalogue.jsx'
+import { CoursesButton, CourseGroupsList } from './CourseCatalogue.jsx'
 import { EDUA } from '../../data/educationAuthorized.js'
 import { EDU } from '../../data/educationFranchise.js'
-import { IT_COURSES, NON_IT_COURSES, NON_IT_DESCRIPTION } from '../../data/educationCourses.js'
+import { COURSE_SUMMARY } from '../../data/educationCourses.js'
 
 // In-page navigation of the Education Authorized Partner page, in page order. PartnerOpportunity inserts Responsibilities, Process and Commercial between the two lists.
 export const EDUA_NAV_A = [['about', 'About'], ['who', 'Who can apply'], ['models', 'Partnership models'], ['courses', 'Courses'], ['provide', 'What we provide'], ['collab', 'College collaboration'], ['internships', 'Internships'], ['faculty', 'Faculty & staff training'],
@@ -25,12 +25,12 @@ export function EducationAuthorizedA({ accent }) {
         <div className="mt-10"><h3 className="font-display text-xl font-semibold">Our mission</h3><p className="mt-2 max-w-3xl text-soft">{e.about.mission.lead}</p><div className="mt-5"><Facts rows={e.about.mission.items} /></div></div>
       </Block>
       <Block id="who" eyebrow="Eligibility" title="Who can become an authorized partner?" tint>
-        <ul className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2 lg:grid-cols-3">{e.who.map(([t, d]) => <li key={t} className="bg-bg p-5"><p className="font-display text-lg font-semibold">{t}</p><p className="mt-1 text-sm text-soft">{d}</p></li>)}</ul>
+        <ul className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2 lg:grid-cols-3">{e.who.map(([t, d]) => <li key={t} className="bg-night p-5"><p className="font-display text-lg font-semibold">{t}</p><p className="mt-1 text-sm text-soft">{d}</p></li>)}</ul>
       </Block>
       <Block id="models" eyebrow="Authorized partnership models" title="Choose the model that fits your organization">
         <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge md:grid-cols-2">
           {e.models.map((m) => (
-            <article key={m.id} className="bg-bg p-6">
+            <article key={m.id} className="bg-night p-6">
               <p className="eyebrow" style={{ color: accent }}>Model {m.id}</p><h3 className="mt-1 font-display text-xl font-semibold">{m.name}</h3><p className="mt-1 text-sm text-soft">{m.for}</p>
               <div className="mt-4"><Checklist items={m.items} accent={accent} /></div>
             </article>
@@ -38,14 +38,9 @@ export function EducationAuthorizedA({ accent }) {
         </div>
         <p className="mt-4 rounded-lg border border-edge p-4 text-sm font-semibold">{e.modelsNote}</p>
       </Block>
-      <Block id="courses" eyebrow="IT and Non-IT course partnership" title="IT and Non-IT courses" lead="Partners can conduct IT and Non-IT courses, subject to the approved programme, faculty, facilities and course delivery arrangements." tint>
+      <Block id="courses" eyebrow="Course partnership" title="LAX360 Education courses" lead={`Partners can conduct the LAX360 Education courses (${COURSE_SUMMARY}), subject to the approved programme, faculty, facilities and course delivery arrangements. These are the only courses offered.`} tint>
         <div className="mb-8"><CoursesButton accent={accent} /></div>
-        <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge md:grid-cols-2">
-          <div className="bg-bg p-6"><h3 className="font-display text-xl font-semibold">IT education</h3><p className="mt-1 text-sm text-soft">Software, programming, AI and technology training.</p>
-            <ol className="mt-4 columns-1 gap-8 sm:columns-2">{IT_COURSES.map((c) => <li key={c.no} value={c.no} className="break-inside-avoid py-0.5 text-[0.9375rem]"><span className="mr-2 inline-block w-6 text-right font-semibold tabular-nums text-soft">{c.no}.</span>{c.name}</li>)}</ol></div>
-          <div className="bg-bg p-6"><h3 className="font-display text-xl font-semibold">Non-IT education</h3><p className="mt-1 text-sm text-soft">{NON_IT_DESCRIPTION}</p>
-            {NON_IT_COURSES.length ? <ol className="mt-4 space-y-1">{NON_IT_COURSES.map((c, i) => <li key={c}>{i + 1}. {c}</li>)}</ol> : <p className="mt-4 text-soft">The individual Non-IT course list has not been published yet. Ask our team for the current catalogue.</p>}</div>
-        </div>
+        <CourseGroupsList accent={accent} />
         <p className="mt-4 text-sm text-soft">Courses delivered at a partner depend on the approved programme, faculty and facilities.</p>
       </Block>
       <Block id="provide" eyebrow="What LAX360 Education provides" title="Support for authorized partners" lead="Support available to an approved partner, according to the partnership model and agreement.">

@@ -5,6 +5,9 @@ import Button from '../ui/Button.jsx'
 import Reveal from '../ui/Reveal.jsx'
 import SectionHeading from '../ui/SectionHeading.jsx'
 import { CourseAccordion } from './CourseCatalogue.jsx'
+import { ProductAccordion } from './ProductCatalogue.jsx'
+import { ITA_PRODUCTS } from '../../data/itAuthorized.js'
+import { ITR_PRODUCTS } from '../../data/itReferral.js'
 import { CATEGORIES, COMPARISON, DIVISIONS, commercialFallback, commercialLabel, opportunityPath } from '../../data/partnership.js'
 import { useDivisionItems } from '../../services/partnershipService.js'
 
@@ -25,12 +28,12 @@ export function Crumbs({ items }) {
 }
 
 /** Full-width editorial hero. The background is a typographic gradient; an administrator can add a real photograph (it is then shown beneath a readable overlay). */
-export function PartnerHero({ eyebrow, title, lead, accent = '#6d5efc', imageUrl, imageAlt, children }) {
+export function PartnerHero({ eyebrow, title, lead, accent = 'var(--color-primary)', imageUrl, imageAlt, children }) {
   return (
     <section className="relative isolate overflow-hidden border-b border-edge" style={{ '--pa': accent }}>
       {imageUrl && <img src={imageUrl} alt={imageAlt || ''} loading="eager" decoding="async" className="absolute inset-0 -z-20 h-full w-full object-cover" />}
       <div aria-hidden="true" className="absolute inset-0 -z-10" style={{ background: `radial-gradient(60rem 28rem at 85% -10%, color-mix(in srgb, ${accent} 32%, transparent), transparent 70%), linear-gradient(180deg, color-mix(in srgb, ${accent} 10%, transparent), transparent 75%)` }} />
-      <svg aria-hidden="true" className="absolute right-0 top-0 -z-10 hidden h-full w-1/2 opacity-[0.12] md:block" viewBox="0 0 400 400" preserveAspectRatio="xMaxYMid slice"><g fill="none" stroke={accent} strokeWidth="1.2">{Array.from({ length: 12 }, (_, i) => <circle key={i} cx="400" cy="0" r={40 + i * 34} />)}</g></svg>
+      <svg aria-hidden="true" className="absolute right-0 top-0 -z-10 hidden h-full w-1/2 opacity-[0.12] md:block" viewBox="0 0 400 400" preserveAspectRatio="xMaxYMid slice"><g fill="none" style={{ stroke: accent }} strokeWidth="1.2">{Array.from({ length: 12 }, (_, i) => <circle key={i} cx="400" cy="0" r={40 + i * 34} />)}</g></svg>
       <div className="wrap py-14 md:py-24">
         <Reveal y={12} className="max-w-4xl">
           <p className="eyebrow mb-5 flex items-center gap-3" style={{ color: accent }}><span aria-hidden="true" className="h-px w-10 bg-current" />{eyebrow}</p>
@@ -67,7 +70,7 @@ export function DivisionSwitcher({ category, division }) {
       <ul className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
         {items.map((d) => {
           const on = d.slug === division
-          const accent = DIVISIONS.find((x) => x.slug === d.slug)?.accent || cat?.accent || '#6d5efc'
+          const accent = DIVISIONS.find((x) => x.slug === d.slug)?.accent || cat?.accent || 'var(--color-primary)'
           return (
             <li key={d.slug} className="shrink-0 lg:shrink">
               <Link to={opportunityPath(category, d.slug)} aria-current={on ? 'page' : undefined} className={`flex min-h-11 items-center gap-3 border-l-4 px-4 py-2.5 text-sm font-semibold transition-colors lg:py-3 ${on ? 'bg-glass-strong text-fg' : 'border-transparent text-soft hover:bg-glass hover:text-fg'}`} style={on ? { borderColor: accent } : undefined}>
@@ -77,7 +80,10 @@ export function DivisionSwitcher({ category, division }) {
           )
         })}
       </ul>
-      {division === 'education' && <CourseAccordion accent="#2563eb" applyTo={`/partner-with-us/apply?type=${category}&division=education`} applyLabel={{ franchise: 'Apply for an Education Franchise', 'authorized-partner': 'Apply as an Authorized Partner', 'referral-partner': 'Apply as a Referral Partner' }[category] || 'Apply now'} />}
+      {division === 'it' && category === 'franchise' && <ProductAccordion accent={DIVISIONS.find((x) => x.slug === 'it')?.accent} />}
+      {division === 'it' && category === 'authorized-partner' && <ProductAccordion accent={DIVISIONS.find((x) => x.slug === 'it')?.accent} catalogue={ITA_PRODUCTS} />}
+      {division === 'it' && category === 'referral-partner' && <ProductAccordion accent={DIVISIONS.find((x) => x.slug === 'it')?.accent} catalogue={ITR_PRODUCTS} />}
+      {division === 'education' && <CourseAccordion accent="var(--color-primary)" applyTo={`/partner-with-us/apply?type=${category}&division=education`} applyLabel={{ franchise: 'Apply for an Education Franchise', 'authorized-partner': 'Apply as an Authorized Partner', 'referral-partner': 'Apply as a Referral Partner' }[category] || 'Apply now'} />}
     </nav>
   )
 }
@@ -85,7 +91,7 @@ export function DivisionSwitcher({ category, division }) {
 /** In-page section links for a long opportunity page. */
 export function SectionNav({ items }) {
   return (
-    <nav aria-label="On this page" className="sticky top-[72px] z-20 border-b border-edge bg-bg/85 backdrop-blur lg:top-[92px]">
+    <nav aria-label="On this page" className="sticky top-[72px] z-20 border-b border-edge bg-night/85 backdrop-blur lg:top-[92px]">
       <ul className="wrap flex gap-1 overflow-x-auto py-1.5">
         {items.map((s) => <li key={s.id} className="shrink-0"><a href={`#${s.id}`} className="inline-flex min-h-10 items-center rounded-full px-3 text-[0.8125rem] font-semibold text-soft hover:bg-glass-strong hover:text-fg">{s.label}</a></li>)}
       </ul>
@@ -105,7 +111,7 @@ export function Block({ id, eyebrow, title, lead, tint = false, children }) {
   )
 }
 
-export function Checklist({ items, accent = '#6d5efc', cols = false }) {
+export function Checklist({ items, accent = 'var(--color-primary)', cols = false }) {
   return (
     <ul className={`grid gap-x-10 gap-y-3 ${cols ? 'md:grid-cols-2' : ''}`}>
       {items.map((t) => <li key={t} className="flex gap-3 leading-relaxed"><Check className="mt-1 size-4 shrink-0" style={{ color: accent }} aria-hidden="true" /><span>{t}</span></li>)}
@@ -113,11 +119,11 @@ export function Checklist({ items, accent = '#6d5efc', cols = false }) {
   )
 }
 
-export function Steps({ items, accent = '#6d5efc' }) {
+export function Steps({ items, accent = 'var(--color-primary)' }) {
   return (
     <ol className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2 lg:grid-cols-4">
       {items.map((t, i) => (
-        <li key={t} className="bg-bg p-5">
+        <li key={t} className="bg-night p-5">
           <span className="font-display text-3xl font-semibold tabular-nums" style={{ color: accent }}>{String(i + 1).padStart(2, '0')}</span>
           <p className="mt-2 font-semibold leading-snug">{t}</p>
         </li>
@@ -129,7 +135,7 @@ export function Steps({ items, accent = '#6d5efc' }) {
 export function Facts({ rows }) {
   return (
     <dl className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2">
-      {rows.map(([k, v]) => <div key={k} className="bg-bg p-5"><dt className="text-sm font-semibold uppercase tracking-wide text-soft">{k}</dt><dd className="mt-1.5 leading-relaxed">{v}</dd></div>)}
+      {rows.map(([k, v]) => <div key={k} className="bg-night p-5"><dt className="text-sm font-semibold uppercase tracking-wide text-soft">{k}</dt><dd className="mt-1.5 leading-relaxed">{v}</dd></div>)}
     </dl>
   )
 }
@@ -163,7 +169,7 @@ export function ComparisonTable() {
         <caption className="sr-only">Comparison of the franchise, authorized partner and referral partner programs</caption>
         <thead><tr className="bg-glass-strong"><th scope="col" className="sticky left-0 z-10 bg-glass-strong px-4 py-3 font-semibold">&nbsp;</th>{COMPARISON.heads.map((h) => <th key={h} scope="col" className="px-4 py-3 font-semibold">{h}</th>)}</tr></thead>
         <tbody className="divide-y divide-edge">
-          {COMPARISON.rows.map(([label, ...cells]) => <tr key={label}><th scope="row" className="sticky left-0 bg-bg px-4 py-3 font-semibold">{label}</th>{cells.map((c, i) => <td key={i} className="px-4 py-3 align-top text-soft">{c}</td>)}</tr>)}
+          {COMPARISON.rows.map(([label, ...cells]) => <tr key={label}><th scope="row" className="sticky left-0 bg-night px-4 py-3 font-semibold">{label}</th>{cells.map((c, i) => <td key={i} className="px-4 py-3 align-top text-soft">{c}</td>)}</tr>)}
         </tbody>
       </table>
     </div>

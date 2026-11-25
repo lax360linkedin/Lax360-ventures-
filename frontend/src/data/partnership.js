@@ -10,24 +10,27 @@
 import { EDU } from './educationFranchise.js'
 import { EDUA } from './educationAuthorized.js'
 import { EDUR } from './educationReferral.js'
+import { ITF } from './itFranchise.js'
+import { ITA } from './itAuthorized.js'
+import { ITR } from './itReferral.js'
 
 export const CATEGORIES = [
   {
-    slug: 'franchise', path: '/franchise', label: 'Franchise', short: 'Franchise Opportunities', accent: '#6d5efc',
+    slug: 'franchise', path: '/franchise', label: 'Franchise', short: 'Franchise Opportunities', accent: 'var(--color-primary)',
     tagline: 'Establish and operate an approved LAX360 business under a formal franchise agreement.',
     summary: 'A franchise is a formal agreement to set up and run an approved LAX360 business in an agreed territory, with your own premises, team and investment, following LAX360 standards. Commercial terms are still being finalised and are discussed during evaluation.',
     seoTitle: 'Franchise Opportunities in India', seoDescription: 'Explore LAX360 franchise opportunities in Education, Digital Marketing and IT & Software: how a franchise works, who can apply and how to start a consultation.',
     profile: 'Entrepreneurs, institutions and established businesses ready to own and operate a local business.',
   },
   {
-    slug: 'authorized-partner', path: '/authorized-partner', label: 'Authorized Partner', short: 'Authorized Partner Program', accent: '#0ea5a4',
+    slug: 'authorized-partner', path: '/authorized-partner', label: 'Authorized Partner', short: 'Authorized Partner Program', accent: 'var(--color-primary)',
     tagline: 'Collaborate with LAX360 as a Lead & Sales Support Partner.',
     summary: 'Authorized Partners help LAX360 with business development, lead generation, customer communication and sales coordination. They are not franchise owners and do not run an independent delivery centre. Registration is free; commission depends on the approved product, service, deal and partner agreement.',
     seoTitle: 'Authorized Partner Program', seoDescription: 'Join the LAX360 Authorized Partner Program as a lead and sales support partner for Education, Digital Marketing and IT & Software. Free registration; eligibility and agreement apply.',
     profile: 'Professionals, consultants and businesses with a customer network who want to support LAX360 sales.',
   },
   {
-    slug: 'referral-partner', path: '/referral-partner', label: 'Referral Partner', short: 'Referral Partner Program', accent: '#e8590c',
+    slug: 'referral-partner', path: '/referral-partner', label: 'Referral Partner', short: 'Referral Partner Program', accent: 'var(--color-primary)',
     tagline: 'Refer. Track. Convert. Earn.',
     summary: 'Referral Partners introduce potential customers to LAX360. LAX360 handles qualification, follow-up, quotations and delivery. There is no registration fee and no centre to operate. Eligible commission is payable only when the approved referral conditions are met.',
     seoTitle: 'Referral Partner Program', seoDescription: 'Introduce customers to LAX360 as a referral partner for Education, Digital Marketing and IT & Software. No registration fee; commission applies only to eligible, converted referrals.',
@@ -37,17 +40,17 @@ export const CATEGORIES = [
 
 export const DIVISIONS = [
   {
-    slug: 'education', label: 'Education', long: 'Education & Skill Development', accent: '#2563eb', icon: 'graduation',
-    blurb: 'Technical training, software development and AI courses, internships, workshops and institutional training.',
-    services: ['Technical training programmes', 'Software development courses', 'Artificial intelligence courses', 'Career-oriented programmes', 'Internships', 'Workshops', 'Institutional and corporate training'],
+    slug: 'education', label: 'Education', long: 'Education & Skill Development', accent: 'var(--color-primary)', icon: 'graduation',
+    blurb: 'IT certification courses in programming, web, databases, testing, cloud, DevOps, data, cyber security, digital marketing and frameworks, plus internships, workshops and institutional training.',
+    services: ['IT certification courses', 'Software development courses', 'Career-oriented programmes', 'Internships', 'Workshops', 'Institutional and corporate training'],
   },
   {
-    slug: 'digital-marketing', label: 'Digital Marketing', long: 'Digital Marketing', accent: '#db2777', icon: 'megaphone',
+    slug: 'digital-marketing', label: 'Digital Marketing', long: 'Digital Marketing', accent: 'var(--color-primary)', icon: 'megaphone',
     blurb: 'Search, social, paid advertising, branding, content and lead generation for growing businesses.',
     services: ['Search engine optimization', 'Social media management', 'Paid advertising (Google and Meta)', 'Lead generation', 'Branding and creative', 'Content marketing', 'Digital business growth'],
   },
   {
-    slug: 'it', label: 'IT & Software', long: 'IT & Software Solutions', accent: '#0d9488', icon: 'code',
+    slug: 'it', label: 'IT & Software', long: 'IT & Software Solutions', accent: 'var(--color-primary)', icon: 'code',
     blurb: 'Websites, web and mobile applications, business software, CRM and ERP, SaaS, AI and automation.',
     services: ['Website development', 'Web applications', 'Mobile applications', 'Business software', 'CRM and ERP', 'SaaS products', 'Artificial intelligence', 'Business automation'],
   },
@@ -64,10 +67,10 @@ const D = {
   education: {
     franchise: {
       heading: 'Open an approved LAX360 training centre.',
-      lead: 'Run a technical training centre in your city under a formal franchise agreement: skills programmes, software development and AI courses, internships, workshops and institutional training, delivered to LAX360 academic standards.',
+      lead: 'Run a technical training centre in your city under a formal franchise agreement: IT certification courses, internships, workshops and institutional training, delivered to LAX360 academic standards.',
       intro: ['Demand for practical, career-oriented technical skills is steady in most cities, and many learners want a local centre with real classrooms and computer labs. An LAX360 Education Franchise is for people and institutions who want to build that kind of centre as their own business.',
         'The franchisee owns and operates the centre: premises, staff, local admissions and day-to-day management. LAX360 provides the approved course catalogue, academic guidelines, brand standards and the coordination described in the franchise agreement.'],
-      opportunities: ['Technical training and skill-development programmes', 'Software development and AI courses from the approved catalogue', 'Student admissions for local learners', 'College workshops, seminars and internship programmes', 'Corporate and institutional training enquiries', 'Short-term and career-oriented courses where approved'],
+      opportunities: ['Technical training and skill-development programmes', 'IT certification courses from the LAX360 Education course list', 'Student admissions for local learners', 'College workshops, seminars and internship programmes', 'Corporate and institutional training enquiries', 'Short-term and career-oriented courses where approved'],
       model: [['Centre', 'A branded training centre with classrooms and a computer laboratory that meet LAX360 guidelines.'], ['Programmes', 'Courses and training categories approved by LAX360 for your territory.'], ['Students', 'Admissions handled locally; student records managed through the processes LAX360 specifies.'], ['Institutions', 'Local college, school and company relationships for workshops and training.']],
       infrastructure: ['A suitable commercial space with reception, classroom(s) and a computer laboratory', 'Computers and networking meeting the minimum specification LAX360 provides', 'Reliable internet, power backup and basic safety provisions', 'Display equipment for instruction and demonstrations', 'A counselling and admissions area', 'Signage and branding applied according to the brand guidelines'],
       team: ['A centre manager or owner who is actively involved', 'Qualified trainers for the programmes you offer (onboarded and briefed by LAX360)', 'An admissions and counselling coordinator', 'Support staff as the centre grows'],
@@ -93,7 +96,7 @@ const D = {
       lead: 'Introduce students, colleges and companies to LAX360 training. LAX360 handles counselling, enrolment and delivery; you earn eligible commission when a referral converts.',
       intro: ['If people around you ask where to learn software, AI or technical skills, you can point them to LAX360 and be recognised for it. Referral partners do not need a centre, an office or any investment.',
         'You share the details of an interested person or institution (with their permission); LAX360 qualifies and follows up. Commission is payable only when the approved referral conditions are satisfied.'],
-      opportunities: ['Students interested in technical and software courses', 'AI and software development course enquiries', 'Internship and workshop requests', 'Colleges and educational institutions', 'Corporate training enquiries'],
+      opportunities: ['Students interested in technical and software courses', 'IT certification course enquiries', 'Internship and workshop requests', 'Colleges and educational institutions', 'Corporate training enquiries'],
       model: [['Process', 'Refer, track, convert, earn.'], ['Registration', 'No registration fee.'], ['Your role', 'Introduce; LAX360 qualifies, counsels and enrols.'], ['Commission', 'Only for eligible, converted referrals under the approved terms.']],
       lax: ['Verification of each referral', 'Counselling, enrolment and delivery', 'Referral tracking', 'Commission calculation and settlement under the approved terms'],
       partner: ['Refer only people who have agreed to be contacted', 'Share accurate details', 'Make no promises about admission, jobs or fees', 'Respect the duplicate-referral rules'],
@@ -281,7 +284,7 @@ export function customOpportunity(category, divisionSlug, label, description) {
   const ef = opportunityBySlug('franchise/education')
   Object.assign(ef, {
     seoTitle: 'Education Franchise: LAX360 Education Training Centres',
-    seoDescription: 'Open a LAX360 Education training centre: IT and Non-IT courses, branding kit, academic and certification support, CRM, internships and placement assistance, under a franchise agreement.',
+    seoDescription: 'Open a LAX360 Education training centre: 53 IT certification courses, branding kit, academic and certification support, CRM, internships and placement assistance, under a franchise agreement.',
     heroHeading: 'Open a LAX360 Education training centre.',
     heroLead: EDU.about.paragraphs[1],
     intro: EDU.about.paragraphs,
@@ -294,12 +297,64 @@ export function customOpportunity(category, divisionSlug, label, description) {
   })
 }
 
+// The IT & Software Referral Partner page is written from "LAX360_IT_Software_Referral_Partner_Website_Content.docx" (data/itReferral.js).
+{
+  const ir = opportunityBySlug('referral-partner/it')
+  Object.assign(ir, {
+    seoTitle: 'IT & Software Referral Partner Program: Refer Customers to LAX360',
+    seoDescription: 'Join the LAX360 IT & Software Referral Partner programme: free registration, refer businesses needing software, websites, mobile apps, AI and automation, track referrals and eligible commission in a partner portal.',
+    heroHeading: ITR.hero.heading,
+    heroLead: ITR.hero.lead,
+    intro: ITR.about.paragraphs,
+    eligibility: ITR.who.items,
+    responsibilities: { partner: ITR.responsibilities, lax: ITR.lax },
+    process: ITR.onboarding,
+    faqs: ITR.faqs.map(([q, a]) => ({ q, a })),
+    disclaimers: ['Submitting a registration is an enquiry. Registration is free, but submission does not activate a partner account; approval follows verification and a signed partner agreement.', 'Commission is flexible and depends on the partner, product, deal and vendor terms. No fixed or guaranteed income and no commission percentage is promised. Referral status does not grant franchise rights or reseller authorization.'],
+  })
+}
+
+// The IT & Software Authorized Partner page is written from "LAX360_IT_Software_Authorized_Partner_Website_Content.docx" (data/itAuthorized.js).
+{
+  const ia = opportunityBySlug('authorized-partner/it')
+  Object.assign(ia, {
+    seoTitle: 'IT & Software Authorized Partner Program: Sell LAX360 Technology Solutions',
+    seoDescription: 'Become a LAX360 IT & Software Authorized Partner: free registration, eligible commission, product demonstrations, quotation support and a partner portal for software, web, mobile and AI solutions.',
+    heroHeading: ITA.hero.heading,
+    heroLead: ITA.hero.lead,
+    intro: ITA.about.paragraphs,
+    eligibility: ITA.who.items,
+    responsibilities: { partner: ITA.responsibilities, lax: ITA.lax },
+    process: ITA.onboarding,
+    faqs: ITA.faqs.map(([q, a]) => ({ q, a })),
+    disclaimers: ['Submitting an application is an enquiry. Registration is free, but submission does not grant authorization or activate an account; approval follows verification and a signed partner agreement.', 'Commission is flexible and depends on the partner, product, deal and vendor terms. No fixed or guaranteed income and no commission percentage is promised.'],
+  })
+}
+
+// The IT & Software Franchise page is written from "LAX360_IT_Software_Franchise_Website_Content.pdf" (data/itFranchise.js).
+{
+  const it = opportunityBySlug('franchise/it')
+  Object.assign(it, {
+    seoTitle: 'IT & Software Franchise: Build a Technology Business with LAX360',
+    seoDescription: 'Explore the LAX360 IT & Software franchise: software and SaaS sales, websites, web and mobile apps, AI and automation, with branding, training, CRM and centralized delivery support under a franchise agreement.',
+    heroHeading: ITF.hero.heading,
+    heroLead: ITF.hero.lead,
+    intro: ITF.about.paragraphs,
+    infrastructure: null,
+    eligibility: ITF.who.items,
+    responsibilities: { partner: ITF.responsibilities, lax: ITF.lax },
+    process: ITF.onboarding,
+    faqs: ITF.faqs.map(([q, a]) => ({ q, a })),
+    disclaimers: ['This page is information, not an offer. Franchise fees, investment, territory, royalty and renewal terms are specified in the approved proposal and signed franchise agreement.', 'Earnings depend on approved commercial terms, customer payments and vendor policies. No fixed income or guaranteed return is promised.'],
+  })
+}
+
 // The Education Referral Partner page is written from "LAX360_Referral_Programme_Updated.pdf" (data/educationReferral.js).
 {
   const er = opportunityBySlug('referral-partner/education')
   Object.assign(er, {
     seoTitle: 'Education Referral Partner Program: Refer Students to LAX360 Education',
-    seoDescription: 'Join the LAX360 Education Referral Partnership: refer students, colleges and organizations to IT and Non-IT training, internships and workshops, with referral tracking and commission under a written agreement.',
+    seoDescription: 'Join the LAX360 Education Referral Partnership: refer students, colleges and organizations to IT certification courses, internships and workshops, with referral tracking and commission under a written agreement.',
     heroHeading: 'Become a LAX360 Education Referral Partner.',
     heroLead: EDUR.about.paragraphs[0],
     intro: EDUR.about.paragraphs,
@@ -375,3 +430,38 @@ export const PARTNER_PAGES = {
   privacy: { path: '/partner-with-us/privacy-policy', title: 'Partnership Privacy Notice', seoTitle: 'Partnership Applicant Privacy Notice', seoDescription: 'How LAX360 Pvt Ltd handles the details you submit when you enquire about a franchise or partnership program.' },
   terms: { path: '/partner-with-us/terms-and-conditions', title: 'Partnership Terms and Conditions', seoTitle: 'Partnership Terms and Conditions', seoDescription: 'Terms that apply to LAX360 franchise and partnership enquiries, and how approved partnership terms are published.' },
 }
+
+// ------------------------------------------------------------------------------------------------ search-engine text for every partnership page
+// One place for every partnership page's title and meta description, written by hand: the title head is at most 51 characters, so "<head> | LAX360 Pvt Ltd" fits the 68-character limit of fitTitle() and
+// is never cut at a colon; the description is at most 158 characters and ends at a full stop. Every title and description is unique. Nothing here promises income, results, approval, placement or accreditation.
+// (An administrator's SEO override in the admin panel still wins over these.)
+const SEO = {
+  'category:franchise': ['Franchise Opportunities in India', 'Explore LAX360 franchise opportunities in Education, Digital Marketing and IT & Software: how a franchise works, who can apply and how to start.'],
+  'category:authorized-partner': ['Authorized Partner Program in India', 'Join the LAX360 Authorized Partner Program as a lead and sales support partner for Education, Digital Marketing and IT & Software. Agreement applies.'],
+  'category:referral-partner': ['Referral Partner Program in India', 'Introduce customers to LAX360 as a referral partner for Education, Digital Marketing and IT & Software. Commission applies to eligible, converted referrals.'],
+  'franchise/education': ['Education Franchise Opportunity in India', 'Open a LAX360 Education training centre: 53 IT certification courses, branding kit, academic and certification support and CRM, under a franchise agreement.'],
+  'franchise/digital-marketing': ['Digital Marketing Franchise Opportunity', 'Operate an approved LAX360 digital marketing business: SEO, social media, paid ads, branding and lead generation. No results are guaranteed.'],
+  'franchise/it': ['IT & Software Franchise Opportunity', 'Explore the LAX360 IT & Software franchise: software and SaaS sales, websites, apps, AI and automation, with branding, training, CRM and delivery support.'],
+  'authorized-partner/education': ['Education Authorized Partner Program', 'Become a LAX360 Education Authorized Partner: college MoUs, training partnerships, workshops, internships and branding support, under an agreement.'],
+  'authorized-partner/digital-marketing': ['Digital Marketing Authorized Partner Program', 'Become a LAX360 Digital Marketing Authorized Partner: find clients and support sales while LAX360 prepares proposals and delivers the work.'],
+  'authorized-partner/it': ['IT & Software Authorized Partner Program', 'Become a LAX360 IT & Software Authorized Partner: free registration, eligible commission, demos, quotations and a partner portal.'],
+  'referral-partner/education': ['Education Referral Partner Program', 'Join the LAX360 Education Referral Partnership: refer students and colleges to IT certification courses, with tracking and commission under an agreement.'],
+  'referral-partner/digital-marketing': ['Digital Marketing Referral Partner Program', 'Refer businesses that need marketing to LAX360. LAX360 qualifies the lead and discusses the service; commission applies only to eligible, converted referrals.'],
+  'referral-partner/it': ['IT & Software Referral Partner Program', 'Join the LAX360 IT & Software Referral Partner programme: free registration, refer customers needing software or AI, and track eligible commission.'],
+  'page:overview': ['Franchise & Partnership Opportunities in India', 'Partner with LAX360 Pvt Ltd: franchise, authorized partner and referral programs across Education, Digital Marketing and IT & Software. Apply online.'],
+  'page:apply': ['Apply to Become a LAX360 Partner', 'Apply for a LAX360 franchise, authorized partner or referral partner program. An application is an enquiry; approval follows consultation and an agreement.'],
+  'page:faq': ['Franchise & Partner Program FAQs', 'Answers about LAX360 franchise, authorized partner and referral partner programs: fees, eligibility, commission, agreements and applications.'],
+}
+for (const c of CATEGORIES) { const s = SEO[`category:${c.slug}`]; if (s) [c.seoTitle, c.seoDescription] = s }
+for (const o of opportunities) { const s = SEO[o.slug]; if (s) [o.seoTitle, o.seoDescription] = s }
+for (const k of ['overview', 'apply', 'faq']) [PARTNER_PAGES[k].seoTitle, PARTNER_PAGES[k].seoDescription] = SEO[`page:${k}`]
+export const PARTNER_SEO = SEO
+
+/** schema.org FAQPage for the questions that are visible on the page (never questions that are not shown). */
+export const faqJsonLd = (items) => {
+  const list = (items || []).filter((f) => (f.q || f.question) && (f.a || f.answer)).slice(0, 30)
+  return list.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: list.map((f) => ({ '@type': 'Question', name: f.q || f.question, acceptedAnswer: { '@type': 'Answer', text: f.a || f.answer } })) } : null
+}
+
+/** schema.org WebPage for a partnership page (the site's organization and its home are referenced, as on the opportunity pages). */
+export const webPageLd = (name, description) => ({ '@context': 'https://schema.org', '@type': 'WebPage', name, description, isPartOf: { '@id': '__SITE__/#website' }, about: { '@type': 'Organization', name: 'LAX360 Pvt Ltd', url: '__SITE__/' } })

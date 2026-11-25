@@ -23,6 +23,17 @@ for (const r of literal) if (known.has(r.source)) problems.push(`redirect source
 const rewrites = new Set(v.rewrites.map((r) => r.source.replace(/\(\[a-z0-9-\]\{1,80\}\)/g, '')))
 for (const r of v.rewrites) if (/:(slug|dept|service)(\/|$)/.test(r.source) && !/:(slug|dept|service)\(\[a-z0-9-\]\{1,80\}\)/.test(r.source)) problems.push(`rewrite ${r.source} must restrict the slug to [a-z0-9-] (up to 80 characters) so junk URLs get a real 404`)
 for (const s of ['/products/:slug', '/industries/:slug', '/insights/:slug', '/our-network/:slug', '/websites/:slug', '/services/:slug', '/services/:slug/:service', '/locations/:slug', '/our-team/:dept', '/api/:path*']) if (!rewrites.has(s)) problems.push(`missing rewrite ${s}`)
-console.log(`${routes.length} routes checked, ${literal.length} alias redirects, ${v.rewrites.length} rewrites`)
+// 5) response headers: both sitemaps carry "X-Robots-Tag: noindex" (the sitemap file itself must not be indexed; it stays a public 200 and is NOT blocked in robots.txt), and no public page does
+const noindexRules = (v.headers || []).filter((h) => h.headers.some((x) => x.key.toLowerCase() === 'x-robots-tag' && /noindex/i.test(x.value)))
+const noindexSources = new Set(noindexRules.map((h) => h.source))
+for (const s of ['/sitemap.xml', '/sitemap-content.xml']) if (!noindexSources.has(s)) problems.push(`vercel.json has no "X-Robots-Tag: noindex" header rule for ${s}`)
+const allowedNoindex = ['/company-admin/:path*', '/user/:path*', '/demo', '/sitemap.xml', '/sitemap-content.xml']
+for (const s of noindexSources) if (!allowedNoindex.includes(s)) problems.push(`"X-Robots-Tag: noindex" is applied to ${s}, which could hide public pages`)
+if (existsSync(new URL('../dist/robots.txt', import.meta.url))) {
+  const robots = readFileSync(new URL('../dist/robots.txt', import.meta.url), 'utf8')
+  if (/^\s*Disallow:\s*\/sitemap/im.test(robots)) problems.push('robots.txt blocks a sitemap')
+  for (const s of ['/sitemap.xml', '/sitemap-content.xml']) if (!robots.includes(`Sitemap: https://lax360.in${s}`)) problems.push(`robots.txt does not list ${s}`)
+}
+console.log(`${routes.length} routes checked, ${literal.length} alias redirects, ${v.rewrites.length} rewrites, ${noindexRules.length} noindex header rules`)
 if (problems.length) { console.log('Problems:\n  ' + problems.join('\n  ')); process.exit(1) }
 console.log('Routing checks passed.')

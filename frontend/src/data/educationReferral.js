@@ -16,7 +16,7 @@ export const EDUR = {
     ['Business Partners', 'Companies, training centres and business networks.'], ['Student Ambassadors', 'College students and campus representatives.'], ['Schools & Institutions', 'Schools, polytechnics and educational organizations.']],
   programmes: {
     lead: 'Referral partners can introduce candidates to the following programmes.',
-    groups: [['IT training programmes', 'Software, programming, AI and technology courses.'], ['Non-IT training programmes', 'Professional and industrial skills courses.'], ['Additional services', 'Programmes and services beyond the course catalogue.']],
+    groups: [['IT certification courses', 'The LAX360 Education course list.'], ['Additional services', 'Programmes and services beyond the course list.']],
     services: ['Internship Programmes', 'Final-Year Projects', 'Industrial Training', 'Workshop & Seminar Programmes', 'College Add-on Courses', 'Faculty Development Programmes', 'Professional Certification Programmes', 'Career Guidance', 'Placement Preparation', 'Corporate Training'],
     note: 'All offerings are subject to course availability and approval.',
   },
@@ -39,7 +39,7 @@ export const EDUR = {
   benefits: ['Attractive referral commission opportunities.', 'Official LAX360 Education Referral Partner Certificate.', 'Digital referral partner ID.', 'Official promotional posters and brochures.', 'Course catalogue and syllabus information.', 'Dedicated referral tracking ID or code.', 'Admission and enquiry coordination support.', 'Marketing and social media support.', 'Partnership recognition.', 'Opportunity to develop long-term business relationships.', 'Access to approved workshops and institutional activities.', 'Performance-based recognition and rewards.'],
   branding: {
     lead: 'Every approved referral partner can receive an authorized digital branding package.',
-    rows: [['Partner Certificate', 'Official referral partnership certificate'], ['Partner ID Card', 'Unique partner identification'], ['Referral Code', 'Unique referral tracking code'], ['Digital Logo', 'Approved LAX360 Education logo'], ['Social Media Posters', 'Course promotional designs'], ['Course Brochure', 'IT and Non-IT course catalogue'], ['WhatsApp Creatives', 'Admission promotional materials'], ['Digital Business Card', 'Partner contact information'], ['Referral Guidelines', 'Partner operating instructions'], ['Marketing Presentation', 'LAX360 Education company profile']],
+    rows: [['Partner Certificate', 'Official referral partnership certificate'], ['Partner ID Card', 'Unique partner identification'], ['Referral Code', 'Unique referral tracking code'], ['Digital Logo', 'Approved LAX360 Education logo'], ['Social Media Posters', 'Course promotional designs'], ['Course Brochure', 'LAX360 Education course catalogue'], ['WhatsApp Creatives', 'Admission promotional materials'], ['Digital Business Card', 'Partner contact information'], ['Referral Guidelines', 'Partner operating instructions'], ['Marketing Presentation', 'LAX360 Education company profile']],
     note: 'All branding materials must follow the LAX360 Education brand guidelines.',
   },
   process: [
@@ -62,10 +62,10 @@ export const EDUR = {
     items: ['Name and address of both parties.', 'Partner category and authorization details.', 'Partnership scope and activities.', 'Referral commission percentage or fixed amount.', 'Commission eligibility and calculation method.', 'Lead ownership and referral attribution rules.', 'Commission payment schedule.', 'Confidentiality and data protection.', 'Branding and intellectual property rights.', 'Marketing and promotional restrictions.', 'Tax and statutory compliance.', 'Refund and cancellation adjustments.', 'Dispute resolution procedure.', 'Agreement duration and renewal.', 'Termination and post-termination settlement.'],
     important: 'Referral partnership does not automatically provide franchise rights, branch ownership, territory exclusivity, authority to collect fees or permission to issue company certificates.',
   },
-  why: ['Industry-oriented IT and Non-IT programmes.', 'Wide range of technical training opportunities.', 'Internship and project support.', 'College and institutional collaboration opportunities.', 'Professional certification processes.', 'Marketing and promotional support.', 'Transparent referral tracking.', 'Performance-based commission opportunities.', 'Long-term education business networking.'],
+  why: ['Industry-oriented IT certification courses.', 'Wide range of technical training opportunities.', 'Internship and project support.', 'College and institutional collaboration opportunities.', 'Professional certification processes.', 'Marketing and promotional support.', 'Transparent referral tracking.', 'Performance-based commission opportunities.', 'Long-term education business networking.'],
   application: {
     lead: 'Join the LAX360 Education network and create opportunities through education and professional training.',
-    details: ['Full name', 'Mobile number', 'Email address', 'Partner category (for example Individual Referral Partner)', 'Organization / college name', 'City / district', 'Your network / experience', 'Interested referral category (for example IT & Non-IT courses)'],
+    details: ['Full name', 'Mobile number', 'Email address', 'Partner category (for example Individual Referral Partner)', 'Organization / college name', 'City / district', 'Your network / experience', 'Interested referral category (for example IT certification courses)'],
   },
   faqs: [
     ['Who can join the referral partnership?', 'Individuals, college representatives, educational institutions, consultants, freelancers, business owners and student ambassadors can apply.'],

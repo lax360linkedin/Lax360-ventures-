@@ -93,7 +93,7 @@ export default function PartnerApply() {
 
   return (
     <PageContainer path={meta.path} title={meta.seoTitle} description={meta.seoDescription} noindex={false}>
-      <PartnerHero eyebrow="Partner With Us" title="Become a Partner" accent="#6d5efc" lead="Tell us about yourself and the opportunity you are interested in. This is an enquiry: it does not make you a partner, and no documents or identity numbers are needed at this stage." />
+      <PartnerHero eyebrow="Partner With Us" title="Become a Partner" accent="var(--color-primary)" lead="Tell us about yourself and the opportunity you are interested in. This is an enquiry: it does not make you a partner, and no documents or identity numbers are needed at this stage." />
       <Crumbs items={[{ label: 'Home', to: '/' }, { label: 'Partner With Us', to: '/partner-with-us' }, { label: 'Apply' }]} />
       <section ref={topRef} aria-labelledby="form-t" className="wrap scroll-mt-32 py-10 md:py-14">
         <h2 id="form-t" className="sr-only">Partnership application form</h2>
@@ -134,7 +134,7 @@ export default function PartnerApply() {
               {!cat && <p className="md:col-span-2 text-soft">Go back to step 1 and choose a partnership type first.</p>}
               {cat === 'franchise' && <>
                 {text('proposed_location', 'Proposed franchise location', { required: true })}
-                {v.division === 'education' && <FormField id="pa-interest" as="select" label="Franchise interest" value={v.franchise_interest} onChange={set('franchise_interest')}><option value="">Choose…</option><option value="IT courses">IT Courses</option><option value="Non-IT courses">Non-IT Courses</option><option value="Both IT and Non-IT">Both IT &amp; Non-IT</option></FormField>}
+                
                 {text('investment_budget', 'Investment budget you have in mind', { hint: 'Optional. LAX360 franchise investment is not yet finalised and is discussed in consultation.' })}
                 {text('start_date', 'Expected business start date')}
                 <FormField id="pa-part" as="select" label="Your role" value={v.participation} onChange={set('participation')}><option value="">Choose…</option><option value="operator">Active business operator</option><option value="investor">Investor</option><option value="both">Both</option></FormField>

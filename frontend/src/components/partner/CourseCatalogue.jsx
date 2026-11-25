@@ -2,10 +2,27 @@ import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } fro
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { BookOpen, ChevronDown, Search, X } from 'lucide-react'
-import { COURSE_COUNT, IT_COURSES, IT_GROUPS, NON_IT_COURSES, NON_IT_DESCRIPTION } from '../../data/educationCourses.js'
+import { COURSE_COUNT, COURSE_GROUPS, COURSE_SUMMARY } from '../../data/educationCourses.js'
+
+const matches = (c, term) => !term || `${c.name} ${c.software}`.toLowerCase().includes(term)
+const filterGroups = (term) => COURSE_GROUPS.map((g) => ({ ...g, courses: g.courses.filter((c) => matches(c, term)) })).filter((g) => g.courses.length)
+
+/** The full course list for a page section: every course under its category, with the document's numbering and software. Shared by the three Education programme pages. */
+export function CourseGroupsList({ accent = 'var(--color-primary)' }) {
+  return (
+    <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge md:grid-cols-2 xl:grid-cols-3">
+      {COURSE_GROUPS.map((g) => (
+        <div key={g.title} className="bg-night p-5">
+          <h3 className="border-b border-edge pb-2 font-display text-lg font-semibold" style={{ color: accent }}>{g.title}</h3>
+          <ol className="mt-3 space-y-1.5">{g.courses.map((c) => <li key={c.no} value={c.no} className="flex gap-2.5 text-[0.9375rem]"><span className="w-7 shrink-0 text-right font-semibold tabular-nums text-soft">{c.no}.</span><span className="min-w-0">{c.name}{c.software && <span className="block text-xs text-soft">Software: {c.software}</span>}</span></li>)}</ol>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 /** The complete LAX360 Education course list in an accessible dialog (Escape closes it, focus stays inside, the page behind does not scroll). */
-export function CourseDialog({ open, onClose, accent = '#2563eb' }) {
+export function CourseDialog({ open, onClose, accent = 'var(--color-primary)' }) {
   const titleId = useId()
   const ref = useRef(null)
   const [q, setQ] = useState('')
@@ -28,8 +45,7 @@ export function CourseDialog({ open, onClose, accent = '#2563eb' }) {
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = overflow; prev?.focus?.() }
   }, [open, onClose])
   const term = q.trim().toLowerCase()
-  const match = (c) => !term || c.name.toLowerCase().includes(term)
-  const groups = useMemo(() => IT_GROUPS.map((g) => ({ ...g, courses: g.nos.map((n) => IT_COURSES.find((c) => c.no === n)).filter(match) })).filter((g) => g.courses.length), [term]) // eslint-disable-line react-hooks/exhaustive-deps
+  const groups = useMemo(() => filterGroups(term), [term])
   if (!open) return null
   const shown = groups.reduce((n, g) => n + g.courses.length, 0)
   if (typeof document === 'undefined') return null
@@ -38,38 +54,31 @@ export function CourseDialog({ open, onClose, accent = '#2563eb' }) {
       <div ref={ref} role="dialog" aria-modal="true" aria-labelledby={titleId} className="flex max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden rounded-t-2xl border border-edge-strong bg-night text-fg shadow-menu sm:rounded-2xl">
         <header className="flex items-start justify-between gap-4 border-b border-edge px-5 py-4 sm:px-7">
           <div><p className="eyebrow flex items-center gap-2" style={{ color: accent }}><BookOpen className="size-4" aria-hidden="true" />LAX360 Education</p><h2 id={titleId} className="mt-1 font-display text-2xl font-semibold">All courses</h2>
-            <p className="mt-1 text-sm text-soft">{COURSE_COUNT} courses listed: {IT_COURSES.length} IT course categories{NON_IT_COURSES.length ? ` and ${NON_IT_COURSES.length} Non-IT courses` : ''}. Courses offered at a centre depend on the approved franchise package, infrastructure and faculty.</p></div>
+            <p className="mt-1 text-sm text-soft">{COURSE_SUMMARY}. These are the only courses LAX360 Education offers; what a partner delivers depends on the approved partnership, infrastructure and faculty.</p></div>
           <button type="button" onClick={onClose} aria-label="Close course list" className="grid size-11 shrink-0 place-items-center rounded-lg text-soft hover:bg-glass-strong hover:text-fg"><X className="size-5" aria-hidden="true" /></button>
         </header>
         <div className="border-b border-edge px-5 py-3 sm:px-7">
           <label className="relative block"><span className="sr-only">Search courses</span><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-soft" aria-hidden="true" />
             <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search courses" className="h-11 w-full rounded-lg border border-edge bg-glass pl-10 pr-3 text-sm text-fg placeholder:text-soft/70 focus:border-lav focus:outline-none" /></label>
-          <p className="mt-2 text-xs text-soft" role="status" aria-live="polite">{term ? `${shown} of ${IT_COURSES.length} IT courses match` : `Showing all ${IT_COURSES.length} IT courses`}</p>
+          <p className="mt-2 text-xs text-soft" role="status" aria-live="polite">{term ? `${shown} of ${COURSE_COUNT} courses match` : `Showing all ${COURSE_COUNT} courses`}</p>
         </div>
         <div className="overflow-y-auto px-5 py-5 sm:px-7">
           <section aria-labelledby={`${titleId}-it`}>
-            <h3 id={`${titleId}-it`} className="font-display text-xl font-semibold">IT courses <span className="text-base font-normal text-soft">· software, programming, AI and technology training</span></h3>
+            <h3 id={`${titleId}-it`} className="font-display text-xl font-semibold">IT certification courses <span className="text-base font-normal text-soft">· {COURSE_SUMMARY}</span></h3>
             {groups.length === 0 ? <p className="mt-4 text-soft">No course matches “{q}”.</p> : (
               <div className="mt-4 grid gap-6 md:grid-cols-2">
                 {groups.map((g) => (
                   <div key={g.title}>
                     <h4 className="mb-2 border-b border-edge pb-1.5 text-sm font-semibold uppercase tracking-wide" style={{ color: accent }}>{g.title}</h4>
-                    <ol className="space-y-1.5">{g.courses.map((c) => <li key={c.no} value={c.no} className="flex gap-3 text-[0.9375rem]"><span className="w-7 shrink-0 text-right font-semibold tabular-nums text-soft">{c.no}.</span><span>{c.name}</span></li>)}</ol>
+                    <ol className="space-y-1.5">{g.courses.map((c) => <li key={c.no} value={c.no} className="flex gap-3 text-[0.9375rem]"><span className="w-7 shrink-0 text-right font-semibold tabular-nums text-soft">{c.no}.</span><span>{c.name}{c.software && <span className="block text-xs text-soft">Software: {c.software}</span>}</span></li>)}</ol>
                   </div>
                 ))}
               </div>
             )}
           </section>
-          {!term && (
-            <section aria-labelledby={`${titleId}-non`} className="mt-8 border-t border-edge pt-6">
-              <h3 id={`${titleId}-non`} className="font-display text-xl font-semibold">Non-IT courses <span className="text-base font-normal text-soft">· {NON_IT_DESCRIPTION.replace(/\.$/, '').toLowerCase()}</span></h3>
-              {NON_IT_COURSES.length ? <ol className="mt-3 grid gap-1.5 md:grid-cols-2">{NON_IT_COURSES.map((c, i) => <li key={c} className="flex gap-3"><span className="w-7 shrink-0 text-right font-semibold tabular-nums text-soft">{i + 1}.</span>{c}</li>)}</ol>
-                : <p className="mt-3 text-soft">LAX360 Education also supports Non-IT training programmes. The individual Non-IT course list has not been published yet; ask our team for the current catalogue.</p>}
-            </section>
-          )}
         </div>
         <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-edge px-5 py-4 sm:px-7">
-          <p className="text-xs text-soft">Course availability and certification follow the approved programme and the franchise agreement.</p>
+          <p className="text-xs text-soft">Course availability and certification follow the approved programme and the partnership agreement.</p>
           <div className="flex flex-wrap gap-2"><Link to="/partner-with-us/apply?type=franchise&division=education" onClick={onClose} className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-white">Apply for an Education Franchise</Link><button type="button" onClick={onClose} className="inline-flex min-h-11 items-center rounded-full border border-edge-strong px-5 text-sm font-semibold hover:bg-glass-strong">Close</button></div>
         </footer>
       </div>
@@ -87,42 +96,35 @@ const useOpen = () => useSyncExternalStore(subscribe, () => store.open, () => fa
 const setOpenState = (v) => { if (store.open !== v) { store.open = v; emit() } }
 
 /** The course list as an expandable section of the sidebar (no popup): the same list the buttons expand. Opens and closes with a height + fade animation. */
-export function CourseAccordion({ accent = '#2563eb', applyTo = '/partner-with-us/apply?type=franchise&division=education', applyLabel = 'Apply for an Education Franchise' }) {
+export function CourseAccordion({ accent = 'var(--color-primary)', applyTo = '/partner-with-us/apply?type=franchise&division=education', applyLabel = 'Apply for an Education Franchise' }) {
   const open = useOpen()
   const id = useId()
   const [q, setQ] = useState('')
   useEffect(() => { store.mounted += 1; return () => { store.mounted -= 1; if (!store.mounted) store.open = false } }, [])
   const term = q.trim().toLowerCase()
-  const groups = useMemo(() => IT_GROUPS.map((g) => ({ ...g, courses: g.nos.map((n) => IT_COURSES.find((c) => c.no === n)).filter((c) => c && (!term || c.name.toLowerCase().includes(term))) })).filter((g) => g.courses.length), [term])
+  const groups = useMemo(() => filterGroups(term), [term])
   const shown = groups.reduce((n, g) => n + g.courses.length, 0)
   return (
     <section id={PANEL_ID} aria-label="Education courses" className="mt-4 scroll-mt-44 rounded-2xl border border-edge bg-glass lg:scroll-mt-48">
-      <button type="button" onClick={() => setOpenState(!open)} aria-expanded={open} aria-controls={`${id}-body`} className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl px-4 text-left text-sm font-semibold text-white shadow-menu transition-[filter] hover:brightness-110" style={{ background: accent }}>
+      <button type="button" onClick={() => setOpenState(!open)} aria-expanded={open} aria-controls={`${id}-body`} className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl px-4 text-left text-sm font-semibold bg-primary text-white shadow-menu transition-[filter] hover:brightness-110">
         <span className="flex items-center gap-2"><BookOpen className="size-4" aria-hidden="true" />View All Courses</span>
         <ChevronDown className={`size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
       </button>
       <div id={`${id}-body`} role="region" aria-label="All Education courses" inert={!open} className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="min-h-0 overflow-hidden">
           <div className="p-4">
-            <p className="text-xs text-soft">{COURSE_COUNT} courses: {IT_COURSES.length} IT course categories{NON_IT_COURSES.length ? ` and ${NON_IT_COURSES.length} Non-IT courses` : ''}. Courses offered depend on the approved partnership and its agreement.</p>
+            <p className="text-xs text-soft">{COURSE_SUMMARY}: the only courses LAX360 Education offers. What a partner delivers depends on the approved partnership and its agreement.</p>
             <label className="relative mt-3 block"><span className="sr-only">Search courses</span><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-soft" aria-hidden="true" />
-              <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search courses" className="h-11 w-full rounded-lg border border-edge bg-bg pl-9 pr-3 text-sm text-fg placeholder:text-soft/70 focus:border-lav focus:outline-none" /></label>
-            <p className="mt-2 text-xs text-soft" role="status" aria-live="polite">{term ? `${shown} of ${IT_COURSES.length} IT courses match` : `Showing all ${IT_COURSES.length} IT courses`}</p>
+              <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search courses" className="h-11 w-full rounded-lg border border-edge bg-night pl-9 pr-3 text-sm text-fg placeholder:text-soft/70 focus:border-lav focus:outline-none" /></label>
+            <p className="mt-2 text-xs text-soft" role="status" aria-live="polite">{term ? `${shown} of ${COURSE_COUNT} courses match` : `Showing all ${COURSE_COUNT} courses`}</p>
             {groups.length === 0 ? <p className="mt-3 text-sm text-soft">No course matches “{q}”.</p> : (
               <div className="mt-3 space-y-5">
                 {groups.map((g) => (
                   <div key={g.title}>
                     <h3 className="mb-1.5 border-b border-edge pb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: accent }}>{g.title}</h3>
-                    <ol className="space-y-1">{g.courses.map((c) => <li key={c.no} value={c.no} className="flex gap-2 text-sm"><span className="w-6 shrink-0 text-right font-semibold tabular-nums text-soft">{c.no}.</span><span className="min-w-0">{c.name}</span></li>)}</ol>
+                    <ol className="space-y-1">{g.courses.map((c) => <li key={c.no} value={c.no} className="flex gap-2 text-sm"><span className="w-6 shrink-0 text-right font-semibold tabular-nums text-soft">{c.no}.</span><span className="min-w-0">{c.name}{c.software && <span className="block text-xs text-soft">Software: {c.software}</span>}</span></li>)}</ol>
                   </div>
                 ))}
-              </div>
-            )}
-            {!term && (
-              <div className="mt-5 border-t border-edge pt-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wide" style={{ color: accent }}>Non-IT courses</h3>
-                {NON_IT_COURSES.length ? <ol className="mt-2 space-y-1">{NON_IT_COURSES.map((c, i) => <li key={c} className="flex gap-2 text-sm"><span className="w-6 shrink-0 text-right font-semibold tabular-nums text-soft">{i + 1}.</span>{c}</li>)}</ol>
-                  : <p className="mt-2 text-sm text-soft">{NON_IT_DESCRIPTION} The individual Non-IT course list has not been published yet; ask our team for the current catalogue.</p>}
               </div>
             )}
             <div className="mt-5 flex flex-wrap gap-2">
@@ -137,7 +139,7 @@ export function CourseAccordion({ accent = '#2563eb', applyTo = '/partner-with-u
 }
 
 /** A prominent "View All Courses" button. Where the sidebar course list is on the page it scrolls there smoothly and expands it; elsewhere (no sidebar) it opens the dialog. */
-export function CoursesButton({ accent = '#2563eb', block = false, className = '' }) {
+export function CoursesButton({ accent = 'var(--color-primary)', block = false, className = '' }) {
   const [dlg, setDlg] = useState(false)
   const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
   const go = () => {
@@ -151,7 +153,7 @@ export function CoursesButton({ accent = '#2563eb', block = false, className = '
   }
   return (
     <>
-      <button type="button" onClick={go} aria-controls={store.mounted ? PANEL_ID : undefined} aria-haspopup={store.mounted ? undefined : 'dialog'} className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold text-white shadow-menu transition-transform hover:-translate-y-0.5 ${block ? 'w-full' : ''} ${className}`} style={{ background: accent }}>
+      <button type="button" onClick={go} aria-controls={store.mounted ? PANEL_ID : undefined} aria-haspopup={store.mounted ? undefined : 'dialog'} className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold bg-primary text-white shadow-menu transition-transform hover:-translate-y-0.5 ${block ? 'w-full' : ''} ${className}`}>
         <BookOpen className="size-4" aria-hidden="true" />View All Courses
       </button>
       <CourseDialog open={dlg} onClose={() => setDlg(false)} accent={accent} />

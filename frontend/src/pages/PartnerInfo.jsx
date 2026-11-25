@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import { Block, Cta, Crumbs, Faqs, PartnerHero } from '../components/partner/PartnerUI.jsx'
-import { CATEGORIES, GENERAL_FAQS, PARTNER_PAGES, opportunities } from '../data/partnership.js'
+import { CATEGORIES, GENERAL_FAQS, PARTNER_PAGES, faqJsonLd, opportunities, webPageLd } from '../data/partnership.js'
 import { usePartnerContent } from '../services/partnershipService.js'
 
 /** /partner-with-us/faq, /partner-with-us/privacy-policy and /partner-with-us/terms-and-conditions. Policy text is shown ONLY when management has published it; otherwise the page says what applies meanwhile. */
@@ -16,8 +16,8 @@ export default function PartnerInfo({ kind }) {
     const groups = [{ title: 'General', items: [...admin.filter((f) => f.scope === 'general' || f.scope === 'overview'), ...GENERAL_FAQS].filter((f, i, a) => a.findIndex((x) => x.q === f.q) === i) },
       ...CATEGORIES.map((c) => ({ title: c.short, items: [...admin.filter((f) => f.scope === c.slug), ...opportunities.filter((o) => o.category === c.slug).flatMap((o) => o.faqs.slice(0, 2).map((f) => ({ q: `${o.title}: ${f.q}`, a: f.a })))] }))]
     return (
-      <PageContainer path={meta.path} title={meta.seoTitle} description={meta.seoDescription}>
-        <PartnerHero eyebrow="Partner With Us" title="Partnership FAQs" lead="Answers about fees, eligibility, commission, agreements and how applications work." accent="#6d5efc" />
+      <PageContainer path={meta.path} title={meta.seoTitle} description={meta.seoDescription} jsonLd={faqJsonLd(groups.flatMap((g) => g.items))}>
+        <PartnerHero eyebrow="Partner With Us" title="Partnership FAQs" lead="Answers about fees, eligibility, commission, agreements and how applications work." accent="var(--color-primary)" />
         <Crumbs items={crumbs} />
         {groups.map((g, i) => <Block key={g.title} id={`faq-${i}`} eyebrow="FAQ" title={g.title} tint={i % 2 === 1}><Faqs items={g.items} /></Block>)}
         <section className="wrap py-14"><Cta brochureUrl={data?.general_brochure_url} portalUrl={data?.portal_url} /></section>
@@ -26,8 +26,8 @@ export default function PartnerInfo({ kind }) {
   }
   const isPrivacy = kind === 'privacy'
   return (
-    <PageContainer path={meta.path} title={meta.seoTitle} description={meta.seoDescription}>
-      <PartnerHero eyebrow="Partner With Us" title={meta.title} lead={isPrivacy ? 'How we handle the details you share when you enquire about a franchise or partnership program.' : 'The terms that apply when you enquire about a franchise or partnership program.'} accent="#6d5efc" />
+    <PageContainer path={meta.path} title={meta.seoTitle} description={meta.seoDescription} jsonLd={webPageLd(meta.title, meta.seoDescription)}>
+      <PartnerHero eyebrow="Partner With Us" title={meta.title} lead={isPrivacy ? 'How we handle the details you share when you enquire about a franchise or partnership program.' : 'The terms that apply when you enquire about a franchise or partnership program.'} accent="var(--color-primary)" />
       <Crumbs items={crumbs} />
       <div className="wrap max-w-3xl py-12">
         {published.length ? published.map((p) => (

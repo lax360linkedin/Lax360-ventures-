@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Block, Checklist, Facts } from './PartnerUI.jsx'
-import { CoursesButton } from './CourseCatalogue.jsx'
+import { CoursesButton, CourseGroupsList } from './CourseCatalogue.jsx'
 import { EDU } from '../../data/educationFranchise.js'
-import { IT_COURSES, NON_IT_COURSES, NON_IT_DESCRIPTION } from '../../data/educationCourses.js'
+import { COURSE_SUMMARY } from '../../data/educationCourses.js'
 
 // The in-page navigation entries of the Education Franchise page, in page order (id -> label). The generic opportunity sections that this content replaces are skipped by PartnerOpportunity.
 export const EDU_NAV_A = [['about', 'About'], ['provide', 'What we provide'], ['courses', 'Courses'], ['branding', 'Branding kit'], ['academic', 'Academic support'], ['certification', 'Certification'], ['digital', 'Digital presence'], ['crm', 'CRM'],
@@ -21,15 +21,10 @@ export function EducationBlocksA({ accent }) {
           <div className="lg:col-span-5"><h3 className="eyebrow mb-3 text-soft">Our mission</h3><Checklist items={e.about.mission} accent={accent} /></div></div>
       </Block>
       <Block id="provide" eyebrow="Franchise support" title="What LAX360 Pvt Ltd provides" lead="Support available to an approved franchise partner, according to the franchise package and agreement." tint><Facts rows={e.provide} /></Block>
-      <Block id="courses" eyebrow="Course categories" title="IT and Non-IT training programmes" lead="LAX360 Education supports IT and Non-IT training programmes with practical, industry-focused learning.">
+      <Block id="courses" eyebrow="Course list" title="LAX360 Education courses" lead={`LAX360 Education offers ${COURSE_SUMMARY}, with practical, industry-focused learning. These are the only courses offered.`}>
         <div className="mb-8"><CoursesButton accent={accent} /></div>
-        <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge md:grid-cols-2">
-          <div className="bg-bg p-6"><h3 className="font-display text-xl font-semibold">IT courses</h3><p className="mt-1 text-sm text-soft">Software, programming, AI and technology training.</p>
-            <ol className="mt-4 columns-1 gap-8 sm:columns-2">{IT_COURSES.map((c) => <li key={c.no} value={c.no} className="break-inside-avoid py-0.5 text-[0.9375rem]"><span className="mr-2 inline-block w-6 text-right font-semibold tabular-nums text-soft">{c.no}.</span>{c.name}</li>)}</ol></div>
-          <div className="bg-bg p-6"><h3 className="font-display text-xl font-semibold">Non-IT courses</h3><p className="mt-1 text-sm text-soft">{NON_IT_DESCRIPTION}</p>
-            {NON_IT_COURSES.length ? <ol className="mt-4 space-y-1">{NON_IT_COURSES.map((c, i) => <li key={c}>{i + 1}. {c}</li>)}</ol> : <p className="mt-4 text-soft">The individual Non-IT course list has not been published yet. Ask our team for the current catalogue.</p>}</div>
-        </div>
-        <p className="mt-4 text-sm text-soft">An approved franchise partner can select courses from both categories based on infrastructure and faculty availability.</p>
+        <CourseGroupsList accent={accent} />
+        <p className="mt-4 text-sm text-soft">An approved franchise partner can select courses from this list based on infrastructure and faculty availability.</p>
       </Block>
       <Block id="branding" eyebrow="Franchise partner package" title="Branding kit" lead="Helps every franchise centre keep a consistent and professional LAX360 Education identity." tint>
         <div className="grid gap-8 md:grid-cols-2">{e.branding.map(([t, items]) => <div key={t}><h3 className="font-display text-xl font-semibold">{t}</h3><div className="mt-3"><Checklist items={items} accent={accent} /></div></div>)}</div>
@@ -57,7 +52,7 @@ export function EducationBlocksB({ accent }) {
     <>
       <Block id="packages" eyebrow="Franchise packages" title="Suggested package structure" lead={e.packagesNote} tint>
         <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge lg:grid-cols-3">
-          {e.packages.map((p) => <article key={p.name} className="bg-bg p-6"><p className="eyebrow" style={{ color: accent }}>{p.note}</p><h3 className="mt-2 font-display text-2xl font-semibold">{p.name}</h3><p className="text-soft">{p.tag}</p><div className="mt-5"><Checklist items={p.items} accent={accent} /></div></article>)}
+          {e.packages.map((p) => <article key={p.name} className="bg-night p-6"><p className="eyebrow" style={{ color: accent }}>{p.note}</p><h3 className="mt-2 font-display text-2xl font-semibold">{p.name}</h3><p className="text-soft">{p.tag}</p><div className="mt-5"><Checklist items={p.items} accent={accent} /></div></article>)}
         </div>
       </Block>
       <Block id="documents" eyebrow="Documentation" title="Franchise documents and materials provided" lead="The documentation pack an approved franchise partner receives."><ol className="grid gap-x-10 gap-y-1.5 text-[0.9375rem] md:grid-cols-2 lg:grid-cols-3">{e.documents.map((d, i) => <li key={d} className="flex gap-3"><span className="w-7 shrink-0 text-right font-semibold tabular-nums text-soft">{i + 1}.</span>{d}</li>)}</ol></Block>

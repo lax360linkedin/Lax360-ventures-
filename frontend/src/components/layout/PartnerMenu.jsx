@@ -57,7 +57,7 @@ export default function PartnerMenu({ bot }) {
   const cur = categories.find((c) => c.slug === sub)
   return (
     <div ref={root} className="relative" onMouseEnter={() => { if (window.matchMedia('(hover: hover)').matches) { show(); botTo('partner') } }} onMouseLeave={() => { hide(); bot?.current?.leave() }} onKeyDown={onKey} onBlur={(e) => !root.current?.contains(e.relatedTarget) && hide(60)}>
-      <div className="inline-flex items-stretch overflow-hidden rounded-full bg-gradient-to-r from-accent to-primary text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] ring-1 ring-white/20 transition-shadow hover:shadow-[0_12px_28px_-10px_rgb(var(--glow)/1)]">
+      <div className="inline-flex items-stretch overflow-hidden rounded-full bg-gradient-to-r from-primary-hover to-primary text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] ring-1 ring-white/20 transition-shadow hover:shadow-[0_12px_28px_-10px_rgb(var(--glow)/1)]">
         <Link to="/partner-with-us" data-bot="partner" data-bot-at="top" data-pm-item data-pm-level="0" onFocus={() => { show(); botTo('partner') }} aria-haspopup="menu" aria-expanded={open} aria-controls={`${id}-panel`}
           onClick={(e) => { if (!window.matchMedia('(hover: hover)').matches && !open) { e.preventDefault(); show() } else botClick('partner') /* touch: the first tap opens the menu, the second opens the landing page */ }}
           className="inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap px-3.5 text-[0.8125rem] font-semibold min-[1140px]:text-[0.875rem] xl:px-5 xl:text-[0.9375rem]">

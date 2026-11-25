@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import { Block, Checklist, Facts } from './PartnerUI.jsx'
-import { CoursesButton } from './CourseCatalogue.jsx'
+import { CoursesButton, CourseGroupsList } from './CourseCatalogue.jsx'
 import { EDUR } from '../../data/educationReferral.js'
 import { EDU } from '../../data/educationFranchise.js'
-import { IT_COURSES, NON_IT_COURSES, NON_IT_DESCRIPTION } from '../../data/educationCourses.js'
+import { COURSE_SUMMARY } from '../../data/educationCourses.js'
 
 // In-page navigation of the Education Referral Partner page, in page order. PartnerOpportunity inserts "Responsibilities" between the two lists.
 export const EDUR_NAV_A = [['about', 'About'], ['who', 'Who can join'], ['models', 'Partner models'], ['courses', 'Courses & services'], ['commission', 'Commission'], ['benefits', 'Benefits'], ['branding', 'Branding kit'], ['process', 'How it works'], ['tracking', 'Tracking']]
@@ -20,27 +20,23 @@ export function EducationReferralA({ accent, published = {} }) {
           <div className="lg:col-span-5"><h3 className="eyebrow mb-3 text-soft">Our partnership vision</h3><Checklist items={e.about.vision} accent={accent} /></div></div>
       </Block>
       <Block id="who" eyebrow="Eligibility" title="Who can become a referral partner?" tint>
-        <ul className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2 lg:grid-cols-3">{e.who.map(([t, d]) => <li key={t} className="bg-bg p-5"><p className="font-display text-lg font-semibold">{t}</p><p className="mt-1 text-sm text-soft">{d}</p></li>)}</ul>
+        <ul className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2 lg:grid-cols-3">{e.who.map(([t, d]) => <li key={t} className="bg-night p-5"><p className="font-display text-lg font-semibold">{t}</p><p className="mt-1 text-sm text-soft">{d}</p></li>)}</ul>
       </Block>
       <Block id="models" eyebrow="Referral partnership models" title="Choose the model that matches your role" lead="We offer different partnership models based on the partner's role and activities.">
         <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge md:grid-cols-2 lg:grid-cols-3">
           {e.models.map((m) => (
-            <article key={m.id} className="bg-bg p-6">
+            <article key={m.id} className="bg-night p-6">
               <p className="eyebrow" style={{ color: accent }}>Model {m.id} · {m.tag}</p><h3 className="mt-1 font-display text-xl font-semibold">{m.name}</h3>
               <div className="mt-4"><Checklist items={m.items} accent={accent} /></div>
             </article>
           ))}
         </div>
       </Block>
-      <Block id="courses" eyebrow="Products and services for referral" title="LAX360 Education products and services" lead={e.programmes.lead} tint>
+      <Block id="courses" eyebrow="Products and services for referral" title="LAX360 Education courses and services" lead={`${e.programmes.lead} LAX360 Education offers ${COURSE_SUMMARY}; these are the only courses offered.`} tint>
         <div className="mb-8"><CoursesButton accent={accent} /></div>
-        <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge md:grid-cols-2">
-          <div className="bg-bg p-6"><h3 className="font-display text-xl font-semibold">A. IT training programmes</h3><p className="mt-1 text-sm text-soft">Software, programming, AI and technology training.</p>
-            <ol className="mt-4 columns-1 gap-8 sm:columns-2">{IT_COURSES.map((c) => <li key={c.no} value={c.no} className="break-inside-avoid py-0.5 text-[0.9375rem]"><span className="mr-2 inline-block w-6 text-right font-semibold tabular-nums text-soft">{c.no}.</span>{c.name}</li>)}</ol></div>
-          <div className="bg-bg p-6"><h3 className="font-display text-xl font-semibold">B. Non-IT training programmes</h3><p className="mt-1 text-sm text-soft">{NON_IT_DESCRIPTION}</p>
-            {NON_IT_COURSES.length ? <ol className="mt-4 space-y-1">{NON_IT_COURSES.map((c, i) => <li key={c}>{i + 1}. {c}</li>)}</ol> : <p className="mt-4 text-soft">The individual Non-IT course list has not been published yet. Ask our team for the current catalogue.</p>}</div>
-        </div>
-        <h3 className="mt-10 font-display text-xl font-semibold">C. Additional services</h3><div className="mt-3"><Checklist items={e.programmes.services} accent={accent} cols /></div>
+        <h3 className="mb-4 font-display text-xl font-semibold">A. IT certification courses</h3>
+        <CourseGroupsList accent={accent} />
+        <h3 className="mt-10 font-display text-xl font-semibold">B. Additional services</h3><div className="mt-3"><Checklist items={e.programmes.services} accent={accent} cols /></div>
         <p className="mt-4 text-sm text-soft">{e.programmes.note}</p>
       </Block>
       <Block id="commission" eyebrow="Referral commission" title="Referral commission structure" lead={e.commission.lead}>
@@ -55,7 +51,7 @@ export function EducationReferralA({ accent, published = {} }) {
       <Block id="branding" eyebrow="Official partner resources" title="Referral partner branding kit" lead={e.branding.lead}><Facts rows={e.branding.rows} /><p className="mt-4 text-sm text-soft">{e.branding.note}</p></Block>
       <Block id="process" eyebrow="Referral process" title="How it works" lead="Submitting an application is an enquiry. It does not make you a partner." tint>
         <ol className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2 lg:grid-cols-3">
-          {e.process.map(([t, d], i) => <li key={t} className="bg-bg p-5"><span className="font-display text-3xl font-semibold tabular-nums" style={{ color: accent }}>{String(i + 1).padStart(2, '0')}</span><p className="mt-2 font-semibold leading-snug">{t}</p><p className="mt-1 text-sm text-soft">{d}</p></li>)}
+          {e.process.map(([t, d], i) => <li key={t} className="bg-night p-5"><span className="font-display text-3xl font-semibold tabular-nums" style={{ color: accent }}>{String(i + 1).padStart(2, '0')}</span><p className="mt-2 font-semibold leading-snug">{t}</p><p className="mt-1 text-sm text-soft">{d}</p></li>)}
         </ol>
       </Block>
       <Block id="tracking" eyebrow="Referral tracking and partner dashboard" title="Referral tracking and partner dashboard" lead={e.tracking.lead}>

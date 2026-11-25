@@ -69,13 +69,64 @@ await test('every game in the catalogue is live and has a route in the app', () 
   assert.ok(games.every((g) => g.status === 'live'))
 })
 console.log(`\n${passed} client tests passed`)
-await test('the Education course catalogue holds all 20 IT courses of the supplied document, numbered 1-20, each shown once', async () => {
-  const { IT_COURSES, IT_GROUPS, NON_IT_COURSES } = await vite.ssrLoadModule('/src/data/educationCourses.js')
+await test('the Education course catalogue holds exactly the 53 courses of the supplied course list, numbered 1-53, each shown once', async () => {
+  const { IT_COURSES, IT_GROUPS, COURSE_GROUPS, COURSE_COUNT } = await vite.ssrLoadModule('/src/data/educationCourses.js')
   const { EDU } = await vite.ssrLoadModule('/src/data/educationFranchise.js')
-  assert.deepEqual(IT_COURSES.map((c) => c.no), Array.from({ length: 20 }, (_, i) => i + 1))
-  assert.equal(IT_COURSES[0].name, 'Python Programming'); assert.equal(IT_COURSES[19].name, 'Microsoft Office & Advanced Excel'); assert.equal(new Set(IT_COURSES.map((c) => c.name)).size, 20)
+  assert.equal(COURSE_COUNT, 53); assert.equal(COURSE_GROUPS.length, 11)
+  assert.deepEqual(IT_COURSES.map((c) => c.no), Array.from({ length: 53 }, (_, i) => i + 1))
+  assert.equal(IT_COURSES[0].name, 'Certificate in Python Programming'); assert.equal(IT_COURSES[16].name, 'MERN Stack Development With AI'); assert.equal(IT_COURSES[52].name, 'Certificate in React Native'); assert.equal(new Set(IT_COURSES.map((c) => c.name)).size, 53)
+  assert.deepEqual(COURSE_GROUPS.map((g) => g.courses.length), [6, 6, 4, 5, 5, 4, 6, 4, 4, 5, 4])
   assert.deepEqual(IT_GROUPS.flatMap((g) => g.nos).sort((a, b) => a - b), IT_COURSES.map((c) => c.no)) // the on-screen grouping drops and repeats nothing
-  assert.equal(NON_IT_COURSES.length, 0) // the document gives no Non-IT list: none is invented
+  assert.equal(IT_COURSES.filter((c) => c.software === '').length, 5) // the five "Full Stack Development with AI" courses have no software entry ("-") in the document
   assert.equal(EDU.faqs.length, 10); assert.equal(EDU.documents.length, 24); assert.equal(EDU.onboarding.length, 9); assert.equal(EDU.packages.length, 3); assert.equal(EDU.crm.rows.length, 10); assert.equal(EDU.infrastructure.length, 10); assert.equal(EDU.responsibilities.length, 12)
+})
+await test('no Education programme page mentions Non-IT courses or the removed course list; all three pages read the one course file', async () => {
+  const { readFileSync } = await import('node:fs')
+  const files = ['data/educationFranchise.js', 'data/educationAuthorized.js', 'data/educationReferral.js', 'data/educationCourses.js', 'components/partner/EducationFranchiseBlocks.jsx', 'components/partner/EducationAuthorizedBlocks.jsx', 'components/partner/EducationReferralBlocks.jsx', 'components/partner/CourseCatalogue.jsx', 'pages/PartnerApply.jsx']
+  for (const f of files) {
+    const t = readFileSync(new URL(`../src/${f}`, import.meta.url), 'utf8')
+    assert.ok(!/Non-IT|NON_IT/.test(t.replace(/^\/\/.*$/gm, '')), `${f} still mentions Non-IT courses`)
+    assert.ok(!/Microsoft Office & Advanced Excel|Ethical Hacking/.test(t), `${f} still lists a course that is not offered`)
+  }
+  for (const f of ['components/partner/EducationFranchiseBlocks.jsx', 'components/partner/EducationAuthorizedBlocks.jsx', 'components/partner/EducationReferralBlocks.jsx']) assert.ok(readFileSync(new URL(`../src/${f}`, import.meta.url), 'utf8').includes('CourseGroupsList'), `${f} must render the shared course list`)
+})
+await test('every partnership page is in the sitemap routes with a unique, correctly sized title and description, and FAQ structured data matches visible questions', async () => {
+  const { CATEGORIES, opportunities, PARTNER_PAGES, faqJsonLd } = await vite.ssrLoadModule('/src/data/partnership.js')
+  const { routes } = await vite.ssrLoadModule('/src/routes.js')
+  const { fitTitle, fitDescription } = await vite.ssrLoadModule('/src/utils/seo.js')
+  const pages = [...Object.values(PARTNER_PAGES).map((p) => [p.path, p.seoTitle, p.seoDescription]), ...CATEGORIES.map((c) => [c.path, c.seoTitle, c.seoDescription]), ...opportunities.map((o) => [o.path, o.seoTitle, o.seoDescription])]
+  assert.equal(pages.length, 17)
+  const seen = new Set()
+  for (const [path, title, desc] of pages) {
+    assert.ok(routes.includes(path), `${path} is missing from the sitemap routes`)
+    const full = `${title} | LAX360 Pvt Ltd`
+    assert.equal(fitTitle(full), full, `${path}: the title would be shortened by fitTitle (${full.length} characters)`)
+    assert.ok(desc.length >= 100 && desc.length <= 160 && fitDescription(desc) === desc && desc.endsWith('.'), `${path}: description length ${desc.length}`)
+    assert.ok(!seen.has(title) && !seen.has(desc), `${path}: title or description repeated`); seen.add(title); seen.add(desc)
+    assert.ok(!/Non-IT|guarantee(d)? (income|placement|job)/i.test(title + desc), `${path}: banned wording`)
+  }
+  const ld = faqJsonLd([{ q: 'Is it free?', a: 'Yes.' }, { q: '', a: 'x' }])
+  assert.equal(ld['@type'], 'FAQPage'); assert.equal(ld.mainEntity.length, 1); assert.equal(faqJsonLd([]), null)
+})
+await test('partnership pages use only the global theme tokens: no hard-coded colours and no colour utility that the theme does not define', async () => {
+  const { readFileSync, readdirSync } = await import('node:fs')
+  const src = (f) => readFileSync(new URL(`../src/${f}`, import.meta.url), 'utf8')
+  const css = src('styles/index.css')
+  const tokens = new Set([...css.matchAll(/--color-([a-z0-9-]+):/g)].map((m) => m[1])) // the colours the theme system defines (they change with the selected theme)
+  const ok = new Set([...tokens, 'transparent', 'current', 'white', 'black', 'inherit'])
+  const dirs = ['components/partner', 'pages', 'admin/partnerships']
+  const files = [...dirs.flatMap((d) => readdirSync(new URL(`../src/${d}/`, import.meta.url)).filter((f) => f.endsWith('.jsx') && (d !== 'pages' || f.startsWith('Partner'))).map((f) => `${d}/${f}`)), 'components/layout/PartnerMenu.jsx', 'data/partnership.js']
+  const nonColour = /^(?:\d|\[|gradient-|linear-|radial-|conic-|clip-|no-repeat|repeat|origin-|position-|blend-|size-|cover$|contain$|center$|none$|fixed$|local$|scroll$)/
+  for (const f of files) {
+    const t = src(f).replace(/^\s*\/\/.*$/gm, '')
+    assert.ok(!/(?<![&\w])#[0-9a-fA-F]{3,8}\b(?![\w-])/.test(t.replace(/&#\d+;/g, '').replace(/href="#[^"]*"|['"`]#[a-z-]+['"`]|\$\{[^}]*#[^}]*\}/g, '')), `${f}: hard-coded hex colour; use a theme token (var(--color-primary), bg-primary, text-lav ...)`)
+    assert.ok(!/\b(?:bg|text|border|from|to|via|ring|fill|stroke|divide|outline|shadow)-(?:slate|gray|zinc|neutral|stone|red|green|blue|indigo|purple|violet|sky|pink|rose|amber|yellow|emerald|teal|cyan|orange|lime|fuchsia)-\d{2,3}\b/.test(t), `${f}: fixed Tailwind palette colour; use a theme token`)
+    for (const m of t.matchAll(/(?<=[\s"'`:])(?:bg|from|to|via|ring-offset)-([a-z][a-z0-9-]*)(?:\/\d+)?(?=[\s"'`}])/g)) {
+      const name = m[1]
+      if (ok.has(name) || nonColour.test(name)) continue
+      assert.fail(`${f}: bg-${name} is not a colour defined by the theme (it would render transparent). Defined: ${[...tokens].join(', ')}`)
+    }
+  }
+  assert.ok(tokens.has('night') && tokens.has('primary') && tokens.has('edge') && !tokens.has('bg'))
 })
 process.exit(process.exitCode || 0) // Vite's dev server keeps handles open; the tests are finished
