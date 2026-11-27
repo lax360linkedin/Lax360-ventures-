@@ -38,7 +38,7 @@ function RotatingWord() {
   }, [animate])
 
   return (
-    <p className="font-display text-3xl font-medium md:text-5xl">
+    <p className="font-display text-3xl font-medium md:text-4xl lg:text-5xl">
       <span className="sr-only">for software, AI, growth and skills</span>
       <span aria-hidden="true" className="text-soft">for </span>
       <BotHighlight delay={1.9}>
@@ -72,7 +72,9 @@ function RotatingWord() {
  */
 export default function Hero() {
   const hero = useContent('hero')?.[0]?.data || {} // published override from the admin panel, else the built-in text
-  const lines = [hero.headline_1 || 'One team to build,', hero.headline_2 || 'automate and grow', hero.headline_3 || 'your business.']
+  // The H1: the lines an administrator typed (Home page hero, or SEO management > Home page), used on their own so a half-edited heading never mixes with the built-in words; all empty = the built-in heading.
+  const typed = [hero.headline_1, hero.headline_2, hero.headline_3].map((l) => (l || '').trim()).filter(Boolean)
+  const lines = typed.length ? typed : ['One team to build,', 'automate and grow', 'your business.']
   return (
     <section aria-labelledby="hero-title" className="hero-media relative isolate overflow-hidden">
       <HeroBackground />

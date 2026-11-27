@@ -97,7 +97,7 @@ def upgrade() -> None:
         add("social", platform, LABEL[platform], url, ALL, active=active, key=_social_key(platform, url))
 
     # ---- contact details ----
-    email = settings.get("contact_email") or "lax360tech@gmail.com"
+    email = settings.get("contact_email") or "admin@lax360.in"
     phones = [settings.get("contact_phone_1"), settings.get("contact_phone_2")]
     if not any(phones):
         phones = ["+91 95666 79928", "+91 95666 05272"]

@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { divisionUrl } from '../utils/slugify.js'
 import { m, useReducedMotion } from 'framer-motion'
 import { ArrowRight, ArrowUpRight, Check, ChevronRight, Lightbulb, Sparkles, TrendingUp } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
@@ -224,7 +225,7 @@ export default function IndustryDetail() {
                   const Icon = divisionIcons[d.slug]
                   return (
                     <Reveal as="li" key={d.slug} delay={i * 0.06}>
-                      <Link to={`/services/${d.slug}`} className="glass-flat lift group flex h-full flex-col gap-3 p-6">
+                      <Link to={`/services/${divisionUrl(d.slug)}`} className="glass-flat lift group flex h-full flex-col gap-3 p-6">
                         <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white"><Icon className="size-5" aria-hidden="true" /></span>
                         <span className="font-display text-lg font-semibold leading-tight">{d.name}</span><span className="flex-1 text-soft">{d.short}</span>
                         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-lav">View service <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>

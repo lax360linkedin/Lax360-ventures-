@@ -4,11 +4,11 @@ import PageContainer from '../components/layout/PageContainer.jsx'
 import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
-import { asCompany, ownershipLabels, pinnedProfiles, relationshipLabels, softwareCategories } from '../data/network.js'
+import { asCompany, canonicalSlug, ownershipLabels, pinnedProfiles, relationshipLabels, softwareCategories } from '../data/network.js'
 import { getDivision } from '../data/services.js'
 import OwnerLinks from '../components/layout/OwnerLinks.jsx'
-import { offeringHref } from '../utils/slugify.js'
-import { useContentReady } from '../hooks/useSite.js'
+import { offeringHref, divisionUrl } from '../utils/slugify.js'
+import { useContentReady, useSeeded } from '../hooks/useSite.js'
 import { useNetwork, useSoftware } from '../hooks/useCmsPages.js'
 
 const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
@@ -33,7 +33,7 @@ function serviceLink(key) {
   const [cat, sub] = key.split('/')
   const d = getDivision(cat)
   if (!d) return null
-  if (sub === '*' || !sub) return { to: `/services/${cat}`, label: d.name }
+  if (sub === '*' || !sub) return { to: `/services/${divisionUrl(cat)}`, label: d.name }
   const o = d.offerings.find((x) => x.slug === sub)
   return o ? { to: offeringHref(cat, o.name), label: `${d.name} — ${o.name}` } : null
 }
@@ -48,8 +48,9 @@ export default function NetworkPartner() {
   const companies = useNetwork()
   const software = useSoftware()
   const ready = useContentReady()
-  const pin = pinnedProfiles.find((p) => p.slugs.includes(slug))
-  const c = companies.find((x) => x.slug === slug) || (pin ? asCompany({ ...pin.fallback, category: 'authorized', relationship: 'authorized' }) : null)
+  const seeded = useSeeded('network')
+  const pin = seeded ? null : pinnedProfiles.find((p) => p.slugs.includes(slug)) // before the migration only: a deleted partner must not come back from the built-in copy
+  const c = companies.find((x) => canonicalSlug(x.slug) === canonicalSlug(slug)) || (pin ? asCompany({ ...pin.fallback, category: 'authorized', relationship: 'authorized' }) : null)
 
   if (!c) {
     return (
@@ -67,10 +68,12 @@ export default function NetworkPartner() {
   const hasProducts = c.products.length || products.length || c.softwareCategories.length || c.features.length || c.adoptionHelp.length || related.length
   const hasCollab = c.collaboration.length || c.weReceive.length || c.weContribute.length || c.customerBenefits.length || c.journey.length
   const path = `/our-network/${c.slug}`
-  const kindLabel = c.relationship === 'technology_provider' ? 'Technology Partner' : 'Authorised Partner'
-  const kindPlural = c.relationship === 'technology_provider' ? 'Technology Partners' : 'Authorised Partners'
+  // the label follows the verified relationship: "Authorised Partner" is only used for a company recorded as an authorized partner
+  const KIND = { group_company: ['Group Company', 'Group Company', '#group-company'], technology_provider: ['Technology Partner', 'IT & Software Partners', '#it-software-partners'], operated: ['Education & Training Partner', 'Education & Training Partners', '#education-partners'],
+    collaboration: c.category === 'cybersecurity' ? ['Cybersecurity Partner', 'Cybersecurity Partners', '#cybersecurity-partners'] : ['Strategic Collaboration', 'Strategic Collaborations', '#future-partners'] }
+  const [kindLabel, kindPlural, kindAnchor] = KIND[c.relationship] || (c.relationship === 'authorized' ? ['Authorised Partner', 'Authorised Partners', '#it-software-partners'] : ['Partner', 'Partners', '#it-software-partners'])
   const status = c.designation
-    ? <span className="inline-flex items-center gap-1.5 rounded-full border border-sky/50 bg-sky/10 px-3 py-1 text-xs font-bold text-sky-700 dark:text-sky"><BadgeCheck className="size-3.5" aria-hidden="true" />{c.designation}</span>
+    ? <span className="inline-flex items-center gap-1.5 rounded-full border border-sky/50 bg-sky/10 px-3 py-1 text-xs font-bold text-sky"><BadgeCheck className="size-3.5" aria-hidden="true" />{c.designation}</span>
     : <span className="inline-flex items-center rounded-full border border-edge-strong bg-glass px-3 py-1 text-xs font-semibold text-soft">Partnership designation: pending verification</span>
 
   return (
@@ -87,7 +90,7 @@ export default function NetworkPartner() {
             <ol className="flex flex-wrap items-center gap-x-1.5">
               <li><Link to="/" className={crumb}>Home</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" />
               <li><Link to="/our-network" className={crumb}>Our Network</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" />
-              <li><Link to={c.relationship === 'technology_provider' ? '/our-network#technology-partners' : '/our-network#authorized-partners'} className={crumb}>{kindPlural}</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" />
+              <li><Link to={`/our-network${kindAnchor}`} className={crumb}>{kindPlural}</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" />
               <li aria-current="page" className="font-semibold text-fg">{c.name}</li>
             </ol>
           </nav>

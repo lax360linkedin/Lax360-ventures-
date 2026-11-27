@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Archive, ArchiveRestore, CalendarClock, Check, Download, FileText, Search, Trash2 } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import { Badge, Btn, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, Field, Input, Modal, PageHeader, Pagination, Select, Spinner, Textarea, fmtDate, label, useDebounced, useFetch, useToast } from '../ui.jsx'
@@ -184,7 +185,9 @@ function Detail({ id, onClose, onChanged }) {
 export default function Enquiries() {
   const toast = useToast()
   const opts = useOptions()
-  const [f, setF] = useState({ q: '', status: '', type: '', service: '', industry: '', from: '', to: '', archived: 'no' })
+  const [params] = useSearchParams() // the Enquiry center links here with ?category=
+  const [f, setF] = useState({ q: '', status: '', type: '', service: '', industry: '', category: params.get('category') || '', source: '', from: '', to: '', archived: 'no' })
+  const { data: cats } = useFetch(() => api('/api/admin/enquiry-center/categories'), [])
   const [sort, setSort] = useState({ key: 'created_at', order: 'desc' })
   const [page, setPage] = useState(1)
   const [openId, setOpenId] = useState(null)
@@ -194,10 +197,10 @@ export default function Enquiries() {
   const qs = useCallback((extra = '') => {
     const p = new URLSearchParams()
     if (q.trim()) p.set('q', q.trim())
-    ;['status', 'type', 'service', 'industry', 'from', 'to'].forEach((k) => { if (f[k]) p.set(k, f[k]) })
+    ;['status', 'type', 'service', 'industry', 'category', 'source', 'from', 'to'].forEach((k) => { if (f[k]) p.set(k, f[k]) })
     p.set('archived', f.archived)
     return `${p}${extra}`
-  }, [q, f.status, f.type, f.service, f.industry, f.from, f.to, f.archived])
+  }, [q, f.status, f.type, f.service, f.industry, f.category, f.source, f.from, f.to, f.archived])
   const { data, error, loading, reload } = useFetch(() => api(`/api/admin/enquiries?${qs(`&sort=${sort.key}&order=${sort.order}&page=${page}&page_size=20`)}`), [qs, sort.key, sort.order, page])
   const set = (k) => (e) => { setF({ ...f, [k]: e.target.value }); setPage(1) }
   const onSort = (key) => { setSort((s) => (s.key === key ? { key, order: s.order === 'asc' ? 'desc' : 'asc' } : { key, order: key === 'name' ? 'asc' : 'desc' })); setPage(1) }
@@ -230,6 +233,8 @@ export default function Enquiries() {
             </Select>)}</Field>
           <Field label="Industry">{(p) => <Select {...p} value={f.industry} onChange={set('industry')}><option value="">All industries</option>{(industries || []).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</Select>}</Field>
           <Field label="Type">{(p) => <Select {...p} value={f.type} onChange={set('type')}><option value="">All types</option><option value="quote">Quote request</option><option value="project">Software project</option><option value="career">Careers</option><option value="partner">All partnership enquiries</option><option value="partner-franchise">Partnership: Franchise</option><option value="partner-business">Partnership: Business &amp; sales partner</option><option value="partner-authorised">Partnership: Authorised partner</option><option value="partner-technology">Partnership: Technology</option><option value="partner-reseller">Partnership: Reseller / distribution</option><option value="general">Something else</option></Select>}</Field>
+          <Field label="Category">{(p) => <Select {...p} value={f.category} onChange={set('category')}><option value="">All categories</option>{(cats || []).map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</Select>}</Field>
+          <Field label="Source page / form">{(p) => <Select {...p} value={f.source} onChange={set('source')}><option value="">Any</option><option value="contact">Contact page</option><option value="welcome-card">Intro contact card</option><option value="welcome-cards">Welcome cards</option><option value="home-cta">Home page button</option><option value="modal">Enquiry pop-up</option><option value="career">Careers page</option><option value="our-network">Our Network page</option><option value="upcoming">Upcoming service pages</option></Select>}</Field>
           <Field label="From">{(p) => <Input {...p} type="date" value={f.from} max={f.to || undefined} onChange={set('from')} />}</Field>
           <Field label="To">{(p) => <Input {...p} type="date" value={f.to} min={f.from || undefined} onChange={set('to')} />}</Field>
           <Field label="Archive">{(p) => <Select {...p} value={f.archived} onChange={set('archived')}><option value="no">Active</option><option value="only">Archived only</option><option value="all">All</option></Select>}</Field>

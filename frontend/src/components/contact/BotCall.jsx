@@ -108,7 +108,7 @@ export default function BotCall({ className = '' }) {
       <div className="mt-3 min-h-[3.6rem]">
         {phase.line && (
           <p key={`${i}-${phase.line.who}`} className={`vc-line max-w-[90%] rounded-2xl px-3.5 py-2 text-[0.8rem] leading-snug ${phase.line.who === 'bot' ? 'rounded-bl-sm bg-white/10' : 'ml-auto rounded-br-sm text-white'}`}
-            style={phase.line.who === 'user' ? { background: 'linear-gradient(135deg, color-mix(in srgb, rgb(var(--glow)) 70%, #000), #7c3aed)' } : undefined}>{phase.line.text}</p>
+            style={phase.line.who === 'user' ? { background: 'linear-gradient(135deg, color-mix(in srgb, rgb(var(--glow)) 70%, #000), rgb(var(--glow2)))' } : undefined}>{phase.line.text}</p>
         )}
       </div>
 

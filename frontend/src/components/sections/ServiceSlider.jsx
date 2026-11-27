@@ -12,7 +12,7 @@ const slides = [
   { id: 'headless', title: 'Headless SaaS & API Solutions', text: 'Reusable backend services and ready-to-integrate APIs.', photo: '/assets/services/headless.webp' },
   { id: 'automation', title: 'Workflow Automation & Integration', text: 'n8n, WhatsApp, email and CRM automation, and integrations.', photo: '/assets/services/automation.webp' },
   { id: 'mobile', title: 'Mobile & Business Applications', text: 'Booking, field staff, billing and inventory apps.', photo: '/assets/services/mobile.webp' },
-  { id: 'education', title: 'Technology Education & Training', text: 'Courses and workshops for students and professionals.', photo: '/assets/services/education.webp' },
+  { id: 'education', title: 'Education & Training', text: 'Certification courses, internships and workshops for students and professionals.', photo: '/assets/services/education.webp' },
 ]
 
 /** Auto-advancing photo slider of the services (cross-fade with a gentle slide and zoom). Pauses on hover, focus and while the tab is hidden;

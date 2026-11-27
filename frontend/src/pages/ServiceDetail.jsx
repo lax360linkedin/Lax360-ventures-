@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { ArrowRight, ArrowUpRight, Check, Lightbulb } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import ProcessTimeline from '../components/sections/ProcessTimeline.jsx'
@@ -12,6 +12,9 @@ import ServiceClients from '../components/sections/ServiceClients.jsx'
 import CmsServiceDetail from '../components/cms/CmsServiceDetail.jsx'
 import { getDivision, divisions } from '../data/services.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
+import { divisionUrl } from '../utils/slugify.js'
+import { CourseGroupsList } from '../components/partner/CourseCatalogue.jsx'
+import { useEducationPage } from '../hooks/useEducation.js'
 import { useContent, useContentReady } from '../hooks/useSite.js'
 import NotFound from './NotFound.jsx'
 
@@ -23,6 +26,8 @@ import NotFound from './NotFound.jsx'
 export default function ServiceDetail() {
   const { slug } = useParams()
   const d = getDivision(slug)
+  const { pathname } = useLocation()
+  const edu = useEducationPage() // Education & Training: text set in the admin panel (empty = built-in)
   const cmsServices = useContent('service')
   const cmsCategories = useContent('service_category')
   const ready = useContentReady()
@@ -32,6 +37,7 @@ export default function ServiceDetail() {
     if (!ready) return <div className="wrap section min-h-[50vh]" role="status"><p className="text-soft">Loading…</p></div>
     return <NotFound />
   }
+  if (slug !== divisionUrl(d.slug)) return <Navigate to={pathname.replace(`/services/${slug}`, `/services/${divisionUrl(d.slug)}`)} replace /> // an old address (/services/growth): go to the current one
   const isAi = d.slug === 'ai'
   const Hero = heroes[d.slug]
   const Services = serviceSections[d.slug]
@@ -40,7 +46,7 @@ export default function ServiceDetail() {
 
   return (
     <PageContainer
-      path={`/services/${d.slug}`}
+      path={`/services/${divisionUrl(d.slug)}`}
       title={d.metaTitle}
       description={d.metaDescription}
       jsonLd={{
@@ -59,8 +65,9 @@ export default function ServiceDetail() {
         <Reveal className="lg:col-span-7">
           <p className="eyebrow flex items-center gap-2 text-lav"><Icon className="size-4" aria-hidden="true" />Overview</p>
           <h2 id="overview-title" className="h2 mt-3">What this category covers.</h2>
-          <p className="mt-5 text-lg text-soft">{d.overview}</p>
-          <p className="mt-4 text-lg text-soft">{d.outcome}</p>
+          {d.slug === 'education' && edu.overview.length
+            ? edu.overview.map((p) => <p key={p} className="mt-5 text-lg text-soft">{p}</p>)
+            : <><p className="mt-5 text-lg text-soft">{d.overview}</p><p className="mt-4 text-lg text-soft">{d.outcome}</p></>}
         </Reveal>
         <Reveal delay={0.08} className="lg:col-span-5">
           <div className="glass p-6 md:p-8">
@@ -77,6 +84,32 @@ export default function ServiceDetail() {
           <div className="mt-10"><Services d={d} /></div>
         </div>
       </section>
+
+      {d.slug === 'education' && (
+        <>
+          <section id="courses" className="scroll-mt-[calc(var(--header-bottom,92px)+1rem)] wrap section" aria-labelledby="courses-title">
+            <SectionHeading id="courses-title" eyebrow="Course catalogue" title="Available" gradient="courses." lead={edu.coursesIntro || 'Certification courses from the approved LAX360 Education course catalogue, grouped by category. Ask us for fees, duration and start dates.'} />
+            <div className="mt-10"><CourseGroupsList /></div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button to={edu.ctaLink || `/contact?type=${d.enquiryType}`} arrow>{edu.ctaLabel || 'Enquire About a Course'}</Button>
+              <Button to="/contact?type=workshop" variant="secondary">Ask About Workshops and Training</Button>
+            </div>
+          </section>
+          <section className="border-y border-edge bg-glass" aria-labelledby="edu-benefits-title">
+            <div className="wrap section">
+              <SectionHeading id="edu-benefits-title" eyebrow="Program benefits" title={edu.benefitsTitle || 'Why learn'} gradient="with LAX360." />
+              <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {(edu.benefits.length ? edu.benefits : d.benefits).map(([t, text], i) => (
+                  <Reveal as="li" key={t} delay={(i % 3) * 0.06} className="glass-flat lift flex gap-4 p-6">
+                    <Check className="mt-1 size-5 shrink-0 text-lav" aria-hidden="true" />
+                    <span><span className="block font-display text-xl font-semibold">{t}</span>{text && <span className="mt-1 block text-soft">{text}</span>}</span>
+                  </Reveal>
+                ))}
+              </ul>
+            </div>
+          </section>
+        </>
+      )}
 
       {d.highlights && (
         <section className="wrap section" aria-labelledby="highlights-title">
@@ -124,7 +157,7 @@ export default function ServiceDetail() {
           <ul className="mt-6 grid gap-5 md:grid-cols-2">
             {related.map((r) => (
               <li key={r.slug}>
-                <Link to={`/services/${r.slug}`} className="glass-flat lift group flex h-full items-center gap-5 overflow-hidden p-4">
+                <Link to={`/services/${divisionUrl(r.slug)}`} className="glass-flat lift group flex h-full items-center gap-5 overflow-hidden p-4">
                   <img src={r.photo} alt="" width="200" height="150" loading="lazy" decoding="async" className="h-24 w-28 shrink-0 rounded-2xl object-cover" />
                   <span className="flex-1"><span className="block font-display text-xl font-semibold leading-tight">{r.name}</span><span className="mt-1 block text-soft">{r.short}</span></span>
                   <ArrowRight className="size-6 shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -132,7 +165,7 @@ export default function ServiceDetail() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-sm text-soft">All categories: {divisions.map((x, i) => <span key={x.slug}>{i > 0 && ' · '}{x.slug === d.slug ? x.name : <Link to={`/services/${x.slug}`} className="hover:text-lav">{x.name}</Link>}</span>)}.</p>
+          <p className="mt-6 text-sm text-soft">All categories: {divisions.map((x, i) => <span key={x.slug}>{i > 0 && ' · '}{x.slug === d.slug ? x.name : <Link to={`/services/${divisionUrl(x.slug)}`} className="hover:text-lav">{x.name}</Link>}</span>)}.</p>
         </div>
       </section>
 

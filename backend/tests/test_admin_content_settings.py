@@ -299,9 +299,10 @@ def test_service_demo_seed_is_valid_flagged_and_covers_every_service_page(app, d
         for r in rows:
             assert r["data"]["is_sample"] is True  # always labelled as fictional
             cs._validate(db, kind, r["title"], dict(r["data"]))  # raises if the row would be rejected by the admin API
-    assert set(demo.SERVICES) == {v for v, _ in SERVICE_PAGES}  # exactly the individual service pages
-    by_service = {v: [c["title"] for c in clients if v in c["data"]["services"].split(",")] for v, _ in SERVICE_PAGES}
-    for value, _ in SERVICE_PAGES:
+    DEMO_PAGES = [(v, l) for v, l in SERVICE_PAGES if not v.startswith("education/")]  # the Education & Training pages have no invented sample testimonials or clients
+    assert set(demo.SERVICES) == {v for v, _ in DEMO_PAGES}  # exactly the individual service pages
+    by_service = {v: [c["title"] for c in clients if v in c["data"]["services"].split(",")] for v, _ in DEMO_PAGES}
+    for value, _ in DEMO_PAGES:
         assert len(by_service[value]) >= 3, value  # clients assigned to this exact service, never a whole category
         mine = [t for t in tests if t["data"]["service"] == value]
         assert len(mine) >= 2, value
@@ -329,7 +330,7 @@ def test_service_hierarchy_workflow_for_testimonials_and_clients(app, db, client
     assert names(sub("ai", "rag-based-ai-solutions"), "testimonials") == ["Rita"] and names(sub("ai", "rag-based-ai-solutions"), "clients") == ["Acme AI"]
     assert names(sub("ai", "ai-agent-development"), "clients") == ["Acme AI"] and names(sub("ai", "ai-agent-development"), "testimonials") == []  # only the sub-services it was assigned
     assert names(main("ai"), "testimonials") == ["Rita"] and names(main("ai"), "clients") == ["Acme AI"]  # the main page includes its sub-services
-    for other in (("ai", "workflow-automation"), ("software", "website-development"), ("growth", "google-ads-management")):
+    for other in (("ai", "workflow-automation"), ("software", "website-development"), ("growth", "paid-advertising")):
         assert sub(*other) == {"clients": [], "testimonials": []}, other  # unrelated pages never show it
     assert main("software") == {"clients": [], "testimonials": []}
 
@@ -346,7 +347,7 @@ def test_service_hierarchy_workflow_for_testimonials_and_clients(app, db, client
     assert "Rita" not in names(sub("software", "website-development"), "testimonials") and "Rita" not in [i["title"] for i in client.get("/api/public/content?kind=testimonial").json()["items"]]
     # a hidden-from-home entry still shows on its service pages
     admin.post("/api/admin/content/client", json={"title": "Quiet", "data": {"services": "growth/*", "hide_on_home": True}, "status": "published", "sort_order": 3}, headers=csrf)
-    assert "Quiet" in names(sub("growth", "google-ads-management"), "clients") and "Quiet" in names(main("growth"), "clients")
+    assert "Quiet" in names(sub("growth", "paid-advertising"), "clients") and "Quiet" in names(main("growth"), "clients")
 
 
 def test_careers_jobs_perks_page_text_and_applications(app, db, client):

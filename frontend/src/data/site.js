@@ -10,7 +10,7 @@ export const site = {
   tagline: '360° Execution',
   locations: branchLine, // Salem · Bangalore · Mumbai (see data/branches.js)
   branches,
-  email: 'lax360tech@gmail.com', // [Confirm] a domain email for LAX360 Pvt Ltd is recommended
+  email: 'admin@lax360.in', // the company address: changed in the admin panel (Settings > Contact email), which overrides this built-in value everywhere
   // Official branch phone numbers (see data/branches.js for the full address of each branch).
   phones: [
     { display: '+91 95666 79928', tel: '+919566679928', label: 'Salem & Bangalore' },
@@ -27,6 +27,7 @@ export const site = {
     { label: 'LinkedIn', href: 'https://www.linkedin.com/company/lax360-pvt-ltd' },
     { label: 'X', href: 'https://x.com/lax360tech' },
   ],
+  businessHours: '9:30 AM – 7:00 PM', // shown on the Contact page; the admin panel (Settings > Business hours) overrides it
   responseTime: null, // [Confirm] e.g. "within 1 business day" — not shown until approved
   // Flip to true only when 3+ approved case studies exist (see data/projects.js).
   workIsLive: false,

@@ -7,7 +7,7 @@
 export const DEFAULT_LANG = 'en'
 
 export const LANGUAGES = [
-  { code: 'en', name: 'English', native: 'English', htmlLang: 'en', locale: 'en_IN', short: 'EN' },
+  { code: 'en', name: 'English', native: 'English', htmlLang: 'en-IN', locale: 'en_IN', short: 'EN' },
   { code: 'ta', name: 'Tamil', native: 'தமிழ்', htmlLang: 'ta', locale: 'ta_IN', short: 'தமி' },
   { code: 'hi', name: 'Hindi', native: 'हिन्दी', htmlLang: 'hi', locale: 'hi_IN', short: 'हिं' },
 ]

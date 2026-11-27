@@ -1,4 +1,6 @@
 import { useRef } from 'react'
+import { useH1Override } from '../../../hooks/useSite.js'
+
 import { Link } from 'react-router-dom'
 import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
@@ -15,9 +17,10 @@ const photo = (src, className, alt = '') => (
 
 /**
  * Services hero: headline, lead and two buttons on the left; a mosaic of three real photographs on the right that drift at different speeds as the
- * page scrolls, with a glass card listing the six categories (each links to its section). Uses the page theme (light or graphite).
+ * page scrolls, with a glass card listing the seven categories (each links to its section). Uses the page theme (light or graphite).
  */
 export default function ServicesHero() {
+  const h1 = useH1Override()
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
@@ -43,10 +46,10 @@ export default function ServicesHero() {
             <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgb(var(--glow2)/0.6)]" />Our services
           </m.p>
           <m.h1 {...rise(0.2)} id="services-title" className="h1 mt-5 !text-[clamp(2.4rem,5vw,4.5rem)]">
-            Technology and Digital Capabilities, <BotHighlight delay={0.9}><span className="text-gradient">Under One Roof.</span></BotHighlight>
+            {h1 || <>Technology and Digital Capabilities, <BotHighlight delay={0.9}><span className="text-gradient">Under One Roof.</span></BotHighlight></>}
           </m.h1>
           <m.p {...rise(0.3)} className="lead mt-7 max-w-xl text-soft">
-            From custom software and AI to digital marketing, backend APIs, workflow automation and mobile apps, LAX360 brings six areas of expertise together to turn your requirements into practical solutions.
+            From custom software and AI to digital marketing, backend APIs, workflow automation and mobile apps, LAX360 brings seven areas of expertise, including education and training, together to turn your requirements into practical solutions.
           </m.p>
           <m.div {...rise(0.4)} className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button to="/contact?type=project" arrow>Start a Project</Button>
@@ -61,7 +64,7 @@ export default function ServicesHero() {
             <m.div style={{ y: up }} className="col-span-3 row-span-2 overflow-hidden rounded-[2rem] border border-edge-strong shadow-[0_30px_70px_-30px_rgb(var(--glow)/0.55)]">{photo('/assets/services/hero-dev.webp', 'aspect-[4/5]')}</m.div>
             <m.div style={{ y: down }} className="col-span-2 overflow-hidden rounded-3xl border border-edge-strong">{photo('/assets/services/mobile.webp', 'aspect-square')}</m.div>
             <m.div style={{ y: down }} className="col-span-2 overflow-hidden rounded-3xl border border-edge-strong">{photo('/assets/services/automation.webp', 'aspect-square')}</m.div>
-            <ul aria-label="Six service categories" className="glass absolute -bottom-6 left-0 right-0 z-10 mx-2 grid grid-cols-6 gap-1 p-2 sm:mx-6">
+            <ul aria-label="Seven service categories" className="glass absolute -bottom-6 left-0 right-0 z-10 mx-2 grid grid-cols-7 gap-1 p-2 sm:mx-6">
               {allDivisions.map((d) => {
                 const Icon = divisionIcons[d.slug]
                 return (

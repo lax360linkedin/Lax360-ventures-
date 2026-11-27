@@ -12,7 +12,7 @@ import BranchCards from '../components/sections/BranchCards.jsx'
 import { branchSentence } from '../data/branches.js'
 import { useBranchDirectory } from '../hooks/useBranches.js'
 import { localBusinessSchemas } from '../utils/seo.js'
-import { useContacts, useSite, useSocial } from '../hooks/useSite.js'
+import { useContacts, useSite, useSocial, useH1Override } from '../hooks/useSite.js'
 import { useContactPageText } from '../hooks/useCmsPages.js'
 import { courses } from '../data/courses.js'
 
@@ -20,6 +20,7 @@ import { courses } from '../data/courses.js'
 const LEAD_TYPES = { project: [], quote: [], ai: ['ai-solutions'], 'website-app': ['website-development'], marketing: ['digital-marketing'] }
 
 export default function Contact() {
+  const h1 = useH1Override()
   const site = useSite()
   const social = useSocial('contact')
   const { branches } = useBranchDirectory()
@@ -49,7 +50,7 @@ export default function Contact() {
         <div className="wrap relative grid items-center gap-10 pb-12 pt-10 md:pb-16 md:pt-14 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-7">
             <p style={{ '--d': '0.05s' }} className="ct-in eyebrow mb-6 flex items-center gap-3 text-lav"><span aria-hidden="true" className="ct-line h-px w-10 bg-current" />{page.hero_eyebrow || 'Contact us'}</p>
-            <h1 style={{ '--d': '0.15s' }} className="ct-in h1 !text-[clamp(2.5rem,5.6vw,5.25rem)]">{page.hero_title || <>Let&apos;s Build <span className="text-gradient">Something Great</span> Together.</>}</h1>
+            <h1 style={{ '--d': '0.15s' }} className="ct-in h1 !text-[clamp(2.5rem,5.6vw,5.25rem)]">{h1 || page.hero_title || <>Let&apos;s Build <span className="text-gradient">Something Great</span> Together.</>}</h1>
             <p style={{ '--d': '0.3s' }} className="ct-in lead mt-7 max-w-2xl text-soft">
               {page.hero_lead || `LAX360 Pvt Ltd brings software, AI, automation and digital growth together under one team, with branches in ${branchSentence}. Tell us about your business and what you want to achieve, and we will come back with a clear next step.`}
             </p>
@@ -89,34 +90,49 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Contact details */}
+      {/* Contact details: one card per kind of detail (icon badge, title, a list of tappable rows), then the opening hours. Every phone number and e-mail address is a link (tel: / mailto:). */}
       <section id="contact-info" className="border-y border-edge bg-base2/50 scroll-mt-[calc(var(--header-bottom,92px)+1rem)]" aria-labelledby="info-title">
         <div className="wrap section">
           <SectionHeading id="info-title" eyebrow="Contact information" title={page.info_title || 'Reach us'} gradient={page.info_title ? undefined : 'directly.'} lead={page.info_lead || site.contactIntro || 'Prefer to talk or write? Use any of these.'} />
-          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(min(100%,16.5rem),1fr))] items-start gap-4 md:mt-10 md:gap-5">
             {groups.map((g, n) => (
-              <Reveal as="li" key={g.type} delay={n * 0.05} className="ct-card glass-flat p-6">
-                <span className="ct-icon inline-block text-lav"><ChannelIcon channel={g.items[0]} className="size-6" /></span>
-                <h3 className="mt-3 font-display text-lg font-semibold">{GROUPS[g.type]}</h3>
-                {g.items.map((c) => {
-                  const out = opensNewTab(c)
-                  const text = c.type === 'whatsapp' ? 'Chat with us' : c.type === 'enquiry' || c.type === 'other' ? c.label : c.value
-                  return (
-                    <p key={c.id}>
-                      {c.href ? <a href={c.href} {...(out ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={`${line} break-all ${c.type === 'whatsapp' ? 'font-semibold text-lav hover:underline' : ''}`}>{text}{c.note && <span className="ml-1 text-sm text-soft">({c.note})</span>}{out && <span className="sr-only"> (opens in a new tab)</span>}</a> : <span className="inline-flex min-h-11 items-center">{text}</span>}
-                      {c.detail && <span className="block whitespace-pre-line text-sm text-soft">{c.detail}</span>}
-                    </p>
-                  )
-                })}
+              <Reveal as="li" key={g.type} delay={n * 0.05} className="ct-card glass-flat flex flex-col p-5">
+                <div className="flex items-center gap-3">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-primary/15 text-lav ring-1 ring-edge"><span className="ct-icon"><ChannelIcon channel={g.items[0]} className="size-5" /></span></span>
+                  <h3 className="font-display text-lg font-semibold leading-tight">{GROUPS[g.type]}</h3>
+                </div>
+                <ul className="mt-3 divide-y divide-edge/70 border-t border-edge/70">
+                  {g.items.map((c) => {
+                    const out = opensNewTab(c)
+                    const text = c.type === 'whatsapp' ? 'Chat with us' : c.type === 'enquiry' || c.type === 'other' ? c.label : c.value
+                    const href = c.href || (c.type === 'email' ? `mailto:${c.value}` : c.type === 'phone' ? `tel:${String(c.value).replace(/[^\d+]/g, '')}` : '')
+                    return (
+                      <li key={c.id} className="py-2 first:pt-3 last:pb-0">
+                        {href
+                          ? <a href={href} {...(out ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={`flex min-h-11 flex-col justify-center font-medium transition-colors hover:text-lav focus-visible:text-lav ${c.type === 'email' ? '[overflow-wrap:anywhere]' : c.type === 'phone' ? 'whitespace-nowrap' : 'break-words'} ${c.type === 'whatsapp' ? 'font-semibold text-lav' : 'text-fg'}`}><span>{text}</span>{c.note && <span className="text-sm font-normal text-soft">{c.note}</span>}{out && <span className="sr-only"> (opens in a new tab)</span>}</a>
+                          : <span className="inline-flex min-h-11 items-center font-medium">{text}</span>}
+                        {c.detail && <span className="block whitespace-pre-line text-sm leading-relaxed text-soft">{c.detail}</span>}
+                      </li>
+                    )
+                  })}
+                </ul>
               </Reveal>
             ))}
-            <Reveal as="li" delay={groups.length * 0.05} className="ct-card glass-flat p-6">
-              <Clock className="ct-icon size-6 text-lav" aria-hidden="true" /><h3 className="mt-3 font-display text-lg font-semibold">Business hours</h3>
-              {site.businessHours ? <p className="mt-1 whitespace-pre-line text-soft">{site.businessHours}</p> : <p className="mt-1 text-soft">Send an enquiry or message us on WhatsApp and the team will reply{site.responseTime ? ` ${site.responseTime}` : ' as soon as possible'}.</p>}
+            <Reveal as="li" delay={groups.length * 0.05} className="ct-card glass-flat flex flex-col p-5">
+              <div className="flex items-center gap-3">
+                <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-primary/15 text-lav ring-1 ring-edge"><span className="ct-icon"><Clock className="size-5" aria-hidden="true" /></span></span>
+                <h3 className="font-display text-lg font-semibold leading-tight">Opening hours</h3>
+              </div>
+              <div className="mt-3 border-t border-edge/70 pt-3">
+                {site.businessHours
+                  ? <p className="whitespace-pre-line font-display text-xl font-semibold leading-snug text-fg">{site.businessHours}</p>
+                  : <p className="text-soft">Send an enquiry or message us on WhatsApp and the team will reply{site.responseTime ? ` ${site.responseTime}` : ' as soon as possible'}.</p>}
+                {site.businessHours && site.responseTime && <p className="mt-2 text-sm text-soft">We reply {site.responseTime}.</p>}
+              </div>
             </Reveal>
           </ul>
           {social.length > 0 && (
-            <div className="mt-8 flex flex-wrap items-center gap-3"><span className="font-semibold">Follow us</span>
+            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-edge bg-glass px-4 py-3 sm:px-5"><span className="font-semibold">Follow us</span>
               <ul className="flex flex-wrap gap-2">{social.map((s) => <li key={s.id}><a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`} className="ct-social inline-flex size-11 items-center justify-center rounded-full border border-edge-strong bg-glass transition-colors hover:border-lav hover:text-lav"><ChannelIcon channel={s} className="size-4" /></a></li>)}</ul>
             </div>
           )}

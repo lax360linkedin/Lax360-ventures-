@@ -13,16 +13,21 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
 from app.core.rate_limit import rate_limit
-from app.db.session import get_db, get_read_db
+from app.core import pubcache
+from app.db.session import _read_factory, get_db, get_read_db
 from app.schemas.common import ApiModel
-from app.services import notify_service, partnership_service as ps
+from app.services import notify_service, partnership_service as ps, sheets_service
 
 router = APIRouter(prefix="/public/partnerships", tags=["partnerships"])
 
 
 class ApplicationIn(ApiModel):
     category: str
-    division: str
+    division: str = ""  # older clients send one division; the form sends `divisions`
+    divisions: list[str] = []
+    all_divisions: bool = False
+    other_interest: str | None = None
+    quick: bool = False  # the short enquiry form at the bottom of a partnership page
     full_name: str
     email: str
     phone: str
@@ -43,17 +48,16 @@ class ApplicationIn(ApiModel):
 
 
 @router.get("")
-def content(response: Response, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> dict:
-    """Admin overrides, published FAQs and policies, brochure and portal links. Cached briefly by the CDN; a failure here leaves the built-in content on screen."""
-    response.headers["Cache-Control"] = "public, max-age=30, s-maxage=15, stale-while-revalidate=600"
-    return ps.public_payload(db, settings)
+def content(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
+    """Admin overrides, published FAQs and policies, brochure and portal links. Built once and reused (the in-process cache drops it the moment anything it is built from is saved, and
+    rebuilds it in the background), then cached briefly by the CDN; a failure here leaves the built-in content on screen."""
+    return pubcache.cached_json(request, settings.app_env != "test", "partnerships", lambda d: ps.public_payload(d, settings), {"Cache-Control": "public, max-age=30, s-maxage=15, stale-while-revalidate=600"}, db, _read_factory() if settings.app_env != "test" else None)
 
 
 @router.get("/menu")
-def menu(response: Response, db: Session = Depends(get_read_db)) -> dict:
+def menu(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
     """The Partner With Us navigation menu (categories and their enabled divisions). Small and cacheable: the header asks for it only when a visitor opens the menu."""
-    response.headers["Cache-Control"] = "public, max-age=60, s-maxage=30, stale-while-revalidate=600"
-    return ps.public_menu(db)
+    return pubcache.cached_json(request, settings.app_env != "test", "partnerships-menu", lambda d: ps.public_menu(d), {"Cache-Control": "public, max-age=60, s-maxage=30, stale-while-revalidate=600"}, db, _read_factory() if settings.app_env != "test" else None)
 
 
 @router.post("/applications", status_code=201, dependencies=[Depends(rate_limit("partner_apply", "partner_rate_limit_max", "partner_rate_limit_window_seconds"))])
@@ -73,5 +77,7 @@ def apply(body: ApplicationIn, request: Request, response: Response, tasks: Back
         response.status_code = 200
     else:
         tasks.add_task(notify_service.notify_application, row.id)
+        tasks.add_task(sheets_service.sync_application, row.id)  # a copy goes to the Google Spreadsheet after the response (never blocks or fails the submission)
+        tasks.add_task(sheets_service.retry_recent)
     return {"status": "received", "reference": row.reference, "duplicate": duplicate,
             "message": "Thank you for your interest in partnering with LAX360. Your application has been received. Our team will review your details and contact you to discuss the next steps."}

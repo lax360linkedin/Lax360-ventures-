@@ -1,19 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0a0c10" />
     <!-- Apply the theme before first paint (no flash): the website theme a Super Admin chose (cached as lax360-site-theme), else the visitor's saved Dark/Light choice. Dark is the default; ?theme=light|dark|snow|rose|sage also sets the visitor choice. -->
-    <script>try{var ok=/^(light|dark|[a-z]+(-[a-z]+)*)$/,q=/[?&]theme=([a-z]+(?:-[a-z]+)*)/.exec(location.search),s=localStorage.getItem("lax360-site-theme"),t=q?q[1]:(ok.test(s)?s:localStorage.getItem("lax360-theme"));if(q){localStorage.setItem("lax360-theme",t)}if(t&&ok.test(t)){var d=document.documentElement;d.setAttribute("data-theme",t==="dark"?"dark":"light");if(t!=="dark"&&t!=="light"){d.setAttribute("data-palette",t)}document.querySelector('meta[name="theme-color"]').setAttribute("content",t==="dark"?"#0a0c10":"#ffffff")}}catch(e){}</script>
+    <script>try{var cs=localStorage.getItem("lax360-site-theme"),cc=/^(custom|preset)-/.test(cs)&&JSON.parse(localStorage.getItem("lax360-custom-css")||"null");if(cc&&cc.id===cs){var st=document.createElement("style");st.id="lax360-custom-theme";st.textContent=cc.css;document.head.appendChild(st);var sv=localStorage.getItem("lax360-theme"),dm=cc.mode==="both"?(sv==="dark"?"dark":"light"):cc.mode,de=document.documentElement;de.setAttribute("data-theme",dm);de.setAttribute("data-palette","custom");document.querySelector('meta[name="theme-color"]').setAttribute("content",dm==="dark"?cc.bgD:cc.bgL)}else{var ok=/^(light|dark|[a-z]+(-[a-z]+)*)$/,q=/[?&]theme=([a-z]+(?:-[a-z]+)*)/.exec(location.search),s=localStorage.getItem("lax360-site-theme"),t=q?q[1]:(ok.test(s)?s:localStorage.getItem("lax360-theme"));if(q){localStorage.setItem("lax360-theme",t)}if(t&&ok.test(t)){var d=document.documentElement;d.setAttribute("data-theme",t==="dark"?"dark":"light");if(t!=="dark"&&t!=="light"){d.setAttribute("data-palette",t)}document.querySelector('meta[name="theme-color"]').setAttribute("content",t==="dark"?"#0a0c10":"#ffffff")}}}catch(e){}</script>
     <!-- Welcome intro: on every full load of the homepage (so a browser refresh replays it) hold the page back before first paint and preload only the two brand images. Nothing is stored; rules mirror src/utils/welcomeIntro.js. -->
     <script>try{var l=location,c=navigator.connection;if(/^\/([a-z]{2})?\/?$/.test(l.pathname)&&l.search.indexOf("welcome=preview")<0&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&!(c&&c.saveData)){document.documentElement.setAttribute("data-intro","pending");["/assets/mascot-welcome.webp","/assets/logo-shield.png"].forEach(function(h){var k=document.createElement("link");k.rel="preload";k.as="image";k.href=h;document.head.appendChild(k)})}}catch(e){}</script>
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <title>LAX360 Pvt Ltd — Software, AI, Digital Growth &amp; Training</title>
-    <meta name="description" content="One team to build, automate and grow your business. Custom software, AI automation, digital marketing and training from LAX360 Pvt Ltd." />
+    <title>LAX360 Pvt Ltd | Software, AI &amp; Digital Marketing in Salem</title>
+    <meta name="description" content="Custom software, AI automation, digital marketing and training from LAX360 Pvt Ltd. One team in Salem, Bangalore and Mumbai to build and grow your business." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="LAX360 Pvt Ltd" />
     <meta property="og:title" content="LAX360 Pvt Ltd — One team to build, automate and grow your business" />

@@ -6,5 +6,9 @@ export const slugify = (text) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
 
+/** The address segment of a service category when it differs from the category's internal id (the id `growth` keeps its data, icons and admin records; its public address is /services/digitalmarketing). */
+export const DIVISION_URL = { growth: 'digitalmarketing' }
+export const divisionUrl = (divisionSlug) => DIVISION_URL[divisionSlug] || divisionSlug
+
 /** Link to an individual service's own page: /services/<category>/<service>. */
-export const offeringHref = (divisionSlug, offeringName) => `/services/${divisionSlug}/${slugify(offeringName)}`
+export const offeringHref = (divisionSlug, offeringName) => `/services/${divisionUrl(divisionSlug)}/${slugify(offeringName)}`

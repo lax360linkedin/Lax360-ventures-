@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
-import { faqOnPage, useContent } from './useSite.js'
+import { faqOnPage, useContent, useDatabaseItems } from './useSite.js'
 import faqData from '../data/faqs.json'
 import { industries, industryVisuals } from '../data/industries.js'
 import { articles, articleCategories, categoryPhotos, legacyCategories } from '../data/articles.js'
-import { networkEntries, softwareEntries } from '../data/network.js'
+import { canonicalSlug, networkEntries, softwareEntries } from '../data/network.js'
 import { toParagraphs } from '../utils/cms.js'
 import { leaderRank } from '../data/team.js'
 
@@ -78,6 +78,8 @@ export function normaliseCompany(i) {
   return {
     slug: i.slug, name: i.title, category: d.category || 'associated', relationship: d.relationship || '', businessCategory: d.business_category || '', description: d.description || '',
     designation: verified ? d.designation || '' : '', claim: d.designation || '', verified, verification: d.verification || 'pending', products: toList(d.products), sameLocation: d.location_type === 'same', location: d.location || '', email: d.contact_email || '', phone: d.contact_phone || '',
+    establishedVia: d.established_via || '', division: d.division || '', partnershipStatus: d.partnership_status || 'active', hidden: d.hidden === true,
+    certificateImage: verified && d.certificate_public === true ? d.certificate_image || '' : '', certificateAlt: d.certificate_image_alt || '',
     website: d.website_link || '', ctaLabel: d.cta_label || 'Visit website', featured: d.featured === true, logo: d.logo || '', logoAlt: d.logo_alt || '',
     // details page (/our-network/<partner>): all optional, shown only when entered in the admin panel
     overview: toParagraphs(d.overview), partnershipType: d.partnership_type || '', partnershipNature: toParagraphs(d.partnership_nature), collaboration: toParagraphs(d.collaboration),
@@ -92,7 +94,14 @@ export function normaliseCompany(i) {
 /** Network companies and partners: the published ones from the admin panel, otherwise the built-in published entries. Drafts are never public. */
 export function useNetwork() {
   const items = useContent('network_partner')
-  return useMemo(() => (items || networkEntries).map(normaliseCompany), [items])
+  const db = useDatabaseItems('network_partner', 'network') // migrated: the database is the only source
+  return useMemo(() => {
+    if (db) return db.map(normaliseCompany).filter((c) => !c.hidden)
+    const core = networkEntries.filter((e) => e.core)
+    // published entries replace the built-in list, except that the core partner profiles are always there until an administrator replaces or hides them
+    const base = items ? [...items, ...core.filter((c) => !items.some((i) => canonicalSlug(i.slug) === canonicalSlug(c.slug)))] : networkEntries
+    return base.map(normaliseCompany).filter((c) => !c.hidden)
+  }, [items, db])
 }
 
 /** Extra network categories created in the admin panel (name and description), keyed by their slug. */
@@ -103,7 +112,9 @@ export function useNetworkCategories() {
 
 /** Software distribution products (vendor, category and type) published in the admin panel, otherwise the built-in published ones. */
 export function useSoftware() {
-  const items = useContent('software_product')
+  const found = useContent('software_product')
+  const db = useDatabaseItems('software_product', 'network') // migrated: the database is the only source
+  const items = db || found
   return useMemo(() => (items || softwareEntries).map((i) => ({ slug: i.slug, name: i.title, vendor: i.data.vendor || '', category: i.data.software_category || 'other', ownership: i.data.ownership || 'third_party', description: i.data.description || '', link: i.data.product_link || '', cta: i.data.cta_link || '' })), [items])
 }
 

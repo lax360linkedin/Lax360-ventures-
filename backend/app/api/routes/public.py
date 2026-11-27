@@ -41,9 +41,9 @@ def translations(lang: str, db: Session = Depends(get_read_db)) -> JSONResponse:
 
 
 @router.get("/public/redirects")
-def redirects(db: Session = Depends(get_read_db)) -> JSONResponse:
+def redirects(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
     """The active redirects set in the admin panel (SEO management > Redirects)."""
-    return JSONResponse({"redirects": seo_service.redirects(db)}, headers={"Cache-Control": "public, max-age=300"})
+    return pubcache.cached_json(request, _cacheable(settings), "redirects", lambda d: {"redirects": seo_service.redirects(d)}, {"Cache-Control": "public, max-age=300"}, db, _read_factory() if _cacheable(settings) else None)
 
 
 @router.get("/public/site")

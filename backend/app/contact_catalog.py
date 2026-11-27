@@ -1,6 +1,6 @@
 """The choices on the Contact / enquiry form (single source of truth: the website reads them from /api/public/contact-options, the API validates against them).
 
-Services: eleven main services, each with sub-services taken from the real individual service pages (`SERVICE_PAGES`: ids are "<category>/<service>").
+Services: twelve main services, each with sub-services taken from the real individual service pages (`SERVICE_PAGES`: ids are "<category>/<service>").
 """
 
 from __future__ import annotations
@@ -18,17 +18,22 @@ def _prefix(prefix: str) -> list[str]:
     return [v for v, _ in SERVICE_PAGES if v.startswith(prefix)]
 
 
+def _prefix_subs(prefix: str) -> list[dict]:
+    return _subs(*_prefix(prefix))
+
+
 SERVICE_MAINS = [
     {"value": "software-development", "label": "Software Development", "subs": _subs("software/custom-software-development", "software/web-application-development", "software/business-management-systems")},
-    {"value": "website-development", "label": "Website Development", "subs": _subs("software/website-development", "software/e-commerce-development", "growth/website-and-landing-page-optimization")},
+    {"value": "website-development", "label": "Website Development", "subs": _subs("software/website-development", "software/e-commerce-development")},
     {"value": "mobile-app-development", "label": "Mobile Application Development", "subs": _subs("software/mobile-application-development", *_prefix("mobile/"))},
     {"value": "ai-solutions", "label": "AI & Generative AI Solutions", "subs": _subs("ai/ai-application-development", "ai/ai-chatbots-and-virtual-assistants", "ai/rag-based-ai-solutions", "ai/ai-integration-and-consulting", "headless/ai-apis")},
     {"value": "ai-agents-automation", "label": "AI Agents & Business Automation", "subs": _subs("ai/ai-agent-development", "ai/business-process-automation", "ai/workflow-automation", *_prefix("automation/"))},
     {"value": "crm-erp", "label": "CRM & ERP Solutions", "subs": _subs("software/crm-and-erp-development", "headless/crm-apis", "automation/crm-automation")},
     {"value": "saas-development", "label": "SaaS Development", "subs": _subs(*[v for v in _prefix("headless/") if v not in ("headless/ai-apis", "headless/crm-apis")])},
-    {"value": "digital-marketing", "label": "Digital Marketing", "subs": _subs("growth/social-media-management", "growth/content-creation", "growth/digital-marketing-strategy")},
+    {"value": "digital-marketing", "label": "Digital Marketing", "subs": _subs("growth/social-media-management", "growth/creatives", "growth/content-publishing")},
     {"value": "seo", "label": "SEO Services", "subs": _subs("growth/search-engine-optimization-seo")},
-    {"value": "paid-ads", "label": "Google Ads & Meta Ads", "subs": _subs("growth/google-ads-management", "growth/meta-ads-management")},
+    {"value": "paid-ads", "label": "Paid Advertising", "subs": _subs("growth/paid-advertising")},
+    {"value": "education-training", "label": "Education & Training", "subs": _prefix_subs("education/")},
     {"value": "other", "label": "Other Services", "subs": []},
 ]
 

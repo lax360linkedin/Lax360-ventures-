@@ -4,7 +4,7 @@ from app import seed_welcome as seed
 from app.services import content_service as cs
 from tests.admin_helpers import staff
 
-EXISTING_PAGES = {"/services/software", "/services/growth", "/services/ai", "/our-network/cadpoint-academy-salem", "/robotics", "/blockchain"}
+EXISTING_PAGES = {"/services/software", "/services/digitalmarketing", "/services/ai", "/our-network/cadpoint-academy-salem", "/robotics", "/blockchain"}
 
 
 def test_seed_has_the_six_cards_in_order_with_the_requested_buttons(db):  # the opening intro card was removed

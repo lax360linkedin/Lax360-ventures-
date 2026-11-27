@@ -1,13 +1,14 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronRight, Lightbulb, TrendingUp, Wrench } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
+import { useEducationPrograms, withProgram } from '../hooks/useEducation.js'
 import { getOffering } from '../data/offerings.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 import { serviceIcons } from '../utils/serviceIcons.js'
-import { offeringHref } from '../utils/slugify.js'
+import { offeringHref, divisionUrl } from '../utils/slugify.js'
 import ServiceTestimonials from '../components/sections/ServiceTestimonials.jsx'
 import ServiceClients from '../components/sections/ServiceClients.jsx'
 import NotFound from './NotFound.jsx'
@@ -23,9 +24,13 @@ const DIVISION_SHORT = { software: 'Software', ai: 'AI', growth: 'Marketing', he
 
 export default function ServiceItem() {
   const { slug, service } = useParams()
-  const s = getOffering(slug, service)
+  const { pathname } = useLocation()
+  const programs = useEducationPrograms() // Education & Training programmes: text and photo set in the admin panel
+  const base = getOffering(slug, service)
+  const s = base && base.category.slug === 'education' ? withProgram(base, programs[service]) : base
   if (!s) return <NotFound />
   const d = s.category
+  if (slug !== divisionUrl(d.slug)) return <Navigate to={pathname.replace(`/services/${slug}/`, `/services/${divisionUrl(d.slug)}/`)} replace /> // an old address (/services/growth/...): go to the current one
   const CatIcon = divisionIcons[d.slug]
   const Icon = serviceIcons[s.slug] || CatIcon
   const idx = d.offerings.findIndex((o) => o.slug === s.slug)
@@ -34,7 +39,7 @@ export default function ServiceItem() {
   const sameGroup = d.offerings.filter((o) => o.slug !== s.slug && o.group === s.group)
   const related = [...sameGroup, ...d.offerings.filter((o) => o.slug !== s.slug && o.group !== s.group)].slice(0, 3)
   const enquiry = `/contact?type=${d.enquiryType}`
-  const path = `/services/${d.slug}/${s.slug}`
+  const path = `/services/${divisionUrl(d.slug)}/${s.slug}`
   return (
     <PageContainer
       path={path}
@@ -51,7 +56,7 @@ export default function ServiceItem() {
             <ol className="flex flex-wrap items-center gap-x-1.5">
               <li><Link to="/" className={crumb}>Home</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" />
               <li><Link to="/services" className={crumb}>Services</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" />
-              <li><Link to={`/services/${d.slug}`} className={crumb}>{d.name}</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" />
+              <li><Link to={`/services/${divisionUrl(d.slug)}`} className={crumb}>{d.name}</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" />
               <li aria-current="page" className="font-semibold text-fg">{s.name}</li>
             </ol>
           </nav>
@@ -64,7 +69,7 @@ export default function ServiceItem() {
               <p className="lead mt-5 text-soft">{s.intro}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button to={enquiry} arrow>Enquire Now</Button>
-                <Button to={`/services/${d.slug}`} variant="secondary"><ArrowLeft className="size-4" aria-hidden="true" />All {d.name}</Button>
+                <Button to={`/services/${divisionUrl(d.slug)}`} variant="secondary"><ArrowLeft className="size-4" aria-hidden="true" />All {d.name}</Button>
               </div>
             </div>
             <Reveal x={24} y={0} className="lg:col-span-6">
@@ -83,23 +88,29 @@ export default function ServiceItem() {
       </section>
 
       {/* what it is + what we provide */}
-      <section className="wrap section grid gap-10 lg:grid-cols-12 lg:gap-14" aria-labelledby="about-title">
-        <Reveal className="lg:col-span-7">
-          <h2 id="about-title" className="h2">About this service</h2>
-          <div className="mt-5 space-y-4 text-lg text-soft">{s.about.map((p) => <p key={p}>{p}</p>)}</div>
-        </Reveal>
-        <Reveal delay={0.08} className="lg:col-span-5">
-          <div className="glass p-6 md:p-8">
-            <h3 className="font-display text-xl font-semibold">What we provide</h3>
-            <ul className="mt-4 space-y-3">
-              {s.offers.map((o) => <li key={o} className="flex gap-3"><Check className="mt-1 size-5 shrink-0 text-lav" aria-hidden="true" />{o}</li>)}
-            </ul>
-          </div>
-        </Reveal>
-      </section>
+      {(s.about?.length > 0 || s.offers?.length > 0) && (
+        <section className={`wrap section grid gap-10 lg:gap-14 ${s.about?.length && s.offers?.length ? 'lg:grid-cols-12' : ''}`} aria-labelledby="about-title">
+          {s.about?.length > 0 && (
+            <Reveal className="lg:col-span-7">
+              <h2 id="about-title" className="h2">About this service</h2>
+              <div className="mt-5 space-y-4 text-lg text-soft">{s.about.map((p) => <p key={p}>{p}</p>)}</div>
+            </Reveal>
+          )}
+          {s.offers?.length > 0 && (
+            <Reveal delay={0.08} className={s.about?.length ? 'lg:col-span-5' : 'mx-auto w-full max-w-3xl'}>
+              <div className="glass p-6 md:p-8">
+                {(() => { const Tag = s.about?.length ? 'h3' : 'h2'; return <Tag id={s.about?.length ? undefined : 'about-title'} className="font-display text-xl font-semibold">{s.about?.length ? 'What we provide' : 'Every engagement includes'}</Tag> })()}{/* h2 when it is the first heading after the h1 (no "About" text), so the heading order never skips a level */}
+                <ul className="mt-4 space-y-3">
+                  {s.offers.map((o) => <li key={o} className="flex gap-3"><Check className="mt-1 size-5 shrink-0 text-lav" aria-hidden="true" />{o}</li>)}
+                </ul>
+              </div>
+            </Reveal>
+          )}
+        </section>
+      )}
 
       {/* problems */}
-      <section className="border-y border-edge bg-glass" aria-labelledby="solves-title">
+      {s.solves?.length > 0 && <section className="border-y border-edge bg-glass" aria-labelledby="solves-title">
         <div className="wrap section">
           <SectionHeading id="solves-title" eyebrow="Why it matters" title="Problems this" gradient="service addresses." />
           <ul className="mt-10 grid gap-5 md:grid-cols-3">
@@ -111,24 +122,25 @@ export default function ServiceItem() {
             ))}
           </ul>
         </div>
-      </section>
+      </section>}
 
       {/* features */}
       <section className="wrap section" aria-labelledby="features-title">
         <SectionHeading id="features-title" eyebrow="Capabilities" title="Key features" gradient="and capabilities." />
-        <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {s.features.map(([t, text], i) => (
+        <ul className={`mt-10 grid gap-5 sm:grid-cols-2 ${s.features.length === 3 || s.features.length === 6 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+          {s.features.map(([t, text, list], i) => (
             <Reveal as="li" key={t} delay={i * 0.06} className="glass-flat lift flex h-full flex-col gap-3 p-6">
               <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white"><Wrench className="size-5" aria-hidden="true" /></span>
               <p className="font-display text-lg font-semibold leading-tight">{t}</p>
-              <p className="text-soft">{text}</p>
+              {text && <p className="text-soft">{text}</p>}
+              {list?.length > 0 && <ul className="space-y-1.5 text-soft">{list.map((x) => <li key={x} className="flex gap-2"><Check className="mt-1 size-4 shrink-0 text-lav" aria-hidden="true" />{x}</li>)}</ul>}
             </Reveal>
           ))}
         </ul>
       </section>
 
       {/* benefits + use cases */}
-      <section className="border-y border-edge bg-base2/50" aria-labelledby="benefits-title">
+      {(s.benefits?.length > 0 || s.uses?.length > 0) && <section className="border-y border-edge bg-base2/50" aria-labelledby="benefits-title">
         <div className="wrap section grid gap-12 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-5">
             <h2 id="benefits-title" className="h2 flex items-center gap-3"><TrendingUp className="size-7 text-lav" aria-hidden="true" />Practical benefits</h2>
@@ -148,7 +160,7 @@ export default function ServiceItem() {
             </ul>
           </div>
         </div>
-      </section>
+      </section>}
 
       <ServiceTestimonials category={d.slug} sub={s.slug} serviceName={s.name} />
 
@@ -158,7 +170,7 @@ export default function ServiceItem() {
       <section className="wrap section" aria-labelledby="related-title">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <SectionHeading id="related-title" eyebrow={d.name} title="Related" gradient="services." />
-          <Link to={`/services/${d.slug}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">View all in this category <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
+          <Link to={`/services/${divisionUrl(d.slug)}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">View all in this category <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
         </div>
         <ul className="mt-8 grid gap-5 md:grid-cols-3">
           {related.map((r, i) => {

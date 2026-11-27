@@ -4,12 +4,12 @@ export const heroPages = {
   '/about': {
     title: 'One accountable team behind your technology.',
     text: 'LAX360 Pvt Ltd plans, builds, automates and grows — software, AI, digital growth and training under one roof.',
-    points: ['Six service categories', 'Salem · Bangalore · Mumbai', 'Clear working principles'],
+    points: ['Seven service categories', 'Salem · Bangalore · Mumbai', 'Clear working principles'],
     cta: 'Meet the team',
   },
   '/services': {
     title: 'Everything you need to build and grow.',
-    text: 'Custom software, CRM and ERP, websites and apps, AI automation, digital marketing, APIs, workflow automation and mobile apps — each followed through the same four steps.',
+    text: 'Custom software, CRM and ERP, websites and apps, AI automation, digital marketing, APIs, workflow automation, mobile apps and education and training — each followed through the same four steps.',
     points: ['Software & IT', 'AI & Automation', 'Digital Marketing', 'Headless SaaS & APIs', 'Workflow Automation', 'Mobile & Business Apps'],
     cta: 'Explore services',
   },

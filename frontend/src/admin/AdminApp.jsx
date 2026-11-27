@@ -55,12 +55,14 @@ const SeoAdmin = lazy(() => import('./pages/SeoAdmin.jsx'))
 const SocialContact = lazy(() => import('./pages/SocialContact.jsx'))
 const BranchSocial = lazy(() => import('./pages/OwnerSocial.jsx').then((m) => ({ default: m.BranchSocial })))
 const PartnerSocial = lazy(() => import('./pages/OwnerSocial.jsx').then((m) => ({ default: m.PartnerSocial })))
+const EnquiryCenter = lazy(() => import('./pages/EnquiryCenter.jsx'))
 const Audit = lazy(() => import('./pages/Audit.jsx'))
 const System = lazy(() => import('./pages/System.jsx'))
 
 const NAV = [
   { section: 'Overview', to: '/company-admin/dashboard', end: true, label: 'Dashboard', icon: LayoutDashboard, module: null, hint: 'Numbers, shortcuts and your website at a glance' },
   { section: 'Pages', to: '/company-admin/pages', label: 'Pages', icon: PanelsTopLeft, module: ['content', 'services', 'careers', 'navigation', 'settings'], hint: 'Every page and section of the website with its pictures: upload, replace or remove' },
+  { section: 'Leads & customers', to: '/company-admin/enquiry-center', label: 'Enquiry center', icon: Inbox, module: 'enquiries', hint: 'Every website form grouped by category, with the Google Sheets copy (worksheets, retry)' },
   { section: 'Leads & customers', to: '/company-admin/enquiries', label: 'Enquiries & leads', icon: Inbox, module: 'enquiries', hint: 'Contact forms, quotes, partnership and career enquiries' },
   { section: 'Leads & customers', to: '/company-admin/demos', label: 'Demo requests', icon: CalendarCheck, module: 'demo_requests', hint: 'Requests for a product demonstration' },
   { section: 'Leads & customers', to: '/company-admin/customers', label: 'Registered users', icon: UserCog, module: 'customers', hint: 'Website customers: accounts, enquiry and demo history, activate or deactivate' },
@@ -323,6 +325,7 @@ export default function AdminApp() {
         <Route element={<AdminShell />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="enquiry-center" element={<Guard module="enquiries"><EnquiryCenter /></Guard>} />
           <Route path="enquiries" element={<Guard module="enquiries"><Enquiries /></Guard>} />
           <Route path="demos" element={<Guard module="demo_requests"><Demos /></Guard>} />
           <Route path="pages/*" element={<Guard module={['content', 'services', 'careers', 'navigation', 'settings']}><PagesModule /></Guard>} />

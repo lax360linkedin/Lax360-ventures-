@@ -15,6 +15,7 @@ import { useScrolledPast } from '../../hooks/useScrollDirection.js'
 import PreviewBanner from '../cms/PreviewBanner.jsx'
 import { useSite, useSiteSettings } from '../../hooks/useSite.js'
 import { SiteThemeSync } from '../../hooks/useTheme.js'
+import { installPrefetch } from '../../utils/prefetch.js'
 
 // Loaded after the page itself / on first use, so they never compete with first paint.
 const ChatWidget = lazy(() => import('../chatbot/ChatWidget.jsx'))
@@ -23,9 +24,13 @@ const EnquiryModal = lazy(() => import('./EnquiryModal.jsx'))
 function ScrollToTop() {
   const { pathname, hash } = useLocation()
   useEffect(() => {
+    // The page's own smooth-scroll setting must not animate a page change (a long animation is cut short when the new page mounts and strands the visitor mid-page): jump to the top instead.
+    try { window.history.scrollRestoration = 'manual' } catch { /* not available */ }
     if (!hash) {
-      window.scrollTo(0, 0)
-      return undefined
+      const top = () => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+      top()
+      const frame = requestAnimationFrame(top) // once more after the lazy page has mounted
+      return () => cancelAnimationFrame(frame)
     }
     // The target may live in a lazy page that has not mounted yet, so wait for it (up to ~3s).
     let frame
@@ -80,6 +85,7 @@ export default function RootLayout() {
     const t = window.requestIdleCallback ? window.requestIdleCallback(() => setChatReady(true)) : setTimeout(() => setChatReady(true), 800)
     return () => (window.cancelIdleCallback ? window.cancelIdleCallback(t) : clearTimeout(t))
   }, [])
+  useEffect(() => installPrefetch(), []) // pages are fetched on hover / focus / touch, so a click opens them from the cache
   // Any CTA can open the enquiry dialog with: window.dispatchEvent(new CustomEvent('lax360:open-enquiry'))
   useEffect(() => {
     window.addEventListener('lax360:open-enquiry', openEnquiry)

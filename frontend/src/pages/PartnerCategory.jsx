@@ -4,6 +4,8 @@ import PageContainer from '../components/layout/PageContainer.jsx'
 import { Checklist, Cta, Crumbs, DivisionSwitcher, Faqs, PartnerHero, PartnerTabs, Steps, StickyApply } from '../components/partner/PartnerUI.jsx'
 import { DIVISIONS, GENERAL_FAQS, JOURNEY, PARTNER_POLICIES, categoryBySlug, opportunities, opportunityPath, webPageLd } from '../data/partnership.js'
 import { pageOverride, useDivisionItems, usePartnerContent } from '../services/partnershipService.js'
+import { UpcomingSection } from '../components/upcoming/UpcomingPartner.jsx'
+import PartnerEnquiryForm from '../components/partner/PartnerEnquiryForm.jsx'
 import NotFound from './NotFound.jsx'
 
 const KEY = { franchise: 'franchise', 'authorized-partner': 'authorized', 'referral-partner': 'referral' }
@@ -22,6 +24,7 @@ export default function PartnerCategory({ category }) {
   const apply = `/partner-with-us/apply?type=${c.slug}`
   return (
     <PageContainer path={c.path} title={o.seo_title || c.seoTitle} description={o.seo_description || c.seoDescription} noindex={!!o.noindex} jsonLd={webPageLd(c.short, o.seo_description || c.seoDescription)}>
+      <div className="pp">
       <PartnerHero eyebrow={c.short} title={o.content?.hero_heading || `${c.short}: ${c.tagline}`} accent={c.accent} imageUrl={o.hero_url} imageAlt={o.hero_alt} lead={o.content?.hero_lead || c.summary}>
         <Link to={apply} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-white">Become a Partner<ArrowRight className="size-4" aria-hidden="true" /></Link>
       </PartnerHero>
@@ -50,12 +53,15 @@ export default function PartnerCategory({ category }) {
             <section aria-labelledby="pol-t"><h2 id="pol-t" className="h2">Commercial policies</h2><dl className="mt-6 grid gap-px overflow-hidden rounded-xl border border-edge bg-edge sm:grid-cols-2">{PARTNER_POLICIES.slice(0, 8).map(([k, v]) => <div key={k} className="bg-night p-5"><dt className="font-semibold">{k}</dt><dd className="mt-1 text-soft">{v}</dd></div>)}</dl></section>
           )}
           {KEY[c.slug] === 'franchise' && <section aria-labelledby="inv-t"><h2 id="inv-t" className="h2">Investment and fees</h2><p className="mt-4 text-lg text-soft">Franchise investment details are available upon consultation. Commercial terms will be discussed during the franchise evaluation process, and final terms are subject to the approved franchise agreement. LAX360 does not guarantee income, profit or any business result.</p></section>}
+          <UpcomingSection category={c.slug} />
           <section aria-labelledby="faq-t"><h2 id="faq-t" className="h2">Frequently asked questions</h2><div className="mt-6"><Faqs items={faqs.length ? faqs : GENERAL_FAQS.slice(0, 3)} /></div></section>
           <Cta applyTo={apply} brochureUrl={data?.general_brochure_url} portalUrl={KEY[c.slug] === 'franchise' ? null : data?.portal_url} />
         </div>
       </div>
+      <PartnerEnquiryForm category={c.slug} />
       <StickyApply to={apply} />
       <div aria-hidden="true" className="h-16 lg:hidden" />
+    </div>
     </PageContainer>
   )
 }

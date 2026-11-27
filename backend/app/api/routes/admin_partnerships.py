@@ -15,7 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import permission
-from app.api.paging import Paging
+from app.api.paging import Paging, day_after, day_start
 from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
 from app.core.rate_limit import rate_limit
@@ -52,7 +52,7 @@ def _app(db: Session, app_id: uuid.UUID) -> PartnershipApplication:
 # ================================================================== dashboard and applications
 @router.get("/dashboard")
 def dashboard(days: int = Query(30, ge=1, le=365), _: User = Depends(read), db: Session = Depends(get_read_db)) -> dict:
-    return {**ps.dashboard(db, ps.utcnow() - timedelta(days=days)), "days": days, "statuses": list(STATUSES),
+    return {**ps.dashboard(db, ps.utcnow() - timedelta(days=days)), "division_options": ps.division_options(db), "days": days, "statuses": list(STATUSES),
             "note": "Page views are not recorded by the website, so 'most viewed opportunity' is not shown."}
 
 
@@ -63,17 +63,19 @@ def staff(_: User = Depends(read), db: Session = Depends(get_read_db)) -> dict:
 
 
 @router.get("/applications")
-def applications(q: str | None = Query(None, max_length=80), status: str | None = Query(None, max_length=30), category: str | None = Query(None, max_length=12), division: str | None = Query(None, max_length=20),
-                 branch: str | None = Query(None, max_length=40), assigned: str | None = Query(None, max_length=40), paging: Paging = Depends(), _: User = Depends(read), db: Session = Depends(get_read_db)) -> dict:
-    rows, total = ps.applications_page(db, q=q, status=status, category=category, division=division, branch=branch, assigned=assigned, page=paging.page, page_size=paging.page_size)
+def applications(q: str | None = Query(None, max_length=80), status: str | None = Query(None, max_length=30), category: str | None = Query(None, max_length=12), division: str | None = Query(None, max_length=40),
+                 branch: str | None = Query(None, max_length=40), assigned: str | None = Query(None, max_length=40), date_from: date | None = Query(None, alias="from"), date_to: date | None = Query(None, alias="to"),
+                 source: str | None = Query(None, max_length=60), paging: Paging = Depends(), _: User = Depends(read), db: Session = Depends(get_read_db)) -> dict:
+    rows, total = ps.applications_page(db, q=q, status=status, category=category, division=division, branch=branch, assigned=assigned, page=paging.page, page_size=paging.page_size, date_from=day_start(date_from), date_to=day_after(date_to), source=source)
     names = ps.staff_names(db, [r.assigned_to for r in rows])
-    return {**paging.envelope([ps.application_out(r, names=names) for r in rows], total), "statuses": list(STATUSES)}
+    return {**paging.envelope([ps.application_out(r, names=names) for r in rows], total), "statuses": list(STATUSES), "division_options": ps.division_options(db)}
 
 
 @router.get("/applications/export")
-def export(q: str | None = Query(None, max_length=80), status: str | None = Query(None, max_length=30), category: str | None = Query(None, max_length=12), division: str | None = Query(None, max_length=20),
+def export(q: str | None = Query(None, max_length=80), status: str | None = Query(None, max_length=30), category: str | None = Query(None, max_length=12), division: str | None = Query(None, max_length=40),
+           date_from: date | None = Query(None, alias="from"), date_to: date | None = Query(None, alias="to"), source: str | None = Query(None, max_length=60),
            user: User = Depends(read), db: Session = Depends(get_read_db)) -> Response:
-    rows, _ = ps.applications_page(db, q=q, status=status, category=category, division=division, branch=None, assigned=None, page=1, page_size=5000)
+    rows, _ = ps.applications_page(db, q=q, status=status, category=category, division=division, branch=None, assigned=None, page=1, page_size=5000, date_from=day_start(date_from), date_to=day_after(date_to), source=source)
     return Response(ps.export_csv(rows), media_type="text/csv; charset=utf-8", headers={"Content-Disposition": 'attachment; filename="partnership-applications.csv"', "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"})
 
 
@@ -81,7 +83,7 @@ def export(q: str | None = Query(None, max_length=80), status: str | None = Quer
 def application(app_id: uuid.UUID, _: User = Depends(read), db: Session = Depends(get_read_db)) -> dict:
     a = _app(db, app_id)
     events = db.scalars(select(ApplicationEvent).where(ApplicationEvent.application_id == a.id).order_by(ApplicationEvent.created_at.desc())).all()
-    return {**ps.application_out(a, detail=True, names=ps.staff_names(db, [a.assigned_to])), "events": [ps.event_out(e) for e in events]}
+    return {**ps.application_out(a, detail=True, names=ps.staff_names(db, [a.assigned_to])), "events": [ps.event_out(e) for e in events], "division_options": ps.division_options(db)}
 
 
 class StatusIn(ApiModel):

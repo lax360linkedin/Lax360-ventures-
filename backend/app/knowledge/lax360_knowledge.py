@@ -28,8 +28,8 @@ DIVISIONS = [
     ("AI & Business Automation (/services/ai)",
      "AI application development, AI chatbots & virtual assistants, AI agent development, business process automation, workflow automation, RAG-based AI solutions and AI integration & consulting. "
      "People stay in the loop for decisions that matter; data handling is discussed and agreed before anything is built. Starts with an AI consultation."),
-    ("Digital Marketing (/services/growth)",
-     "Social media management, Meta Ads management, Google Ads management, search engine optimization (SEO), website & landing page optimization, content creation and digital marketing strategy. Exact scope and reporting are agreed per business (scope is still to be confirmed)."),
+    ("Digital Marketing (/services/digitalmarketing)",
+     "Social media management (Meta, LinkedIn, Pinterest, X), search engine optimization (on-page, local, off-page and technical SEO), creatives (poster and graphic design, video shooting, video editing), content publishing (article writing, Blogger, Reddit) and paid advertising (Meta, Google, LinkedIn and X ads, with audience targeting, budget management, A/B testing and regular performance reports). Exact scope and reporting are agreed per business."),
     ("Headless SaaS & API Solutions (/services/headless)",
      "Reusable backend services and ready-to-integrate APIs for developers, startups, agencies and businesses: API hub development, headless backend development, authentication APIs, billing & subscription APIs, booking & appointment APIs, CRM APIs, notification APIs, payment gateway integration, "
      "file & media APIs, AI APIs, multi-tenant SaaS development and white-label SaaS solutions. A product page for the LAX360 API Hub will be linked from the website later; do not claim it is live."),
@@ -37,8 +37,10 @@ DIVISIONS = [
      "n8n workflow automation, business process automation, WhatsApp automation, email automation, CRM automation, AI agent workflows, third-party application integration and webhook integration."),
     ("Mobile & Business Applications (/services/mobile)",
      "Appointment booking applications, field staff & task tracking applications, employee location tracking applications, business billing applications, inventory management applications and custom business mobile applications."),
-    ("Training and workshops (enquire via /contact?type=course)",
-     "Training and college workshops. Courses on the website: 'AI Tools & Prompt Engineering' (5-hour college workshop: 2 hours theory + 3 hours practicals), "
+    ("Education & Training (/services/education)",
+     "LAX360 Education is the education and skill development division of LAX360 Pvt Ltd: technical training, professional certification courses, internship programs, AI & software development training, workshops and seminars, corporate training, college and institutional training and skill development programs. "
+     "Certification courses are only those on the approved LAX360 Education course catalogue (programming languages, web designing, databases, full stack development with AI, software testing, cloud computing, DevOps, data and AI, cyber security, digital marketing and frameworks); the full list is on the Education & Training page. "
+     "Enquire via /contact?type=course. Training and college workshops. Courses on the website: 'AI Tools & Prompt Engineering' (5-hour college workshop: 2 hours theory + 3 hours practicals), "
      "'3-Day Hands-on AI Workshop' (AI fundamentals, AI-assisted development, AI agents and a mini-project), and 'Python with Artificial Intelligence' (eight sessions; total length to be confirmed). "
      "Fees, schedules, certificates and online/in-person mode are shared when someone enquires."),
 ]
@@ -53,7 +55,7 @@ SOLUTIONS = [
 PROCESS = "Typical process: Discover (listen and write down the problem), Design (experience, architecture and a written scope), Develop (build in steps with early feedback), Deploy & Improve."
 
 CONTACT = (
-    "Official contact details listed on the website: email lax360tech@gmail.com; phone +91 95666 79928 (Salem and Bangalore), +91 86676 30258 (Salem, second number) and +91 95666 05272 (Mumbai); WhatsApp is available from the website's WhatsApp button; "
+    "Official contact details listed on the website: email admin@lax360.in; phone +91 95666 79928 (Salem and Bangalore), +91 86676 30258 (Salem, second number) and +91 95666 05272 (Mumbai); WhatsApp is available from the website's WhatsApp button; "
     "an enquiry form at /contact. Instagram: lax360pvtltd; LinkedIn: lax360-pvt-ltd; X: lax360tech."
 )
 
@@ -65,13 +67,16 @@ DEMO_PROCESS = (
 
 CAREERS = "Careers (/career): no open roles are listed on the website; interested people can send an enquiry of type 'Careers' via /contact."
 
+UPCOMING = ("Upcoming services (not available yet, currently under development, to be launched in the future; statuses are managed by the team): CAD & Engineering Design Services (/cad-engineering: Mechanical CAD, Civil CAD), "
+            "Robotics Services (/robotics: Robotics Solutions, Robotics Development and Integration), Blockchain & Web 3.0 Services (/blockchain: Blockchain Development, Web 3.0 Solutions). "
+            "Never offer them as available, quote them or promise dates. Visitors can register interest on those pages (enquiry type 'Interest in an upcoming service'); this is not a partnership or an order.")
+
 UNCONFIRMED = [
     "pricing, quotes or fees (a written scope and estimate is provided before work starts, after an enquiry)",
     "business hours and any response-time promise",
     "course fees, schedules, certificates, placement promises",
     "client names, case studies, results or statistics (none are published yet)",
     "partnerships, certifications, awards or guarantees (do NOT claim any, and never claim an official OpenAI partnership)",
-    "the exact scope of Digital Marketing services (still being confirmed)",
 ]
 
 
@@ -98,6 +103,7 @@ def build_knowledge(branches: Iterable[Branch]) -> str:
         "CONTACT\n" + CONTACT,
         "DEMO REQUESTS\n" + DEMO_PROCESS,
         CAREERS,
+        UPCOMING,
         "NOT CONFIRMED (say it needs confirmation by the team; point to /contact)\n" + "\n".join(f"- {u}" for u in UNCONFIRMED),
     ]
     return "\n\n".join(parts)

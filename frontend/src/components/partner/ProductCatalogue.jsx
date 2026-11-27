@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useState, useSyncExternalStore } from 'react
 import { Link } from 'react-router-dom'
 import { Boxes, ChevronDown, Search } from 'lucide-react'
 import { ITF_PRODUCTS } from '../../data/itFranchise.js'
+import { useProductCatalogue } from '../../hooks/usePartnerProducts.js'
 
 // Same pattern as the Education course list: one shared open / closed state for the sidebar list and every "Our Products" button on the page.
 const PANEL_ID = 'product-panel'
@@ -12,7 +13,8 @@ const useOpen = () => useSyncExternalStore(subscribe, () => store.open, () => fa
 const setOpenState = (v) => { if (store.open !== v) { store.open = v; emit() } }
 
 /** "Our Products": the IT & Software product, platform and service list as an expandable section of the sidebar. */
-export function ProductAccordion({ accent = 'var(--color-primary)', catalogue = ITF_PRODUCTS }) {
+export function ProductAccordion({ accent = 'var(--color-primary)', catalogue: base = ITF_PRODUCTS, program = 'franchise' }) {
+  const catalogue = useProductCatalogue(base, program) // the built-in list plus the administrator's changes
   const COUNT = catalogue.groups.reduce((n, g) => n + g.items.length, 0)
   const open = useOpen()
   const id = useId()
@@ -38,7 +40,7 @@ export function ProductAccordion({ accent = 'var(--color-primary)', catalogue = 
               <div className="mt-3 space-y-5">
                 {groups.map((g) => (
                   <div key={g.title}>
-                    <h3 className="mb-1.5 border-b border-edge pb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: accent }}>{g.title}</h3>
+                    <h2 className="mb-1.5 border-b border-edge pb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: accent }}>{g.title}</h2>
                     <ul className="space-y-2">
                       {g.items.map((i) => (
                         <li key={i.name} className="text-sm">

@@ -10,3 +10,4 @@ __pycache__/
 .pgdev/
 venv/
 env/
+backups/

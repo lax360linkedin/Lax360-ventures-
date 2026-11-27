@@ -4,6 +4,8 @@ import { m, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Plus, Briefcase, Bot, Brain, Cloud, Code2, GraduationCap, Layers, Megaphone, Search, Server, Sparkles, Workflow } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
+import { useH1Override } from '../hooks/useSite.js'
+
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import Button from '../components/ui/Button.jsx'
 import OptimizedImage from '../components/ui/OptimizedImage.jsx'
@@ -44,7 +46,7 @@ function FounderSpotlight({ p, onOpen }) {
           </div>
         </m.div>
 
-        <m.h2 {...rise(0.12)} id="founder-name" className="mt-8 font-display text-3xl font-semibold leading-[1.1] tracking-tight md:text-5xl">{p.name}</m.h2>
+        <m.h2 {...rise(0.12)} id="founder-name" className="mt-8 font-display text-3xl font-semibold leading-[1.1] tracking-tight md:text-4xl lg:text-5xl">{p.name}</m.h2>
         <m.p {...rise(0.2)} className="mt-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-base font-semibold text-transparent md:text-xl">{p.designation}</m.p>
         {p.sample && <m.div {...rise(0.25)} className="mt-3"><SampleTag /></m.div>}
         {p.bio && (
@@ -93,6 +95,7 @@ const Gallery = ({ people, label, onOpen }) => (
  * Moving a person to another department (or changing their position) in their profile moves them here too: nobody is entered twice.
  */
 export default function Team() {
+  const h1 = useH1Override()
   const people = useTeam()
   const departments = useDepartmentList()
   const gallery = useTeamGallery()
@@ -144,7 +147,7 @@ export default function Team() {
         <div className="wrap relative grid gap-8 pb-10 pt-10 md:pb-12 md:pt-16">
           <Reveal y={12} className="max-w-4xl">
             <p className="eyebrow mb-6 flex items-center gap-3 text-lav"><span aria-hidden="true" className="h-px w-10 bg-current" />{page.hero_eyebrow || teamText.heroEyebrow}</p>
-            <h1 className="h1 !text-[clamp(2.5rem,5.6vw,5.5rem)]">{page.hero_title || teamText.heroTitle}</h1>
+            <h1 className="h1 !text-[clamp(2.5rem,5.6vw,5.5rem)]">{h1 || page.hero_title || teamText.heroTitle}</h1>
             <p className="lead mt-7 max-w-3xl text-soft">{page.hero_lead || teamText.heroLead}</p>
             {hasPeople && (
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">

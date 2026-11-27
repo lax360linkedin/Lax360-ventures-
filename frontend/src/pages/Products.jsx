@@ -10,6 +10,7 @@ import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { ProductCard, ProductMark, ProductVisual } from '../components/products/ProductBits.jsx'
 import { productCategories } from '../data/products.js'
 import { useProducts } from '../hooks/useProducts.js'
+import { useH1Override } from '../hooks/useSite.js'
 import { useWebsites } from '../hooks/useWebsites.js'
 import { WebsiteCard } from '../components/websites/WebsiteBits.jsx'
 
@@ -22,6 +23,7 @@ const scrollToList = (e) => { e.preventDefault(); document.getElementById('produ
  * (data/products.json) is shown until some are published there.
  */
 export default function Products() {
+  const h1 = useH1Override()
   const products = useProducts()
   const websites = useWebsites()
   const [cat, setCat] = useState('all')
@@ -51,7 +53,7 @@ export default function Products() {
               <BadgeCheck className="size-4" aria-hidden="true" />Built and owned by LAX360
             </m.p>
             <m.h1 {...rise(0.2)} id="products-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.3rem)]">
-              Technology Products Built for the <BotHighlight delay={0.9}><span className="text-gradient">Way Businesses Work.</span></BotHighlight>
+              {h1 || <>Technology Products Built for the <BotHighlight delay={0.9}><span className="text-gradient">Way Businesses Work.</span></BotHighlight></>}
             </m.h1>
             <m.p {...rise(0.3)} className="lead mt-7 max-w-xl text-soft">
               Discover practical software products and intelligent SaaS solutions designed to simplify business operations, connect workflows, and support digital growth.

@@ -7,7 +7,9 @@ import { tr } from '../i18n/translator.js'
 
 // The canonical origin. In a production build it falls back to the company domain, so a page served from the old Vercel address or the www host still declares https://lax360.in as canonical.
 const SITE_URL = (import.meta.env.VITE_SITE_URL || (import.meta.env.PROD ? 'https://lax360.in' : '')).replace(/\/$/, '')
-const DEFAULT_TITLE = 'LAX360 Pvt Ltd — Software, AI, Digital Growth & Training'
+export const DEFAULT_TITLE = 'LAX360 Pvt Ltd | Software, AI & Digital Marketing in Salem' // home page title: brand + main services + the head-office city (under 60 characters)
+export const DEFAULT_OG_IMAGE = '/assets/og-image.png' // 1200 x 630: the size is declared in og:image:width / og:image:height only for this image
+export const TWITTER_HANDLE = '@lax360tech'
 
 function upsert(selector, tag, attrs) {
   let el = document.head.querySelector(selector)
@@ -34,7 +36,9 @@ export function useDocumentHead({ title, description, path = '/', jsonLd = null,
   const settings = useSiteSettings()
   const fullTitle = seo?.title || (title ? fitTitle(`${T(title)} | ${SITE_NAME}`) : T(DEFAULT_TITLE))
   const desc = seo?.description || fitDescription(T(description))
-  const image = seo?.image || pageImage || settings.default_og_image_url || '/assets/og-image.png' // the default sharing image (replaceable in Settings)
+  const ogTitle = seo?.ogTitle || fullTitle // the sharing title / description an administrator set for the page, else the search title / description
+  const ogDesc = seo?.ogDescription || desc
+  const image = seo?.image || pageImage || settings.default_og_image_url || DEFAULT_OG_IMAGE // the default sharing image (replaceable in Settings)
   const hidden = noindex || seo?.noindex === true
   const keywords = seo?.keywords || pageKeywords
   const canonical = seo?.canonical || ''
@@ -43,7 +47,7 @@ export function useDocumentHead({ title, description, path = '/', jsonLd = null,
   const ld = [...[].concat(jsonLd || []), ...(crumbs ? [crumbs] : []), ...(seo?.structured || [])]
 
   if (typeof document === 'undefined') {
-    globalThis.__SSR_HEAD__ = { title: fullTitle, description: desc, titleKey: title || DEFAULT_TITLE, descriptionKey: description || '', path, lang, jsonLd: ld.length ? ld : null, noindex: hidden, image, keywords, ogType, canonical }
+    globalThis.__SSR_HEAD__ = { title: fullTitle, description: desc, ogTitle, ogDescription: ogDesc, titleKey: title || DEFAULT_TITLE, descriptionKey: description || '', path, lang, jsonLd: ld.length ? ld : null, noindex: hidden, image, keywords, ogType, canonical }
   }
 
   useEffect(() => {
@@ -60,16 +64,21 @@ export function useDocumentHead({ title, description, path = '/', jsonLd = null,
       LANGUAGES.forEach((l) => { const a = document.createElement('link'); a.rel = 'alternate'; a.hreflang = l.htmlLang; a.href = origin + (path === '/' ? prefixOf(l.code) : pathIn(l.code, path)); document.head.appendChild(a) })
       const d = document.createElement('link'); d.rel = 'alternate'; d.hreflang = 'x-default'; d.href = origin + (path === '/' ? '' : path); document.head.appendChild(d)
     }
-    upsert('meta[property="og:title"]', 'meta', { property: 'og:title', content: fullTitle })
-    upsert('meta[property="og:description"]', 'meta', { property: 'og:description', content: desc })
+    upsert('meta[property="og:title"]', 'meta', { property: 'og:title', content: ogTitle })
+    upsert('meta[property="og:description"]', 'meta', { property: 'og:description', content: ogDesc })
     upsert('meta[property="og:url"]', 'meta', { property: 'og:url', content: url })
     upsert('meta[name="twitter:card"]', 'meta', { name: 'twitter:card', content: 'summary_large_image' })
-    upsert('meta[name="twitter:title"]', 'meta', { name: 'twitter:title', content: fullTitle })
-    upsert('meta[name="twitter:description"]', 'meta', { name: 'twitter:description', content: desc })
+    upsert('meta[name="twitter:site"]', 'meta', { name: 'twitter:site', content: TWITTER_HANDLE })
+    upsert('meta[name="twitter:title"]', 'meta', { name: 'twitter:title', content: ogTitle })
+    upsert('meta[name="twitter:description"]', 'meta', { name: 'twitter:description', content: ogDesc })
     if (abs) {
       upsert('meta[property="og:image"]', 'meta', { property: 'og:image', content: abs })
       upsert('meta[name="twitter:image"]', 'meta', { name: 'twitter:image', content: abs })
     }
+    if (image === DEFAULT_OG_IMAGE) { // the size of the default sharing image is known; a custom image's size is not, so none is declared for it
+      upsert('meta[property="og:image:width"]', 'meta', { property: 'og:image:width', content: '1200' })
+      upsert('meta[property="og:image:height"]', 'meta', { property: 'og:image:height', content: '630' })
+    } else { remove('meta[property="og:image:width"]'); remove('meta[property="og:image:height"]') }
     if (keywords) upsert('meta[name="keywords"]', 'meta', { name: 'keywords', content: keywords })
     else remove('meta[name="keywords"]')
     if (hidden) upsert('meta[name="robots"]', 'meta', { name: 'robots', content: 'noindex, nofollow' })

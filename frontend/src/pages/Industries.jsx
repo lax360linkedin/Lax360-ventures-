@@ -11,6 +11,7 @@ import { IndustryCard, IndustryIcon, PairCard } from '../components/industries/I
 import ContactCta from '../components/sections/ContactCta.jsx'
 import { industryGroups } from '../data/industries.js'
 import { useIndustries } from '../hooks/useCmsPages.js'
+import { useH1Override } from '../hooks/useSite.js'
 
 const EASE = [0.2, 0.8, 0.2, 1]
 const jump = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -34,6 +35,7 @@ const AI_USES = [
  * comparisons and how AI and automation help. Managed in the admin panel (Website content > Industries); the built-in set shows until some are published.
  */
 export default function Industries() {
+  const h1 = useH1Override()
   const industries = useIndustries()
   const [query, setQuery] = useState('')
   const [group, setGroup] = useState('all')
@@ -65,7 +67,7 @@ export default function Industries() {
               <ol className="flex items-center gap-2"><li><Link to="/" className="transition-colors hover:text-lav">Home</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" /><li aria-current="page" className="font-semibold text-fg">Industries</li></ol>
             </m.nav>
             <m.p {...rise(0.12)} className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-edge-strong bg-glass px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav backdrop-blur-md">Industries We Empower</m.p>
-            <m.h1 {...rise(0.2)} id="industries-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.3rem)]">Technology Solutions for <BotHighlight delay={0.9}><span className="text-gradient">Every Industry.</span></BotHighlight></m.h1>
+            <m.h1 {...rise(0.2)} id="industries-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.3rem)]">{h1 || <>Technology Solutions for <BotHighlight delay={0.9}><span className="text-gradient">Every Industry.</span></BotHighlight></>}</m.h1>
             <m.p {...rise(0.3)} className="lead mt-7 max-w-xl text-soft">Discover how modern software, AI, and intelligent automation are transforming businesses and industries.</m.p>
             <m.div {...rise(0.4)} className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button href="#browse" arrow onClick={(e) => { e.preventDefault(); jump('browse') }}>Explore Industries</Button>

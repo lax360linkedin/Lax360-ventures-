@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "sitemap": "node scripts/generate-sitemap.js",
     "test:client": "node scripts/test-play-zone-client.mjs",
+    "test:analytics": "node scripts/test-analytics.mjs",
     "test:gesture": "node scripts/test-scroll-gesture.mjs",
     "test:game": "node scripts/test-catch-the-stars.mjs && node scripts/test-laxbot-jump.mjs && node scripts/test-puzzle-pop.mjs && node scripts/test-bug-hunter.mjs",
     "seo:audit": "node scripts/seo-audit.mjs",

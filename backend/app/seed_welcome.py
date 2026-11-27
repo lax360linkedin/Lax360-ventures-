@@ -17,7 +17,7 @@ CARDS = [  # (the opening "Welcome to LAX360" intro card was removed on request:
      "to enterprise applications, we turn business requirements into practical technology solutions.", "", "Explore Software", "/services/software", True, "Software & IT Services"),
     ("digital-marketing", "Digital Marketing", "marketing", "Make Your Brand Impossible to Ignore.",
      "Build your digital presence, reach the right audience, and turn engagement into business growth through strategic digital marketing solutions. We help businesses grow "
-     "through SEO, Google Ads, Meta Ads, social media marketing, and content strategies.", "", "Explore Digital Marketing", "/services/growth", True, "Digital Marketing"),
+     "through SEO, Google Ads, Meta Ads, social media marketing, and content strategies.", "", "Explore Digital Marketing", "/services/digitalmarketing", True, "Digital Marketing"),
     ("education-training", "Education & Training", "education", "Learn Today. Lead Tomorrow.",
      "We empower students, professionals, and aspiring technology experts through industry-focused training, practical learning experiences, technology workshops, and "
      "career-oriented skill development programs.", "", "Explore Education", "/our-network/cadpoint-academy-salem", True, "Education & Training"),

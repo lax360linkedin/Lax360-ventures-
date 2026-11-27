@@ -12,7 +12,7 @@ import { allDivisions } from '../data/services.js'
 import { branchSentence, branches } from '../data/branches.js'
 import { applySteps, careerText, principles, typeLabels, workModeLabels } from '../data/career.js'
 import { useCareerJobs, useCareerPageText, useCareerPerks } from '../hooks/useCmsPages.js'
-import { useSite } from '../hooks/useSite.js'
+import { useSite, useH1Override } from '../hooks/useSite.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 
 const ICONS = { sparkles: Sparkles, rocket: Rocket, graduation: GraduationCap, users: Users, laptop: Laptop, heart: Heart, trending: TrendingUp, clock: Clock, map: MapPin }
@@ -71,6 +71,7 @@ function JobCard({ job, i, onApply }) {
  * enquiry API and appear under Enquiries (type "Careers"). No vacancy, salary or perk is built in.
  */
 export default function Career() {
+  const h1 = useH1Override()
   const site = useSite()
   const jobs = useCareerJobs()
   const page = useCareerPageText()
@@ -106,7 +107,7 @@ export default function Career() {
           <Reveal y={12} className="lg:col-span-8">
             <p className="eyebrow mb-6 flex items-center gap-3 text-lav"><span aria-hidden="true" className="h-px w-10 bg-current" />{page.hero_eyebrow || careerText.heroEyebrow}</p>
             <h1 className="h1 !text-[clamp(2.5rem,5.6vw,5.5rem)]">
-              {page.hero_title || careerText.heroTitle} {!page.hero_title && <BotHighlight delay={0.4}><span className="text-gradient">{careerText.heroGradient}</span></BotHighlight>}
+              {h1 || page.hero_title || careerText.heroTitle} {!h1 && !page.hero_title && <BotHighlight delay={0.4}><span className="text-gradient">{careerText.heroGradient}</span></BotHighlight>}
             </h1>
             <p className="lead mt-7 max-w-2xl text-soft">{page.hero_lead || careerText.heroLead}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">

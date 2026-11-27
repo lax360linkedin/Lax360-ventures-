@@ -679,7 +679,7 @@ INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_
 
 INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('2ac41554-2f65-57db-a206-86e919f34785', 'contact', 'phone', 'Phone', '+91 95666 79928', 'Salem & Bangalore', '["header", "footer", "contact"]', true, 40, 'contact:phone:919566679928');
 
-INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('c5c1c102-d26f-5217-8703-c66ea2b7b2a6', 'contact', 'email', 'Email', 'lax360tech@gmail.com', NULL, '["header", "footer", "contact"]', true, 50, 'contact:email:lax360tech@gmail.com');
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('c5c1c102-d26f-5217-8703-c66ea2b7b2a6', 'contact', 'email', 'Email', 'admin@lax360.in', NULL, '["header", "footer", "contact"]', true, 50, 'contact:email:admin@lax360.in');
 
 INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('41dc71d7-b45c-59a5-b935-c6369fb8ff00', 'contact', 'phone', 'Phone', '+91 95666 05272', 'Mumbai', '["footer", "contact"]', true, 60, 'contact:phone:919566605272');
 

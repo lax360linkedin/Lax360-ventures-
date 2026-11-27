@@ -37,7 +37,7 @@ export default function TopBar() {
   }, [visible, pathname])
 
   if (!visible) return null
-  const link = 'inline-flex min-h-8 items-center gap-1.5 transition-colors hover:text-lav focus-visible:text-lav max-sm:min-w-8 max-sm:justify-center' // min-w-8: an icon-only link (WhatsApp on a phone) is still a full-size touch target
+  const link = 'inline-flex min-h-8 items-center gap-1.5 transition-colors hover:text-lav focus-visible:text-lav max-sm:min-w-8 max-sm:justify-center whitespace-nowrap' // min-w-8: an icon-only link (WhatsApp on a phone) is still a full-size touch target
   // phones and WhatsApp stay visible on a phone; the rest (email, addresses ...) appear from the small breakpoint up, and only the first two are shown on a phone so the strip stays one line
   const shown = contacts.filter((c) => c.type !== 'address')
   const mobile = new Set(shown.filter((c) => c.type !== 'email').slice(0, 2).map((c) => c.id))
@@ -47,7 +47,7 @@ export default function TopBar() {
     {/* The bar is 33px tall (min-h-8 + border). Declaring it in the HTML itself means the page is laid out correctly on the very first paint instead of jumping down by 33px when the script measures it. */}
     <style>{':root{--topbar-h:33px;--topbar-offset:33px}'}</style>
     <div ref={ref} data-topbar className="fixed inset-x-0 top-0 z-[41] border-b border-edge/60 bg-night/80 text-xs text-soft backdrop-blur-md">
-      <div className="wrap flex min-h-8 items-center justify-between gap-3">
+      <div className="wrap flex min-h-8 items-center justify-between gap-2 sm:gap-3">
         <ul className="flex items-center gap-x-4" aria-label="Contact">
           {shown.map((c) => {
             const out = opensNewTab(c)
@@ -66,7 +66,7 @@ export default function TopBar() {
             <ul className="flex items-center gap-1" aria-label="Social media">
               {social.map((s) => (
                 <li key={s.id}>
-                  <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`} className="grid size-8 place-items-center rounded-full transition-[color,transform] duration-200 hover:-translate-y-0.5 hover:text-lav focus-visible:text-lav">
+                  <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`} className="grid size-7 place-items-center rounded-full transition-[color,transform] duration-200 hover:-translate-y-0.5 hover:text-lav focus-visible:text-lav min-[380px]:size-8">
                     <ChannelIcon channel={s} className="size-3.5" />
                   </a>
                 </li>

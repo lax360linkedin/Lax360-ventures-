@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useSyncExternalStore } from 'react'
+import { useLocation } from 'react-router-dom'
+import { splitPath } from '../i18n/languages.js'
 import { site as defaults } from '../data/site.js'
 import { EMPTY, getState, loadContent, loadSite, subscribe } from '../services/siteService.js'
 import { pagePathToKey } from '../utils/cms.js'
@@ -31,7 +33,7 @@ export function mergeSite(s = {}, channels = null) {
     mapLink: s.map_link || '',
     email2: s.contact_email_2 || '',
     footerTagline: s.footer_tagline || '',
-    businessHours: s.business_hours || '',
+    businessHours: s.business_hours || defaults.businessHours || '',
   }
   return Array.isArray(channels) ? withChannels(merged, channels) : merged
 }
@@ -80,6 +82,23 @@ export function useContent(kind) {
   return items && items.length ? items : null
 }
 
+/**
+ * Has a section's built-in content been moved into the database (`python -m app.cli migrate-content`)? From then on the database is its ONLY source: what an administrator deletes,
+ * unpublishes or switches off never comes back from the built-in copy. Domains: network, upcoming, courses.
+ */
+export function useSeeded(domain) {
+  const items = useContent('content_seed')
+  return Boolean(items?.some((i) => i.slug === domain))
+}
+
+/** The published database items of `kind` when the section is migrated and the content has loaded (an empty list when everything was removed), otherwise undefined (use the built-in content). */
+export function useDatabaseItems(kind, domain) {
+  const items = useContent(kind)
+  const seeded = useSeeded(domain)
+  const ready = useContentReady()
+  return seeded && ready ? items || [] : undefined
+}
+
 /** Which page(s) a question is for: "home" = home and services (the original setting), "home_only", "services_only". */
 export const faqOnPage = (where, page) => {
   const w = where || 'home'
@@ -126,10 +145,17 @@ export function useSeo(path) {
     if (!mine) return null
     const d = mine.data
     return {
-      title: mine.title, description: d.meta_description || '', image: d.image || null, keywords: d.keywords || '', noindex: d.noindex === true,
-      canonical: d.canonical_url || '', structured: parseCustomJsonLd(d.structured_data),
+      title: mine.title === 'Page titles & SEO' ? '' : mine.title, description: d.meta_description || '', image: d.image || null, keywords: d.keywords || '', noindex: d.noindex === true,
+      canonical: d.canonical_url || '', structured: parseCustomJsonLd(d.structured_data), h1: d.h1 || '', ogTitle: d.og_title || '', ogDescription: d.og_description || '',
     }
   }, [items, key, path])
+}
+
+/** The H1 heading an administrator set for the page being shown (SEO management > the page > H1 heading), or null to keep the page's own heading. Pages call it and render the text in place of their built-in H1. */
+export function useH1Override() {
+  const { pathname } = useLocation()
+  const { path } = splitPath(pathname)
+  return useSeo(path.length > 1 ? path.replace(/\/+$/, '') : path)?.h1 || null
 }
 
 /** The redirects set in the admin panel (SEO management > Redirects): [{ from, to, permanent }]. */

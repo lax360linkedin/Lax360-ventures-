@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Download, Pencil, Plus, Trash2 } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
 import { Badge, Btn, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, Field, Input, Modal, PageHeader, Pagination, Select, Spinner, Textarea, Toggle, fmtDate, label, useDebounced, useFetch, useToast } from '../ui.jsx'
@@ -7,7 +8,24 @@ import { MediaPicker } from '../MediaPicker.jsx'
 const qs = (p) => { const s = new URLSearchParams(Object.entries(p || {}).filter(([, v]) => v !== '' && v != null && v !== false)).toString(); return s ? `?${s}` : '' }
 const pt = (path, { params, ...o } = {}) => api(`/api/admin/partnerships${path}${qs(params)}`, { timeoutMs: 20000, ...o })
 const CAT = { franchise: 'Franchise', authorized: 'Authorized Partner', referral: 'Referral Partner' }
-const DIV = { education: 'Education', 'digital-marketing': 'Digital Marketing', it: 'IT & Software' }
+const DIV = { education: 'Education', 'digital-marketing': 'Digital Marketing', it: 'IT & Software', 'cad-engineering': 'CAD & Engineering Design', robotics: 'Robotics', blockchain: 'Blockchain & Web 3.0', other: 'Others' }
+/** Division slug -> current name, from the list the server sends (it follows the divisions managed in the admin panel). */
+const divMap = (opts) => ({ ...DIV, ...Object.fromEntries((opts || []).map((o) => [o.value, o.label])) })
+/** Every division an application selected (older records only have the one). */
+const divNames = (a, map) => (a.divisions?.length ? a.divisions : [a.division]).filter((d) => d !== 'other' || !a.other_interest).map((d) => map[d] || d) // the custom interest of Others is shown in full beside the list
+/** The selected divisions as chips; "All Business Divisions" is shown as one tag, a custom interest under Others is spelled out. */
+function DivChips({ a, map, max = 3 }) {
+  const names = divNames(a, map)
+  const shown = a.all_divisions ? ['All Business Divisions'] : names.slice(0, max)
+  const rest = a.all_divisions ? 0 : names.length - shown.length
+  return (
+    <span className="mt-1 flex flex-wrap gap-1">
+      {shown.map((n) => <span key={n} className="rounded-full border border-edge bg-glass px-2 py-0.5 text-[0.6875rem] font-semibold text-fg">{n}</span>)}
+      {rest > 0 && <span className="rounded-full border border-edge px-2 py-0.5 text-[0.6875rem] text-soft" title={names.slice(max).join(', ')}>+{rest} more</span>}
+      {a.other_interest && <span className="rounded-full border border-edge px-2 py-0.5 text-[0.6875rem] text-soft" title={a.other_interest}>Other: {a.other_interest.length > 28 ? `${a.other_interest.slice(0, 28)}…` : a.other_interest}</span>}
+    </span>
+  )
+}
 const TONE = { new: 'new', approved: 'success', rejected: 'failure', closed: 'draft', onboarding: 'connected', under_review: 'in_progress', contacted: 'contacted' }
 const SLUG_LABEL = (s) => s.split('/').map((x) => ({ overview: 'Partner With Us (main page)', 'authorized-partner': 'Authorized Partner', 'referral-partner': 'Referral Partner', 'digital-marketing': 'Digital Marketing', it: 'IT & Software' }[x] || label(x))).join(' › ')
 const COMM = { registration_fee: 'Registration fee', initial_investment: 'Initial investment', infrastructure_investment: 'Infrastructure investment', working_capital: 'Working capital', security_deposit: 'Security deposit', royalty: 'Royalty', revenue_sharing: 'Revenue sharing', agreement_duration: 'Agreement duration', renewal_fee: 'Renewal fee', territory: 'Territory conditions', exclusivity: 'Exclusivity', refund_conditions: 'Refund conditions', exit_conditions: 'Exit conditions', commission_model: 'Commission' }
@@ -30,8 +48,8 @@ export function PtOverview() {
       {error && <ErrorState error={error} onRetry={reload} />}
       {data && <>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[['Total applications', data.total], ['New', data.new], ['Under review', data.under_review], ['Approved', data.approved], ['Rejected', data.rejected], ['Consultation requests', data.consultation_requests], ['Franchise', data.by_category.franchise || 0], ['Authorized Partner', data.by_category.authorized || 0], ['Referral Partner', data.by_category.referral || 0], ['Education', data.by_division.education || 0], ['Digital Marketing', data.by_division['digital-marketing'] || 0], ['IT & Software', data.by_division.it || 0]].map(([k, v]) => <Card key={k} className="!p-4"><p className="text-xs font-semibold uppercase tracking-wide text-soft">{k}</p><p className="mt-1 font-display text-2xl font-semibold tabular-nums">{v}</p></Card>)}</div>
-        <div className="mt-4 grid gap-4 lg:grid-cols-3"><Bars title="By partnership type" data={data.by_category} names={CAT} /><Bars title="By division" data={data.by_division} names={DIV} /><Bars title="By status" data={data.by_status} /></div>
-        <Card className="mt-4"><h3 className="font-display text-base font-semibold">Recent applications</h3>{data.recent.length === 0 ? <p className="mt-3 text-sm text-soft">No applications yet.</p> : <ul className="mt-3 divide-y divide-edge text-sm">{data.recent.map((a) => <li key={a.id} className="flex flex-wrap justify-between gap-2 py-2"><span><strong>{a.full_name}</strong> · {CAT[a.category]} · {DIV[a.division]} <code className="text-xs text-soft">{a.reference}</code></span><span className="text-soft">{fmtDate(a.created_at)}</span></li>)}</ul>}</Card>
+        <div className="mt-4 grid gap-4 lg:grid-cols-3"><Bars title="By partnership type" data={data.by_category} names={CAT} /><Bars title="By division" data={data.by_division} names={divMap(data.division_options)} /><Bars title="By status" data={data.by_status} /></div>
+        <Card className="mt-4"><h3 className="font-display text-base font-semibold">Recent applications</h3>{data.recent.length === 0 ? <p className="mt-3 text-sm text-soft">No applications yet.</p> : <ul className="mt-3 divide-y divide-edge text-sm">{data.recent.map((a) => <li key={a.id} className="flex flex-wrap justify-between gap-2 py-2"><span><strong>{a.full_name}</strong> · {CAT[a.category]} · {divNames(a, divMap(data.division_options)).join(', ')} <code className="text-xs text-soft">{a.reference}</code></span><span className="text-soft">{fmtDate(a.created_at)}</span></li>)}</ul>}</Card>
         <p className="mt-3 text-xs text-soft">{data.note}</p>
       </>}
     </>
@@ -53,7 +71,8 @@ function ApplicationModal({ id, staff, onClose, onChanged }) {
       {loading && !data && <Spinner />}
       {error && <ErrorState error={error} onRetry={reload} />}
       {data && <div className="space-y-5 text-sm">
-        <div className="flex flex-wrap items-center gap-2"><Badge value={TONE[data.status] || 'draft'} text={label(data.status)} /><span className="text-soft">{CAT[data.category]} · {DIV[data.division]} · received {fmtDate(data.created_at)} {data.source_page ? `from ${data.source_page}` : ''}</span></div>
+        <div className="flex flex-wrap items-center gap-2"><Badge value={TONE[data.status] || 'draft'} text={label(data.status)} /><span className="text-soft">{CAT[data.category]} · received {fmtDate(data.created_at)} {data.source_page ? `from ${data.source_page}` : ''}</span></div>
+        <section><h3 className="font-display font-semibold">Business divisions of interest</h3><DivChips a={data} map={divMap(data.division_options)} max={20} />{data.all_divisions && <p className="mt-1 text-xs text-soft">The applicant chose All Business Divisions: {divNames(data, divMap(data.division_options)).join(', ')}.</p>}{data.other_interest && <p className="mt-2"><span className="text-xs uppercase text-soft">Others (custom interest)</span><br />{data.other_interest}</p>}</section>
         <p className="rounded-lg bg-glass-strong p-3 text-xs">An application is an enquiry. Approving it here records the decision only: no partner account is created and no access is granted.</p>
         <dl className="grid gap-3 sm:grid-cols-2">{[['E-mail', data.email], ['Mobile', data.phone], ['Location', [data.city, data.state, data.country].filter(Boolean).join(', ')], ['Occupation', data.occupation], ['Applying as', data.entity_type ? `${data.entity_type}${data.organization ? `: ${data.organization}` : ''}` : ''], ['Preferred location', data.preferred_location], ['Preferred office', data.preferred_branch], ['Marketing consent', data.consent_marketing ? 'Yes (optional)' : 'No'], ['Processing consent', data.consent_processing ? `Yes, ${fmtDate(data.consent_at)}` : 'No']].filter(([, v]) => v).map(([k, v]) => <div key={k}><dt className="text-xs uppercase text-soft">{k}</dt><dd className="break-words">{v}</dd></div>)}</dl>
         {answers.length > 0 && <section><h3 className="font-display font-semibold">Answers</h3><dl className="mt-2 grid gap-3 sm:grid-cols-2">{answers.map(([k, v]) => <div key={k}><dt className="text-xs uppercase text-soft">{label(k)}</dt><dd className="whitespace-pre-wrap break-words">{v}</dd></div>)}</dl></section>}
@@ -73,27 +92,32 @@ const ALL_STATUSES = ['new', 'contacted', 'under_review', 'consultation_schedule
 
 export function PtApplications() {
   const toast = useToast()
-  const [f, setF] = useState({ q: '', status: '', category: '', division: '', assigned: '' })
+  const [params] = useSearchParams()
+  const [f, setF] = useState({ q: '', status: '', category: params.get('category') || '', division: '', assigned: '', from: '', to: '', source: '' })
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState(null)
   const q = useDebounced(f.q, 350)
   const staff = useFetch(() => pt('/staff'))
-  const { data, error, loading, reload } = useFetch(() => pt('/applications', { params: { ...f, q, page, page_size: 20 } }), [q, f.status, f.category, f.division, f.assigned, page])
+  const { data, error, loading, reload } = useFetch(() => pt('/applications', { params: { ...f, q, page, page_size: 20 } }), [q, f.status, f.category, f.division, f.assigned, f.from, f.to, f.source, page])
   const set = (k) => (e) => { setF({ ...f, [k]: e.target.value }); setPage(1) }
   const exportCsv = async () => { try { const { blob } = await api(`/api/admin/partnerships/applications/export${qs({ ...f, q })}`, { as: 'blob', timeoutMs: 60000 }); const url = URL.createObjectURL(blob); const a = Object.assign(document.createElement('a'), { href: url, download: 'partnership-applications.csv' }); document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url) } catch (e) { toast(e.message, 'error') } }
+  const map = divMap(data?.division_options)
   const cols = [
     { key: 'ref', header: 'Reference', render: (a) => <code className="text-xs">{a.reference}</code> }, { key: 'n', header: 'Applicant', render: (a) => <span><strong>{a.full_name}</strong><span className="block text-xs text-soft">{a.email} · {a.phone}</span></span> },
-    { key: 'c', header: 'Program', render: (a) => <span>{CAT[a.category]}<span className="block text-xs text-soft">{DIV[a.division]}</span></span> }, { key: 'l', header: 'Location', render: (a) => [a.city, a.state].filter(Boolean).join(', ') || a.country },
+    { key: 'c', header: 'Program', render: (a) => <span>{CAT[a.category]}<DivChips a={a} map={map} /></span> }, { key: 'l', header: 'Location', render: (a) => [a.city, a.state].filter(Boolean).join(', ') || a.country },
     { key: 'd', header: 'Received', render: (a) => fmtDate(a.created_at) }, { key: 'a', header: 'Assigned', render: (a) => a.assigned_to_name || <span className="text-soft">—</span> }, { key: 's', header: 'Status', render: (a) => <Badge value={TONE[a.status] || 'draft'} text={label(a.status)} /> },
   ]
   return (
     <>
       <PageHeader title="Applications & enquiries" lead="Every application from the Partner With Us pages. Approving an application records the decision only; it never creates a partner account." actions={<Btn onClick={exportCsv}><Download className="size-4" aria-hidden="true" />Export CSV</Btn>} />
-      <Card className="mb-4"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <Card className="mb-4"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Field label="Search">{(p) => <Input {...p} type="search" placeholder="Reference, name, e-mail, phone" value={f.q} onChange={set('q')} />}</Field>
         <Field label="Status">{(p) => <Select {...p} value={f.status} onChange={set('status')}><option value="">All</option>{ALL_STATUSES.map((s) => <option key={s} value={s}>{label(s)}</option>)}</Select>}</Field>
         <Field label="Partnership type">{(p) => <Select {...p} value={f.category} onChange={set('category')}><option value="">All</option>{Object.entries(CAT).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select>}</Field>
-        <Field label="Division">{(p) => <Select {...p} value={f.division} onChange={set('division')}><option value="">All</option>{Object.entries(DIV).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select>}</Field>
+        <Field label="Business division">{(p) => <Select {...p} value={f.division} onChange={set('division')}><option value="">All</option>{Object.entries(map).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select>}</Field>
+        <Field label="From">{(p) => <Input {...p} type="date" value={f.from} max={f.to || undefined} onChange={set('from')} />}</Field>
+        <Field label="To">{(p) => <Input {...p} type="date" value={f.to} min={f.from || undefined} onChange={set('to')} />}</Field>
+        <Field label="Source page">{(p) => <Input {...p} placeholder="e.g. /franchise/it" value={f.source} onChange={set('source')} />}</Field>
         <Field label="Assigned">{(p) => <Select {...p} value={f.assigned} onChange={set('assigned')}><option value="">Anyone</option><option value="unassigned">Unassigned</option>{(staff.data?.items || []).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</Select>}</Field>
       </div></Card>
       <Card className="!p-0">
@@ -241,12 +265,18 @@ export function PtSettings() {
   if (loading && !data) return <Spinner />
   if (error && !data) return <ErrorState error={error} onRetry={reload} />
   if (!v) return null
-  const save = async () => { setBusy(true); setErrors({}); try { await pt('/settings', { method: 'PUT', body: { values: { portal_url: v.portal_url || '', notify_emails: v.notify_emails.split(',').map((x) => x.trim()).filter(Boolean), applications_open: v.applications_open, acknowledgement_enabled: v.acknowledgement_enabled, general_brochure_media_id: v.general_brochure_media_id || null, general_brochure_published: !!(v.general_brochure_published && v.general_brochure_media_id) } } }); toast('Settings saved.'); reload() } catch (e) { setErrors(e.fields || {}); toast(e.fields ? 'Please fix the highlighted fields.' : e.message, 'error') } finally { setBusy(false) } }
+  const save = async () => { setBusy(true); setErrors({}); try { await pt('/settings', { method: 'PUT', body: { values: { portal_url: v.portal_url || '', notify_emails: v.notify_emails.split(',').map((x) => x.trim()).filter(Boolean), applications_open: v.applications_open, enquiry_form_enabled: v.enquiry_form_enabled !== false, enquiry_form_title: v.enquiry_form_title || '', enquiry_form_lead: v.enquiry_form_lead || '', acknowledgement_enabled: v.acknowledgement_enabled, general_brochure_media_id: v.general_brochure_media_id || null, general_brochure_published: !!(v.general_brochure_published && v.general_brochure_media_id) } } }); toast('Settings saved.'); reload() } catch (e) { setErrors(e.fields || {}); toast(e.fields ? 'Please fix the highlighted fields.' : e.message, 'error') } finally { setBusy(false) } }
   return (
     <>
       <PageHeader title="Partnership settings" lead="Application intake, notifications, the partner portal link and the general brochure." />
       <Card className="space-y-5">
         <Toggle checked={v.applications_open} onChange={(on) => setV({ ...v, applications_open: on })} label="Accept new applications" />
+        <fieldset className="space-y-3 rounded-xl border border-edge p-4"><legend className="px-1 font-semibold">Enquiry form at the bottom of every partnership page</legend>
+          <Toggle checked={v.enquiry_form_enabled !== false} onChange={(on) => setV({ ...v, enquiry_form_enabled: on })} label="Show the enquiry form" />
+          <Field label="Heading" hint="Leave empty for the built-in heading, “Send a partnership enquiry”.">{(p) => <Input {...p} maxLength={120} value={v.enquiry_form_title || ''} onChange={(e) => setV({ ...v, enquiry_form_title: e.target.value })} />}</Field>
+          <Field label="Introduction" hint="Leave empty for the built-in introduction.">{(p) => <Input {...p} maxLength={300} value={v.enquiry_form_lead || ''} onChange={(e) => setV({ ...v, enquiry_form_lead: e.target.value })} />}</Field>
+          <p className="text-xs text-soft">The business divisions in the form follow Partnerships &gt; Navigation menu and Services &gt; Upcoming service categories. Submissions are listed under Applications &amp; enquiries and in the Enquiry center.</p>
+        </fieldset>
         <Toggle checked={v.acknowledgement_enabled} onChange={(on) => setV({ ...v, acknowledgement_enabled: on })} label="E-mail an acknowledgement to applicants (needs the server's e-mail settings; a failed e-mail never blocks an application)" />
         <Field label="Notify these e-mail addresses about new applications" hint="Comma-separated. The enquiry notification address set on the server is also used." error={errors.notify_emails}>{(p) => <Input {...p} value={v.notify_emails} onChange={(e) => setV({ ...v, notify_emails: e.target.value })} />}</Field>
         <Field label="Partner portal address" hint="Shown as “Partner Login” only when set. Must start with https://. Logging in on the portal never gives access to this admin panel." error={errors.portal_url}>{(p) => <Input {...p} type="url" placeholder="https://" value={v.portal_url} onChange={(e) => setV({ ...v, portal_url: e.target.value })} />}</Field>

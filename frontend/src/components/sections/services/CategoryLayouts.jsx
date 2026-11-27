@@ -10,7 +10,8 @@ import { getOffering } from '../../../data/offerings.js'
 import { divisionIcons } from '../../../utils/divisionIcons.js'
 import { serviceIcons } from '../../../utils/serviceIcons.js'
 import { offeringHref } from '../../../utils/slugify.js'
-import { useSite } from '../../../hooks/useSite.js'
+import { useSite, useH1Override } from '../../../hooks/useSite.js'
+import { useEducationPage, useEducationPrograms, withProgram } from '../../../hooks/useEducation.js'
 
 const P = (n) => `/assets/services/items/p${String(n).padStart(2, '0')}.webp`
 const EASE = [0.2, 0.8, 0.2, 1]
@@ -154,7 +155,7 @@ function HeroHeadless({ d }) {
   const reduce = useReducedMotion()
   const site = useSite()
   const external = /^https?:/.test(site.apiHubUrl)
-  const hubCls = 'group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-violet-800 shadow-xl transition-transform duration-200 hover:-translate-y-0.5 dark:bg-sky dark:text-night'
+  const hubCls = 'group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-primary shadow-xl transition-transform duration-200 hover:-translate-y-0.5 dark:bg-sky dark:text-night'
   return (
     <section className="wrap pt-8 md:pt-10" aria-labelledby="cat-title">
       <Crumb d={d} />
@@ -258,7 +259,42 @@ function HeroMobile({ d }) {
   )
 }
 
-export const heroes = { software: HeroSoftware, ai: HeroAi, growth: HeroGrowth, headless: HeroHeadless, automation: HeroAutomation, mobile: HeroMobile }
+
+/** 07 — Education & Training: the photo beside the headline; the headline, intro, photo and enquiry button can be changed in the admin panel (Education & Training page). */
+function HeroEducation({ d }) {
+  const reduce = useReducedMotion()
+  const page = useEducationPage()
+  const h1 = useH1Override()
+  const photo = page.image || d.photo
+  const title = h1 || page.headline || 'Learn practical skills, step by step.'
+  return (
+    <section className={heroBg} aria-labelledby="cat-title">
+      {blobs}
+      <div className="wrap grid items-center gap-12 pb-16 pt-8 md:pt-10 lg:grid-cols-12 lg:pb-24">
+        <div className="lg:col-span-6">
+          <m.div {...rise(reduce, 0.05)}><Crumb d={d} /></m.div>
+          <m.div {...rise(reduce, 0.1)} className="mt-6"><Eyebrow d={d} /></m.div>
+          <m.h1 {...rise(reduce, 0.18)} id="cat-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.2rem)]">{title}</m.h1>
+          <m.p {...rise(reduce, 0.28)} className="lead mt-6 max-w-xl text-soft">{page.lead || d.short}</m.p>
+          <m.div {...rise(reduce, 0.36)} className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button to={page.ctaLink || `/contact?type=${d.enquiryType}`} arrow>{page.ctaLabel || 'Enquire About a Course'}</Button>
+            <Button href="#courses" variant="secondary" onClick={(e) => { e.preventDefault(); document.getElementById('courses')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }) }}>View All Courses</Button>
+          </m.div>
+        </div>
+        <m.div {...rise(reduce, 0.3)} className="lg:col-span-6">
+          <div className="relative mx-auto max-w-lg">
+            <div className={frame}><img src={photo} alt="Students learning software development together at LAX360 Education" width="1000" height="800" fetchPriority="high" decoding="async" className="aspect-[5/4] h-full w-full object-cover" /></div>
+            <ul className="mt-4 flex flex-wrap gap-2" aria-label="Programmes">
+              {d.tags.map((t) => <li key={t} className="rounded-full border border-edge-strong bg-glass px-3.5 py-1.5 text-sm font-semibold">{t}</li>)}
+            </ul>
+          </div>
+        </m.div>
+      </div>
+    </section>
+  )
+}
+
+export const heroes = { software: HeroSoftware, ai: HeroAi, growth: HeroGrowth, headless: HeroHeadless, automation: HeroAutomation, mobile: HeroMobile, education: HeroEducation }
 
 /* ======================================================= SERVICE SECTIONS (one layout per category) ======================================================= */
 
@@ -422,5 +458,31 @@ function MobileServices({ d }) {
   )
 }
 
-export const serviceSections = { software: SoftwareServices, ai: AiServices, growth: GrowthServices, headless: HeadlessServices, automation: AutomationServices, mobile: MobileServices }
+
+/** Education & Training — a card per programme with its photo; text and photo follow the admin panel (Education programmes) when set. */
+function EducationServices({ d }) {
+  const ov = useEducationPrograms()
+  return (
+    <ol className="grid gap-6 md:grid-cols-2">
+      {d.offerings.map((o, i) => {
+        const x = withProgram({ ...o, photo: photoOf(d, o) }, ov[o.slug])
+        const Icon = serviceIcons[o.slug] || divisionIcons.education
+        return (
+          <Reveal as="li" key={o.slug} delay={(i % 2) * 0.06}>
+            <Link to={offeringHref(d.slug, o.name)} className="glass-flat lift group flex h-full flex-col overflow-hidden">
+              <span className="block overflow-hidden"><img src={x.photo} alt="" width="900" height="675" loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-105" /></span>
+              <span className="flex flex-1 flex-col gap-2 p-6">
+                <span className="flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-xl bg-primary/15 text-lav"><Icon className="size-5" aria-hidden="true" /></span><span className="eyebrow text-lav">{o.group}</span></span>
+                <span className="font-display text-2xl font-semibold leading-tight">{o.name}</span>
+                <span className="flex-1 text-soft">{x.text}</span>{readMore}
+              </span>
+            </Link>
+          </Reveal>
+        )
+      })}
+    </ol>
+  )
+}
+
+export const serviceSections = { software: SoftwareServices, ai: AiServices, growth: GrowthServices, headless: HeadlessServices, automation: AutomationServices, mobile: MobileServices, education: EducationServices }
 

@@ -13,7 +13,7 @@ const literal = v.redirects.filter((r) => !r.has && !/[:(*]/.test(r.source))
 const sources = new Set(literal.map((r) => r.source))
 const known = new Set(routes)
 for (const r of literal) {
-  const dest = r.destination.replace('https://lax360.in', '') || '/'
+  const dest = (r.destination.replace('https://lax360.in', '') || '/').replace(/^\/(ta|hi)(?=\/|$)/, '') || '/' // Tamil / Hindi targets are the same pages under a language prefix
   if (r.destination.startsWith('https://lax360.in') && sources.has(dest)) problems.push(`redirect chain: ${r.source} -> ${dest} -> ...`)
   if (r.source === dest) problems.push(`redirect loop: ${r.source}`)
   if (!known.has(dest)) problems.push(`redirect ${r.source} lands on ${dest}, which is not a real route`)

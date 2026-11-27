@@ -33,7 +33,7 @@ export function setLang(code) {
   try { localStorage.setItem(KEY, code) } catch { /* not remembered */ }
   window.history.pushState(null, '', pathIn(code, path) + window.location.search + window.location.hash)
   current = code
-  document.documentElement.lang = code
+  document.documentElement.lang = code === 'en' ? 'en-IN' : code
   listeners.forEach((l) => l())
 }
 

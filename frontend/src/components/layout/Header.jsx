@@ -130,7 +130,7 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
       style={{ '--d': '0.1s' }}
     >
       <div className="wrap flex h-[72px] items-center justify-between gap-3 pt-2 lg:grid lg:h-[92px] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-2 min-[1140px]:gap-4 xl:gap-6 lg:pt-3">
-        <Logo aRef={aRef} className="lg:justify-self-start" />
+        <Logo aRef={aRef} priority className="lg:justify-self-start" />
 
         <nav aria-label="Primary" className="a-fade hidden items-center lg:flex lg:justify-self-center" style={{ '--d': '0.75s' }}>
           <div

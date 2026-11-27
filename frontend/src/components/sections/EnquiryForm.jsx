@@ -35,6 +35,10 @@ const typeFields = {
     { id: 'company', label: 'Company', kind: 'text', required: true },
     { id: 'partnershipType', label: 'Partnership type', kind: 'select', required: true, options: opts(['Referral', 'White-label', 'Technology', 'College']) },
   ],
+  'upcoming-interest': [
+    { id: 'service', label: 'Service you are interested in', kind: 'text', required: true, hint: 'For example: Mechanical CAD, Robotics Solutions or Web 3.0 Solutions.' },
+    { id: 'interestedAs', label: 'I am interested as', kind: 'select', options: opts(['A customer', 'A possible franchise partner', 'A possible authorized partner', 'A possible referral partner', 'Other']) },
+  ],
   general: [],
 }
 

@@ -193,96 +193,58 @@ export const serviceDetails = {
   },
 
   // ---------------------------------------------------------------- 03 Digital Marketing
+  // Written from "LAX360_Digital_Marketing_Services_Page_Content" (supplied by LAX360 management). Each service category has its own page: the document's introduction line is `intro`, its sub-services are `features`
+  // ([title, description, optional list]), and any closing line of the category is `offers`. The document has no problems / benefits / examples text, so those sections are intentionally absent (ServiceItem hides them).
   'growth/social-media-management': {
     photo: I(24),
-    intro: 'Regular, on-brand publishing on the channels your customers use.',
-    about: [
-      'Consistent social media presence takes planning and time. We manage your channels — content calendar, post creation, scheduling and community replies — in a voice that fits your brand.',
-      'The channels and frequency are agreed with you based on your audience and capacity, not applied as a fixed formula.',
+    intro: "We set up, manage, and grow your brand's presence on the platforms where your customers spend their time.",
+    offers: ['Consistent branding, hashtag strategy, and monthly performance reports across all platforms'],
+    features: [
+      ['Meta (Facebook and Instagram)', 'Page setup, profile optimization, content calendar, daily posting, stories, reels, and community engagement'],
+      ['LinkedIn', 'Company page setup, professional posts, and B2B networking to build authority'],
+      ['Pinterest', 'Business profile, boards, and pins that drive traffic to your website'],
+      ['X (Twitter)', 'Profile setup, regular updates, trending topics, and audience interaction'],
     ],
-    offers: ['Channel selection and content calendar', 'Post design and caption writing', 'Scheduling and publishing', 'Basic performance summaries'],
-    solves: ['Profiles are updated irregularly or not at all', 'No time to plan or create content', 'Messages and comments go unanswered'],
-    features: [['Content planning', 'A calendar tied to your offers and seasons.'], ['Creative and copy', 'Posts designed and written for each channel.'], ['Community replies', 'Comments and messages handled in your tone.'], ['Reporting', 'Simple summaries of what was published and how it performed.']],
-    benefits: ['A steady, professional presence', 'Time saved for your team', 'Better understanding of what your audience responds to'],
-    uses: [['Local business', 'Share offers, events and customer stories.'], ['New brand launch', 'Build awareness from the first post.'], ['Training provider', 'Promote course intakes and student work.']],
-  },
-  'growth/meta-ads-management': {
-    photo: I(24),
-    intro: 'Paid campaigns on Facebook and Instagram, planned and tracked towards enquiries.',
-    about: [
-      'Meta’s advertising platform lets you reach people by location, interest and behaviour. Managing it well means clear goals, tested creative and careful budget control.',
-      'We set up campaigns, measure results against the goals we agree with you, and adjust what is not working.',
-    ],
-    offers: ['Goal, audience and budget planning', 'Ad creative and copy', 'Campaign set-up and tracking', 'Ongoing optimisation and reporting'],
-    solves: ['Boosted posts spend money without clear returns', 'Unsure who is seeing your ads', 'No tracking of enquiries from advertising'],
-    features: [['Audience targeting', 'Reach defined locations and interests.'], ['Creative testing', 'Compare versions to see what works.'], ['Conversion tracking', 'Measure enquiries, not just clicks.'], ['Budget control', 'Spending limits agreed in advance.']],
-    benefits: ['Spend tied to a purpose', 'Clear reporting on results', 'Steady improvement as data comes in'],
-    uses: [['Lead generation', 'Collect enquiries for a service.'], ['Event promotion', 'Drive registrations for a workshop.'], ['Local awareness', 'Reach people near your branch.']],
-  },
-  'growth/google-ads-management': {
-    photo: I(6),
-    intro: 'Search and display ads that reach people already looking for what you offer.',
-    about: [
-      'Google Ads places your business in front of people at the moment they search. Results depend on choosing the right keywords, writing clear ads and sending visitors to a page that answers their need.',
-      'We plan the campaign structure, manage bids and budget, and review search terms regularly to remove wasted spend.',
-    ],
-    offers: ['Keyword research and campaign structure', 'Ad copy and extensions', 'Conversion tracking set-up', 'Regular review and reporting'],
-    solves: ['Ads appear for searches that do not match your services', 'Clicks that do not turn into calls or enquiries', 'No visibility of which keywords bring results'],
-    features: [['Keyword planning', 'Target the searches that matter.'], ['Negative keyword review', 'Exclude irrelevant searches.'], ['Call and form tracking', 'See which ads create enquiries.'], ['Budget management', 'Spend kept within agreed limits.']],
-    benefits: ['Reach people with active intent', 'Reduced wasted clicks', 'Transparent reporting'],
-    uses: [['Local service', 'Appear for “near me” and service searches.'], ['Product campaign', 'Promote a specific product line.'], ['Course enrolment', 'Capture searches for training programmes.']],
   },
   'growth/search-engine-optimization-seo': {
     photo: I(6),
-    intro: 'Technical and content improvements so people searching for what you offer can find you.',
-    about: [
-      'SEO is the work of making your website easier for search engines to understand and more useful to visitors. It covers site structure and speed, page content, and how other sites refer to you.',
-      'Results build over time, so we agree priorities and review progress regularly instead of promising rankings.',
+    intro: 'A complete SEO service to improve your Google rankings and bring in consistent organic traffic.',
+    features: [
+      ['On-Page SEO', 'Keyword research, title and meta tag optimization, heading structure, content optimization, image optimization, and internal linking'],
+      ['Local SEO', 'Google Business Profile optimization, local listings, citations, and review management to reach nearby customers'],
+      ['Off-Page SEO', 'Quality backlink building, directory and bookmark submissions, guest posting, and brand mentions to build domain authority'],
+      ['Technical SEO', 'Site speed optimization, mobile-friendliness, sitemap and robots.txt setup, crawl error fixes, schema markup, and Search Console setup'],
     ],
-    offers: ['Site and keyword audit', 'On-page improvements: titles, headings, content', 'Technical fixes: speed, structure, indexing', 'Local search profile set-up'],
-    solves: ['Your site does not appear for your own service names', 'Pages load slowly or are hard to crawl', 'Competitors are easier to find'],
-    features: [['Audit and priorities', 'A ranked list of improvements.'], ['Content guidance', 'Pages that answer real search questions.'], ['Technical health', 'Speed, mobile use and indexing checked.'], ['Local presence', 'Business profiles kept accurate.']],
-    benefits: ['A steadier flow of visitors who are looking for you', 'A faster, better-structured website', 'Less reliance on paid advertising over time'],
-    uses: [['Service website', 'Rank for the services you provide in your city.'], ['Multi-branch business', 'Make each location easy to find.'], ['Content programme', 'Publish articles that match what customers search for.']],
   },
-  'growth/website-and-landing-page-optimization': {
-    photo: I(6),
-    intro: 'Improve your pages so more of the visitors you already have become enquiries.',
-    about: [
-      'Getting visitors is only half of the job. Optimisation looks at how people use your pages — where they drop off, what they miss — and improves layout, wording and speed to guide them to act.',
-      'For campaigns, we also build focused landing pages with one clear goal and a short path to enquire.',
+  'growth/creatives': {
+    photo: I(1),
+    intro: 'Eye-catching visuals and videos that make your brand stand out and keep audiences engaged.',
+    features: [
+      ['Poster and Graphic Design', 'Social media posters, banners, brochures, and festival and offer creatives'],
+      ['Video Shooting', 'Professional product, service, and promotional video shoots'],
+      ['Video Editing', 'Reels, short videos, and promotional videos with music, text, and branding'],
     ],
-    offers: ['Page and funnel review', 'Layout, copy and call-to-action improvements', 'Speed and mobile improvements', 'Landing pages for campaigns'],
-    solves: ['Traffic arrives but few visitors enquire', 'Pages are slow or hard to read on phones', 'Ad clicks land on a general page'],
-    features: [['Behaviour review', 'See where visitors stop.'], ['Clear calls to action', 'Make the next step obvious.'], ['Faster pages', 'Reduce delay before content appears.'], ['Focused landing pages', 'One page, one goal.']],
-    benefits: ['More enquiries from existing traffic', 'Better return on advertising', 'A smoother experience on every device'],
-    uses: [['Campaign landing page', 'Match an ad to a dedicated page.'], ['Service page rewrite', 'Clarify what you offer and why to contact you.'], ['Enquiry form simplification', 'Reduce fields to what is needed.']],
   },
-  'growth/content-creation': {
-    photo: I(24),
-    intro: 'Clear, useful writing and creative that supports your pages and campaigns.',
-    about: [
-      'Good content explains what you do in language your customers use. We create website copy, articles, social posts and simple creative assets that stay consistent with your brand.',
-      'We work from your own knowledge and materials, so content is accurate and specific rather than generic.',
+  'growth/content-publishing': {
+    photo: I(23),
+    intro: 'Valuable content, published where your audience reads and searches.',
+    offers: ['Other article and content platforms for wider reach'],
+    features: [
+      ['Article Writing', 'SEO-friendly blog articles, website content, and product descriptions'],
+      ['Blogger', 'Regular blog posts to improve search visibility and build backlinks'],
+      ['Reddit', 'Community-focused posts and discussions that bring relevant traffic and build trust'],
     ],
-    offers: ['Website and service-page copy', 'Articles and blog posts', 'Social media content', 'Basic graphics and creative'],
-    solves: ['Pages that describe services vaguely', 'No time to write articles or posts', 'Inconsistent tone across channels'],
-    features: [['Brand voice', 'Consistent wording across channels.'], ['Search-aware writing', 'Content structured around what people look for.'], ['Fact-checked with you', 'Accuracy confirmed before publishing.'], ['Reusable assets', 'One idea adapted for several channels.']],
-    benefits: ['Clearer communication of your offer', 'A steady supply of material for your channels', 'Content that supports search and campaigns'],
-    uses: [['Website refresh', 'Rewrite key pages.'], ['Expertise articles', 'Explain topics your customers ask about.'], ['Campaign set', 'Matched copy and graphics for one promotion.']],
   },
-  'growth/digital-marketing-strategy': {
+  'growth/paid-advertising': {
     photo: I(5),
-    intro: 'A plan that connects channels, budget and goals, so every activity has a purpose.',
-    about: [
-      'Without a plan, marketing becomes a collection of unrelated tasks. A strategy defines who you want to reach, what you want them to do, which channels to use and how to measure it.',
-      'We review your current activity, set practical priorities and build a plan sized to your budget and team.',
+    intro: 'We plan, launch, and optimize ad campaigns that reach the right audience and bring you enquiries, leads, and sales.',
+    offers: ['Audience targeting', 'Budget management', 'A/B testing', 'Regular performance reports'],
+    features: [
+      ['Meta Ads (Facebook and Instagram)', '', ['Lead Generation campaigns', 'Traffic campaigns', 'Engagement campaigns', 'Awareness campaigns', 'Messages campaigns (WhatsApp and Messenger)', 'Sales campaigns']],
+      ['Google Ads', '', ['Search Ads campaigns', 'Performance Max campaigns', 'Display Ads campaigns', 'YouTube Video Ads campaigns']],
+      ['LinkedIn Ads', '', ['Lead Generation campaigns', 'Website Visits campaigns', 'Brand Awareness campaigns', 'Engagement campaigns', 'Video Views campaigns']],
+      ['X (Twitter) Ads', '', ['Awareness (Reach) campaigns', 'Website Traffic campaigns', 'Engagement campaigns', 'Video Views campaigns', 'Followers campaigns']],
     ],
-    offers: ['Review of current marketing and market', 'Audience and goal definition', 'Channel and budget plan', 'Measurement framework and review schedule'],
-    solves: ['Unsure which marketing activities to spend on', 'Channels run separately with no shared goal', 'No agreed way to judge success'],
-    features: [['Audience clarity', 'Who you are talking to and what they need.'], ['Channel mix', 'The few channels worth your effort now.'], ['Budget allocation', 'Spend matched to priorities.'], ['Measures', 'Agreed indicators reviewed on a schedule.']],
-    benefits: ['Focused spending', 'One plan across website, social and ads', 'A way to review and adjust'],
-    uses: [['New business launch plan', 'Decide what to do in the first six months.'], ['Marketing reset', 'Replace scattered activity with a plan.'], ['Quarterly planning', 'Set goals and review the last period.']],
   },
 
   // ---------------------------------------------------------------- 04 Headless SaaS & API Solutions
@@ -627,6 +589,113 @@ export const serviceDetails = {
     features: [['Designed from your process', 'Screens follow your steps.'], ['Forms and checklists', 'Structured data capture.'], ['Offline capability where required', 'Work without a signal and sync later.'], ['Central data', 'Everything flows to your system.']],
     benefits: ['Digital capture instead of paper', 'Real-time information for managers', 'A tool people actually fit to their work'],
     uses: [['Inspection checklist', 'Complete and submit checks on site.'], ['Survey app', 'Collect structured responses in the field.'], ['Customer onboarding', 'Guide new customers through steps.']],
+  },
+
+  // ---------------------------------------------------------------- 07 Education & Training
+  // Written from LAX360's own education programme documents (Education Franchise, Authorized Partner and Referral Partner content and the approved IT course list). No fees, batch dates, placement promises or results are stated.
+  'education/technical-training': {
+    photo: I(11),
+    intro: 'Hands-on technical training for students and working professionals.',
+    about: [
+      'Technical training at LAX360 Education is built around practical sessions: you learn a tool or language, then use it on exercises and small projects.',
+      'Training covers the areas in the LAX360 Education course list, including programming languages, web design, databases, software testing, cloud computing and DevOps.',
+    ],
+    offers: ['Practical, hands-on sessions', 'Courses from the approved LAX360 Education list', 'Guidance on choosing a course', 'Project and assessment support'],
+    solves: ['Theory without enough practice', 'No clear starting point in a large technical field', 'Skills that do not match what employers ask for'],
+    features: [['Programming and web', 'Languages and web design courses from the course list.'], ['Databases and testing', 'MySQL, MongoDB, SQL Server, manual and automation testing.'], ['Cloud and DevOps', 'Cloud platform and DevOps tool courses.'], ['Practical sessions', 'Exercises and project work alongside each topic.']],
+    benefits: ['Learn by doing', 'A course list you can see in full', 'Help picking the right starting point'],
+    uses: [['First IT course', 'Start with a programming or web design certificate.'], ['Adding a tool', 'Learn one tool, such as Git, Docker or Selenium, for your current work.'], ['Career change', 'Build a technical base before applying for IT roles.']],
+  },
+  'education/professional-certification-courses': {
+    photo: I(14),
+    intro: 'Certificate courses taken from the approved LAX360 Education course list.',
+    about: [
+      'LAX360 Education offers only the courses on its approved catalogue. Each is a certificate course focused on one language, tool or platform, grouped by category so it is easy to compare.',
+      'The full list is on this page: programming languages, web designing, databases, full stack development with AI, software testing, cloud computing, DevOps, data and AI, cyber security, digital marketing and frameworks.',
+    ],
+    offers: ['Certificate courses by category', 'Course completion certification for eligible participants', 'Software and tool named for every course', 'Advice on which course to take first'],
+    solves: ['Too many courses with unclear content', 'Not knowing which tool a course teaches', 'Wanting a recognised record of what you completed'],
+    features: [['Clear categories', 'Courses grouped so you can browse by field.'], ['Tool named for each course', 'The software or language each course teaches is shown.'], ['One catalogue', 'Every programme page reads the same approved list.'], ['Enquiry first', 'Ask us for fees, duration and start dates.']],
+    benefits: ['A transparent course list', 'Focused, single-subject certificates', 'The same catalogue wherever you see it'],
+    uses: [['Student certificate', 'Add a certificate in Python, Java or web design.'], ['Cloud or DevOps skills', 'Choose AWS, Azure, Docker or Kubernetes.'], ['Digital marketing basics', 'Start with SEO, Google Ads or web analytics.']],
+  },
+  'education/internship-programs': {
+    photo: I(13),
+    intro: 'Domain-based internships with real project exposure and mentoring.',
+    about: [
+      'Internship programmes give students practical exposure in a chosen domain, working on real-time tasks with technical mentoring.',
+      'Programmes are offered as 15-day, 30-day and long-term internships, subject to approval, and can include mini-project or final-year project guidance.',
+    ],
+    offers: ['15-day, 30-day and long-term programmes, subject to approval', 'Domain-based internship tracks', 'Real-time project exposure', 'Technical mentoring and documentation'],
+    solves: ['Little practical experience before graduation', 'Academic projects without guidance', 'No route from learning to real work'],
+    features: [['Domain based', 'Choose a track that matches your interest.'], ['Real-time projects', 'Work on practical tasks rather than only exercises.'], ['Mentoring', 'Technical guidance throughout the programme.'], ['Project support', 'Help with mini and final-year projects.']],
+    benefits: ['Practical experience to describe in interviews', 'Guided project work', 'Internship completion certification for eligible participants'],
+    uses: [['Summer internship', 'A short programme during a break.'], ['Final-year project', 'Mentored project work with documentation.'], ['Long-term internship', 'Extended practice in one domain.']],
+  },
+  'education/ai-and-software-development-training': {
+    photo: I(12),
+    intro: 'Learn to build software and AI solutions through practical projects.',
+    about: [
+      'This training follows the way LAX360 builds software: full stack development with AI, databases, and data science with Python and machine learning.',
+      'It draws on the Full Stack Development with AI and Database & AI categories of the approved LAX360 Education course list.',
+    ],
+    offers: ['Full stack development with AI courses', 'Data science, machine learning and analytics courses', 'Practical, project-based learning', 'Guidance on the right learning path'],
+    solves: ['AI topics that feel too abstract', 'Not knowing how front end, back end and data fit together', 'Learning tools without building anything'],
+    features: [['Full stack with AI', 'MERN, Java, MEAN, PHP and Python full stack courses with AI.'], ['Data and machine learning', 'Python data science and machine learning courses.'], ['Analytics tools', 'Tableau and Power BI courses.'], ['Build as you learn', 'Projects instead of slides.']],
+    benefits: ['A path from basics to a working project', 'Skills used in real software work', 'Courses from one approved list'],
+    uses: [['Aspiring developer', 'Follow a full stack course end to end.'], ['Analyst', 'Learn Python, machine learning and a dashboard tool.'], ['Working developer', 'Add AI to your development skills.']],
+  },
+  'education/workshops-and-seminars': {
+    photo: I(13),
+    intro: 'Technical workshops and industry-oriented seminars for students and professionals.',
+    about: [
+      'Workshops and seminars bring a focused topic to a group: a technical workshop on a tool or technology, an industry-oriented seminar, or a guest lecture.',
+      'They can be arranged with colleges and institutions, and a participation certificate can be issued for eligible participants.',
+    ],
+    offers: ['Technical workshops', 'Industry-oriented seminars', 'Guest lectures', 'Workshop and seminar participation certificates'],
+    solves: ['Students with no exposure to current technology', 'A department that wants an industry speaker', 'A team that needs a short, focused session'],
+    features: [['Technical workshops', 'Hands-on sessions on a defined topic.'], ['Seminars', 'Industry-focused talks and discussions.'], ['Guest lectures', 'Sessions led by industry professionals.'], ['Participation certificates', 'Issued for eligible participants.']],
+    benefits: ['Current technology topics', 'Short, focused formats', 'Easy to fit into an academic or training calendar'],
+    uses: [['College workshop', 'A one-day technical workshop for a department.'], ['Industry seminar', 'A talk on emerging technology.'], ['Team session', 'A short upskilling session for staff.']],
+  },
+  'education/corporate-training': {
+    photo: I(23),
+    intro: 'Technical and AI training for your employees, planned around your needs.',
+    about: [
+      'Corporate training helps a company build technical skills in its own team: software and technology workshops, AI and automation training, and digital transformation training.',
+      'Programmes are customised: we agree the topics, depth and schedule with you before the training starts.',
+    ],
+    offers: ['Employee technical training', 'Software and technology workshops', 'AI and automation training', 'Customised training solutions'],
+    solves: ['A team that needs new technical skills quickly', 'Staff unsure how to use AI and automation tools', 'No time to design a training programme in-house'],
+    features: [['Employee training', 'Technical topics matched to your team.'], ['AI and automation', 'Practical training on AI tools and automation.'], ['Digital transformation', 'Training that supports a move to digital processes.'], ['Customised programmes', 'Content, depth and schedule agreed with you.']],
+    benefits: ['Training built around your team', 'Skills your business can use straight away', 'One partner for training and technology'],
+    uses: [['Upskilling a technical team', 'Add cloud, DevOps or testing skills.'], ['AI awareness', 'Help staff use AI and automation safely.'], ['Professional development', 'A programme for managers and analysts.']],
+  },
+  'education/college-and-institutional-training': {
+    photo: I(14),
+    intro: 'Programmes with schools, colleges, universities and polytechnics.',
+    about: [
+      'LAX360 Education works with educational institutions to improve students\' technical knowledge and industry exposure.',
+      'Activities can include technical workshops, seminars, guest lectures, add-on and value-added courses, internships, final-year project guidance and faculty development programmes, agreed through an institutional MoU where appropriate.',
+    ],
+    offers: ['Technical workshops and seminars', 'Add-on and value-added courses', 'Internship programmes and final-year project guidance', 'Faculty development programmes'],
+    solves: ['A curriculum that needs industry-oriented add-ons', 'Students who need project guidance', 'Faculty who want updated technical skills'],
+    features: [['Add-on courses', 'Industry-oriented courses alongside the curriculum.'], ['Workshops and seminars', 'Sessions for students across departments.'], ['Internships and projects', 'Guided practical work for students.'], ['Faculty programmes', 'Technical updates and teaching support.']],
+    benefits: ['Industry exposure for students', 'Flexible programme design', 'A clear agreement of what is delivered'],
+    uses: [['Department add-on course', 'A certificate course for a final-year batch.'], ['Annual workshop series', 'Technical workshops across the year.'], ['Project guidance', 'Mini and major project support.']],
+  },
+  'education/skill-development-programs': {
+    photo: I(12),
+    intro: 'Skill development for students and professionals, from technical skills to career readiness.',
+    about: [
+      'Skill development programmes combine a technical course with the supporting skills that help people move into work: career guidance, aptitude and technical training, and soft skills.',
+      'Programmes are shaped around the course and the group, so a college batch and a working professional can each follow a suitable plan.',
+    ],
+    offers: ['Technical skill courses from the approved list', 'Career guidance sessions', 'Aptitude and soft skills sessions', 'Resume and interview preparation guidance'],
+    solves: ['Technical skills without career preparation', 'Unclear next steps after a course', 'Little practice with interviews and communication'],
+    features: [['Technical base', 'A course from the LAX360 Education list.'], ['Career guidance', 'Sessions on choosing and preparing for a career path.'], ['Aptitude and soft skills', 'Practice beyond the technical subject.'], ['Interview preparation', 'Resume and interview guidance.']],
+    benefits: ['Preparation that goes beyond the syllabus', 'Support for the step after the course', 'Programmes shaped to the group'],
+    uses: [['Final-year batch', 'A technical course plus career preparation.'], ['Career starter', 'A skills plan before applying for roles.'], ['Returning professional', 'Refresh technical skills with guidance.']],
   },
 }
 

@@ -8,5 +8,6 @@ export const divisionIcons = {
   headless: Server,
   automation: Workflow,
   mobile: Smartphone,
+  education: GraduationCap,
   training: GraduationCap,
 }

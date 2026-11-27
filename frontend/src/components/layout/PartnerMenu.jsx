@@ -2,6 +2,9 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ChevronRight, Handshake } from 'lucide-react'
 import { usePartnerMenu } from '../../services/partnershipService.js'
+import { useUpcomingForProgram } from '../../hooks/useUpcoming.js'
+import { PROGRAM_BY_SLUG } from '../../data/upcomingServices.js'
+import { StatusBadge } from '../upcoming/UpcomingUI.jsx'
 
 /**
  * "Partner With Us": a highlighted call-to-action beside the Login button, with a hover dropdown (the three partnership programs) and a nested side menu (the business divisions of the
@@ -55,6 +58,7 @@ export default function PartnerMenu({ bot }) {
   }
 
   const cur = categories.find((c) => c.slug === sub)
+  const upcoming = useUpcomingForProgram(PROGRAM_BY_SLUG[sub] || '')
   return (
     <div ref={root} className="relative" onMouseEnter={() => { if (window.matchMedia('(hover: hover)').matches) { show(); botTo('partner') } }} onMouseLeave={() => { hide(); bot?.current?.leave() }} onKeyDown={onKey} onBlur={(e) => !root.current?.contains(e.relatedTarget) && hide(60)}>
       <div className="inline-flex items-stretch overflow-hidden rounded-full bg-gradient-to-r from-primary-hover to-primary text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] ring-1 ring-white/20 transition-shadow hover:shadow-[0_12px_28px_-10px_rgb(var(--glow)/1)]">
@@ -82,13 +86,23 @@ export default function PartnerMenu({ bot }) {
 
           {/* nested side menu: the divisions of the program under the pointer */}
           <div role="menu" aria-label={cur ? `${cur.label}: business divisions` : undefined} className={`absolute right-full top-0 pr-2 transition-[opacity,transform] duration-200 ease-out ${open && cur ? 'visible translate-x-0 opacity-100' : 'pointer-events-none invisible translate-x-1 opacity-0'}`}>
-            <div className="w-64 rounded-2xl border border-edge-strong bg-night/95 p-2 shadow-menu backdrop-blur-xl">
+            <div className="w-72 rounded-2xl border border-edge-strong bg-night/95 p-2 shadow-menu backdrop-blur-xl">
               <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wider text-soft">{cur?.label}</p>
               <ul>
                 {(cur?.items || []).map((d) => (
                   <li key={d.slug}><Link to={d.path} role="menuitem" data-bot={`partner:${cur.slug}/${d.slug}`} data-bot-at="row" data-pm-item data-pm-level="1" tabIndex={open && cur ? 0 : -1} onMouseEnter={() => botTo(`partner:${cur.slug}/${d.slug}`)} onFocus={() => botTo(`partner:${cur.slug}/${d.slug}`)} onClick={() => botClick(`partner:${cur.slug}/${d.slug}`)} className="flex min-h-11 items-center rounded-xl px-3 text-[0.9375rem] font-medium text-fg transition-colors hover:bg-glass">{d.label}</Link></li>
                 ))}
               </ul>
+              {upcoming.length > 0 && (
+                <>
+                  <p className="mt-1 border-t border-edge px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wider text-soft">Upcoming (not open yet)</p>
+                  <ul>
+                    {upcoming.map((u) => (
+                      <li key={u.slug}><Link to={u.path} role="menuitem" data-pm-item data-pm-level="1" tabIndex={open && cur ? 0 : -1} className="flex min-h-11 items-center justify-between gap-2 rounded-xl px-3 text-[0.9375rem] font-medium text-fg transition-colors hover:bg-glass">{u.short}<StatusBadge status={u.status} /></Link></li>
+                    ))}
+                  </ul>
+                </>
+              )}
               <Link to={cur?.path || '/partner-with-us'} role="menuitem" data-pm-item data-pm-level="1" tabIndex={open && cur ? 0 : -1} className="mt-1 flex min-h-11 items-center rounded-xl border-t border-edge px-3 pt-0.5 text-sm font-semibold text-lav hover:text-fg">Program overview</Link>
             </div>
           </div>

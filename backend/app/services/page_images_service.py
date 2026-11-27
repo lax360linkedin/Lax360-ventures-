@@ -26,7 +26,7 @@ PAGES = [
     ("insights", "Insights", "/insights"), ("career", "Careers", "/career"), ("contact", "Contact", "/contact"), ("seo", "Search & sharing", "/"), ("site", "Whole website", "/"),
 ]
 PAGE_OF = {
-    "carousel_image": "home", "service_card": "home", "client": "home", "testimonial": "home", "welcome_card": "home", "about_block": "about", "service_category": "services", "service": "services",
+    "carousel_image": "home", "service_card": "home", "client": "home", "testimonial": "home", "welcome_card": "home", "about_block": "about", "service_category": "services", "service": "services", "upcoming_category": "services", "upcoming_service": "services",
     "industry": "industries", "product": "products", "product_module": "products", "website": "websites", "project": "work", "network_partner": "network", "team_member": "team",
     "team_department": "team", "team_gallery": "team", "team_page": "team", "article": "insights", "career_page": "career", "seo_page": "seo",
 }
@@ -137,6 +137,10 @@ def listing(db: Session, user: User) -> dict:
         loose = [entry("service", i, "Service") for i in items.get("service", []) if (i.data or {}).get("category") not in known]
         if loose:
             pages["services"].append(section("cat-other", "Other services", loose, kind="service"))
+    if "upcoming_category" in allowed and items.get("upcoming_category"):  # the upcoming service categories and the services inside them (images and icons)
+        up = items["upcoming_category"]
+        rows = [entry("upcoming_category", c, "Upcoming category") for c in up] + ([entry("upcoming_service", i, "Upcoming service") for i in items.get("upcoming_service", [])] if "upcoming_service" in allowed else [])
+        pages["services"].append(section("upcoming", "Upcoming services", rows, kind="upcoming_category"))
     # ---- Industries, Products, Websites, Work, Network, Insights: one section per category of the content itself
     if "industry" in allowed:
         pages["industries"] += by("industry", "group")

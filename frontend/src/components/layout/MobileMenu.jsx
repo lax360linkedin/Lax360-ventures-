@@ -1,6 +1,9 @@
 import LanguageSwitcher from './LanguageSwitcher.jsx'
 import { useEffect, useRef, useState } from 'react'
 import { usePartnerMenu } from '../../services/partnershipService.js'
+import { useUpcoming } from '../../hooks/useUpcoming.js'
+import { PROGRAM_BY_SLUG } from '../../data/upcomingServices.js'
+import { StatusBadge } from '../upcoming/UpcomingUI.jsx'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { CalendarCheck, ChevronDown, Gamepad2, Handshake, LogIn, LogOut, MessageCircle, Phone, UserRound, X } from 'lucide-react'
@@ -20,6 +23,7 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
   const site = useSite()
   const nav = useNav('header', primaryNav).filter((n) => n.to !== '/partner-with-us')
   const { categories, refresh } = usePartnerMenu()
+  const upcoming = useUpcoming()
   const [pOpen, setPOpen] = useState(false)
   const [pCat, setPCat] = useState(null)
   const panelRef = useRef(null)
@@ -107,6 +111,7 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
                     </div>
                     <ul hidden={pCat !== c.slug} className="mb-1 ml-3 border-l border-edge pl-2">
                       {c.items.map((d) => <li key={d.slug}><Link to={d.path} onClick={onClose} className="flex min-h-12 items-center rounded-xl px-3 text-fg/90 hover:bg-glass">{d.label}</Link></li>)}
+                      {upcoming.filter((u) => u.partners[PROGRAM_BY_SLUG[c.slug]]).map((u) => <li key={u.slug}><Link to={u.path} onClick={onClose} className="flex min-h-12 flex-wrap items-center justify-between gap-2 rounded-xl px-3 text-fg/90 hover:bg-glass">{u.short}<StatusBadge status={u.status} /></Link></li>)}
                     </ul>
                   </div>
                 ))}

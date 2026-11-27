@@ -9,6 +9,7 @@ import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { articleCategories } from '../data/articles.js'
 import { categoryLabel, formatDate, useArticles } from '../hooks/useCmsPages.js'
+import { useH1Override } from '../hooks/useSite.js'
 
 const EASE = [0.2, 0.8, 0.2, 1]
 const ICONS = { bot: Bot, code: Code2, workflow: Workflow, server: Server, layers: Layers, smartphone: Smartphone, megaphone: Megaphone, trend: TrendingUp }
@@ -55,6 +56,7 @@ function ArticleCard({ a, delay = 0 }) {
  * show until some are published there.
  */
 export default function Insights() {
+  const h1 = useH1Override()
   const articles = useArticles()
   const [params] = useSearchParams()
   const [cat, setCat] = useState(() => (articleCategories.some((c) => c.value === params.get('category')) ? params.get('category') : 'all'))
@@ -93,7 +95,7 @@ export default function Insights() {
               <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgb(var(--glow2)/0.6)]" />LAX360 Insights
             </m.p>
             <m.h1 {...rise(0.2)} id="insights-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.3rem)]">
-              Ideas and updates for a <BotHighlight delay={0.9}><span className="text-gradient">technology-driven business.</span></BotHighlight>
+              {h1 || <>Ideas and updates for a <BotHighlight delay={0.9}><span className="text-gradient">technology-driven business.</span></BotHighlight></>}
             </m.h1>
             <m.p {...rise(0.3)} className="lead mt-7 max-w-xl text-soft">
               Practical articles on AI, software, automation, SaaS and APIs, digital marketing and the technology trends that matter to the people who run businesses.

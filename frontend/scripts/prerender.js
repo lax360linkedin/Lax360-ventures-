@@ -63,13 +63,15 @@ function headTags(head, route, lang = 'en') {
     `<meta property="og:type" content="${esc(head.ogType || 'website')}" />`,
     '<meta property="og:site_name" content="LAX360 Pvt Ltd" />',
     `<meta property="og:locale" content="${esc(LANGUAGES.find((l) => l.code === lang).locale)}" />`,
-    `<meta property="og:title" content="${esc(head.title)}" />`,
-    `<meta property="og:description" content="${esc(head.description)}" />`,
+    `<meta property="og:title" content="${esc(head.ogTitle || head.title)}" />`,
+    `<meta property="og:description" content="${esc(head.ogDescription || head.description)}" />`,
     `<meta property="og:url" content="${esc(url)}" />`,
     `<meta property="og:image" content="${esc(image)}" />`,
+    ...(raw === '/assets/og-image.png' ? ['<meta property="og:image:width" content="1200" />', '<meta property="og:image:height" content="630" />'] : []), // the default sharing image is 1200 x 630; a custom image's size is not known
     '<meta name="twitter:card" content="summary_large_image" />',
-    `<meta name="twitter:title" content="${esc(head.title)}" />`,
-    `<meta name="twitter:description" content="${esc(head.description)}" />`,
+    '<meta name="twitter:site" content="@lax360tech" />',
+    `<meta name="twitter:title" content="${esc(head.ogTitle || head.title)}" />`,
+    `<meta name="twitter:description" content="${esc(head.ogDescription || head.description)}" />`,
     `<meta name="twitter:image" content="${esc(image)}" />`,
     ...(head.noindex || route === '/404' ? [] : [...LANGUAGES.map((l) => `<link rel="alternate" hreflang="${l.htmlLang}" href="${esc(SITE + (route === '/' ? prefixOf(l.code) : pathIn(l.code, route)))}" />`), `<link rel="alternate" hreflang="x-default" href="${esc(SITE + (route === '/' ? '' : route))}" />`]),
     ...verification,
@@ -146,7 +148,7 @@ async function build(route, outFile, lang = 'en') {
   const body = lang === 'en' ? html : translateHtml(html, dict)
   const ln = LANGUAGES.find((l) => l.code === lang)
   const page = stripped
-    .replace('<html lang="en">', `<html lang="${ln.htmlLang}">`)
+    .replace(/<html lang="[^"]*">/, `<html lang="${ln.htmlLang}">`)
     .replace('</head>', `    ${headTags(head, route === '/404' ? '/404' : route, lang)}\n  </head>`)
     .replace('<div id="root"></div>', `<div id="root" data-route="${route}">${body}</div>`)
   mkdirSync(dirname(outFile), { recursive: true })

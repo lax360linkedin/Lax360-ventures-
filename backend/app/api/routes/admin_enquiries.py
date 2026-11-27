@@ -27,8 +27,9 @@ class Filters:
     def __init__(self, q: str | None = Query(None, max_length=100), status: str | None = Query(None, pattern="^(new|in_progress|contacted|qualified|proposal_sent|negotiation|converted|not_interested|closed)$"),
                  date_from: date | None = Query(None, alias="from"), date_to: date | None = Query(None, alias="to"),
                  archived: str = Query("no", pattern="^(no|only|all)$"), assigned_to: uuid.UUID | None = None,
-                 type: str | None = Query(None, pattern="^[a-z-]{2,30}$"), service: str | None = Query(None, pattern="^[a-z0-9/-]{2,80}$"), industry: str | None = Query(None, max_length=60)) -> None:
-        self.kw = dict(q=q, status=status, enquiry_type=type, service=service, industry=industry, date_from=day_start(date_from), date_to=day_after(date_to), archived=archived, assigned_to=assigned_to)
+                 type: str | None = Query(None, pattern="^[a-z-]{2,30}$"), service: str | None = Query(None, pattern="^[a-z0-9/-]{2,80}$"), industry: str | None = Query(None, max_length=60),
+                 category: str | None = Query(None, pattern="^[a-z_]{3,30}$"), source: str | None = Query(None, max_length=30), branch_id: uuid.UUID | None = None, course: str | None = Query(None, max_length=80)) -> None:
+        self.kw = dict(q=q, status=status, enquiry_type=type, service=service, industry=industry, category=category, source=source, branch_id=branch_id, course=course, date_from=day_start(date_from), date_to=day_after(date_to), archived=archived, assigned_to=assigned_to)
 
 
 def _row(r: ContactEnquiry, names: dict) -> dict:

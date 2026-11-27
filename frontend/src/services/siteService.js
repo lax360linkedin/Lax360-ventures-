@@ -28,15 +28,27 @@ function wantsPreview() {
   } catch { return false }
 }
 
+// The public data of the last visit is kept in the browser (localStorage) and used at once on the next page load or refresh, while the fresh copy is fetched in the background and replaces it when
+// it differs: a refresh or a new page load shows the managed content and the chosen theme immediately instead of waiting for the API. Administrators' draft previews are never cached.
+const CACHE_PREFIX = 'lax360-public-v1:'
+const CACHE_MAX_AGE = 7 * 24 * 3600 * 1000
+const readCache = (name) => { try { const x = JSON.parse(localStorage.getItem(CACHE_PREFIX + name) || 'null'); return x && Date.now() - x.t < CACHE_MAX_AGE ? x.v : null } catch { return null } }
+const writeCache = (name, value) => { try { localStorage.setItem(CACHE_PREFIX + name, JSON.stringify({ t: Date.now(), v: value })) } catch { /* storage full or blocked: the site just works without the cache */ } }
+const sameData = (a, b) => { try { return JSON.stringify(a) === JSON.stringify(b) } catch { return false } }
+
+const siteStateOf = (r) => ({ settings: r.settings || {}, channels: Array.isArray(r.channels) ? r.channels : null, owned: r.owned && typeof r.owned === 'object' ? r.owned : null, loaded: true })
+
 let siteRequested = false
 export function loadSite() {
   if (siteRequested) return
   siteRequested = true
   const preview = wantsPreview()
   const publicSite = () => api('/api/public/site')
+  const cached = preview ? null : readCache('site')
+  if (cached) emit(siteStateOf(cached)) // shown at once; refreshed below
   ;(preview ? api('/api/admin/preview/site').catch(publicSite) : publicSite())
-    .then((r) => emit({ settings: r.settings || {}, channels: Array.isArray(r.channels) ? r.channels : null, owned: r.owned && typeof r.owned === 'object' ? r.owned : null, loaded: true }))
-    .catch(() => emit({ loaded: true }))
+    .then((r) => { if (!preview) writeCache('site', r); if (!(cached && sameData(cached, r))) emit(siteStateOf(r)) })
+    .catch(() => { if (!cached) emit({ loaded: true }) })
 }
 
 let contentRequested = false
@@ -46,7 +58,9 @@ export function loadContent() {
   contentRequested = true
   const preview = wantsPreview()
   const publicContent = () => api('/api/public/content-all').then((r) => ({ r, preview: false }))
+  const cached = preview ? null : readCache('content')
+  if (cached) emit({ content: cached.kinds || {}, ready: true, preview: false }) // shown at once; refreshed below
   ;(preview ? api('/api/admin/preview/content').then((r) => ({ r, preview: true })).catch(publicContent) : publicContent())
-    .then(({ r, preview: isPreview }) => emit({ content: r.kinds || {}, ready: true, preview: isPreview }))
-    .catch(() => emit({ ready: true }))
+    .then(({ r, preview: isPreview }) => { if (!isPreview) writeCache('content', r); if (!(cached && !isPreview && sameData(cached, r))) emit({ content: r.kinds || {}, ready: true, preview: isPreview }) })
+    .catch(() => { if (!cached) emit({ ready: true }) })
 }

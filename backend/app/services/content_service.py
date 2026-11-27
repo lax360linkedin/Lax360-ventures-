@@ -26,6 +26,10 @@ _LINK = re.compile(r"^https?://[^\s]+$")
 _LINK_FIELDS = ("link", "cta_link", "apply_link", "cta_primary_link", "cta_secondary_link")
 
 
+UPCOMING_STATUSES = [{"value": v, "label": l} for v, l in (("coming_soon", "Coming Soon"), ("under_development", "Under Development"), ("available", "Available"), ("unavailable", "Temporarily Unavailable"))]
+UPCOMING_BUILTIN_CATEGORIES = [{"value": v, "label": l} for v, l in (("cad-engineering", "CAD & Engineering Design Services"), ("robotics", "Robotics Services"), ("blockchain", "Blockchain & Web 3.0 Services"))]
+
+
 def F(name, label, kind="text", required=False, max_len=300, options=None, help="", options_from=None, default=None, ui=None):
     return {"name": name, "label": label, "type": kind, "required": required, "max": max_len, "options": options or [], "help": help, "options_from": options_from, "default": default, "ui": ui}
 
@@ -36,7 +40,10 @@ WELCOME_THEMES = [{"value": v, "label": l} for v, l in (("welcome", "Welcome (vi
 CAROUSEL_SHAPES = [{"value": "landscape", "label": "Landscape (wide)"}, {"value": "portrait", "label": "Portrait (narrow)"}]
 CAROUSEL_SPEEDS = [{"value": "slow", "label": "Slow"}, {"value": "normal", "label": "Normal"}, {"value": "fast", "label": "Fast"}]
 WELCOME_CARD_TYPES = [{"value": v, "label": l} for v, l in (("regular", "Regular welcome card"), ("festival", "Festival greeting"), ("announcement", "Special announcement"), ("offer", "Company offer / promotion"))]
-DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("ai", "AI & Business Automation"), ("growth", "Digital Marketing"), ("headless", "Headless SaaS & API Solutions"), ("automation", "Workflow Automation & Integration"), ("mobile", "Mobile & Business Applications"))]
+EDUCATION_PROGRAMS = [("technical-training", "Technical Training"), ("professional-certification-courses", "Professional Certification Courses"), ("internship-programs", "Internship Programs"),
+                      ("ai-and-software-development-training", "AI & Software Development Training"), ("workshops-and-seminars", "Workshops and Seminars"), ("corporate-training", "Corporate Training"),
+                      ("college-and-institutional-training", "College and Institutional Training"), ("skill-development-programs", "Skill Development Programs")]
+DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("ai", "AI & Business Automation"), ("growth", "Digital Marketing"), ("headless", "Headless SaaS & API Solutions"), ("automation", "Workflow Automation & Integration"), ("mobile", "Mobile & Business Applications"), ("education", "Education & Training"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
     ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("purpose", "Our Vision & Our Mission"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
     ("process", "How we work"), ("gallery", "Image carousel (between Testimonials and Our Clients)"),
@@ -57,7 +64,10 @@ INDUSTRY_GROUPS = [{"value": v, "label": l} for v, l in (("health", "Health, Edu
 NETWORK_CATEGORIES = [{"value": v, "label": l} for v, l in (
     ("group", "LAX360 Group Companies"), ("authorized", "Authorized Partners"), ("associated", "Associated Companies"), ("collaboration", "Strategic Collaborations"),
     ("education", "Education & Academic Network"), ("associate", "Business Associates"), ("reseller", "Reseller & Distribution Partners"), ("implementation", "Implementation Partners"),
-    ("startup", "Startup & Innovation Ecosystem"), ("industry", "Industry Collaborations"), ("professional", "Professional Network"))]
+    ("startup", "Startup & Innovation Ecosystem"), ("industry", "Industry Collaborations"), ("professional", "Professional Network"),
+    ("it_software", "IT & Software Partners"), ("cybersecurity", "Cybersecurity Partners"), ("digital_marketing", "Digital Marketing Partners"))]
+NETWORK_DIVISIONS = [{"value": v, "label": l} for v, l in (("group", "Group company"), ("it", "IT & Software"), ("cybersecurity", "Cybersecurity"), ("education", "Education & Training"), ("digital-marketing", "Digital Marketing"), ("other", "Other"))]
+PARTNER_STATUSES = [{"value": v, "label": l} for v, l in (("active", "Active"), ("planned", "Planned: being finalised"), ("paused", "Paused"))]
 NETWORK_RELATIONSHIPS = [{"value": v, "label": l} for v, l in (
     ("group_company", "Group company of LAX360 Pvt Ltd"), ("operated", "Operated by LAX360 Pvt Ltd"), ("associated", "Associated company (separate business)"), ("authorized", "Authorized partner"),
     ("technology_provider", "Technology provider"), ("reseller", "Reseller / distribution partner"), ("associate", "Business associate"), ("implementation", "Implementation partner"),
@@ -85,8 +95,8 @@ KINDS: dict[str, dict] = {
         "label": "Home page hero", "group": "Homepage", "module": "content", "single": True, "slug": "home", "preview_path": "/",
         "help": "Leave a field empty to keep the website's built-in text. The animated rotating word is not editable here.",
         "fields": [
-            F("eyebrow", "Small label above the title", max_len=90), F("headline_1", "Headline line 1", max_len=80), F("headline_2", "Headline line 2 (highlighted)", max_len=80),
-            F("headline_3", "Headline line 3", max_len=80), F("lead", "Supporting paragraph", "textarea", max_len=400),
+            F("eyebrow", "Small label above the title", max_len=90), F("headline_1", "H1 heading: line 1", max_len=80, help="The three headline lines together are the home page's one H1 (main heading). Keep it under about 70 characters in total and include the main keyword. Also editable in SEO management."), F("headline_2", "H1 heading: line 2 (highlighted)", max_len=80),
+            F("headline_3", "H1 heading: line 3", max_len=80), F("lead", "Supporting paragraph", "textarea", max_len=400),
             F("cta_primary_label", "Primary button text", max_len=40), F("cta_primary_link", "Primary button link", max_len=200, help="A page like /contact or a full https:// URL"),
             F("cta_secondary_label", "Secondary button text", max_len=40), F("cta_secondary_link", "Secondary button link", max_len=200),
         ],
@@ -143,7 +153,109 @@ KINDS: dict[str, dict] = {
             F("cta_label", "Button text", max_len=40), F("cta_link", "Button link", max_len=300, help="A page like /contact?type=project or a full https:// URL"),
         ],
     },
+    "education_page": {
+        "label": "Education & Training page", "group": "Services", "module": "services", "single": True, "slug": "education", "preview_path": "/services/education",
+        "help": "The text, photo and enquiry button of the Education & Training page (/services/education). Leave a field empty to keep the website's built-in text. "
+                "The search title, description and H1 can also be set in SEO management.",
+        "fields": [
+            F("headline", "Main heading (H1)", max_len=120, help="The one H1 of the page. Keep it clear and include what people search for, for example Education and Training Courses in Salem."),
+            F("lead", "Short introduction under the heading", "textarea", max_len=400),
+            F("hero_image", "Main photo", "image", help="Shown beside the heading and on the Services page. 1000 x 800 pixels works best."),
+            F("overview", "Overview text", "textarea", max_len=3000, help="Plain paragraphs. A blank line starts a new paragraph."),
+            F("courses_intro", "Text above the course list", "textarea", max_len=400, help="The course list itself is managed under Education courses."),
+            F("benefits_title", "Benefits heading", max_len=80),
+            F("benefits", "Program benefits", "textarea", max_len=3000, help="One benefit per line, written as: Title: short explanation"),
+            F("cta_label", "Enquiry button text", max_len=40), F("cta_link", "Enquiry button link", max_len=300, help="A page like /contact?type=course or a full https:// URL"),
+        ],
+    },
+    "education_program": {
+        "label": "Education programmes", "group": "Services", "module": "services", "single": False, "slug_field": "program", "preview_path": "/services/education",
+        "help": "Change the text and photo of one of the eight Education & Training programmes (each has its own page). Leave a field empty to keep the built-in text. "
+                "To add a completely new service, use Services and choose a category instead.",
+        "title_label": "Programme name (for your own reference)",
+        "fields": [
+            F("program", "Programme", "select", True, options=[{"value": v, "label": l} for v, l in EDUCATION_PROGRAMS]),
+            F("summary", "Short summary (card text and page introduction)", "textarea", max_len=300),
+            F("description", "Full description", "textarea", max_len=4000, help="Plain paragraphs. A blank line starts a new paragraph. Replaces the built-in description."),
+            F("details", "Key points", "textarea", max_len=2000, help="One point per line. Replaces the built-in key features."),
+            F("image", "Photo", "image", help="Shown on the programme's page and card."),
+        ],
+    },
+    "education_course": {
+        "label": "Education courses", "group": "Services", "module": "services", "single": False, "preview_path": "/services/education",
+        "help": "Changes to the approved LAX360 Education course catalogue. The built-in catalogue is always the starting point and appears on the Education & Training page and on every Education partner page, so nothing needs to be re-entered. "
+                "ADD a course: enter its name and category. HIDE a course: enter its exact name and tick Hidden. REPLACE a course: enter the new name and the exact name of the course it replaces.",
+        "title_label": "Course name",
+        "fields": [
+            F("category", "Category", max_len=80, help="An existing category (for example Cloud Computing) or a new one. Used when adding a course."),
+            F("software", "Software / tool taught", max_len=80),
+            F("replaces", "Replaces this course (exact name)", max_len=120, help="Optional. The built-in course this entry replaces."),
+            F("hidden", "Hidden", "bool", default=False, help="Removes the course (the one named above, or this entry's own name) from every course list."),
+        ],
+    },
+    "upcoming_category": {
+        "label": "Upcoming service categories", "group": "Services", "module": "services", "single": False, "slug_field": "url_slug", "preview_path": "/services#upcoming",
+        "help": "Service categories that LAX360 is planning or building: CAD & Engineering Design, Robotics, Blockchain & Web 3.0. They are shown with a status badge (Coming Soon, Under Development, Available or Temporarily Unavailable) "
+                "on the home page, the Services page, the menus and the partnership pages, and visitors can register their interest. Built-in entries exist for the three categories: to change one, add an entry whose Page URL is "
+                "cad-engineering, robotics or blockchain (and set its status). To launch a category, change its status to Available: no code change is needed. Remember to describe only what really exists.",
+        "title_label": "Category name",
+        "fields": [
+            F("url_slug", "Page URL", max_len=80, help="The page address: cad-engineering, robotics and blockchain replace the built-in categories; any other text creates a new category at /upcoming/<text>."),
+            F("status", "Launch status", "select", True, options=UPCOMING_STATUSES, default="coming_soon"),
+            F("tagline", "Short description (cards and menus)", "textarea", max_len=300),
+            F("description", "Full description", "textarea", max_len=3000, help="Plain paragraphs. A blank line starts a new paragraph. Describe only what is planned or already real."),
+            F("launch_note", "Launch note", max_len=160, help="For example: Planned for a future release. Do not enter a date unless it is confirmed."),
+            F("short_name", "Short name (menus and footer)", max_len=60, help="For example Robotics. Leave empty to use the full name."),
+            F("headline", "Page heading (H1)", max_len=120), F("lead", "Introduction under the heading", "textarea", max_len=400),
+            F("areas", "Planned direction / areas of interest", "textarea", max_len=2500, help="One per line, written as: Title: short explanation"),
+            F("today", "What LAX360 already delivers today", "textarea", max_len=800, help="One per line. Only things that really exist."),
+            F("today_links", "Links under 'What LAX360 already delivers'", "textarea", max_len=500, help="One per line: Label | /page"),
+            F("seo_title", "Search title", max_len=70), F("seo_description", "Search description", "textarea", max_len=300),
+            F("image", "Main image", "image"), F("icon", "Icon", "image", help="Optional. A built-in icon is used when empty."),
+            F("show_home", "Show on the home page", "bool", default=True),
+            F("partner_franchise", "Available under Franchise Opportunities (future)", "bool", default=True),
+            F("partner_authorized", "Available under the Authorized Partner Program (future)", "bool", default=True),
+            F("partner_referral", "Available under the Referral Partner Program (future)", "bool", default=True),
+            F("cta_label", "Button text", max_len=40, help="Shown when the status is Available, for example Get started."), F("cta_link", "Button link", max_len=300, help="Shown when the status is Available. A page like /contact?type=project or a full https:// URL."),
+        ],
+    },
+    "upcoming_service": {
+        "label": "Upcoming services", "group": "Services", "module": "services", "single": False, "slug_field": "url_slug", "preview_path": "/services#upcoming",
+        "help": "The individual services inside an upcoming category (for example Mechanical CAD, Civil CAD). A service shows the category's status unless you set its own. "
+                "Built-in entries: mechanical-cad, civil-cad, robotics-solutions, robotics-development-integration, blockchain-development, web3-solutions.",
+        "title_label": "Service name",
+        "fields": [
+            F("url_slug", "Reference name", max_len=80, help="Use a built-in name (see above) to change that service; any other text adds a new service."),
+            F("category", "Category", "select", True, options=UPCOMING_BUILTIN_CATEGORIES, options_from="upcoming_category"),
+            F("status", "Launch status", "select", False, options=UPCOMING_STATUSES, help="Leave empty to follow the category."),
+            F("summary", "Short description", "textarea", max_len=300),
+            F("description", "Full description", "textarea", max_len=3000),
+            F("image", "Image", "image"), F("icon", "Icon", "image"),
+            F("partner_franchise", "Offered under Franchise Opportunities (future)", "bool", default=True),
+            F("partner_authorized", "Offered under the Authorized Partner Program (future)", "bool", default=True),
+            F("partner_referral", "Offered under the Referral Partner Program (future)", "bool", default=True),
+        ],
+    },
+    "partner_product": {
+        "label": "Partner product list (Our Products)", "group": "Services", "module": "services", "single": False, "preview_path": "/franchise/it",
+        "help": "Changes to the \"Our Products\" list on the IT & Software partnership pages (Franchise, Authorized Partner and Referral Partner). The built-in list is always the starting point, so nothing needs to be re-entered. "
+                "ADD an entry: enter its name and the group it belongs to. HIDE one: enter its exact name and tick Hidden. REPLACE one: enter the new name and the exact name it replaces.",
+        "title_label": "Product or service name",
+        "fields": [
+            F("program", "Program", "select", False, options=[{"value": "franchise", "label": "Franchise Opportunities"}, {"value": "authorized-partner", "label": "Authorized Partner Program"}, {"value": "referral-partner", "label": "Referral Partner Program"}], help="Which partnership program's list the entry belongs to. Leave empty to show it in all three."),
+            F("group", "Group", max_len=80, help="An existing group (for example LAX360 own products) or a new one. Used when adding an entry."),
+            F("description", "Short description", max_len=160), F("tag", "Label chip", max_len=40, help="Optional small label next to the name, for example Partnership option."),
+            F("link", "Link", max_len=300, help="Optional. A page like /products/lax360-business-crm."),
+            F("replaces", "Replaces this entry (exact name)", max_len=120, help="Optional. The built-in entry this one replaces."),
+            F("hidden", "Hidden", "bool", default=False, help="Removes the entry (the one named above, or this entry's own name) from the list."),
+        ],
+    },
     # ---- About ----------------------------------------------------------------------------------------------------------------------
+    "content_seed": {
+        "hidden": True, "label": "Content migration markers", "group": "Navigation & SEO", "module": "content", "single": False, "preview_path": "/",
+        "help": "Internal markers written by `python -m app.cli migrate-content`: once a section's built-in content has been moved into the database, the database is the only source for it.",
+        "fields": [F("seeded", "Migrated", "bool", default=True)],
+    },
     "about_block": {
         "label": "About Us content", "group": "About", "module": "content", "single": False, "preview_path": "/about",
         "help": "Company introduction, vision, mission, values, achievements, team members and images for the About page. "
@@ -172,7 +284,7 @@ KINDS: dict[str, dict] = {
             F("ai_opportunities", "AI and automation opportunities", "textarea", max_len=2500, help="One per line. Optional: Title: description"),
             F("use_cases", "Use cases", "textarea", max_len=2000, help="One use case per line."),
             F("benefits", "Benefits of digital transformation", "textarea", max_len=2000, help="One benefit per line."),
-            F("services", "Related LAX360 services", "textarea", max_len=500, help="One service category per line: software, ai, growth, headless, automation, mobile"),
+            F("services", "Related LAX360 services", "textarea", max_len=500, help="One service category per line: software, ai, growth, headless, automation, mobile, education"),
             F("products", "Related LAX360 products", "textarea", max_len=800, help="One product address per line (the last part of /products/<address>), only where the product genuinely applies."),
             F("insight_categories", "Related Insights categories", "textarea", max_len=300, help="One per line: ai, software, automation, saas, transformation, webmobile, marketing, trends"),
             F("image", "Card image", "image"), F("hero_image", "Hero image", "image"), F("image_alt", "Image description", max_len=160),
@@ -196,6 +308,10 @@ KINDS: dict[str, dict] = {
         "fields": [
             F("category", "Network category", "select", True, options=NETWORK_CATEGORIES, options_from="network_category"),
             F("relationship", "Relationship type", "select", False, options=NETWORK_RELATIONSHIPS),
+            F("division", "Business division", "select", False, options=NETWORK_DIVISIONS, help="Decides which section of the Our Network page the company appears in: IT & Software Partners, Cybersecurity Partners, Education & Training Partners, Digital Marketing Partners, or the group company section. Leave empty to use the category."),
+            F("established_via", "Established through", max_len=80, help="Leave empty for a direct LAX360 partnership. For a partnership set up through a group company, enter that company's name (for example Fatcat Wealthy): the card then says so."),
+            F("partnership_status", "Partnership status", "select", False, options=PARTNER_STATUSES, default="active", help="Planned partnerships are labelled as being finalised; Paused ones are shown without an Active label."),
+            F("hidden", "Hide this company", "bool", default=False, help="Hides the company on the website, including the built-in entry of the same name. Use it instead of deleting a built-in company."),
             F("business_category", "Business category", max_len=80, help="e.g. Training & Education, Financial Services, Business Software & SaaS"),
             F("description", "Description", "textarea", True, max_len=800),
             F("designation", "Partnership designation", max_len=80, help="The exact verified wording only, e.g. \"Authorized Partner\". Leave blank if there is none."),
@@ -229,6 +345,9 @@ KINDS: dict[str, dict] = {
             F("image_1", "Additional image 1", "image"), F("image_1_alt", "Image 1 description", max_len=160),
             F("image_2", "Additional image 2", "image"), F("image_2_alt", "Image 2 description", max_len=160),
             F("document_link", "Document or brochure link (optional)", max_len=300, help="A full https:// address"), F("document_label", "Document link text", max_len=60),
+            F("certificate_file", "Partnership certificate or supporting document (PDF, administrators only)", "document", False, help="Upload it in the media library. It stays private: visitors never receive a link to it."),
+            F("certificate_image", "Certificate or approval image (optional)", "image", help="A scan or photo of the certificate."),
+            F("certificate_public", "Show the certificate image on the website", "bool", default=False, help="Off: only administrators can see it. On: it is shown on the partner's page, but only while the partnership is Verified."),
             F("extra_links", "Other relevant links", "textarea", False, max_len=1500, help="One per line: Label | https://address"),
         ],
     },
@@ -559,6 +678,9 @@ KINDS: dict[str, dict] = {
                 "untick it (or leave it unpublished) to go straight to the home page. The cards themselves are managed under Welcome cards.",
         "fields": [
             F("enabled", "Show the welcome experience", "bool", default=True),
+            F("contact_card_enabled", "Show the contact card after the intro animation", "bool", default=True, help="The optional contact form offered once per browsing session, right after the intro animation. Untick it to go straight to the home page. Its submissions are listed under Enquiry center > Introductory Contact Form Enquiries."),
+            F("contact_card_title", "Contact card heading", max_len=120, help="Leave empty for the built-in heading."),
+            F("contact_card_text", "Contact card introduction", "textarea", max_len=300, help="Leave empty for the built-in introduction."),
         ],
     },
     "welcome_card": {
@@ -655,6 +777,9 @@ KINDS: dict[str, dict] = {
         "fields": [
             F("page", "Page", "select", False, options=PAGES), F("path", "Or any other page: its address", max_len=120, help="For a page that is not in the list, e.g. /products/lax360-business-crm or /privacy."),
             F("meta_description", "Meta description", "textarea", max_len=320), F("image", "Social sharing image", "image"),
+            F("h1", "H1 heading (optional)", max_len=120, help="The main heading shown at the top of the page. Leave empty to keep the page's own heading."),
+            F("og_title", "Sharing title (optional)", max_len=120, help="Title shown when the page is shared (Open Graph / X). Leave empty to use the search title."),
+            F("og_description", "Sharing description (optional)", "textarea", max_len=320, help="Description shown when the page is shared. Leave empty to use the meta description."),
             F("keywords", "Keywords", max_len=200, help="Comma-separated. Search engines give them little weight, but they are kept for your own records and for other tools."),
             F("noindex", "Hide this page from search engines", "bool", default=False, help="Adds a noindex tag and removes the page from the sitemap."),
             F("canonical_url", "Canonical address (optional)", max_len=300, help="Only when this page is a copy of another address: its full https:// URL. Leave empty for the page's own address."),
@@ -719,7 +844,7 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
     spec = KINDS[kind]
     errors: dict[str, str] = {}
     title = " ".join((title or "").split())
-    if not spec["single"] and not title:
+    if not spec["single"] and not title and kind != "seo_page":  # a page's SEO entry may leave the search title empty (only the H1, indexing, canonical ...): the website then keeps the built-in title
         errors["title"] = f"{spec.get('title_label', 'Title')} is required."
     if len(title) > 200:
         errors["title"] = "Keep it under 200 characters."

@@ -1,9 +1,9 @@
-// The six official LAX360 service categories. All copy lives here so pages never hard-code content: the Services page, the service detail pages,
+// The seven official LAX360 service categories. All copy lives here so pages never hard-code content: the Services page, the service detail pages,
 // the homepage "Our Services", About, the footer, the enquiry form and the chatbot knowledge (backend/app/knowledge/lax360_knowledge.py) all read
 // these names, so keep them in step. Copy describes what we offer and how we work; it makes no claims about results, clients or figures.
 // `group` (optional) sorts the offerings of a category into logical groups on its page.
 
-import { slugify } from '../utils/slugify.js'
+import { slugify, divisionUrl } from '../utils/slugify.js'
 
 export const processSteps = [
   { n: '01', title: 'Discover', text: 'We listen, ask questions and write down the business problem before any build starts.' },
@@ -106,26 +106,24 @@ export const divisions = [
     slug: 'growth',
     number: '03',
     name: 'Digital Marketing',
-    short: 'Social media, Meta and Google Ads, SEO, landing pages, content and marketing strategy.',
+    short: 'Social media management, SEO, creatives, content publishing and paid advertising.',
     outcome: 'Help the right people find you and enquire.',
-    tags: ['Social media', 'Meta & Google Ads', 'SEO', 'Content'],
+    tags: ['Social media', 'SEO', 'Creatives', 'Paid advertising'],
     enquiryType: 'marketing',
     accent: 'monogram',
     photo: '/assets/services/marketing.webp',
-    metaTitle: 'Digital Marketing — Social Media, Meta Ads, Google Ads, SEO and Content',
+    metaTitle: 'Digital Marketing — Social Media, SEO, Creatives, Content and Paid Advertising',
     metaDescription:
-      'Social media management, Meta and Google Ads, SEO, website and landing page optimisation, content creation and digital marketing strategy from LAX360 Pvt Ltd.',
+      'Social media management, SEO, creatives, content publishing and paid advertising on Meta, Google, LinkedIn and X from LAX360 Pvt Ltd.',
     heroLine: 'Be found. Be remembered. Be contacted.',
     overview:
       'A good website needs visitors, and visitors need a reason to get in touch. Our digital marketing work pairs with the website and software we build, so the pieces work together. Exact scope is agreed per business.',
     offerings: [
-      { group: 'Reach', name: 'Social Media Management', text: 'Planning and publishing that fits your audience and your brand voice.' },
-      { group: 'Reach', name: 'Meta Ads Management', text: 'Paid campaigns on Facebook and Instagram aimed at enquiries, with clear tracking of what you spend.' },
-      { group: 'Reach', name: 'Google Ads Management', text: 'Search and display campaigns that reach people already looking for what you offer.' },
-      { group: 'Be found', name: 'Search Engine Optimization (SEO)', text: 'Technical and content improvements so people searching for what you offer can find you.' },
-      { group: 'Convert', name: 'Website & Landing Page Optimization', text: 'Improve page structure, speed and calls to action so more visitors become enquiries.' },
-      { group: 'Create & plan', name: 'Content Creation', text: 'Clear, useful writing and creative that supports your pages and campaigns.' },
-      { group: 'Create & plan', name: 'Digital Marketing Strategy', text: 'A plan that connects channels, budget and goals, so each activity has a purpose.' },
+      { group: 'Reach', name: 'Social Media Management', text: "We set up, manage, and grow your brand's presence on the platforms where your customers spend their time." },
+      { group: 'Be found', name: 'Search Engine Optimization (SEO)', text: 'A complete SEO service to improve your Google rankings and bring in consistent organic traffic.' },
+      { group: 'Create & publish', name: 'Creatives', text: 'Eye-catching visuals and videos that make your brand stand out and keep audiences engaged.' },
+      { group: 'Create & publish', name: 'Content Publishing', text: 'Valuable content, published where your audience reads and searches.' },
+      { group: 'Reach', name: 'Paid Advertising', text: 'We plan, launch, and optimize ad campaigns that reach the right audience and bring you enquiries, leads, and sales.' },
     ],
     challenges: [
       'People find you, but they do not enquire.',
@@ -274,6 +272,55 @@ export const divisions = [
     ],
     related: ['software', 'headless'],
   },
+  {
+    slug: 'education',
+    number: '07',
+    name: 'Education & Training',
+    short: 'Technical training, certification courses, internships, AI and software development training, workshops, corporate and college programmes.',
+    outcome: 'Practical, industry-oriented skills for students, professionals and organisations.',
+    tags: ['Technical training', 'Certification courses', 'Internships', 'Corporate & college training'],
+    enquiryType: 'course',
+    accent: 'monogram',
+    photo: '/assets/services/education.webp',
+    metaTitle: 'Education & Training — Technical Training, Certification Courses and Internships',
+    metaDescription:
+      'Technical training, certification courses, internships, AI and software development training, workshops, corporate and college programmes from LAX360 Education.',
+    heroLine: 'Learn practical skills, step by step.',
+    overview:
+      'LAX360 Education is the education and skill development division of LAX360 Pvt Ltd. It brings technical education, professional training, practical learning and career development together for students, professionals, colleges and organisations, alongside our IT and software and digital marketing services.',
+    offerings: [
+      { group: 'Learn', name: 'Technical Training', text: 'Hands-on technical training in programming, web design, databases, software testing, cloud computing and DevOps, built around practical sessions.' },
+      { group: 'Certify', name: 'Professional Certification Courses', text: 'Certificate courses from the LAX360 Education course list, from programming languages and databases to cloud, cyber security and digital marketing.' },
+      { group: 'Practise', name: 'Internship Programs', text: 'Domain-based internships with real-time project exposure and technical mentoring, subject to approval.' },
+      { group: 'Learn', name: 'AI & Software Development Training', text: 'Full stack development with AI, data science with Python and machine learning, learned through practical projects.' },
+      { group: 'Practise', name: 'Workshops and Seminars', text: 'Technical workshops, industry-oriented seminars and guest lectures for students and professionals.' },
+      { group: 'Organisations', name: 'Corporate Training', text: 'Employee technical training, software and technology workshops, AI and automation training and customised programmes for companies.' },
+      { group: 'Organisations', name: 'College and Institutional Training', text: 'Programmes with schools, colleges, universities and polytechnics: workshops, add-on courses, internships and final-year project guidance.' },
+      { group: 'Learn', name: 'Skill Development Programs', text: 'Skill development for students and professionals, with career guidance, aptitude and soft skills sessions around the course you choose.' },
+    ],
+    challenges: [
+      'Classroom learning that stays far from real software work.',
+      'Not knowing which course or certificate fits your goal.',
+      'A college or company that needs a training programme without building one from scratch.',
+    ],
+    benefits: [
+      ['Practical learning', 'Courses and programmes are built around hands-on sessions and project work, not only theory.'],
+      ['Approved course list', 'Every certification course comes from the LAX360 Education course catalogue, so what you see is what is taught.'],
+      ['Programmes for every group', 'Individual learners, colleges, institutions and companies each have a suitable route.'],
+      ['Real project exposure', 'Internships and workshops put technical skills to use on real tasks, with mentoring.'],
+      ['Guidance before you start', 'We help you choose a course or programme that fits your goal before you commit.'],
+      ['Backed by a working technology company', 'Training is delivered by LAX360 Pvt Ltd, which builds software, AI and digital solutions for businesses every day.'],
+    ],
+    useCases: ['A student choosing a first IT certification', 'A college adding a workshop or internship to its calendar', 'A company upskilling its team in AI and automation', 'A professional moving into software, cloud or data'],
+    engagement: 'Tell us who the training is for and what they need to learn. We recommend suitable courses or a programme and agree the details with you before anything starts.',
+    faqs: [
+      { q: 'Which courses do you offer?', a: 'LAX360 Education offers the certification courses listed on this page, across programming, web design, databases, full stack development with AI, software testing, cloud, DevOps, data and AI, cyber security, digital marketing and frameworks.' },
+      { q: 'Do you run internships?', a: 'Yes. Internship programmes are domain-based, with real-time project exposure and technical mentoring. They are offered as 15-day, 30-day and long-term programmes, subject to approval. Ask us about eligibility.' },
+      { q: 'Can you train our employees or students?', a: 'Yes. We offer corporate training and college and institutional programmes. Topics, scope and schedule are agreed with you in advance.' },
+      { q: 'Are fees and batch dates listed online?', a: 'Fees and schedules depend on the course and the programme, so we share them when you enquire.' },
+    ],
+    related: ['software', 'growth'],
+  },
 ]
 
 // Every offering gets its own slug (its page is /services/<category>/<slug>).
@@ -282,9 +329,10 @@ divisions.forEach((d) => d.offerings.forEach((o) => { o.slug = slugify(o.name) }
 // (getOffering lives in offerings.js: it needs the long per-service copy in serviceDetails.js, which the home page does not.)
 
 // All divisions (service categories), in page order.
-export const allDivisions = divisions.map((d) => ({ ...d, to: `/services/${d.slug}` }))
+export const allDivisions = divisions.map((d) => ({ ...d, to: `/services/${divisionUrl(d.slug)}` }))
 
-export const getDivision = (slug) => divisions.find((d) => d.slug === slug)
+/** A category by its id or by its public address segment (growth / digitalmarketing). */
+export const getDivision = (slug) => divisions.find((d) => d.slug === slug || divisionUrl(d.slug) === slug)
 
 /** An offering's links: its anchor on the category's page. */
 export const offeringsByGroup = (d) => {

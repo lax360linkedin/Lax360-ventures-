@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ExternalLink, EyeOff, FileText, Globe, Link2, Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
@@ -12,18 +12,21 @@ const PAGES = [
   { key: 'industries', label: 'Industries', path: '/industries' }, { key: 'insights', label: 'Insights', path: '/insights' }, { key: 'network', label: 'Our Network', path: '/our-network' },
   { key: 'team', label: 'Our Team', path: '/our-team' }, { key: 'work', label: 'Work', path: '/work' }, { key: 'career', label: 'Careers', path: '/career' }, { key: 'contact', label: 'Contact', path: '/contact' },
   { key: 'websites', label: 'Websites', path: '/websites', byPath: true }, { key: 'privacy', label: 'Privacy Policy', path: '/privacy', byPath: true }, { key: 'terms', label: 'Terms of Use', path: '/terms', byPath: true },
-  { key: 'robotics', label: 'Robotics', path: '/robotics', byPath: true }, { key: 'blockchain', label: 'Blockchain', path: '/blockchain', byPath: true },
+  { key: 'cad-engineering', label: 'CAD & Engineering Design (upcoming)', path: '/cad-engineering', byPath: true }, { key: 'robotics', label: 'Robotics', path: '/robotics', byPath: true }, { key: 'blockchain', label: 'Blockchain', path: '/blockchain', byPath: true },
 ]
+const SEO_LABEL = 'Page titles & SEO' // the title the server stores when a page entry has no search title of its own: it is not a real title
 const src = (id) => (id ? `/api/admin/media/${id}/file` : '')
 const origin = typeof window === 'undefined' ? '' : window.location.origin
 const host = origin.replace(/^https?:\/\//, '')
 const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s)
 
 /** How the page may look in Google, WhatsApp and LinkedIn, from the values being edited. */
-function Previews({ title, description, image, path }) {
+function Previews({ title, description, image, path, shareTitle = '', shareDescription = '' }) {
   const t = title || 'Page title'
   const d = description || 'The description of the page appears here.'
   const url = `${host}${path === '/' ? '' : path}`
+  const st = shareTitle || t
+  const sd = shareDescription || d
   return (
     <div className="space-y-4">
       <figure>
@@ -39,17 +42,34 @@ function Previews({ title, description, image, path }) {
         <figcaption className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-soft">WhatsApp</figcaption>
         <div className="flex max-w-sm overflow-hidden rounded-xl bg-[#dcf8c6] text-left text-slate-800">
           {image ? <img src={image} alt="" className="size-24 shrink-0 object-cover" /> : <span className="grid size-24 shrink-0 place-items-center bg-black/10 text-xs text-slate-500">No image</span>}
-          <div className="min-w-0 p-2.5"><p className="line-clamp-2 text-sm font-semibold">{clip(t, 70)}</p><p className="line-clamp-2 text-xs text-slate-600">{clip(d, 100)}</p><p className="mt-1 truncate text-[0.7rem] text-slate-500">{host}</p></div>
+          <div className="min-w-0 p-2.5"><p className="line-clamp-2 text-sm font-semibold">{clip(st, 70)}</p><p className="line-clamp-2 text-xs text-slate-600">{clip(sd, 100)}</p><p className="mt-1 truncate text-[0.7rem] text-slate-500">{host}</p></div>
         </div>
       </figure>
       <figure>
         <figcaption className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-soft">LinkedIn</figcaption>
         <div className="max-w-sm overflow-hidden rounded-lg border border-slate-300 bg-white text-left text-slate-800">
           {image ? <img src={image} alt="" className="aspect-[1.91/1] w-full object-cover" /> : <span className="grid aspect-[1.91/1] w-full place-items-center bg-slate-100 text-xs text-slate-500">No image: add a 1200 x 630 picture</span>}
-          <div className="p-3"><p className="line-clamp-2 text-sm font-semibold">{clip(t, 90)}</p><p className="mt-0.5 truncate text-xs text-slate-500">{host}</p></div>
+          <div className="p-3"><p className="line-clamp-2 text-sm font-semibold">{clip(st, 90)}</p><p className="mt-0.5 truncate text-xs text-slate-500">{host}</p></div>
         </div>
       </figure>
     </div>
+  )
+}
+
+/** The home page H1: three lines (the middle one is highlighted on the website), with a live count and the checks that matter for search. Saved to the Home page hero. */
+function H1Lines({ lines, setLines, loading }) {
+  const full = lines.map((l) => l.trim()).filter(Boolean).join(' ')
+  const tips = []
+  if (full && full.length > 70) tips.push('Longer than 70 characters: search engines and small screens may cut it.')
+  if (full && full.length < 20) tips.push('Very short: include the main keyword the page should rank for.')
+  const setLine = (i) => (e) => setLines((l) => l.map((x, n) => (n === i ? e.target.value : x)))
+  return (
+    <fieldset className="space-y-2 rounded-xl border border-edge p-3" disabled={loading}>
+      <legend className="px-1 text-sm font-semibold">H1 heading (the main title at the top of the home page)</legend>
+      {['Line 1', 'Line 2 (highlighted)', 'Line 3'].map((label, i) => <Field key={label} label={label}>{(p) => <Input {...p} maxLength={80} value={lines[i]} onChange={setLine(i)} />}</Field>)}
+      <p className="text-xs text-soft">One H1 per page, read as: <strong className="text-fg">{full || 'the built-in heading (all three lines empty)'}</strong> · {full.length}/70 characters. Put the main keyword in it and write it for people first. Leave all three empty to keep the built-in heading.</p>
+      {tips.map((t) => <p key={t} className="text-xs text-amber-600 dark:text-amber-300">{t}</p>)}
+    </fieldset>
   )
 }
 
@@ -59,8 +79,15 @@ function SeoForm({ mode, target, item, onClose, onSaved }) {
   const d = item?.data || {}
   const article = mode === 'article'
   const [v, setV] = useState(() => (article
-    ? { title: d.seo_title || '', description: d.meta_description || '', keywords: d.seo_keywords || '', image: '', noindex: d.noindex === true, canonical: '', structured: '' }
-    : { title: item?.title || '', description: d.meta_description || '', keywords: d.keywords || '', image: d.image || '', noindex: d.noindex === true, canonical: d.canonical_url || '', structured: d.structured_data || '' }))
+    ? { title: d.seo_title || '', description: d.meta_description || '', keywords: d.seo_keywords || '', image: '', noindex: d.noindex === true, canonical: '', structured: '', h1: '', ogTitle: '', ogDescription: '' }
+    : { title: item && item.title !== SEO_LABEL ? item.title : '', description: d.meta_description || '', keywords: d.keywords || '', image: d.image || '', noindex: d.noindex === true, canonical: d.canonical_url || '', structured: d.structured_data || '', h1: d.h1 || '', ogTitle: d.og_title || '', ogDescription: d.og_description || '' }))
+  const home = !article && target.key === 'home' // the home page's H1 is the three lines of the home hero (Home page hero): edited here and there, saved once
+  const [hero, setHero] = useState(null) // { id, data } of the home hero, or { id: null, data: {} } when none is saved yet
+  const [lines, setLines] = useState(['', '', ''])
+  useEffect(() => {
+    if (!home) return
+    api('/api/admin/content/hero').then((list) => { const h = (list || [])[0]; setHero({ id: h?.id || null, data: h?.data || {} }); setLines([h?.data?.headline_1 || '', h?.data?.headline_2 || '', h?.data?.headline_3 || '']) }).catch(() => setHero({ id: null, data: {} }))
+  }, [home])
   const [errors, setErrors] = useState({})
   const [busy, setBusy] = useState(false)
   const set = (k) => (e) => { setV((s) => ({ ...s, [k]: e.target.value })); setErrors((x) => ({ ...x, [k]: undefined })) }
@@ -72,10 +99,14 @@ function SeoForm({ mode, target, item, onClose, onSaved }) {
     setBusy(true)
     setErrors({})
     try {
+      if (home && hero) { // the H1 (three lines) is saved to the home hero, the one source the public page reads
+        const hd = { ...hero.data, headline_1: lines[0].trim(), headline_2: lines[1].trim(), headline_3: lines[2].trim() }
+        await (hero.id ? api(`/api/admin/content/item/${hero.id}`, { method: 'PATCH', body: { data: hd, status: 'published' } }) : api('/api/admin/content/hero', { method: 'POST', body: { data: hd, status: 'published' } }))
+      }
       if (article) {
         await api(`/api/admin/content/item/${item.id}`, { method: 'PATCH', body: { data: { ...d, seo_title: v.title, meta_description: v.description, seo_keywords: v.keywords, noindex: v.noindex } } })
       } else {
-        const data = { ...(target.byPath ? { path: target.path } : { page: target.key }), meta_description: v.description, image: v.image, keywords: v.keywords, noindex: v.noindex, canonical_url: v.canonical, structured_data: v.structured }
+        const data = { ...(target.byPath ? { path: target.path } : { page: target.key }), meta_description: v.description, image: v.image, keywords: v.keywords, noindex: v.noindex, canonical_url: v.canonical, structured_data: v.structured, ...(home ? {} : { h1: v.h1 }), og_title: v.ogTitle, og_description: v.ogDescription }
         const body = { title: v.title, status: 'published', data }
         await (item ? api(`/api/admin/content/item/${item.id}`, { method: 'PATCH', body: { title: v.title, data, status: 'published' } }) : api('/api/admin/content/seo_page', { method: 'POST', body }))
       }
@@ -93,11 +124,21 @@ function SeoForm({ mode, target, item, onClose, onSaved }) {
       footer={<>{!article && item && <Btn kind="danger" onClick={remove} disabled={busy} className="mr-auto">Use the built-in text</Btn>}<Btn onClick={onClose}>Cancel</Btn><Btn kind="primary" loading={busy} onClick={save}>Save and publish</Btn></>}>
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-3">
-          <Field label={article ? 'SEO title' : 'Search title'} error={errors.title || errors.seo_title} hint={article ? 'Leave empty to use the article title.' : 'Shown in search results and the browser tab. About 50 to 60 characters.'}>{(p) => <Input {...p} maxLength={article ? 70 : 200} value={v.title} onChange={set('title')} />}</Field>
+          <Field label={article ? 'SEO title' : 'Search title'} error={errors.title || errors.seo_title} hint={article ? 'Leave empty to use the article title.' : 'Shown in search results and the browser tab. About 50 to 60 characters. Leave empty to keep the built-in title.'}>{(p) => <Input {...p} maxLength={article ? 70 : 200} value={v.title} onChange={set('title')} />}</Field>
           <Field label="Meta description" error={errors.meta_description} hint="One or two sentences that make people want to click. About 150 characters.">{(p) => <Textarea {...p} rows={3} maxLength={320} value={v.description} onChange={set('description')} />}</Field>
+          {home && <H1Lines lines={lines} setLines={setLines} loading={!hero} />}
+          {!article && !home && (
+            <Field label="H1 heading (optional)" error={errors.h1} hint={`The main heading at the top of the page, one per page. Leave empty to keep the page's own heading. ${v.h1.length}/70 characters.`}>{(p) => <Input {...p} maxLength={120} value={v.h1} onChange={set('h1')} />}</Field>
+          )}
           <Field label="Keywords" error={errors.keywords || errors.seo_keywords} hint="Comma-separated. Search engines give them little weight; they are kept for your own records.">{(p) => <Input {...p} maxLength={200} value={v.keywords} onChange={set('keywords')} />}</Field>
           {!article && (
             <Field label="Social sharing image" error={errors.image} hint="Shown when the page is shared on WhatsApp, LinkedIn, Facebook and X. 1200 x 630 pixels works best.">{(p) => <MediaField {...p} kind="image" value={v.image} onChange={(id) => setV((s) => ({ ...s, image: id || '' }))} />}</Field>
+          )}
+          {!article && (
+            <>
+              <Field label="Sharing title (optional)" error={errors.og_title} hint="Shown when the page is shared on WhatsApp, LinkedIn, Facebook and X. Empty: the search title is used.">{(p) => <Input {...p} maxLength={120} value={v.ogTitle} onChange={set('ogTitle')} />}</Field>
+              <Field label="Sharing description (optional)" error={errors.og_description} hint="Empty: the meta description is used.">{(p) => <Textarea {...p} rows={2} maxLength={320} value={v.ogDescription} onChange={set('ogDescription')} />}</Field>
+            </>
           )}
           {article && <p className="rounded-lg border border-edge p-2.5 text-xs text-soft">The article’s cover image is used when it is shared. Change it in the article itself.</p>}
           <Toggle checked={v.noindex} onChange={(on) => setV((s) => ({ ...s, noindex: on }))} label="Hide from search engines (noindex)" />
@@ -109,7 +150,7 @@ function SeoForm({ mode, target, item, onClose, onSaved }) {
             </>
           )}
         </div>
-        <div><h3 className="mb-3 text-sm font-semibold">Previews</h3><Previews title={v.title || (article ? item.title : '')} description={v.description || (article ? d.excerpt || '' : '')} image={shownImage} path={path} /></div>
+        <div><h3 className="mb-3 text-sm font-semibold">Previews</h3><Previews title={v.title || (article ? item.title : '')} description={v.description || (article ? d.excerpt || '' : '')} shareTitle={v.ogTitle} shareDescription={v.ogDescription} image={shownImage} path={path} /></div>
       </div>
     </Modal>
   )
@@ -122,7 +163,7 @@ function PagesTab({ entries, reload }) {
   const extra = entries.filter((e) => e.data?.path && !PAGES.some((p) => p.byPath && p.path === e.data.path))
   return (
     <>
-      <p className="mb-4 text-sm text-soft">Set the title, description, sharing image and indexing of each page. A page with no entry keeps the text built into the website. Product, industry and partner pages are edited with the page-level entry below or in their own forms.</p>
+      <p className="mb-4 text-sm text-soft">Set the title, description, H1 heading, sharing text and image, canonical address, keywords and indexing of each page. A page with no entry keeps the text built into the website. Product, industry and partner pages are edited with the page-level entry below or in their own forms.</p>
       <ul className="grid gap-3 md:grid-cols-2">
         {PAGES.map((p) => {
           const e = find(p)
@@ -133,7 +174,7 @@ function PagesTab({ entries, reload }) {
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-2 font-semibold">{p.label}{e ? <Badge value="published" text="Custom SEO" /> : <span className="rounded-full border border-edge-strong px-2 py-0.5 text-xs font-semibold text-soft">Built-in</span>}{e?.data?.noindex && <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-600 dark:text-amber-300">noindex</span>}</p>
                   <p className="truncate text-xs text-soft">{p.path}</p>
-                  {e && <p className="mt-1 line-clamp-2 text-sm text-soft">{e.title}</p>}
+                  {e && <p className="mt-1 line-clamp-2 text-sm text-soft">{e.title !== SEO_LABEL ? e.title : (e.data?.meta_description || 'Built-in title')}</p>}
                 </div>
                 <Btn onClick={() => setEdit({ target: p, item: e || null })}><Pencil className="size-4" aria-hidden="true" /> Edit</Btn>
               </Card>
@@ -225,7 +266,7 @@ function SetupTab() {
     ['Sitemaps', <>The website’s own pages: {link('/sitemap.xml', '/sitemap.xml')} (rebuilt with each deploy). Pages you publish here (articles, products, industries, partners): {link('/sitemap-content.xml', '/sitemap-content.xml')} (live: publishing, editing, hiding or deleting changes it at once).</>],
     ['robots.txt', <>{link('/robots.txt', '/robots.txt')} lists both sitemaps and keeps the admin panel, account pages and the API out of search.</>],
     ['Google Search Console', <>Add the website as a property, verify it (set <code>VITE_GSC_VERIFICATION</code> to the meta-tag code, then deploy), and submit both sitemaps.</>],
-    ['Google Analytics 4 / Tag Manager', <>Set <code>VITE_GA_MEASUREMENT_ID</code> (G-XXXXXXXXXX) or <code>VITE_GTM_ID</code> (GTM-XXXXXXX) and deploy. Events sent: page_view, generate_lead, contact_form_submit, demo_request, whatsapp_click, phone_click, email_click, career_application, partner_enquiry.</>],
+    ['Google Analytics 4 / Tag Manager', <>Set <code>VITE_GA_MEASUREMENT_ID</code> (G-XXXXXXXXXX) and deploy; use <code>VITE_GTM_ID</code> only if you want a Tag Manager container instead (it takes precedence). Nothing is sent until the visitor accepts analytics cookies. Events, each sent only after a successful submission: page_view, generate_lead, contact_form_submit, career_application, partner_enquiry, partner_application, demo_request, sign_up, file_download, whatsapp_click, phone_click, email_click.</>],
     ['Team e-mail for new enquiries', <>Set <code>ENQUIRY_NOTIFY_EMAIL</code> together with the SMTP settings in the backend environment.</>],
     ['Social sharing image', <>Pages without their own image use the default sharing image set in <Link to="/company-admin/settings" className="font-semibold text-lav underline">Settings</Link>.</>],
   ]

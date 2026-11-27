@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom'
 import { m, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight, ArrowUpRight, Boxes, BrainCircuit, CalendarCheck, Check, ClipboardList, CreditCard, FileText, Globe2, LayoutDashboard, Mail, MapPin,
-  Megaphone, MessageCircle, MessagesSquare, Package, PenLine, Receipt, Search, Share2, ShoppingCart, Sparkles, Users, Webhook, Wrench, KeyRound,
+  Megaphone, MessageCircle, MessagesSquare, Package, Palette, PenLine, Receipt, Search, Share2, ShoppingCart, Sparkles, Users, Webhook, Wrench, KeyRound,
 } from 'lucide-react'
 import Reveal from '../../ui/Reveal.jsx'
 import { getDivision, offeringsByGroup } from '../../../data/services.js'
 import { divisionIcons } from '../../../utils/divisionIcons.js'
-import { offeringHref } from '../../../utils/slugify.js'
+import { offeringHref, divisionUrl } from '../../../utils/slugify.js'
 import { useSite } from '../../../hooks/useSite.js'
+import { useEducationPage, useEducationPrograms } from '../../../hooks/useEducation.js'
+import { serviceIcons } from '../../../utils/serviceIcons.js'
 
 const sw = getDivision('software')
 const ai = getDivision('ai')
@@ -17,6 +19,7 @@ const growth = getDivision('growth')
 const headless = getDivision('headless')
 const automation = getDivision('automation')
 const mobile = getDivision('mobile')
+const education = getDivision('education')
 
 const img = (src, className = '') => <img src={src} alt="" width="1000" height="800" loading="lazy" decoding="async" className={`h-full w-full object-cover ${className}`} />
 
@@ -38,7 +41,7 @@ function Head({ d, className = '' }) {
         ))}
       </ul>
       <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1">
-        <Link to={`/services/${d.slug}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
+        <Link to={`/services/${divisionUrl(d.slug)}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
         <Link to={`/contact?type=${d.enquiryType}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold">Enquire <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
       </div>
     </Reveal>
@@ -111,7 +114,7 @@ function Ai() {
             <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-lav">Helps when</p>
             <ul className="mt-2 space-y-1.5">{ai.challenges.slice(0, 3).map((c) => <li key={c} className="flex gap-2.5 text-soft"><Check className="mt-1 size-4 shrink-0 text-lav" aria-hidden="true" />{c}</li>)}</ul>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1">
-              <Link to={`/services/${ai.slug}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
+              <Link to={`/services/${divisionUrl(ai.slug)}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
               <Link to="/contact?type=ai" className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold">Book an AI consultation <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
             </div>
           </Reveal>
@@ -134,7 +137,7 @@ function Ai() {
   )
 }
 
-const GROWTH_ICONS = { 'Social Media Management': Share2, 'Meta Ads Management': Megaphone, 'Google Ads Management': Search, 'Search Engine Optimization (SEO)': Search, 'Website & Landing Page Optimization': LayoutDashboard, 'Content Creation': PenLine, 'Digital Marketing Strategy': ClipboardList }
+const GROWTH_ICONS = { 'Social Media Management': Share2, 'Search Engine Optimization (SEO)': Search, Creatives: Palette, 'Content Publishing': PenLine, 'Paid Advertising': Megaphone }
 
 /** 03 — services as selectable pills; the chosen one is explained in a panel over the photo. */
 function Growth() {
@@ -160,12 +163,10 @@ function Growth() {
           </div>
         </Reveal>
       </div>
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {offeringsByGroup(growth).map((g, i) => (
-          <Reveal key={g.title} delay={i * 0.06} className="rounded-3xl border border-edge bg-glass p-5">
-            <p className="eyebrow text-lav">{g.title}</p>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {g.items.map((o) => (
+      <Reveal className="mt-10">
+        <div className="rounded-3xl border border-edge bg-glass p-5 sm:p-6">
+            <ul className="flex flex-wrap gap-2" aria-label="Digital Marketing services">
+              {growth.offerings.map((o) => (
                 <li key={o.name}>
                   <button type="button" onClick={() => setPick(o.name)} onMouseEnter={() => setPick(o.name)} onFocus={() => setPick(o.name)} aria-pressed={pick === o.name}
                     className={`rounded-full border px-3.5 py-1.5 text-left text-sm font-semibold transition-all duration-200 ${pick === o.name ? 'border-transparent bg-primary text-white shadow-lg' : 'border-edge-strong bg-glass hover:border-lav'}`}>
@@ -174,9 +175,8 @@ function Growth() {
                 </li>
               ))}
             </ul>
-          </Reveal>
-        ))}
-      </div>
+        </div>
+      </Reveal>
     </section>
   )
 }
@@ -187,7 +187,7 @@ const HEADLESS_ICONS = { 'Authentication APIs': KeyRound, 'Billing & Subscriptio
 function Headless() {
   const site = useSite()
   const hubExternal = /^https?:/.test(site.apiHubUrl)
-  const hubCls = 'group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-violet-800 shadow-xl transition-transform duration-200 hover:-translate-y-0.5 dark:bg-sky dark:text-night'
+  const hubCls = 'group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-primary shadow-xl transition-transform duration-200 hover:-translate-y-0.5 dark:bg-sky dark:text-night'
   return (
     <section id="headless" aria-label={headless.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] wrap section">
       <Reveal>
@@ -211,7 +211,7 @@ function Headless() {
                   : <Link to={site.apiHubUrl} className={hubCls}>Explore the API Hub <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" aria-hidden="true" /></Link>}
                 <Link to="/contact?type=project" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3 font-semibold transition-colors hover:bg-white/10">Discuss your requirements</Link>
               </div>
-              <p className="mt-3 text-sm text-white/80"><Link to={`/services/${headless.slug}`} className="underline underline-offset-4">Category details</Link></p>
+              <p className="mt-3 text-sm text-white/80"><Link to={`/services/${divisionUrl(headless.slug)}`} className="underline underline-offset-4">Category details</Link></p>
             </div>
 
             <div className="lg:col-span-5">
@@ -345,6 +345,49 @@ function Mobile() {
   )
 }
 
+/** 07 — Education & Training: photo and text, a card per programme, then the course call to action. Text, photo and programme cards follow the admin panel when set. */
+function Education() {
+  const page = useEducationPage()
+  const ov = useEducationPrograms()
+  return (
+    <section id="education" aria-label={education.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] wrap section">
+      <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
+        <Head d={education} className="lg:col-span-6" />
+        <Reveal x={24} y={0} className="lg:col-span-6">
+          <div className="overflow-hidden rounded-[2rem] border border-edge-strong shadow-[0_30px_70px_-30px_rgb(var(--glow)/0.55)]">{img(page.image || education.photo, 'aspect-[4/3]')}</div>
+        </Reveal>
+      </div>
+      <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {education.offerings.map((o, i) => {
+          const Icon = serviceIcons[o.slug] || divisionIcons.education
+          const text = ov[o.slug]?.summary || o.text
+          return (
+            <Reveal as="li" key={o.name} delay={(i % 4) * 0.06}>
+              <Link to={offeringHref('education', o.name)} className="glass-flat lift group flex h-full flex-col gap-3 p-6">
+                <span className="flex items-center justify-between">
+                  <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105"><Icon className="size-6" aria-hidden="true" /></span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-soft">{o.group}</span>
+                </span>
+                <span className="font-display text-xl font-semibold leading-tight">{o.name}</span>
+                <span className="text-soft">{text}</span>
+              </Link>
+            </Reveal>
+          )
+        })}
+      </ul>
+      <Reveal className="mt-8">
+        <div className="flex flex-col items-start justify-between gap-4 rounded-3xl border border-edge bg-glass p-5 sm:flex-row sm:items-center sm:p-6">
+          <p className="font-display text-lg font-semibold">See every certification course LAX360 Education offers.</p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link to={`/services/${divisionUrl('education')}#courses`} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white shadow-lg transition-[filter] hover:brightness-110">View All Courses <ArrowRight className="size-4" aria-hidden="true" /></Link>
+            <Link to={page.ctaLink || `/contact?type=${education.enquiryType}`} className="inline-flex min-h-12 items-center justify-center rounded-full border border-edge-strong px-6 py-3 font-semibold transition-colors hover:bg-glass-strong">{page.ctaLabel || 'Enquire About a Course'}</Link>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  )
+}
+
 export default function ServiceCategories() {
   return (
     <>
@@ -354,6 +397,7 @@ export default function ServiceCategories() {
       <Headless />
       <Automation />
       <Mobile />
+      <Education />
     </>
   )
 }

@@ -71,7 +71,7 @@ def notify_application(application_id: uuid.UUID) -> None:
             cfg = ps.get_settings_map(db)
             team = {*_recipients(settings), *cfg["notify_emails"]}
             where = ", ".join(x for x in (a.city, a.state, a.country) if x)
-            lines = [f"Reference: {a.reference}", f"Type: {a.category} / {a.division}", f"Name: {a.full_name}", f"Email: {a.email}", f"Phone: {a.phone}", f"Location: {where}"]
+            lines = [f"Reference: {a.reference}", f"Type: {a.category}", f"Business divisions: {'All business divisions: ' if a.all_divisions else ''}{', '.join(ps.divisions_of(a))}" + (f" | Other: {a.other_interest}" if a.other_interest else ""), f"Name: {a.full_name}", f"Email: {a.email}", f"Phone: {a.phone}", f"Location: {where}"]
             for address in sorted(team):
                 email_service.send(settings, address, f"New partnership application {a.reference}", "\n".join(lines) + "\n\nOpen Partnerships in the admin panel to follow up.")
             if cfg["acknowledgement_enabled"]:

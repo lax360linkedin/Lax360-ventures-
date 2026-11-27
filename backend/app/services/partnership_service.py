@@ -16,12 +16,12 @@ import secrets
 import uuid
 from datetime import date, datetime, timedelta, timezone
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.errors import ApiError
-from app.models import (ApplicationEvent, MediaAsset, PartnershipApplication, PartnershipFaq, PartnershipMenuItem, PartnershipPage, PartnershipPolicy, PartnershipSetting, User)
+from app.models import (ApplicationEvent, ContentItem, MediaAsset, PartnershipApplication, PartnershipFaq, PartnershipMenuItem, PartnershipPage, PartnershipPolicy, PartnershipSetting, User)
 from app.models.partnership import CATEGORIES, DIVISIONS, STATUSES
 
 PAGE_SLUGS_CATEGORIES = ("franchise", "authorized-partner", "referral-partner")  # page slugs follow the website routes; an APPLICATION stores the short category name
@@ -34,6 +34,8 @@ MAX_MENU_ITEMS = 12
 STATUS_LABELS = {s: s.replace("_", " ").capitalize() for s in STATUSES}
 COMMERCIAL_FIELDS = ("registration_fee", "initial_investment", "infrastructure_investment", "working_capital", "security_deposit", "royalty", "revenue_sharing", "agreement_duration", "renewal_fee",
                      "territory", "exclusivity", "refund_conditions", "exit_conditions", "commission_model")
+ALL_KEY, OTHER_KEY = "all", "other"  # "All Business Divisions" and "Others" in a selection
+UPCOMING_BUILTIN = ("cad-engineering", "robotics", "blockchain")  # the upcoming service categories that ship with the website (more can be added in the admin panel)
 COMMON_ANSWERS = {"industry": 120, "years_experience": 20, "office_available": 10, "relevant_experience": 600}
 ANSWER_KEYS: dict[str, dict[str, int]] = {
     "franchise": {"proposed_location": 160, "investment_budget": 80, "business_experience": 600, "start_date": 60, "existing_infrastructure": 400, "participation": 20, "additional_info": 800, "franchise_interest": 40},
@@ -72,14 +74,53 @@ def _reference(category: str, division: str, now: datetime) -> str:
     return f"LAX-{category[0].upper()}{division[0].upper()}-{now:%y%m%d}-{secrets.token_hex(3).upper()}"
 
 
+def upcoming_slugs(db: Session) -> set[str]:
+    """The upcoming service categories (built-in plus those published in the admin panel): an applicant can register interest in them too."""
+    rows = db.scalars(select(ContentItem.slug).where(ContentItem.kind == "upcoming_category", ContentItem.status == "published")).all()
+    return set(UPCOMING_BUILTIN) | set(rows)
+
+
+def valid_division_slugs(db: Session) -> set[str]:
+    return active_division_slugs(db) | upcoming_slugs(db)
+
+
+def _selection(body: dict, valid: set[str], errors: dict[str, str]) -> tuple[list[str], bool, str | None]:
+    """The business divisions of an application: (slugs, all_divisions, other_interest). Accepts the old single `division` as well as the new `divisions` list.
+    "all" selects every available division; "other" needs the applicant's own text. Unknown or deactivated divisions are rejected."""
+    raw = body.get("divisions") if isinstance(body.get("divisions"), list) else []
+    if not raw and body.get("division"):
+        raw = [body.get("division")]
+    picked: list[str] = []
+    for x in raw[:40]:
+        x = clean_text(x, 40)
+        if x and x not in picked:
+            picked.append(x)
+    all_flag = body.get("all_divisions") is True or ALL_KEY in picked
+    other_flag = OTHER_KEY in picked
+    picked = [x for x in picked if x not in (ALL_KEY, OTHER_KEY)]
+    unknown = [x for x in picked if x not in valid]
+    if unknown:
+        errors["divisions"] = "One of the selected business divisions is not available. Please reload the page and choose again."
+    if all_flag:
+        picked = sorted({*picked, *valid}, key=lambda s: ([*DIVISIONS, *UPCOMING_BUILTIN].index(s) if s in (*DIVISIONS, *UPCOMING_BUILTIN) else 99, s))
+    other = clean_text(body.get("other_interest"), 300) or None
+    if other_flag and not other:
+        errors["other_interest"] = "Tell us the business division, service or partnership interest you have in mind."
+    if not other_flag:
+        other = None
+    if not picked and not other_flag and "divisions" not in errors:
+        errors["divisions"] = "Choose at least one business division."
+    return picked, all_flag, other
+
+
 def validate_application(body: dict, divisions: set[str] | None = None) -> dict:
     """Validate and normalise a submitted application. Raises ApiError(422) with per-field messages."""
     errors: dict[str, str] = {}
-    category, division = body.get("category"), body.get("division")
+    category = body.get("category")
     if category not in CATEGORIES:
         errors["category"] = "Choose a partnership type."
-    if division not in (divisions or set(DIVISIONS)):
-        errors["division"] = "Choose a business division."
+    picked, all_flag, other_interest = _selection(body, divisions or set(DIVISIONS), errors)
+    division = (picked[0] if picked else OTHER_KEY)[:40]
     name = clean_text(body.get("full_name"), 120)
     if len(name) < 2:
         errors["full_name"] = "Enter your full name."
@@ -103,7 +144,10 @@ def validate_application(body: dict, divisions: set[str] | None = None) -> dict:
     allowed = {**COMMON_ANSWERS, **ANSWER_KEYS.get(category, {})}
     raw = body.get("answers") if isinstance(body.get("answers"), dict) else {}
     answers = {k: clean_text(v, allowed[k], multiline=allowed[k] > 200) for k, v in raw.items() if k in allowed and clean_text(v, allowed[k])}
-    if category == "franchise" and not answers.get("proposed_location"):
+    quick = body.get("quick") is True  # the short enquiry form at the bottom of a partnership page: the franchise location is asked in the full application
+    if quick:
+        answers["enquiry_form"] = "short"
+    if category == "franchise" and not quick and not answers.get("proposed_location"):
         errors["answers.proposed_location"] = "Tell us where you would like to operate."
     cons_raw = body.get("consultation") if isinstance(body.get("consultation"), dict) else {}
     consultation: dict = {}
@@ -126,7 +170,7 @@ def validate_application(body: dict, divisions: set[str] | None = None) -> dict:
     if errors:
         raise ApiError(422, "validation_error", "Please check the highlighted fields.", fields=errors)
     return {
-        "category": category, "division": division, "full_name": name, "email": email, "phone": ("+" if str(body.get("phone", "")).strip().startswith("+") else "") + digits, "country": country,
+        "category": category, "division": division, "divisions": [*picked, *([OTHER_KEY] if other_interest else [])], "all_divisions": all_flag, "other_interest": other_interest, "full_name": name, "email": email, "phone": ("+" if str(body.get("phone", "")).strip().startswith("+") else "") + digits, "country": country,
         "state": clean_text(body.get("state"), 80) or None, "city": clean_text(body.get("city"), 80) or None, "occupation": clean_text(body.get("occupation"), 120) or None,
         "entity_type": entity or None, "organization": organization or None, "preferred_location": clean_text(body.get("preferred_location"), 160) or None, "answers": answers,
         "consultation": consultation, "preferred_branch": clean_text(body.get("preferred_branch"), 40) or None, "consent_marketing": body.get("consent_marketing") is True,
@@ -136,9 +180,9 @@ def validate_application(body: dict, divisions: set[str] | None = None) -> dict:
 
 def create_application(db: Session, body: dict) -> tuple[PartnershipApplication, bool]:
     """Store a validated application and its first history entry. Returns (row, duplicate): the same person sending the same form again within a day gets the same reference, not a second record."""
-    v = validate_application(body, active_division_slugs(db))
+    v = validate_application(body, valid_division_slugs(db))
     now = utcnow()
-    fp = hashlib.sha256(f"{v['email']}|{v['category']}|{v['division']}".encode()).hexdigest()
+    fp = hashlib.sha256(f"{v['email']}|{v['category']}|{','.join(sorted(v['divisions']))}|{v['other_interest'] or ''}".encode()).hexdigest()
     existing = db.scalar(select(PartnershipApplication).where(PartnershipApplication.fingerprint == fp, PartnershipApplication.created_at >= now - timedelta(days=1)).order_by(PartnershipApplication.created_at.desc()))
     if existing is not None:
         return existing, True
@@ -158,8 +202,26 @@ def create_application(db: Session, body: dict) -> tuple[PartnershipApplication,
     return row, False
 
 
+def division_options(db: Session) -> list[dict]:
+    """Every business division an application can name, with its current label (for the admin filter and the record view). Divisions that were later switched off stay listed, so old records keep their names."""
+    labels = dict(BUILTIN_LABELS)
+    for items in menu_items(db, include_disabled=True).values():
+        for x in items:
+            labels.setdefault(x["slug"], x["label"])
+    upcoming = {"cad-engineering": "CAD & Engineering Design", "robotics": "Robotics", "blockchain": "Blockchain & Web 3.0"}
+    upcoming.update({slug: title for slug, title in db.execute(select(ContentItem.slug, ContentItem.title).where(ContentItem.kind == "upcoming_category")).all()})
+    for k, v in upcoming.items():
+        labels.setdefault(k, v)
+    return [*({"value": k, "label": v} for k, v in labels.items()), {"value": OTHER_KEY, "label": "Others (custom interest)"}]
+
+
+def divisions_of(a: PartnershipApplication) -> list[str]:
+    """Every division of an application (older rows only have the single `division`)."""
+    return list(a.divisions) if a.divisions else ([a.division] if a.division else [])
+
+
 def application_out(a: PartnershipApplication, *, detail: bool = False, names: dict | None = None) -> dict:
-    out = {"id": str(a.id), "reference": a.reference, "category": a.category, "division": a.division, "status": a.status, "full_name": a.full_name, "email": a.email, "phone": a.phone,
+    out = {"id": str(a.id), "reference": a.reference, "category": a.category, "division": a.division, "divisions": divisions_of(a), "all_divisions": bool(a.all_divisions), "other_interest": a.other_interest, "status": a.status, "full_name": a.full_name, "email": a.email, "phone": a.phone,
            "country": a.country, "state": a.state, "city": a.city, "preferred_branch": a.preferred_branch, "assigned_branch": a.assigned_branch,
            "assigned_to": str(a.assigned_to) if a.assigned_to else None, "assigned_to_name": (names or {}).get(a.assigned_to), "created_at": aware(a.created_at).isoformat(), "updated_at": aware(a.updated_at).isoformat() if a.updated_at else None,
            "has_consultation_request": bool(a.consultation)}
@@ -173,7 +235,7 @@ def event_out(e: ApplicationEvent) -> dict:
     return {"id": str(e.id), "kind": e.kind, "from_status": e.from_status, "to_status": e.to_status, "note": e.note, "author": e.author_name, "at": aware(e.created_at).isoformat()}
 
 
-def applications_page(db: Session, *, q: str | None, status: str | None, category: str | None, division: str | None, branch: str | None, assigned: str | None, page: int, page_size: int) -> tuple[list[PartnershipApplication], int]:
+def applications_page(db: Session, *, q: str | None, status: str | None, category: str | None, division: str | None, branch: str | None, assigned: str | None, page: int, page_size: int, date_from=None, date_to=None, source: str | None = None) -> tuple[list[PartnershipApplication], int]:
     stmt = select(PartnershipApplication)
     if status:
         if status not in STATUSES:
@@ -181,8 +243,15 @@ def applications_page(db: Session, *, q: str | None, status: str | None, categor
         stmt = stmt.where(PartnershipApplication.status == status)
     if category in CATEGORIES:
         stmt = stmt.where(PartnershipApplication.category == category)
-    if division in DIVISIONS:
-        stmt = stmt.where(PartnershipApplication.division == division)
+    if division and _SLUG.match(division) or division == OTHER_KEY:
+        # an application matches when the division is one of its selections (the JSON list is searched as text: it works on every database), or is its primary division
+        stmt = stmt.where(or_(PartnershipApplication.division == division, cast(PartnershipApplication.divisions, String).like(f'%"{division}"%')))
+    if date_from:
+        stmt = stmt.where(PartnershipApplication.created_at >= date_from)
+    if date_to:
+        stmt = stmt.where(PartnershipApplication.created_at < date_to)
+    if source:
+        stmt = stmt.where(PartnershipApplication.source_page.like(f"%{clean_text(source, 60)}%"))
     if branch:
         stmt = stmt.where(or_(PartnershipApplication.assigned_branch == branch, PartnershipApplication.preferred_branch == branch))
     if assigned == "unassigned":
@@ -194,7 +263,9 @@ def applications_page(db: Session, *, q: str | None, status: str | None, categor
             pass
     if q:
         term = f"%{clean_text(q, 80).lower()}%"
-        stmt = stmt.where(or_(func.lower(PartnershipApplication.reference).like(term), func.lower(PartnershipApplication.full_name).like(term), func.lower(PartnershipApplication.email).like(term), PartnershipApplication.phone.like(term)))
+        stmt = stmt.where(or_(func.lower(PartnershipApplication.reference).like(term), func.lower(PartnershipApplication.full_name).like(term), func.lower(PartnershipApplication.email).like(term), PartnershipApplication.phone.like(term),
+                                  func.lower(PartnershipApplication.city).like(term), func.lower(PartnershipApplication.organization).like(term), func.lower(PartnershipApplication.other_interest).like(term),
+                                  func.lower(PartnershipApplication.source_page).like(term)))
     total = int(db.scalar(select(func.count()).select_from(stmt.subquery())) or 0)
     rows = db.scalars(stmt.order_by(PartnershipApplication.created_at.desc(), PartnershipApplication.id).limit(page_size).offset((page - 1) * page_size)).all()
     return list(rows), total
@@ -249,9 +320,9 @@ def _safe(v):
 def export_csv(rows: list[PartnershipApplication]) -> str:
     out = io.StringIO()
     w = csv.writer(out)
-    w.writerow(["reference", "created_at", "category", "division", "status", "name", "email", "phone", "country", "state", "city", "preferred_branch", "assigned_branch", "consent_marketing"])
+    w.writerow(["reference", "created_at", "category", "division", "all_divisions", "other_interest", "status", "name", "email", "phone", "country", "state", "city", "preferred_branch", "assigned_branch", "consent_marketing"])
     for a in rows:
-        w.writerow([_safe(x) for x in (a.reference, aware(a.created_at).isoformat(), a.category, a.division, a.status, a.full_name, a.email, a.phone, a.country, a.state or "", a.city or "", a.preferred_branch or "", a.assigned_branch or "", a.consent_marketing)])
+        w.writerow([_safe(x) for x in (a.reference, aware(a.created_at).isoformat(), a.category, "; ".join(divisions_of(a)), "yes" if a.all_divisions else "", a.other_interest or "", a.status, a.full_name, a.email, a.phone, a.country, a.state or "", a.city or "", a.preferred_branch or "", a.assigned_branch or "", a.consent_marketing)])
     return out.getvalue()
 
 
@@ -266,18 +337,23 @@ def dashboard(db: Session, since: datetime) -> dict:
         per_day[k] = per_day.get(k, 0) + 1
     recent = db.scalars(select(PartnershipApplication).order_by(PartnershipApplication.created_at.desc()).limit(8)).all()
     st = by(PartnershipApplication.status)
-    return {"since": since.isoformat(), "total": count(), "new": st.get("new", 0), "by_category": by(PartnershipApplication.category), "by_division": by(PartnershipApplication.division), "by_status": st,
+    by_division: dict[str, int] = {}  # an application counts once under every division it selected
+    for division, divisions in db.execute(select(PartnershipApplication.division, PartnershipApplication.divisions).where(*base)).all():
+        for d in (divisions or [division]):
+            by_division[d] = by_division.get(d, 0) + 1
+    return {"since": since.isoformat(), "total": count(), "new": st.get("new", 0), "by_category": by(PartnershipApplication.category), "by_division": by_division, "by_status": st,
             "consultation_requests": sum(1 for (c,) in db.execute(select(PartnershipApplication.consultation).where(*base)).all() if c),
             "under_review": st.get("under_review", 0), "approved": st.get("approved", 0), "rejected": st.get("rejected", 0),
             "per_day": [{"date": d, "applications": n} for d, n in sorted(per_day.items())], "recent": [application_out(a) for a in recent]}
 
 
 # ---------------------------------------------------------------------------- settings and public content
-SETTING_KEYS = ("portal_url", "notify_emails", "general_brochure_media_id", "general_brochure_published", "acknowledgement_enabled", "applications_open")
+SETTING_KEYS = ("portal_url", "notify_emails", "general_brochure_media_id", "general_brochure_published", "acknowledgement_enabled", "applications_open", "enquiry_form_enabled", "enquiry_form_title", "enquiry_form_lead")
 
 
 def get_settings_map(db: Session) -> dict:
-    out = {"portal_url": "", "notify_emails": [], "general_brochure_media_id": None, "general_brochure_published": False, "acknowledgement_enabled": True, "applications_open": True}
+    out = {"portal_url": "", "notify_emails": [], "general_brochure_media_id": None, "general_brochure_published": False, "acknowledgement_enabled": True, "applications_open": True,
+           "enquiry_form_enabled": True, "enquiry_form_title": "", "enquiry_form_lead": ""}
     for r in db.scalars(select(PartnershipSetting)):
         if r.key in out and isinstance(r.value, dict) and "v" in r.value:
             out[r.key] = r.value["v"]
@@ -294,7 +370,9 @@ def clean_setting(key: str, v):
         if not isinstance(v, list) or len(v) > 10 or any(not _EMAIL.match(str(x).strip()) for x in v):
             raise ApiError(422, "invalid_setting", "Enter valid e-mail addresses (up to 10).", fields={key: "Enter valid e-mail addresses."})
         return [str(x).strip().lower() for x in v]
-    if key in ("general_brochure_published", "acknowledgement_enabled", "applications_open"):
+    if key in ("enquiry_form_title", "enquiry_form_lead"):  # the text above the enquiry form at the bottom of every partnership page (empty = the built-in wording)
+        return clean_text(v, 120 if key.endswith("title") else 300)
+    if key in ("general_brochure_published", "acknowledgement_enabled", "applications_open", "enquiry_form_enabled"):
         if not isinstance(v, bool):
             raise ApiError(422, "invalid_setting", "Use on or off.", fields={key: "Use on or off."})
         return v
@@ -335,7 +413,7 @@ def public_payload(db: Session, settings) -> dict:
         policies[f"{pol.key}:{pol.scope}"] = {"key": pol.key, "scope": pol.scope, "title": pol.title, "body": pol.body, "version": pol.version, "effective_date": pol.effective_date.isoformat() if pol.effective_date else None,
                                               "updated_at": aware(pol.updated_at).date().isoformat() if pol.updated_at else None}
     custom = {f"{c}/{x['slug']}": {"label": x["label"], "description": x["description"]} for c, items in menu_items(db).items() for x in items if not x["builtin"]}
-    return {"menu": public_menu(db)["categories"], "custom_pages": custom, "applications_open": st["applications_open"], "portal_url": st["portal_url"] or None, "general_brochure_url": asset_url(db, settings, st["general_brochure_media_id"], pdf=True) if st["general_brochure_published"] else None,
+    return {"menu": public_menu(db)["categories"], "custom_pages": custom, "applications_open": st["applications_open"], "enquiry_form": {"enabled": st["enquiry_form_enabled"], "title": st["enquiry_form_title"], "lead": st["enquiry_form_lead"]}, "portal_url": st["portal_url"] or None, "general_brochure_url": asset_url(db, settings, st["general_brochure_media_id"], pdf=True) if st["general_brochure_published"] else None,
             "pages": pages, "faqs": faqs, "policies": list(policies.values())}
 
 

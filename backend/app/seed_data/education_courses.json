@@ -1,0 +1,377 @@
+{
+ "groups": [
+  {
+   "title": "Programming Languages",
+   "courses": [
+    {
+     "no": 1,
+     "name": "Certificate in Python Programming",
+     "software": "Python",
+     "group": "Programming Languages"
+    },
+    {
+     "no": 2,
+     "name": "Certificate in Java Programming",
+     "software": "Java",
+     "group": "Programming Languages"
+    },
+    {
+     "no": 3,
+     "name": "Certificate in C Programming",
+     "software": "C",
+     "group": "Programming Languages"
+    },
+    {
+     "no": 4,
+     "name": "Certificate in C++ Programming",
+     "software": "C++",
+     "group": "Programming Languages"
+    },
+    {
+     "no": 5,
+     "name": "Certificate in JavaScript Essentials",
+     "software": "JavaScript",
+     "group": "Programming Languages"
+    },
+    {
+     "no": 6,
+     "name": "Certificate in .NET Programming",
+     "software": ".NET",
+     "group": "Programming Languages"
+    }
+   ]
+  },
+  {
+   "title": "Web Designing",
+   "courses": [
+    {
+     "no": 7,
+     "name": "Certificate in HTML & CSS",
+     "software": "HTML & CSS (Combo)",
+     "group": "Web Designing"
+    },
+    {
+     "no": 8,
+     "name": "Certificate in Bootstrap",
+     "software": "Bootstrap",
+     "group": "Web Designing"
+    },
+    {
+     "no": 9,
+     "name": "Certificate in Angular Basics",
+     "software": "Angular",
+     "group": "Web Designing"
+    },
+    {
+     "no": 10,
+     "name": "Certificate in Node.js Basics",
+     "software": "Node.js",
+     "group": "Web Designing"
+    },
+    {
+     "no": 11,
+     "name": "Certificate in React Basics",
+     "software": "React",
+     "group": "Web Designing"
+    },
+    {
+     "no": 12,
+     "name": "Certificate in PHP Programming",
+     "software": "PHP",
+     "group": "Web Designing"
+    }
+   ]
+  },
+  {
+   "title": "Database",
+   "courses": [
+    {
+     "no": 13,
+     "name": "Certificate in MySQL",
+     "software": "MySQL",
+     "group": "Database"
+    },
+    {
+     "no": 14,
+     "name": "Certificate in MongoDB",
+     "software": "MongoDB",
+     "group": "Database"
+    },
+    {
+     "no": 15,
+     "name": "Certificate in Oracle Database",
+     "software": "Oracle",
+     "group": "Database"
+    },
+    {
+     "no": 16,
+     "name": "Certificate in SQL Server",
+     "software": "SQL Server",
+     "group": "Database"
+    }
+   ]
+  },
+  {
+   "title": "Full Stack Development with AI",
+   "courses": [
+    {
+     "no": 17,
+     "name": "MERN Stack Development With AI",
+     "software": "",
+     "group": "Full Stack Development with AI"
+    },
+    {
+     "no": 18,
+     "name": "Java Full Stack Development With AI",
+     "software": "",
+     "group": "Full Stack Development with AI"
+    },
+    {
+     "no": 19,
+     "name": "MEAN Stack Development With AI",
+     "software": "",
+     "group": "Full Stack Development with AI"
+    },
+    {
+     "no": 20,
+     "name": "PHP Full Stack Development With AI",
+     "software": "",
+     "group": "Full Stack Development with AI"
+    },
+    {
+     "no": 21,
+     "name": "Python Full Stack Development With AI",
+     "software": "",
+     "group": "Full Stack Development with AI"
+    }
+   ]
+  },
+  {
+   "title": "Software Testing",
+   "courses": [
+    {
+     "no": 22,
+     "name": "Certificate in Manual Testing",
+     "software": "Manual Testing",
+     "group": "Software Testing"
+    },
+    {
+     "no": 23,
+     "name": "Certificate in Selenium Automation",
+     "software": "Selenium",
+     "group": "Software Testing"
+    },
+    {
+     "no": 24,
+     "name": "Certificate in JMeter",
+     "software": "JMeter",
+     "group": "Software Testing"
+    },
+    {
+     "no": 25,
+     "name": "Certificate in QTP/UFT",
+     "software": "QTP/UFT",
+     "group": "Software Testing"
+    },
+    {
+     "no": 26,
+     "name": "Certificate in Soap UI",
+     "software": "Soap UI",
+     "group": "Software Testing"
+    }
+   ]
+  },
+  {
+   "title": "Cloud Computing",
+   "courses": [
+    {
+     "no": 27,
+     "name": "Certificate in AWS Essentials",
+     "software": "AWS",
+     "group": "Cloud Computing"
+    },
+    {
+     "no": 28,
+     "name": "Certificate in Microsoft Azure",
+     "software": "Azure",
+     "group": "Cloud Computing"
+    },
+    {
+     "no": 29,
+     "name": "Certificate in Google Cloud Basics",
+     "software": "Google Cloud",
+     "group": "Cloud Computing"
+    },
+    {
+     "no": 30,
+     "name": "Certificate in OpenStack",
+     "software": "OpenStack",
+     "group": "Cloud Computing"
+    }
+   ]
+  },
+  {
+   "title": "DevOps",
+   "courses": [
+    {
+     "no": 31,
+     "name": "Certificate in Git & GitHub",
+     "software": "Git & GitHub",
+     "group": "DevOps"
+    },
+    {
+     "no": 32,
+     "name": "Certificate in Jenkins",
+     "software": "Jenkins",
+     "group": "DevOps"
+    },
+    {
+     "no": 33,
+     "name": "Certificate in Docker",
+     "software": "Docker",
+     "group": "DevOps"
+    },
+    {
+     "no": 34,
+     "name": "Certificate in Kubernetes",
+     "software": "Kubernetes",
+     "group": "DevOps"
+    },
+    {
+     "no": 35,
+     "name": "Certificate in Ansible",
+     "software": "Ansible",
+     "group": "DevOps"
+    },
+    {
+     "no": 36,
+     "name": "Certificate in Puppet",
+     "software": "Puppet",
+     "group": "DevOps"
+    }
+   ]
+  },
+  {
+   "title": "Database & AI",
+   "courses": [
+    {
+     "no": 37,
+     "name": "Certificate in Data Science with Python",
+     "software": "Python",
+     "group": "Database & AI"
+    },
+    {
+     "no": 38,
+     "name": "Certificate in Machine Learning",
+     "software": "Machine Learning",
+     "group": "Database & AI"
+    },
+    {
+     "no": 39,
+     "name": "Certificate in Tableau Basics",
+     "software": "Tableau",
+     "group": "Database & AI"
+    },
+    {
+     "no": 40,
+     "name": "Certificate in Power BI Basics",
+     "software": "Power BI",
+     "group": "Database & AI"
+    }
+   ]
+  },
+  {
+   "title": "Cyber Security",
+   "courses": [
+    {
+     "no": 41,
+     "name": "Certificate in Wireshark",
+     "software": "Wireshark",
+     "group": "Cyber Security"
+    },
+    {
+     "no": 42,
+     "name": "Certificate in Metasploit",
+     "software": "Metasploit",
+     "group": "Cyber Security"
+    },
+    {
+     "no": 43,
+     "name": "Certificate in Mimikatz",
+     "software": "Mimikatz",
+     "group": "Cyber Security"
+    },
+    {
+     "no": 44,
+     "name": "Certificate in Burp Suite",
+     "software": "Burp Suite",
+     "group": "Cyber Security"
+    }
+   ]
+  },
+  {
+   "title": "Digital Marketing",
+   "courses": [
+    {
+     "no": 45,
+     "name": "Certificate in SEO Basics",
+     "software": "SEO Tools",
+     "group": "Digital Marketing"
+    },
+    {
+     "no": 46,
+     "name": "Certificate in Google Ads",
+     "software": "Google Ads",
+     "group": "Digital Marketing"
+    },
+    {
+     "no": 47,
+     "name": "Certificate in Email Marketing",
+     "software": "Mailchimp / HubSpot",
+     "group": "Digital Marketing"
+    },
+    {
+     "no": 48,
+     "name": "Certificate in Web Analytics",
+     "software": "Google Analytics",
+     "group": "Digital Marketing"
+    },
+    {
+     "no": 49,
+     "name": "Certificate in Canva for Creatives",
+     "software": "Canva",
+     "group": "Digital Marketing"
+    }
+   ]
+  },
+  {
+   "title": "Frameworks",
+   "courses": [
+    {
+     "no": 50,
+     "name": "Certificate in Django",
+     "software": "Django",
+     "group": "Frameworks"
+    },
+    {
+     "no": 51,
+     "name": "Certificate in Spring Boot",
+     "software": "Spring Boot",
+     "group": "Frameworks"
+    },
+    {
+     "no": 52,
+     "name": "Certificate in Laravel",
+     "software": "Laravel",
+     "group": "Frameworks"
+    },
+    {
+     "no": 53,
+     "name": "Certificate in React Native",
+     "software": "React Native",
+     "group": "Frameworks"
+    }
+   ]
+  }
+ ]
+}

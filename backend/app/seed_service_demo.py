@@ -51,12 +51,10 @@ SERVICES = {
     "ai/workflow-automation": ("KE VL QR OI", "They mapped our workflow first and automated only the repeated steps, so the process is faster without being harder to follow."),
     "ai/ai-integration-and-consulting": ("OI VL ML NH", "The consulting session showed us where AI would genuinely help and where it would not, before we spent anything on building."),
     "growth/social-media-management": ("LF BW ST NH", "Our social channels now post on a steady schedule with a clear plan, and the monthly report is easy to follow."),
-    "growth/meta-ads-management": ("ST BW LF NH", "The Meta campaigns were set up with clear targets and honest expectations, and we could see what each campaign was doing."),
-    "growth/google-ads-management": ("NH BW CD ST", "Our search ads are focused on the services we actually want to grow, and the reports show what each keyword is doing."),
+    "growth/paid-advertising": ("ST BW LF NH", "Our ad campaigns were set up with clear targets and honest expectations, and we could see what each campaign was doing."),
     "growth/search-engine-optimization-seo": ("CD NH ML BW", "They fixed the technical problems on our site first and then built content around what patients really search for."),
-    "growth/website-and-landing-page-optimization": ("BW PO ST CD", "Small, tested changes to our landing pages made the enquiry journey clearer, and the reports showed us the effect."),
-    "growth/content-creation": ("PO ST LF BW", "The articles and graphics matched our tone and arrived on schedule, with revisions handled quickly."),
-    "growth/digital-marketing-strategy": ("ST BW NH LF", "We finally have one plan that connects the website, ads and social media, with priorities we can actually follow."),
+    "growth/creatives": ("PO ST LF BW", "The posters and videos matched our brand and arrived on schedule, with revisions handled quickly."),
+    "growth/content-publishing": ("BW PO ST CD", "The articles were published on a steady schedule and matched our tone."),
     "headless/api-hub-development": ("TF VL KE PO", "One API layer now connects our booking, billing and tracking tools, so a new integration no longer means starting from scratch."),
     "headless/headless-backend-development": ("PO TF KE OI", "The headless backend lets us change the front end freely while the content and data stay in one reliable place."),
     "headless/multi-tenant-saas-development": ("KE TF PO ML", "Each of our customers gets a separate, secure space on the same platform, and onboarding a new one is straightforward."),
@@ -88,7 +86,7 @@ SERVICES = {
 # The home page's sample testimonials, reused (same wording) on the service pages they genuinely fit.
 HOME_FIT = {
     "software/custom-software-development": "AT", "software/crm-and-erp-development": "AT", "software/business-management-systems": "AT",
-    "ai/ai-chatbots-and-virtual-assistants": "VL", "growth/digital-marketing-strategy": "BW", "growth/social-media-management": "BW",
+    "ai/ai-chatbots-and-virtual-assistants": "VL", "growth/social-media-management": "BW",
 }
 HOME_TESTIMONIALS = {
     "AT": "LAX360 took our scattered order and billing sheets and turned them into one simple system. They listened first, suggested only what we needed, and delivered on the date they promised.",

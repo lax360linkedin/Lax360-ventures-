@@ -13,7 +13,7 @@ import Button from '../components/ui/Button.jsx'
 import ContactCta from '../components/sections/ContactCta.jsx'
 import { AboutIntro, AboutMore, useAboutBlocks } from '../components/cms/AboutBlocks.jsx'
 import { useAboutSections } from '../hooks/useCmsPages.js'
-import { useSite } from '../hooks/useSite.js'
+import { useSite, useH1Override } from '../hooks/useSite.js'
 import { allDivisions } from '../data/services.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 
@@ -25,7 +25,7 @@ const MISSION = 'To deliver practical and purpose-driven technology and digital 
 const VISION = 'To grow as a trusted technology and digital solutions organisation, bringing together multiple areas of expertise and helping businesses adapt, innovate, and progress through technology.'
 
 const INTRO = [
-  'We work across software and IT services, artificial intelligence, digital marketing, and related technology services. By bringing these areas together, we help businesses improve their digital presence, streamline their operations, and approach technical challenges with the right solutions.',
+  'We work across software and IT services, artificial intelligence, digital marketing, education and training, and related technology services. By bringing these areas together, we help businesses improve their digital presence, streamline their operations, and approach technical challenges with the right solutions.',
   'At LAX360, we believe technology should serve a clear purpose. Every project begins with understanding the actual requirement, identifying the right approach, and developing a solution that aligns with the client’s objectives.',
   'Our focus is on building meaningful solutions through practical thinking, technical knowledge, and continuous improvement.',
 ]
@@ -95,16 +95,17 @@ function Drawn({ d, className = '', stroke = 'currentColor', width = 3, delay = 
 /** A white photo print with tape and a handwritten-style caption. */
 function Print({ src, alt = '', caption, rotate = -2, className = '', eager = false, sizes }) {
   return (
-    <figure className={`relative bg-white p-2 shadow-[0_24px_50px_-24px_rgba(76,29,149,0.55)] transition-transform duration-500 hover:rotate-0 hover:scale-[1.02] ${caption ? 'pb-9' : ''} ${className}`} style={{ transform: `rotate(${rotate}deg)` }}>
-      <span aria-hidden="true" className="absolute -top-2.5 left-1/2 h-5 w-16 -translate-x-1/2 -rotate-3 bg-violet-200/80 dark:bg-sky-200/70" />
+    <figure className={`relative bg-night p-2 shadow-[0_24px_50px_-24px_rgba(76,29,149,0.55)] transition-transform duration-500 hover:rotate-0 hover:scale-[1.02] ${caption ? 'pb-9' : ''} ${className}`} style={{ transform: `rotate(${rotate}deg)` }}>
+      <span aria-hidden="true" className="absolute -top-2.5 left-1/2 h-5 w-16 -translate-x-1/2 -rotate-3 bg-lav/16 dark:bg-sky-200/70" />
       <img src={src} alt={alt} width="1000" height="800" sizes={sizes} loading={eager ? 'eager' : 'lazy'} fetchPriority={eager ? 'high' : undefined} decoding="async" className="aspect-[5/4] w-full object-cover" />
-      {caption && <figcaption className="absolute inset-x-0 bottom-2 text-center font-display text-sm italic text-violet-900/80 dark:text-slate-700">{caption}</figcaption>}
+      {caption && <figcaption className="absolute inset-x-0 bottom-2 text-center font-display text-sm italic text-fg/80 dark:text-slate-700">{caption}</figcaption>}
     </figure>
   )
 }
 
 /** Hero: bright surface; the headline and buttons on the left, a collage of three real photographs (office, colleagues, code) on the right with drawn accents. */
 function AboutHero() {
+  const h1 = useH1Override()
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const [pt, setPt] = useState({ x: 0, y: 0 })
@@ -118,10 +119,10 @@ function AboutHero() {
   }
   const depth = (k) => ({ transform: `translate3d(${pt.x * k}px, ${pt.y * k}px, 0)`, transition: 'transform 0.4s ease-out' })
   return (
-    <section ref={ref} aria-labelledby="about-title" className="hero-light relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-white via-violet-50/60 to-white text-fg dark:from-night dark:via-base2 dark:to-night">
+    <section ref={ref} aria-labelledby="about-title" className="hero-light relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-lav/4 to-night text-fg dark:from-night dark:via-base2 dark:to-night">
       <m.div style={{ y: shapeY }} aria-hidden="true" className="absolute inset-0 -z-10">
-        <div className="absolute -left-32 top-10 size-[26rem] rounded-full bg-gradient-to-br from-violet-200/70 to-fuchsia-100/40 blur-3xl dark:from-sky-500/15 dark:to-transparent" />
-        <div className="absolute -right-24 top-0 size-[30rem] rounded-full bg-gradient-to-bl from-sky-200/60 to-violet-200/40 blur-3xl dark:from-sky-400/10 dark:to-transparent" />
+        <div className="absolute -left-32 top-10 size-[26rem] rounded-full bg-gradient-to-br from-lav/14 to-accent/5 blur-3xl dark:from-sky-500/15 dark:to-transparent" />
+        <div className="absolute -right-24 top-0 size-[30rem] rounded-full bg-gradient-to-bl from-sky/12 to-lav/8 blur-3xl dark:from-sky-400/10 dark:to-transparent" />
       </m.div>
       <div aria-hidden="true" className="absolute inset-0 -z-10 opacity-40 [background-image:radial-gradient(rgb(var(--glow)/0.28)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(ellipse_at_75%_35%,#000,transparent_62%)]" />
 
@@ -134,19 +135,19 @@ function AboutHero() {
               <li aria-current="page" className="font-semibold text-fg">About Us</li>
             </ol>
           </m.nav>
-          <m.p {...rise(0.12)} className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-edge-strong bg-white/85 dark:bg-glass px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav backdrop-blur-md">
+          <m.p {...rise(0.12)} className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-edge-strong bg-night/85 dark:bg-glass px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-lav backdrop-blur-md">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgb(var(--glow2)/0.6)]" />About LAX360
           </m.p>
           <m.h1 {...rise(0.2)} id="about-title" className="h1 mt-5 !text-[clamp(2.4rem,5vw,4.6rem)]">
-            Technology That Connects{' '}
+            {h1 || <>Technology That Connects{' '}
             <span className="relative inline-block">
               <BotHighlight delay={0.9}><span className="text-gradient">Ideas With Possibilities.</span></BotHighlight>
-            </span>
+            </span></>}
           </m.h1>
           <m.p {...rise(0.3)} className="lead mt-7 max-w-xl text-soft">LAX360 Pvt Ltd is a technology and digital solutions company focused on helping businesses turn their ideas and requirements into practical solutions.</m.p>
           <m.div {...rise(0.4)} className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button to="/contact" arrow>Start a Conversation</Button>
-            <Button to="/services" variant="secondary" className="bg-white/85 dark:bg-glass">Explore Our Services</Button>
+            <Button to="/services" variant="secondary" className="bg-night/85 dark:bg-glass">Explore Our Services</Button>
           </m.div>
         </div>
 
@@ -156,9 +157,9 @@ function AboutHero() {
             <div className="absolute right-0 top-0 w-[38%]" style={depth(16)}><Print src={P('hero-colleagues')} rotate={3} eager className="[&_img]:aspect-[3/4]" sizes="(min-width: 1024px) 14rem, 34vw" /></div>
             <div className="absolute bottom-0 right-[8%] w-[50%]" style={depth(12)}><Print src={P('hero-code')} rotate={2} sizes="(min-width: 1024px) 18rem, 44vw" /></div>
             <Drawn d="M30 70C10 30 60 4 110 12" viewBox="0 0 130 90" className="pointer-events-none absolute -left-2 bottom-[18%] h-16 w-24 text-accent/70" width={2.5} delay={0.6} />
-            <Drawn d="M12 64L52 28M40 28h14v14" viewBox="0 0 70 70" className="pointer-events-none absolute left-[38%] top-[52%] hidden h-14 w-14 text-sky-500/70 dark:text-sky-300/70 sm:block" width={2.5} delay={0.9} />
-            <span className="absolute -left-1 bottom-[8%] flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3.5 py-2 text-xs font-bold text-violet-900 dark:border-edge-strong dark:bg-night dark:text-fg shadow-[0_18px_40px_-18px_rgb(var(--glow)/0.6)] sm:text-sm">
-              <span className="flex size-6 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white dark:from-primary dark:to-accent"><Check className="size-3.5" aria-hidden="true" /></span>One accountable team
+            <Drawn d="M12 64L52 28M40 28h14v14" viewBox="0 0 70 70" className="pointer-events-none absolute left-[38%] top-[52%] hidden h-14 w-14 text-sky/70 dark:text-sky-300/70 sm:block" width={2.5} delay={0.9} />
+            <span className="absolute -left-1 bottom-[8%] flex items-center gap-2 rounded-full border border-lav/20 bg-night px-3.5 py-2 text-xs font-bold text-fg dark:border-edge-strong dark:bg-night dark:text-fg shadow-[0_18px_40px_-18px_rgb(var(--glow)/0.6)] sm:text-sm">
+              <span className="flex size-6 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-white dark:from-primary dark:to-accent"><Check className="size-3.5" aria-hidden="true" /></span>One accountable team
             </span>
           </div>
         </m.div>
@@ -175,7 +176,7 @@ function StoryJourney({ steps }) {
   const drawHeight = useTransform(scrollYProgress, [0, 1], [0, 1000]) // how much of the 1000-unit-tall line is revealed
   const curve = 'M32 0C62 90 2 170 32 260S62 430 32 520S2 690 32 780S62 930 32 1000'
   return (
-    <section className="border-y border-edge bg-gradient-to-b from-violet-50/60 via-transparent to-violet-50/40 dark:from-sky-400/[0.05] dark:to-sky-400/[0.04]" aria-labelledby="story-title">
+    <section className="border-y border-edge bg-gradient-to-b from-lav/4 via-transparent to-lav/2 dark:from-sky-400/[0.05] dark:to-sky-400/[0.04]" aria-labelledby="story-title">
       <div className="wrap section">
         <SectionHeading id="story-title" eyebrow="Our story" title="Built Around Ideas." gradient="Driven by Technology." center />
         <div ref={ref} className="relative mt-12">
@@ -192,7 +193,7 @@ function StoryJourney({ steps }) {
               const photoLeft = i % 2 === 0
               return (
                 <li key={step.title} className="relative grid items-center gap-6 pl-14 md:grid-cols-[1fr_4rem_1fr] md:gap-x-8 md:pl-0">
-                  <span className="absolute left-0 top-0 z-10 flex size-10 items-center justify-center rounded-full border-2 border-accent bg-white font-display text-base font-bold text-violet-700 dark:bg-night dark:text-lav shadow-[0_8px_20px_-8px_rgb(var(--glow)/0.7)] md:static md:col-start-2 md:row-start-1 md:size-14 md:justify-self-center md:text-xl">{i + 1}</span>
+                  <span className="absolute left-0 top-0 z-10 flex size-10 items-center justify-center rounded-full border-2 border-accent bg-night font-display text-base font-bold text-lav dark:bg-night dark:text-lav shadow-[0_8px_20px_-8px_rgb(var(--glow)/0.7)] md:static md:col-start-2 md:row-start-1 md:size-14 md:justify-self-center md:text-xl">{i + 1}</span>
                   <Reveal x={photoLeft ? -30 : 30} y={0} className={`md:row-start-1 ${photoLeft ? 'md:col-start-1' : 'md:col-start-3'}`}>
                     <Print src={step.img} caption={step.caption} rotate={photoLeft ? -2.5 : 2.5} className="mx-auto max-w-sm md:max-w-md" sizes="(min-width: 768px) 28rem, 90vw" />
                   </Reveal>
@@ -217,9 +218,9 @@ function StoryJourney({ steps }) {
 function Motto() {
   const [i, setI] = useState(0)
   return (
-    <section className="hero-light relative overflow-hidden bg-gradient-to-br from-violet-100 via-white to-sky-100 text-fg dark:from-night dark:via-base2 dark:to-night" aria-labelledby="motto-title">
-      <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-0 size-96 rounded-full bg-violet-300/40 blur-3xl dark:bg-sky-500/10" />
-      <div aria-hidden="true" className="pointer-events-none absolute -right-24 bottom-0 size-96 rounded-full bg-sky-300/40 blur-3xl dark:bg-sky-400/10" />
+    <section className="hero-light relative overflow-hidden bg-gradient-to-br from-lav/12 via-night to-sky/12 text-fg dark:from-night dark:via-base2 dark:to-night" aria-labelledby="motto-title">
+      <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-0 size-96 rounded-full bg-lav/12 blur-3xl dark:bg-sky-500/10" />
+      <div aria-hidden="true" className="pointer-events-none absolute -right-24 bottom-0 size-96 rounded-full bg-sky/12 blur-3xl dark:bg-sky-400/10" />
       <div className="wrap section relative">
         <Reveal className="mx-auto max-w-4xl text-center">
           <p className="eyebrow mb-4 flex items-center justify-center gap-3 text-lav"><span aria-hidden="true" className="h-px w-8 bg-gradient-to-r from-transparent to-accent" />Our motto<span aria-hidden="true" className="h-px w-8 bg-gradient-to-l from-transparent to-accent" /></p>
@@ -251,8 +252,8 @@ function Motto() {
 /** Mission and vision as two photo panels. */
 function Purpose({ blocks }) {
   const panels = [
-    { icon: Target, label: 'Our Mission', title: blocks.mission[0]?.title, text: blocks.mission[0]?.data.text || MISSION, img: blocks.mission[0]?.data.image || P('mission'), tint: 'from-violet-100/80 to-white dark:from-sky-400/10 dark:to-transparent' },
-    { icon: Eye, label: 'Our Vision', title: blocks.vision[0]?.title, text: blocks.vision[0]?.data.text || VISION, img: blocks.vision[0]?.data.image || P('vision'), tint: 'from-sky-100/80 to-white dark:from-sky-400/10 dark:to-transparent' },
+    { icon: Target, label: 'Our Mission', title: blocks.mission[0]?.title, text: blocks.mission[0]?.data.text || MISSION, img: blocks.mission[0]?.data.image || P('mission'), tint: 'from-lav/10 to-night dark:from-sky-400/10 dark:to-transparent' },
+    { icon: Eye, label: 'Our Vision', title: blocks.vision[0]?.title, text: blocks.vision[0]?.data.text || VISION, img: blocks.vision[0]?.data.image || P('vision'), tint: 'from-sky/10 to-night dark:from-sky-400/10 dark:to-transparent' },
   ]
   return (
     <section className="wrap section" aria-label="Our mission and vision">
@@ -290,14 +291,14 @@ function Expertise() {
             lead="Our expertise covers multiple areas of technology and digital services. This allows us to understand different business requirements and identify suitable solutions across domains." />
           <Reveal delay={0.1} className="shrink-0"><Button to="/services" variant="secondary" arrow>Explore all services</Button></Reveal>
         </div>
-        <ul className="mt-10 grid gap-5 sm:grid-cols-3 lg:grid-cols-6">
+        <ul className="mt-10 grid gap-5 sm:grid-cols-3 lg:grid-cols-6 lg:[&>li:last-child:nth-child(3n+1)]:col-start-3">
           {expertise.map(({ letter, icon: Icon, title, text, to, img }, i) => (
             <Reveal as="li" key={title} delay={(i % 3) * 0.07} className={`lg:col-span-2`}>
               <Link to={to} className="glass-flat lift group flex h-full flex-col overflow-hidden">
                 <span className="relative block overflow-hidden">
                   <img src={img} alt="" width="1000" height="800" loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />
                   <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  <span className="absolute left-4 top-4 flex size-9 items-center justify-center rounded-xl bg-white font-display text-sm font-bold text-violet-700 shadow-md dark:bg-night dark:text-lav">{letter}</span>
+                  <span className="absolute left-4 top-4 flex size-9 items-center justify-center rounded-xl bg-night font-display text-sm font-bold text-lav shadow-md dark:bg-night dark:text-lav">{letter}</span>
                   <span className="absolute bottom-3 right-4 flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white shadow-lg transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110"><Icon className="size-5" aria-hidden="true" /></span>
                 </span>
                 <span className="flex flex-1 flex-col gap-2 p-6">
@@ -355,11 +356,11 @@ function Values({ blocks }) {
         <Reveal>
           <div className="relative overflow-hidden rounded-[2rem] border border-edge-strong">
             <img src={P('values')} alt="" width="1000" height="720" loading="lazy" decoding="async" className="h-56 w-full object-cover sm:h-72 lg:h-80" />
-            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-violet-950/80 via-violet-900/45 to-transparent dark:from-night/90 dark:via-night/55" />
+            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent dark:from-night/90 dark:via-night/55" />
             <div className="absolute inset-0 flex flex-col justify-center p-6 text-white sm:p-10 lg:p-14">
-              <p className="eyebrow flex items-center gap-3 text-violet-200 dark:text-lav"><span aria-hidden="true" className="h-px w-8 bg-current" />Our values</p>
-              <h2 id="values-title" className="mt-3 max-w-md font-display text-[clamp(1.9rem,4vw,3.25rem)] font-semibold leading-[1.05] tracking-[-0.02em]">Principles That <span className="text-violet-200 dark:text-lav">Guide Us.</span></h2>
-              <p className="mt-3 hidden max-w-md text-violet-100/90 dark:text-slate-200 sm:block">Our values shape how we understand requirements, approach projects, communicate, and work towards delivering solutions.</p>
+              <p className="eyebrow flex items-center gap-3 text-white/80 dark:text-lav"><span aria-hidden="true" className="h-px w-8 bg-current" />Our values</p>
+              <h2 id="values-title" className="mt-3 max-w-md font-display text-[clamp(1.9rem,4vw,3.25rem)] font-semibold leading-[1.05] tracking-[-0.02em]">Principles That <span className="text-white/80 dark:text-lav">Guide Us.</span></h2>
+              <p className="mt-3 hidden max-w-md text-white/90 dark:text-slate-200 sm:block">Our values shape how we understand requirements, approach projects, communicate, and work towards delivering solutions.</p>
             </div>
           </div>
         </Reveal>
@@ -474,7 +475,7 @@ export default function About() {
           <Reveal x={-24} y={0} className="lg:col-span-5">
             <div className="relative mx-auto max-w-md lg:max-w-none">
               <img src={P('who')} alt="" width="1100" height="900" loading="lazy" decoding="async" className="aspect-[5/4] w-full rounded-[2rem] border border-edge-strong object-cover shadow-[0_30px_70px_-30px_rgb(var(--glow)/0.6)]" />
-              <span className="hero-light absolute -bottom-5 right-4 flex items-center gap-3 rounded-2xl border border-edge-strong bg-white dark:bg-night px-4 py-3 shadow-[0_18px_40px_-18px_rgb(var(--glow)/0.6)]">
+              <span className="hero-light absolute -bottom-5 right-4 flex items-center gap-3 rounded-2xl border border-edge-strong bg-night dark:bg-night px-4 py-3 shadow-[0_18px_40px_-18px_rgb(var(--glow)/0.6)]">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white"><Sparkles className="size-5" aria-hidden="true" /></span>
                 <span><span className="block font-display text-base font-bold leading-tight">LAX360 Pvt Ltd</span><span className="block text-sm font-semibold text-lav">{site.tagline}</span></span>
               </span>

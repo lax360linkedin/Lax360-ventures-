@@ -110,7 +110,7 @@ def test_a_valid_application_is_saved_before_success_and_gets_a_reference(api, d
 
 
 def test_validation_is_server_side_with_field_messages(api, db):
-    for over, field in (({"category": "reseller"}, "category"), ({"division": "cad"}, "division"), ({"full_name": " "}, "full_name"), ({"email": "nope"}, "email"), ({"phone": "12"}, "phone"),
+    for over, field in (({"category": "reseller"}, "category"), ({"division": "cad"}, "divisions"), ({"division": "", "divisions": []}, "divisions"), ({"divisions": ["other"]}, "other_interest"), ({"full_name": " "}, "full_name"), ({"email": "nope"}, "email"), ({"phone": "12"}, "phone"),
                         ({"country": ""}, "country"), ({"consent_processing": False}, "consent_processing"), ({"entity_type": "company"}, "entity_type"),
                         ({"entity_type": "organization"}, "organization"), ({"answers": {}}, "answers.proposed_location"), ({"consultation": {"date": "2001-01-01"}}, "consultation.date")):
         r = apply(api, **over)
@@ -198,7 +198,7 @@ def test_export_is_spreadsheet_safe_and_dashboard_counts_are_real(api, db):
     apply(api, full_name="=HYPERLINK(1)Bob")
     apply(api, category="referral", division="it", email="r@example.com", answers={})
     csv_text = api.get(f"{BASE}/applications/export", headers=ADMIN).text
-    assert "'=HYPERLINK" in csv_text and csv_text.splitlines()[0].startswith("reference,created_at,category,division,status")
+    assert "'=HYPERLINK" in csv_text and csv_text.splitlines()[0].startswith("reference,created_at,category,division,all_divisions,other_interest,status")
     api.patch(f"{BASE}/applications/{db.scalars(select(PartnershipApplication)).first().id}/status", json={"status": "under_review"}, headers=ADMIN)
     d = api.get(f"{BASE}/dashboard", headers=ADMIN).json()
     assert d["total"] == 2 and d["by_category"] == {"franchise": 1, "referral": 1} and d["by_division"] == {"education": 1, "it": 1} and d["under_review"] == 1 and d["new"] == 1
@@ -300,3 +300,48 @@ def test_migration_0028_is_additive_and_reversible(capsys):
     assert up.count("CREATE TABLE pt_") == 7 and "DROP" not in up and "ALTER TABLE pz_" not in up and "ENABLE ROW LEVEL SECURITY" in up
     command.downgrade(cfg, "0028:0027", sql=True)
     assert "DROP TABLE pt_applications" in capsys.readouterr().out
+
+
+# ================================================================== several business divisions in one application
+def test_an_application_can_select_several_divisions_and_all_and_other(api, db):
+    r = apply(api, divisions=["education", "robotics"], email="multi@example.com")
+    assert r.status_code == 201
+    a = db.scalar(select(PartnershipApplication).where(PartnershipApplication.email == "multi@example.com"))
+    assert a.divisions == ["education", "robotics"] and a.division == "education" and not a.all_divisions and a.other_interest is None
+
+    r = apply(api, divisions=["all"], email="all@example.com")
+    assert r.status_code == 201
+    a = db.scalar(select(PartnershipApplication).where(PartnershipApplication.email == "all@example.com"))
+    assert a.all_divisions and {"education", "digital-marketing", "it", "cad-engineering", "robotics", "blockchain"} <= set(a.divisions)
+
+    r = apply(api, divisions=["it", "other"], other_interest="Solar installation franchise", email="other@example.com")
+    assert r.status_code == 201
+    a = db.scalar(select(PartnershipApplication).where(PartnershipApplication.email == "other@example.com"))
+    assert a.divisions == ["it", "other"] and a.other_interest == "Solar installation franchise"
+
+
+def test_the_same_selection_is_one_application_but_a_different_selection_is_another(api, db):
+    first = apply(api, divisions=["education", "it"], email="dup@example.com")
+    again = apply(api, divisions=["it", "education"], email="dup@example.com")
+    assert again.json()["duplicate"] is True and again.json()["reference"] == first.json()["reference"]
+    assert apply(api, divisions=["it"], email="dup@example.com").json().get("duplicate") is not True
+
+
+def test_short_enquiry_form_does_not_need_the_franchise_location(api, db):
+    r = apply(api, divisions=["it"], answers={}, quick=True, email="quick@example.com")
+    assert r.status_code == 201
+    assert db.scalar(select(PartnershipApplication).where(PartnershipApplication.email == "quick@example.com")).answers == {"enquiry_form": "short"}
+
+
+def test_admin_list_shows_all_divisions_and_filters_by_any_of_them(api, db):
+    apply(api, divisions=["education", "robotics"], email="a1@example.com")
+    apply(api, divisions=["it"], email="a2@example.com")
+    # an older record: only the single `division` column
+    db.execute(PartnershipApplication.__table__.update().where(PartnershipApplication.email == "a2@example.com").values(divisions=[]))
+    db.commit()
+    by = lambda d: api.get(f"{BASE}/applications?division={d}", headers=ADMIN).json()
+    assert by("robotics")["total"] == 1 and by("education")["total"] == 1 and by("it")["total"] == 1 and by("blockchain")["total"] == 0
+    rows = {r["email"]: r for r in api.get(f"{BASE}/applications", headers=ADMIN).json()["items"]}
+    assert rows["a1@example.com"]["divisions"] == ["education", "robotics"] and rows["a2@example.com"]["divisions"] == ["it"]  # the older record still shows its division
+    d = api.get(f"{BASE}/dashboard", headers=ADMIN).json()
+    assert d["by_division"].get("robotics") == 1 and d["by_division"].get("education") == 1

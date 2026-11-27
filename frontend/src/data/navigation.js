@@ -21,10 +21,11 @@ export const footerColumns = [
     links: [
       { label: 'Software & IT Services', to: '/services/software' },
       { label: 'AI & Business Automation', to: '/services/ai' },
-      { label: 'Digital Marketing', to: '/services/growth' },
+      { label: 'Digital Marketing', to: '/services/digitalmarketing' },
       { label: 'Headless SaaS & API Solutions', to: '/services/headless' },
       { label: 'Workflow Automation & Integration', to: '/services/automation' },
       { label: 'Mobile & Business Applications', to: '/services/mobile' },
+      { label: 'Education & Training', to: '/services/education' },
     ],
   },
   {
@@ -38,8 +39,9 @@ export const footerColumns = [
       { label: 'Our Network', to: '/our-network' },
       { label: 'Our Team', to: '/our-team' },
       { label: 'Work', to: '/work' },
+      { label: 'CAD & Engineering Design', to: '/cad-engineering' },
       { label: 'Robotics', to: '/robotics' },
-      { label: 'Blockchain', to: '/blockchain' },
+      { label: 'Blockchain & Web 3.0', to: '/blockchain' },
       { label: 'Careers', to: '/career' },
       { label: 'Locations', to: '/locations' },
       { label: 'Partner With Us', to: '/partner-with-us' },
@@ -64,5 +66,6 @@ export const enquiryTypes = [
   { id: 'workshop', label: 'College workshop' },
   { id: 'partnership', label: 'Partnership' },
   { id: 'career', label: 'Careers' },
+  { id: 'upcoming-interest', label: 'Interest in an upcoming service' },
   { id: 'general', label: 'Something else' },
 ]

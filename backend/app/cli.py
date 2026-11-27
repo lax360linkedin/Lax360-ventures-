@@ -30,7 +30,9 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import json
 import os
+import re
 import sys
 
 from sqlalchemy import inspect, select, text
@@ -173,7 +175,7 @@ EXPECTED_TABLES = {"users", "auth_sessions", "branches", "demo_requests", "conta
 
 
 def sheets_setup(args: argparse.Namespace) -> None:
-    """Check the Google Sheets connection and prepare the spreadsheet: the three tabs (Enquiries, Demo Requests, Franchise Requests) are created when missing and their header rows written
+    """Check the Google Sheets connection and prepare the spreadsheet: one worksheet per enquiry category (General, Intro Contact, Education, Course, Internship, Digital Marketing, IT & Software, Franchise, Authorized Partner, Referral Partner, Upcoming Services, Consultation Requests, Other: names editable in the admin panel) is created when missing and their header rows written
     when empty. Existing tabs, headers and data are never changed. Secrets are never printed."""
     from app.services import sheets_service as ss
 
@@ -182,8 +184,10 @@ def sheets_setup(args: argparse.Namespace) -> None:
         print("Google Sheets is not configured: set GOOGLE_SHEETS_SPREADSHEET_ID and GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT_FILE) on the server.")
         raise SystemExit(1)
     try:
-        with ss._client() as http:
-            done = ss.ensure_tabs(settings, http)
+        from app.db.session import _factory
+
+        with _factory()() as db:
+            done = ss.setup_worksheets(db, settings)
     except Exception as exc:  # noqa: BLE001
         print(f"Could not prepare the spreadsheet: {str(exc)[:300]}")
         print("Check that the spreadsheet id is right and that the sheet is shared (Editor) with the service account's e-mail address.")
@@ -311,6 +315,59 @@ def hero_videos_report(args: argparse.Namespace) -> None:
     local = [r for r in out if r["storage"] == "local"]
     print(f"\n{len(out)} video(s): {len(out) - len(bad)} verified, {len(bad)} need attention, {len(local)} held only on the server disk (temporary: run hero-videos-migrate while the file is still there).")
     print("No records or files were deleted or changed by this report.")
+
+
+def replace_contact_email(args: argparse.Namespace) -> None:
+    """Change the public contact e-mail address everywhere it is stored in the database: the website settings (Contact email, Second email), the contact list (header, footer, Contact page) and any text typed
+    into website content. Without --apply nothing is changed (a report only). The address is normally changed in the admin panel (Settings > Contact email, and Social media & contact); this command moves
+    every older copy in one go."""
+    from sqlalchemy import select
+
+    from app.models import ContactChannel, ContentItem, SiteSetting
+    from app.services import channel_service
+
+    old, new = args.old.strip().lower(), args.new.strip()
+    if "@" not in new or " " in new:
+        raise SystemExit("--new must be an e-mail address")
+
+    def swap(v):
+        if isinstance(v, str):
+            return re.sub(re.escape(args.old), new, v, flags=re.I)
+        if isinstance(v, list):
+            return [swap(x) for x in v]
+        if isinstance(v, dict):
+            return {k: swap(x) for k, x in v.items()}
+        return v
+
+    get_settings()
+    with _factory()() as db:
+        n_set = n_chan = n_items = 0
+        for row in db.scalars(select(SiteSetting)):
+            if isinstance(row.value, str) and old in row.value.lower():
+                print(f"setting {row.key}: {row.value} -> {swap(row.value)}")
+                n_set += 1
+                if args.apply:
+                    row.value = swap(row.value)
+        for ch in db.scalars(select(ContactChannel)):
+            if old in (ch.value or "").lower() or old in (ch.detail or "").lower():
+                print(f"contact list ({ch.owner_type}/{ch.owner_ref or '-'}, {ch.type}): {ch.value}")
+                n_chan += 1
+                if args.apply:
+                    ch.value, ch.detail = swap(ch.value), (swap(ch.detail) if ch.detail else ch.detail)
+                    key = channel_service._norm(ch.kind, ch.type, ch.label, ch.value)
+                    ch.dedupe_key = key if ch.owner_type == "global" else f"{ch.owner_type}:{ch.owner_ref}:{key}"[:400]
+        for it in db.scalars(select(ContentItem)):
+            if old in json.dumps(it.data or {}, ensure_ascii=False).lower():
+                print(f"content {it.kind}: {it.title}")
+                n_items += 1
+                if args.apply:
+                    it.data = swap(it.data)
+        print(f"{n_set} setting(s), {n_chan} contact entr{'y' if n_chan == 1 else 'ies'}, {n_items} content item(s) contain {args.old}.")
+        if not args.apply:
+            print("Nothing changed. Run again with --apply to replace them.")
+            return
+        db.commit()
+        print(f"Replaced with {new}. (The public website caches for a few seconds.)")
 
 
 def dedupe_carousel(args: argparse.Namespace) -> None:
@@ -713,7 +770,7 @@ def seed_network(args: argparse.Namespace) -> None:
         for n, c in enumerate(data["companies"], start=1):
             if ("network_partner", c["slug"]) in existing:
                 continue
-            body = {k: v for k, v in c.items() if k not in ("slug", "name", "status", "products", "featured")}
+            body = {k: v for k, v in c.items() if k not in ("slug", "name", "status", "products", "featured", "core")}
             body["products"] = nl.join(c["products"])
             body["featured"] = bool(c.get("featured"))
             db.add(ContentItem(kind="network_partner", slug=c["slug"], title=c["name"], data={k: v for k, v in body.items() if v not in ("", None)}, status=c["status"], sort_order=n * 10))
@@ -726,6 +783,73 @@ def seed_network(args: argparse.Namespace) -> None:
             added += 1
         db.commit()
         print(f"Added {added} network row(s). Review them in the admin panel (Website content > Network): verify each partner's designation, add official logos you are permitted to use, and adjust the text.")
+
+
+def migrate_content(args: argparse.Namespace) -> None:
+    """Move the website's built-in content into the database (backup first, idempotent, never overwrites an edit), then mark each section as migrated so the database is its only source."""
+    from argparse import Namespace
+
+    from app import seed_content as sc
+    from app.models import ContentItem
+
+    get_settings()
+    with _factory()() as db:
+        if args.dry_run:
+            print("Dry run: nothing is written. It would back up the content, then add whatever is missing for Our Network, Upcoming services, Education courses, Home hero, Partner product lists, Partnership pages, Industries and Products.")
+            return
+        print("Backup written to:", sc.backup(db))
+        existing = {(i.kind, i.slug) for i in db.scalars(select(ContentItem))}
+        added = {"Our Network": sc.seed_network(db, existing), "Upcoming services": sc.seed_upcoming(db, existing), "Education courses": sc.seed_courses(db, existing), "Home page hero": sc.seed_hero(db, existing), "Partner product lists": sc.seed_partner_products(db, existing),
+                 "Partnership pages": sc.seed_partnership_pages(db)}
+        for domain in ("network", "upcoming", "courses", "partner-products"):
+            sc.mark(db, existing, domain)
+        db.commit()
+    for name, n in added.items():
+        print(f"{name}: {n} item(s) added")
+    seed_industries(Namespace(remove=False))
+    seed_products(Namespace(remove=False))
+    print("Done. Review the sections in the admin panel; run again at any time: nothing is added twice.")
+
+
+def optimize_media(args: argparse.Namespace) -> None:
+    """Make the big pictures already in the media library light: every PNG / JPEG over 200 KB becomes a right-sized WebP (max 2000 px wide, quality 85, transparency kept).
+    The original of each picture is kept as a private "previous-..." library item (nothing is deleted); every page that uses the picture keeps working because the library item is the same.
+    --dry-run only reports what would change."""
+    import tempfile
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    from app.models import MediaAsset
+    from app.services import image_optimize, media_service, object_storage as store
+
+    settings = get_settings()
+    saved = before = after = done = 0
+    with _factory()() as db:
+        assets = list(db.scalars(select(MediaAsset).where(MediaAsset.kind == "image", MediaAsset.content_type.in_(("image/png", "image/jpeg")), MediaAsset.size_bytes >= image_optimize.MIN_BYTES,
+                                                             MediaAsset.storage.in_(("supabase", "local")), ~MediaAsset.filename.like("previous-%")).order_by(MediaAsset.size_bytes.desc())))
+        if args.limit:
+            assets = assets[: args.limit]
+        print(f"{len(assets)} picture(s) over {image_optimize.MIN_BYTES // 1024} KB.")
+        for a in assets:
+            raw = store.read(settings, a.bucket or settings.media_bucket, a.storage_key or "", a.storage)
+            if not raw:
+                print(f"  skip {a.filename}: file not found in storage")
+                continue
+            with tempfile.TemporaryDirectory() as tmp:
+                src, out = Path(tmp) / "src", Path(tmp) / "out.webp"
+                src.write_bytes(raw)
+                if not image_optimize.optimize_file(src, a.content_type, out):
+                    print(f"  keep {a.filename} ({len(raw) // 1024} KB): not worth converting")
+                    continue
+                size = out.stat().st_size
+                before, after, done = before + len(raw), after + size, done + 1
+                print(f"  {a.filename}: {len(raw) // 1024} KB -> {size // 1024} KB")
+                if args.dry_run:
+                    continue
+                prep = media_service.Prepared(out, size, "image/webp", ".webp", "image", media_service.safe_filename(a.filename, ".webp"), media_service._hash(out))
+                media_service.replace(db, settings, SimpleNamespace(id=None), a, prep, delete_previous=False)
+                db.commit()
+    print(f"{'Would convert' if args.dry_run else 'Converted'} {done} picture(s): {before / 1048576:.1f} MB -> {after / 1048576:.1f} MB. Originals are kept as private 'previous-' items in the media library.")
 
 
 def seed_service_demo(args: argparse.Namespace) -> None:
@@ -923,6 +1047,11 @@ def main(argv: list[str] | None = None) -> None:
     ddc = sub.add_parser("dedupe-carousel", help="find repeated pictures in the home-page image carousel; --apply removes the later copies (unique pictures and order untouched)")
     ddc.add_argument("--apply", action="store_true")
     ddc.set_defaults(func=dedupe_carousel)
+    rce = sub.add_parser("replace-contact-email", help="replace an old public contact e-mail address with a new one everywhere in the database (settings, contact list, content); a report unless --apply")
+    rce.add_argument("--old", default="lax360tech@gmail.com")
+    rce.add_argument("--new", default="admin@lax360.in")
+    rce.add_argument("--apply", action="store_true")
+    rce.set_defaults(func=replace_contact_email)
     ssu = sub.add_parser("sheets-setup", help="check the Google Sheets connection and create the three tabs + header rows when missing (never overwrites)")
     ssu.set_defaults(func=sheets_setup)
     ssy = sub.add_parser("sheets-sync", help="append submissions that are not in the Google Spreadsheet yet (retry of failures; nothing is added twice)")
@@ -947,6 +1076,13 @@ def main(argv: list[str] | None = None) -> None:
     snet = sub.add_parser("seed-network", help="load the Our Network starter companies (CADPOINT, Fatcat Wealthy, Zoho, OpenAI, Marg ERP, HexBis; designations pending verification), or --remove them")
     snet.add_argument("--remove", action="store_true")
     snet.set_defaults(func=seed_network)
+    smc = sub.add_parser("migrate-content", help="back up, then move the built-in Our Network, Upcoming services, Education courses, Industries and Products content into the database (idempotent)")
+    smc.add_argument("--dry-run", action="store_true")
+    smc.set_defaults(func=migrate_content)
+    som = sub.add_parser("optimize-media", help="convert the big PNG / JPEG pictures in the media library to right-sized WebP (originals are kept); --dry-run only reports")
+    som.add_argument("--dry-run", action="store_true")
+    som.add_argument("--limit", type=int, default=0)
+    som.set_defaults(func=optimize_media)
     ssd = sub.add_parser("seed-service-demo", help="load FICTIONAL demonstration clients and testimonials for every individual service page (labelled 'Sample'), or --remove them")
     ssd.add_argument("--remove", action="store_true")
     ssd.set_defaults(func=seed_service_demo)

@@ -8,6 +8,8 @@ import Reveal from '../components/ui/Reveal.jsx'
 import { Block, Checklist, ComparisonTable, Cta, Crumbs, Faqs, PartnerHero, PartnerTabs, Steps } from '../components/partner/PartnerUI.jsx'
 import { CATEGORIES, DIVISIONS, ECOSYSTEM, GENERAL_FAQS, JOURNEY, PARTNER_PAGES, PARTNER_POLICIES, WHO_CAN_APPLY, WHY, opportunityPath, webPageLd } from '../data/partnership.js'
 import { pageOverride, usePartnerContent } from '../services/partnershipService.js'
+import { UpcomingMatrix } from '../components/upcoming/UpcomingPartner.jsx'
+import PartnerEnquiryForm from '../components/partner/PartnerEnquiryForm.jsx'
 import { warmBackend } from '../services/backendWake.js'
 
 const ICON = { graduation: GraduationCap, megaphone: Megaphone, code: Code2 }
@@ -20,6 +22,7 @@ export default function PartnerHub() {
   const faqs = [...(data?.faqs?.overview || []), ...(data?.faqs?.general || []), ...GENERAL_FAQS].filter((f, i, a) => a.findIndex((x) => x.q === f.q) === i)
   return (
     <PageContainer path={meta.path} title={o.seo_title || meta.seoTitle} description={o.seo_description || meta.seoDescription} noindex={!!o.noindex} jsonLd={webPageLd(meta.title, o.seo_description || meta.seoDescription)} keywords="franchise opportunities, authorized partner program, referral partner program, business partnership opportunities in India">
+      <div className="pp">
       <PartnerHero eyebrow="Partner With Us" title={o.content?.hero_heading || 'Partner With LAX360. Grow With Us.'} accent="var(--color-primary)" imageUrl={o.hero_url} imageAlt={o.hero_alt}
         lead={o.content?.hero_lead || 'Build your business, explore new opportunities and collaborate with LAX360 across Education, Digital Marketing and Information Technology through our franchise and partnership programs.'}>
         <Button href="#programs" arrow>Explore Opportunities</Button>
@@ -45,7 +48,7 @@ export default function PartnerHub() {
       <section id="programs" aria-labelledby="programs-t" className="scroll-mt-40 border-b border-edge">
         <div className="wrap pt-12 md:pt-16"><h2 id="programs-t" className="h2 max-w-3xl">Explore Our Partnership Programs</h2><p className="lead mt-5 max-w-3xl text-soft">Choose how you want to take part. Each program has its own page for Education, Digital Marketing and IT &amp; Software.</p></div>
         {CATEGORIES.map((c, i) => (
-          <div key={c.slug} className={`wrap grid items-center gap-8 py-10 md:py-14 lg:grid-cols-12 lg:gap-14 ${i % 2 ? 'lg:[&>*:first-child]:order-2' : ''}`}>
+          <div key={c.slug} id={`program-${c.slug}`} className={`wrap scroll-mt-40 grid items-center gap-8 py-10 md:py-14 lg:grid-cols-12 lg:gap-14 ${i % 2 ? 'lg:[&>*:first-child]:order-2' : ''}`}>
             <Reveal className="lg:col-span-5">
               <div className="border-l-4 pl-6" style={{ borderColor: c.accent }}>
                 <p className="eyebrow mb-3" style={{ color: c.accent }}>{`0${i + 1}`} · {c.short}</p>
@@ -78,6 +81,8 @@ export default function PartnerHub() {
         </div>
       </Block>
 
+      <Block id="upcoming" eyebrow="Coming soon" title="Upcoming service areas" lead="CAD and engineering design, robotics, and blockchain and Web 3.0 are planned for all three programs. They are not open yet." tint><UpcomingMatrix /></Block>
+
       <Block id="why" eyebrow="Why partner" title="Why Partner With LAX360?" lead="Support commitments apply as set out in the partnership agreement for each program.">
         <ul className="grid gap-x-12 gap-y-7 md:grid-cols-2">{WHY.map(([t, d]) => <li key={t}><h3 className="font-display text-xl font-semibold">{t}</h3><p className="mt-1.5 text-soft">{d}</p></li>)}</ul>
       </Block>
@@ -105,6 +110,8 @@ export default function PartnerHub() {
         <Cta className="mt-8 justify-center" brochureUrl={data?.general_brochure_url} portalUrl={data?.portal_url} />
         <p className="mt-8 text-sm text-soft"><Link to="/partner-with-us/faq" className="link-underline">Partnership FAQs</Link> · <Link to="/partner-with-us/privacy-policy" className="link-underline">Partnership privacy notice</Link> · <Link to="/partner-with-us/terms-and-conditions" className="link-underline">Partnership terms</Link></p>
       </div></section>
+    <PartnerEnquiryForm />
+      </div>
     </PageContainer>
   )
 }

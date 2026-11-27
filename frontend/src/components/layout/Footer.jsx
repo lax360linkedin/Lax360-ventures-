@@ -3,6 +3,8 @@ import { ArrowUp, ArrowUpRight, ChevronRight, MapPin, Phone, RotateCcw, ShieldCh
 import ChannelIcon, { opensNewTab } from './ChannelIcon.jsx'
 import Logo from './Logo.jsx'
 import OwnerLinks from './OwnerLinks.jsx'
+import { useUpcoming } from '../../hooks/useUpcoming.js'
+import { STATUSES } from '../../data/upcomingServices.js'
 import { footerColumns, legalLinks } from '../../data/navigation.js'
 import { useBranchDirectory } from '../../hooks/useBranches.js'
 import { useContacts, useNav, useSite, useSocial } from '../../hooks/useSite.js'
@@ -59,6 +61,7 @@ export default function Footer() {
   const { branches } = useBranchDirectory() // a branch with a saved Google Maps location opens exactly that place
   const services = useNav('footer_divisions', footerColumns[0].links)
   const company = useNav('footer_company', footerColumns[1].links)
+  const upcoming = useUpcoming()
   const site = useSite()
   const social = useSocial('footer')
   const contacts = useContacts('footer')
@@ -98,6 +101,12 @@ export default function Footer() {
           <nav aria-labelledby="footer-services" className="lg:col-span-3">
             <Heading id="footer-services">Our services</Heading>
             <ul>{services.map((l) => <li key={l.to}><FooterLink l={l} /></li>)}</ul>
+            {upcoming.length > 0 && (
+              <>
+                <p className="mb-1 mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-lav">Upcoming services</p>
+                <ul>{upcoming.map((c) => <li key={c.slug}><Link to={c.path} className={linkCls}>{c.short}<span className="ml-2 rounded-full border border-edge-strong px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wider text-soft">{STATUSES[c.status]?.label}</span></Link></li>)}</ul>
+              </>
+            )}
           </nav>
 
           <section aria-labelledby="footer-connect" className="lg:col-span-3">

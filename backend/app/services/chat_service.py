@@ -46,7 +46,8 @@ _INTENTS: list[tuple[re.Pattern[str], ChatLink, str | None]] = [
     (re.compile(r"\b(n8n|integration|integrations|workflow|workflows)\b", re.I), ChatLink(label="Workflow Automation & Integration", to="/services/automation"), None),
     (re.compile(r"\b(booking|appointment|appointments|inventory|tracking)\b", re.I), ChatLink(label="Mobile & Business Applications", to="/services/mobile"), None),
     (re.compile(r"\b(product|products|api hub)\b", re.I), ChatLink(label="Our Products", to="/products"), None),
-    (re.compile(r"\b(marketing|seo|social|ads)\b", re.I), ChatLink(label="Digital Marketing", to="/services/growth"), None),
+    (re.compile(r"\b(marketing|seo|social|ads)\b", re.I), ChatLink(label="Digital Marketing", to="/services/digitalmarketing"), None),
+    (re.compile(r"\b(course|courses|training|internship|internships|workshop|workshops|certification|certificate|education|learn|learning)\b", re.I), ChatLink(label="Education & Training", to="/services/education"), None),
     (re.compile(r"\b(contact|project|price|pricing|cost|quote|enquiry|talk|call|whatsapp|reach)\b", re.I), ChatLink(label="Contact the team", to="/contact"), "project"),
 ]
 _CONTACT_LINK = ChatLink(label="Contact the team", to="/contact")

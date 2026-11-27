@@ -14,6 +14,9 @@ export const networkCategories = {
   startup: { label: 'Startup & Innovation Ecosystem', text: 'Startup collaborations, innovation initiatives and entrepreneurial ecosystem connections.' },
   industry: { label: 'Industry Collaborations', text: 'Healthcare, retail, education, manufacturing and other industry-specific relationships.' },
   professional: { label: 'Professional Network', text: 'Consultants, trainers, specialists and domain experts.' },
+  it_software: { label: 'IT & Software Partners', text: 'Software and technology companies LAX360 works with.' },
+  cybersecurity: { label: 'Cybersecurity Partners', text: 'Security testing, auditing, compliance and training collaborators.' },
+  digital_marketing: { label: 'Digital Marketing Partners', text: 'Marketing and advertising partners.' },
   associated: { label: 'Associated Companies', text: 'Companies connected to LAX360 Pvt Ltd through close working ties.' },
   collaboration: { label: 'Strategic Collaborations', text: 'Joint initiatives and working relationships on specific programmes or projects.' },
 }
@@ -43,10 +46,14 @@ export const partnerTypes = [
 const lines = (a) => (a || []).join('\n')
 
 /** Built-in published companies in the same shape as admin-panel items (so both go through one normaliser, hooks/useCmsPages.js). */
-export const networkEntries = portfolio.companies.filter((c) => c.status === 'published').map((c) => ({
-  slug: c.slug, title: c.name,
-  data: { category: c.category, relationship: c.relationship, business_category: c.business_category, description: c.description, designation: c.designation, verification: c.verification, products: lines(c.products), location_type: c.location_type, location: c.location, website_link: c.website_link, cta_label: c.cta_label, featured: c.featured },
+export const networkEntries = portfolio.companies.filter((c) => c.status === 'published').map(({ slug, name, status, core, products, ...rest }) => ({
+  slug, title: name, core: core === true, // `core`: the built-in partner profiles that always exist (an admin-panel entry with the same slug replaces one; "Hide this company" removes it)
+  data: { ...rest, products: lines(products) },
 }))
+
+/** CADPOINT's Salem branch has had two addresses (/our-network/<slug>): an admin-panel entry under either slug is the same company. */
+const CADPOINT = ['cadpoint-salem', 'cadpoint-academy-salem']
+export const canonicalSlug = (slug) => (CADPOINT.includes(slug) ? 'cadpoint-salem' : slug)
 
 export const softwareEntries = portfolio.software.filter((p) => p.status === 'published').map((p) => ({ slug: p.slug, title: p.name, data: { vendor: p.vendor, software_category: p.software_category, ownership: p.ownership, description: p.description, product_link: p.product_link } }))
 

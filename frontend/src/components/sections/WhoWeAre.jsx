@@ -22,7 +22,7 @@ export default function WhoWeAre() {
           <Reveal delay={0.08} className="mt-6 max-w-2xl space-y-5 text-lg leading-relaxed text-soft">
             <p>
               Welcome to <strong className="font-semibold text-fg">LAX360 Pvt Ltd</strong>, one accountable team that builds, automates and grows
-              your business. We bring software, AI, digital marketing, APIs, automation, mobile apps and training together under one roof.
+              your business. We bring software, AI, digital marketing, APIs, automation, mobile apps, education and training together under one roof.
             </p>
             <p>
               Our work is planned, built and supported by the same people, so every piece fits the way you already work instead of competing for

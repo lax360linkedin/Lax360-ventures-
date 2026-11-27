@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.core.errors import ApiError
 from app.core.permissions import has_permission
 from app.models import AuditLog, ContactEnquiry, EnquiryFollowup, EnquiryNote, MediaAsset, User
+from app.enquiry_categories import INTRO_SOURCES, types_of
 from app.models.contact_enquiry import ENQUIRY_STATUSES
 from app.utils_validation import LIKE_ESCAPE, like_pattern
 
@@ -21,7 +22,7 @@ SORTS = {"created_at": ContactEnquiry.created_at, "updated_at": ContactEnquiry.u
 EXPORT_LIMIT = 5000
 
 
-def _filtered(*, q, status, date_from, date_to, archived, assigned_to, enquiry_type=None, service=None, industry=None):
+def _filtered(*, q, status, date_from, date_to, archived, assigned_to, enquiry_type=None, service=None, industry=None, category=None, source=None, branch_id=None, course=None):
     stmt = select(ContactEnquiry)
     if q:
         p = like_pattern(q.strip())
@@ -31,6 +32,24 @@ def _filtered(*, q, status, date_from, date_to, archived, assigned_to, enquiry_t
         stmt = stmt.where(ContactEnquiry.status == status)
     if enquiry_type:
         stmt = stmt.where(ContactEnquiry.enquiry_type == enquiry_type) if enquiry_type != "partner" else stmt.where(ContactEnquiry.enquiry_type.like("partner-%"))
+    if category:  # an enquiry category (app/enquiry_categories.py): the introductory contact card is recognised by its source, the others by the enquiry type
+        intro = ContactEnquiry.source.in_(sorted(INTRO_SOURCES))
+        mentions = or_(*(col.ilike("%intern%") for col in (ContactEnquiry.subject, ContactEnquiry.message)), cast(ContactEnquiry.extra, String).ilike("%intern%"))
+        not_intro = or_(ContactEnquiry.source.is_(None), ~intro)
+        if category == "intro":
+            stmt = stmt.where(intro)
+        elif category == "internship":  # a career enquiry that mentions an internship
+            stmt = stmt.where(ContactEnquiry.enquiry_type == "career", mentions, not_intro)
+        elif category == "other":  # the other types, and the career enquiries that do not mention an internship
+            stmt = stmt.where(or_(ContactEnquiry.enquiry_type.in_(types_of("other")), (ContactEnquiry.enquiry_type == "career") & ~mentions), not_intro)
+        else:
+            stmt = stmt.where(ContactEnquiry.enquiry_type.in_(types_of(category) or ["-"]), not_intro)
+    if source:
+        stmt = stmt.where(ContactEnquiry.source == source)
+    if branch_id:
+        stmt = stmt.where(ContactEnquiry.branch_id == branch_id)
+    if course:
+        stmt = stmt.where(cast(ContactEnquiry.extra, String).ilike(like_pattern(course), escape=LIKE_ESCAPE))
     if service:  # a main service id (e.g. "ai-solutions") or a sub-service id (e.g. "ai/rag-based-ai-solutions"); both are stored in the enquiry's answers
         stmt = stmt.where(cast(ContactEnquiry.extra, String).ilike(like_pattern(service), escape=LIKE_ESCAPE))
     if industry:

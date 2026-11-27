@@ -27,7 +27,7 @@ from sqlalchemy.orm import Session, undefer
 from app.core.config import Settings
 from app.core.errors import ApiError
 from app.models import ContentItem, MediaAsset, SiteSetting, User
-from app.services import hero_video_service as video, object_storage as store
+from app.services import hero_video_service as video, image_optimize, object_storage as store
 from app.utils_validation import LIKE_ESCAPE, like_pattern
 
 log = logging.getLogger("app.media")
@@ -97,6 +97,11 @@ async def receive(request: Request, settings: Settings, filename: str) -> Prepar
             ctype, ext, duration = checked.ctype, checked.ext, checked.duration
         elif received.size > settings.media_max_bytes:
             raise ApiError(413, "payload_too_large", f"The file is too large (max {settings.media_max_bytes // 1024 // 1024 or 1} MB for images and documents).")
+        if ctype in ("image/png", "image/jpeg"):  # big pictures are stored as a right-sized WebP (see image_optimize): the website never ships a 4 MB PNG
+            small = received.tmp.with_suffix(".webp")
+            if image_optimize.optimize_file(received.tmp, ctype, small):
+                received.tmp.unlink(missing_ok=True)
+                received.tmp, received.size, ctype, ext = small, small.stat().st_size, "image/webp", ".webp"
         return Prepared(received.tmp, received.size, ctype, ext, kind_of(ctype), safe_filename(filename, ext), _hash(received.tmp), duration)
     except BaseException:
         received.tmp.unlink(missing_ok=True)

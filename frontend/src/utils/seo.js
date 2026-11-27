@@ -8,7 +8,7 @@ export const SITE_TOKEN = '__SITE__'
 const CRUMB = {
   about: 'About Us', services: 'Services', products: 'Products', industries: 'Industries', insights: 'Insights', 'our-network': 'Our Network', 'our-team': 'Our Team', work: 'Work',
   career: 'Careers', contact: 'Contact', locations: 'Locations', websites: 'Websites', robotics: 'Robotics', blockchain: 'Blockchain', privacy: 'Privacy Policy', terms: 'Terms of Use',
-  'partner-with-us': 'Partner With Us', franchise: 'Franchise', 'authorized-partner': 'Authorized Partner', 'referral-partner': 'Referral Partner', education: 'Education', 'digital-marketing': 'Digital Marketing', it: 'IT & Software',
+  'partner-with-us': 'Partner With Us', franchise: 'Franchise', 'authorized-partner': 'Authorized Partner', 'referral-partner': 'Referral Partner', education: 'Education', 'digital-marketing': 'Digital Marketing', digitalmarketing: 'Digital Marketing', it: 'IT & Software',
   apply: 'Apply', faq: 'FAQs', 'privacy-policy': 'Privacy Notice', 'terms-and-conditions': 'Terms and Conditions',
 }
 const titleCase = (slug) => slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())

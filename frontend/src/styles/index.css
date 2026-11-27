@@ -182,17 +182,20 @@ html.theme-switching, html.theme-switching *, html.theme-switching *::before, ht
   .wrap { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 1rem; }
   @media (min-width: 768px) { .wrap { padding-inline: 2rem; } }
   @media (min-width: 1024px) { .wrap { padding-inline: 3rem; } }
-  .section { padding-block: 3rem; }
-  @media (min-width: 768px) { .section { padding-block: 4rem; } }
-  @media (min-width: 1024px) { .section { padding-block: 5rem; } }
+  /* vertical rhythm of every page section: tighter on phones, fuller as the screen grows */
+  .section { padding-block: 2.25rem; }
+  @media (min-width: 480px) { .section { padding-block: 2.75rem; } }
+  @media (min-width: 768px) { .section { padding-block: 3.5rem; } }
+  @media (min-width: 1024px) { .section { padding-block: 4.25rem; } }
+  @media (min-width: 1536px) { .section { padding-block: 5rem; } }
 
   .eyebrow { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
   @media (min-width: 768px) { .eyebrow { font-size: 0.8125rem; } }
 
-  .h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.75rem, 7vw, 6.5rem); line-height: 0.98; letter-spacing: -0.03em; }
-  .h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.25rem, 4.6vw, 3.5rem); line-height: 1.05; letter-spacing: -0.025em; }
-  .h3 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1.15; letter-spacing: -0.01em; }
-  .lead { font-size: 1.125rem; line-height: 1.6; max-width: 40rem; }
+  .h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.75rem, 1rem + 3.6vw, 6.5rem); line-height: 1.02; letter-spacing: -0.03em; }
+  .h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 0.9rem + 2.8vw, 3.5rem); line-height: 1.08; letter-spacing: -0.025em; }
+  .h3 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.25rem, 0.9rem + 1.6vw, 2rem); line-height: 1.2; letter-spacing: -0.01em; }
+  .lead { font-size: 1.0625rem; line-height: 1.6; max-width: 40rem; }
   @media (min-width: 768px) { .lead { font-size: 1.25rem; } }
 
   /* Selected highlight words only — gradient is an accent, not a default text colour. */
@@ -287,7 +290,17 @@ html.theme-switching, html.theme-switching *, html.theme-switching *::before, ht
 
 /* Welcome intro (src/components/intro): while it is pending or playing, the page underneath is hidden and its entrance animations are
    held at their first frame, so the heading, text and buttons fade in as the intro reveals the homepage. */
+/* page entrance (see components/layout/PageContainer.jsx): pure CSS, so it plays before any script has run */
+.page-enter { animation: page-enter 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes page-enter { from { opacity: 0; } to { opacity: 1; } }
 html[data-intro] { background: #0b0b0f; }
+/* Sections below the first screen are not styled, laid out or painted until they are about to scroll into view (their running animations pause with them): long pages cost a fraction of the main-thread
+   time. `auto` remembers each section's real height after its first render, so the scroll bar and in-page links stay put. */
+main > div > section:not(:first-of-type), main > section:not(:first-of-type) { content-visibility: auto; contain-intrinsic-size: auto 720px; }
+/* The intro hides and shows the whole page (an inherited property), which restarted a CSS transition on each of the page's ~2,600 elements at every stage and cost about a second of style
+   recalculation each time. No transition runs while the intro is in progress or in the two frames after it ends; the page's own hover transitions are unaffected afterwards. */
+html[data-intro] #root *, html[data-intro] #root *::before, html[data-intro] #root *::after,
+html[data-intro-ending] #root *, html[data-intro-ending] #root *::before, html[data-intro-ending] #root *::after { transition: none !important; }
 html[data-intro="pending"] #root { visibility: hidden; animation: intro-failsafe 0.01s 4s forwards; } /* never leave the site hidden if scripts fail */
 html[data-intro="pending"] :is(.a-rise, .a-pop, .a-fade),
 html[data-intro="playing"] :is(.a-rise, .a-pop, .a-fade) { animation-play-state: paused; }
@@ -587,3 +600,110 @@ html:lang(ta) :is(p, li, dd, span, label), html:lang(hi) :is(p, li, dd, span, la
 @media (min-width: 1024px) { html:lang(ta) header nav a, html:lang(hi) header nav a { font-size: 0.6875rem; padding-inline: 0.25rem; white-space: nowrap; } }
 @media (min-width: 1280px) { html:lang(ta) header nav a, html:lang(hi) header nav a { font-size: 0.8125rem; padding-inline: 0.55rem; } }
 @media (min-width: 1536px) { html:lang(ta) header nav a, html:lang(hi) header nav a { font-size: 0.875rem; padding-inline: 0.75rem; } }
+
+/* =====================================================================================================================================================================
+   RESPONSIVE SYSTEM
+   One place that keeps every page (built-in, admin-managed and future ones) in proportion on phones, tablets and small / large laptops.
+   - Headings: pages set their own size with `!text-[clamp(...)]` (these utilities are !important and win over plain rules), so the fluid scale below sits in the same layer with a higher
+     specificity. Phones and tablets get a smaller, fluid scale; laptops (1024-1535px) a calmer one; large screens keep each page's own maximum.
+   - Pictures: portrait and large pictures are capped by the screen height / width so one photo never fills a whole phone screen or a short laptop screen. They keep their aspect ratio
+     (object-cover crops the edge, never stretches).
+   - Nothing here uses a fixed pixel width.
+   ===================================================================================================================================================================== */
+@layer utilities {
+  @media (max-width: 1535.98px) {
+    h1.h1, .h1 { font-size: clamp(1.75rem, 1rem + 3.6vw, 2.9rem) !important; line-height: 1.06 !important; letter-spacing: -0.022em !important; }
+    h2.h2, .h2 { font-size: clamp(1.5rem, 0.9rem + 2.8vw, 2.4rem) !important; line-height: 1.1 !important; }
+    .h3 { font-size: clamp(1.25rem, 0.9rem + 1.6vw, 1.75rem) !important; }
+  }
+  @media (min-width: 1024px) and (max-width: 1535.98px) {
+    h1.h1, .h1 { font-size: clamp(2.4rem, 1.2rem + 2.6vw, 3.75rem) !important; }
+    h2.h2, .h2 { font-size: clamp(1.9rem, 1rem + 2vw, 3rem) !important; }
+    .h3 { font-size: clamp(1.4rem, 1rem + 1.1vw, 2rem) !important; }
+  }
+  /* big screens (1536px and up) keep what each page asks for: nothing is forced there */
+  /* Tamil and Hindi words are wider: the same scale, a size smaller (this also fixes the earlier rule that lost to the !important page sizes) */
+  html:lang(ta) :is(h1.h1, .h1), html:lang(hi) :is(h1.h1, .h1) { font-size: clamp(1.6rem, 0.8rem + 3.2vw, 2.5rem) !important; line-height: 1.3 !important; letter-spacing: normal !important; }
+  html:lang(ta) :is(h2.h2, .h2), html:lang(hi) :is(h2.h2, .h2) { font-size: clamp(1.45rem, 0.8rem + 2.4vw, 2.1rem) !important; line-height: 1.3 !important; letter-spacing: normal !important; }
+  @media (min-width: 1024px) {
+    html:lang(ta) :is(h1.h1, .h1), html:lang(hi) :is(h1.h1, .h1) { font-size: clamp(2rem, 1rem + 2.2vw, 3.2rem) !important; }
+    html:lang(ta) :is(h2.h2, .h2), html:lang(hi) :is(h2.h2, .h2) { font-size: clamp(1.6rem, 0.9rem + 1.6vw, 2.5rem) !important; }
+  }
+}
+
+/* pictures: no fixed heights above the screen, no overflow */
+/* (Tailwind's base already makes every picture fluid: max-width 100% and height auto. Nothing here may set a width or height on an image, it would override the sizes the components choose.) */
+@media (max-width: 767.98px) {
+  /* a phone shows a photo at a comfortable size, whatever shape it has */
+  [class*="aspect-[4/5]"], [class*="aspect-[3/4]"], [class*="aspect-[4/4.2]"], [class*="aspect-[4/4.4]"], [class*="aspect-[4/3.4]"], [class*="aspect-[1/0.95]"] { max-height: min(18rem, 42svh); }
+  [class*="aspect-[5/4]"], [class*="aspect-[6/5]"], [class*="aspect-[4/3]"], [class*="aspect-[3/2]"] { max-height: min(15rem, 36svh); }
+  [class*="aspect-[16/10]"], [class*="aspect-[16/9]"], [class*="aspect-[16/8]"] { max-height: min(13rem, 30svh); }
+  [class*="aspect-[21/"], [class*="aspect-[8/3]"] { max-height: 11rem; }
+  /* cards: a little less inner padding on phones so text gets the width */
+  .glass.p-8, .glass-flat.p-8, .glass.md\:p-14, .glass.p-6 { padding: 1.25rem; }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  /* tablets: single-column layouts would otherwise stretch a photo across the whole width */
+  [class*="aspect-[4/5]"], [class*="aspect-[3/4]"], [class*="aspect-[4/4.2]"], [class*="aspect-[4/4.4]"], [class*="aspect-[4/3.4]"], [class*="aspect-[1/0.95]"] { max-height: 25rem; }
+  [class*="aspect-[5/4]"], [class*="aspect-[6/5]"], [class*="aspect-[4/3]"], [class*="aspect-[3/2]"] { max-height: 21rem; }
+  [class*="aspect-[16/10]"], [class*="aspect-[16/9]"], [class*="aspect-[16/8]"] { max-height: 17rem; }
+}
+@media (min-width: 1024px) {
+  /* laptops: a photo never taller than most of the screen (short 768px-high laptops especially) */
+  [class*="aspect-[4/5]"], [class*="aspect-[3/4]"], [class*="aspect-[4/4.2]"], [class*="aspect-[4/4.4]"], [class*="aspect-[4/3.4]"], [class*="aspect-[1/0.95]"] { max-height: min(34rem, 72svh); }
+  [class*="aspect-[5/4]"], [class*="aspect-[6/5]"], [class*="aspect-[4/3]"], [class*="aspect-[3/2]"] { max-height: min(30rem, 64svh); }
+}
+
+
+/* Our Network hero artwork (components/sections/NetworkHubArt.jsx): transform / opacity / dash offset only; all of it is off for reduced motion. */
+.nh-anim .nh-spin-a, .nh-anim .nh-spin-b, .nh-anim .nh-float, .nh-anim .nh-pulse, .nh-anim .nh-ping { transform-box: fill-box; transform-origin: center; }
+.nh-anim .nh-spin-a { animation: nh-spin 90s linear infinite; }
+.nh-anim .nh-spin-b { animation: nh-spin 140s linear infinite reverse; }
+.nh-anim .nh-flow { animation: nh-flow 2.8s linear infinite; }
+.nh-anim .nh-float { animation: nh-float 7s ease-in-out infinite; }
+.nh-anim .nh-pulse { animation: nh-pulse 2.8s ease-out infinite; }
+.nh-anim .nh-ping { animation: nh-ping 4.2s ease-out infinite; }
+@keyframes nh-spin { to { transform: rotate(360deg); } }
+@keyframes nh-flow { to { stroke-dashoffset: -20; } }
+@keyframes nh-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes nh-pulse { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(1.45); opacity: 0; } }
+@keyframes nh-ping { 0% { transform: scale(1); opacity: 0.8; } 60%, 100% { transform: scale(1.35); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .nh-anim * { animation: none !important; } }
+
+
+/* ---- Partner With Us and the partnership program pages (.pp): editorial tiles, badge numbering, callouts and timelines. Visual only: the markup and every word stay as written.
+   Everything uses the global theme tokens, so Light, Dark and Purple (and any admin-selected theme) follow automatically. ---- */
+/* hairline "grid of boxes" blocks become open tiles: a rule on top with an accent tab, no boxes */
+.pp .grid[class*="gap-px"][class*="bg-edge"]:not(ol) { gap: 0.25rem 2.75rem; background: transparent; border: 0; border-radius: 0; overflow: visible; }
+.pp .grid[class*="gap-px"][class*="bg-edge"]:not(ol) > * { position: relative; background: transparent; border-top: 1px solid var(--color-edge-strong); padding: 1.5rem 0.25rem 1.25rem; transition: border-color 0.25s ease, transform 0.25s ease; }
+.pp .grid[class*="gap-px"][class*="bg-edge"]:not(ol) > *::before { content: ""; position: absolute; left: 0; top: -1px; width: 2.75rem; height: 2px; background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); transition: width 0.3s ease; }
+.pp .grid[class*="gap-px"][class*="bg-edge"]:not(ol) > *:hover { border-top-color: var(--color-primary); }
+.pp .grid[class*="gap-px"][class*="bg-edge"]:not(ol) > *:hover::before { width: 5rem; }
+/* tiles that are a single link (the division and program pickers) keep their own padding on the link */
+.pp .grid[class*="gap-px"][class*="bg-edge"]:not(ol) > li:has(> a) { padding: 0; }
+.pp .grid[class*="gap-px"][class*="bg-edge"]:not(ol) > li > a { padding: 1.5rem 0.25rem 1.25rem; }
+.pp .grid[class*="gap-px"][class*="bg-edge"]:not(ol) > li > a:hover { background: transparent; }
+
+/* hairline numbered process blocks become a timeline: a rail with a milestone dot per step */
+.pp ol.grid[class*="gap-px"][class*="bg-edge"] { display: block; background: transparent; border: 0; border-radius: 0; overflow: visible; max-width: 52rem; }
+@media (min-width: 1280px) { .pp ol.grid[class*="gap-px"][class*="bg-edge"] { columns: 2; column-gap: 4rem; max-width: none; } }
+.pp ol.grid[class*="gap-px"][class*="bg-edge"] > li { position: relative; break-inside: avoid; background: transparent; padding: 0 0 2rem 3.5rem; }
+.pp ol.grid[class*="gap-px"][class*="bg-edge"] > li::before { content: ""; position: absolute; left: 0.8125rem; top: 1.75rem; bottom: -0.25rem; width: 2px; background: linear-gradient(180deg, var(--color-edge-strong), transparent); }
+.pp ol.grid[class*="gap-px"][class*="bg-edge"] > li::after { content: ""; position: absolute; left: 0; top: 0.5rem; width: 1.75rem; height: 1.75rem; border-radius: 9999px; border: 2px solid var(--color-primary); background: var(--color-night); box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-primary) 14%, transparent); }
+.pp ol.grid[class*="gap-px"][class*="bg-edge"] > li > span.font-display { font-size: 1.125rem; line-height: 1.75rem; }
+
+/* numbered lists (policies, benefits, courses): the number becomes a badge and each row gets a hairline */
+.pp li > span.tabular-nums.text-right { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; margin-top: 0.05rem; border-radius: 9999px; font-size: 0.75rem; text-align: center; color: var(--color-primary); background: color-mix(in srgb, var(--color-primary) 13%, transparent); }
+.pp ol.md\:grid-cols-2 > li, .pp ol.mt-4.grid > li { padding-block: 0.7rem; border-bottom: 1px solid var(--color-edge); }
+
+/* "important" notes and payout lines: a callout with an accent bar */
+.pp p.rounded-lg[class*="border-edge"] { border: 1px solid var(--color-edge); border-left: 4px solid var(--color-primary); border-radius: 0.75rem; background: var(--color-glass); padding: 1rem 1.25rem; }
+
+/* definition lists outside the spec tables (the legacy hairline rows) */
+.pp dl.divide-y { border-radius: 1rem; overflow: hidden; border-color: var(--color-edge-strong); }
+.pp dl.divide-y > div { transition: background-color 0.2s ease; }
+.pp dl.divide-y > div:hover { background: var(--color-glass); }
+
+/* expandable lists (View All Courses / Our Products) */
+.pp section[aria-label="Education courses"], .pp section[aria-label="Our products"] { border-color: var(--color-edge-strong); box-shadow: 0 18px 40px -26px rgb(var(--glow) / 0.6); }
+@media (prefers-reduced-motion: reduce) { .pp .grid[class*="gap-px"] > *, .pp .grid[class*="gap-px"] > *::before { transition: none; } }

@@ -62,12 +62,27 @@ function audit(route, { indexable, lang = 'en' }) {
   if (indexable && /example\.com/.test(sample)) issues.push('canonical points at the placeholder domain (set SITE_URL for the build)')
   if (indexable && sample && !/^https:\/\/lax360\.in(\/|$)/.test(sample)) issues.push(`canonical is not on https://lax360.in (${sample.slice(0, 60)})`)
   if (/lax360-ventures\.vercel\.app/.test(html.replace(/<link[^>]*rel="(?:preconnect|dns-prefetch)"[^>]*>/gi, ''))) issues.push('the old Vercel address appears in the page HTML')
+  // on-page checklist (lax360-onpage-seo-tags): language tag, sharing-image size, Twitter handle, no generic anchor text, safe external links
+  if (lang === 'en' && !/<html[^>]*lang="en-IN"/i.test(html)) issues.push('<html lang> must be "en-IN"')
+  if (indexable && !meta(html, 'name', 'twitter:site')) issues.push('missing twitter:site')
+  if (indexable && /\/assets\/og-image\.png/.test(meta(html, 'property', 'og:image') || '') && !(meta(html, 'property', 'og:image:width') === '1200' && meta(html, 'property', 'og:image:height') === '630')) issues.push('default og:image without its 1200x630 size')
+  if (indexable && lang === 'en') {
+    const generic = [...body.matchAll(/<a\b[^>]*>\s*(click here|learn more|read more|here|more)\s*<\/a>/gi)].length
+    if (generic) warnings.push(`${route}: ${generic} link(s) with generic anchor text ("click here", "learn more" ...)`)
+  }
+  const unsafe = (body.match(/<a\b[^>]*target="_blank"[^>]*>/gi) || []).filter((a) => !/rel="[^"]*noopener[^"]*"/i.test(a)).length
+  if (unsafe) issues.push(`${unsafe} external link(s) with target="_blank" and no rel="noopener noreferrer"`)
+  if (route === '/' && lang === 'en') {
+    if (!types.some((t) => /FAQPage/.test(t))) warnings.push('/: no FAQPage structured data (the home FAQ is empty or hidden)')
+    if (!/Salem/.test(title)) issues.push('home title must contain the Salem keyword'); if (title.length > 60) issues.push(`home title is ${title.length} characters (limit 60)`)
+    if (desc.length > 160) issues.push(`home description is ${desc.length} characters (limit 160)`); if (!/Salem/.test(desc) || !/Bangalore/.test(desc) || !/Mumbai/.test(desc)) issues.push('home description must name Salem, Bangalore and Mumbai')
+  }
   if (lang !== 'en') {
     const lc = (/<html[^>]*lang="([^"]*)"/i.exec(html) || [])[1]
     if (lc !== lang) issues.push(`<html lang> is "${lc}", expected "${lang}" (${html.slice(0, 40).replace(/s+/g, " ")})`)
     if (indexable && !new RegExp(`rel="canonical"[^>]*href="[^"]*/${lang}(/|")`, 'i').test(html)) issues.push(`canonical does not point at the /${lang} address`)
   }
-  if (indexable) for (const l of ['en', ...LANGS, 'x-default']) if (!new RegExp(`<link[^>]*hreflang="${l}"`, 'i').test(html)) issues.push(`missing hreflang="${l}" alternate`)
+  if (indexable) for (const l of ['en-IN', ...LANGS, 'x-default']) if (!new RegExp(`<link[^>]*hreflang="${l}"`, 'i').test(html)) issues.push(`missing hreflang="${l}" alternate`)
   issues.forEach((i) => problems.push(`${route}: ${i}`))
   rows.push({ route, title: title.slice(0, 48), desc: desc.length, h1, ld: types.join(',') || '-', ok: issues.length === 0 })
 }

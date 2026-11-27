@@ -1,0 +1,332 @@
+{
+ "franchise": {
+  "note": "Availability, vendor authorization and resale rights are confirmed during evaluation and in the franchise agreement. Listing a platform here does not mean LAX360 resells it or that franchise partners may resell it.",
+  "groups": [
+   {
+    "title": "LAX360 own products",
+    "items": [
+     {
+      "name": "Healthcare & Hospital Management"
+     },
+     {
+      "name": "Business CRM",
+      "to": "/products/lax360-business-crm"
+     },
+     {
+      "name": "HR & Employee Management",
+      "to": "/products/lax360-hr-employee-management"
+     },
+     {
+      "name": "Inventory & Billing"
+     },
+     {
+      "name": "ERP Solutions"
+     },
+     {
+      "name": "Education & Institution Management"
+     },
+     {
+      "name": "SaaS Products"
+     }
+    ]
+   },
+   {
+    "title": "Technology partners & platforms",
+    "items": [
+     {
+      "name": "Zoho",
+      "desc": "CRM, accounting, HR and business applications"
+     },
+     {
+      "name": "Marg ERP",
+      "desc": "Billing, inventory, accounting and distribution"
+     },
+     {
+      "name": "OpenAI",
+      "desc": "AI integration and development technologies"
+     },
+     {
+      "name": "HexBis",
+      "desc": "Approved product catalogue",
+      "tag": "Pending verification"
+     }
+    ]
+   },
+   {
+    "title": "IT & software services",
+    "items": [
+     {
+      "name": "Website Development",
+      "desc": "Static, dynamic, corporate, e-commerce and 3D",
+      "to": "/services/software/website-development"
+     },
+     {
+      "name": "Custom Software Development",
+      "desc": "Desktop, cloud, online and offline",
+      "to": "/services/software/custom-software-development"
+     },
+     {
+      "name": "Web Application Development",
+      "to": "/services/software/web-application-development"
+     },
+     {
+      "name": "Mobile Application Development",
+      "desc": "Android and iOS",
+      "to": "/services/software/mobile-application-development"
+     },
+     {
+      "name": "AI Solutions",
+      "desc": "Chatbots, voice AI, AI agents, AI employees and RAG",
+      "to": "/services/ai"
+     },
+     {
+      "name": "Business & Workflow Automation",
+      "to": "/services/automation"
+     },
+     {
+      "name": "Headless SaaS and API Development & Integration",
+      "to": "/services/headless"
+     },
+     {
+      "name": "Cloud & Hosting, UI/UX Design, Testing, Maintenance & Support",
+      "to": "/services"
+     }
+    ]
+   },
+   {
+    "title": "Other partnership opportunities",
+    "items": [
+     {
+      "name": "IT & Software Authorized Partner",
+      "to": "/authorized-partner/it"
+     },
+     {
+      "name": "IT & Software Referral Partner",
+      "to": "/referral-partner/it"
+     }
+    ]
+   }
+  ]
+ },
+ "authorized-partner": {
+  "note": "Product availability and vendor permissions are confirmed during onboarding. Technology integration does not imply reseller authorization.",
+  "groups": [
+   {
+    "title": "LAX360 own products",
+    "items": [
+     {
+      "name": "Healthcare & Hospital Management"
+     },
+     {
+      "name": "Business CRM",
+      "to": "/products/lax360-business-crm"
+     },
+     {
+      "name": "HR & Employee Management",
+      "to": "/products/lax360-hr-employee-management"
+     },
+     {
+      "name": "Inventory & Billing"
+     },
+     {
+      "name": "ERP Solutions"
+     },
+     {
+      "name": "Education & Institution Management"
+     },
+     {
+      "name": "SaaS Products"
+     }
+    ]
+   },
+   {
+    "title": "Technology partners & platforms",
+    "items": [
+     {
+      "name": "Zoho",
+      "desc": "Business applications"
+     },
+     {
+      "name": "Marg ERP",
+      "desc": "Billing, inventory and accounting"
+     },
+     {
+      "name": "OpenAI",
+      "desc": "AI integration technologies"
+     },
+     {
+      "name": "HexBis",
+      "desc": "Catalogue",
+      "tag": "Pending verification"
+     }
+    ]
+   },
+   {
+    "title": "IT & software services",
+    "items": [
+     {
+      "name": "Website Development",
+      "to": "/services/software/website-development"
+     },
+     {
+      "name": "Custom Software",
+      "to": "/services/software/custom-software-development"
+     },
+     {
+      "name": "Web Applications",
+      "to": "/services/software/web-application-development"
+     },
+     {
+      "name": "Mobile Applications",
+      "to": "/services/software/mobile-application-development"
+     },
+     {
+      "name": "AI Solutions, Agents & Voice AI",
+      "to": "/services/ai"
+     },
+     {
+      "name": "Business & Workflow Automation",
+      "to": "/services/automation"
+     },
+     {
+      "name": "Headless SaaS & APIs",
+      "to": "/services/headless"
+     },
+     {
+      "name": "Cloud & Hosting"
+     },
+     {
+      "name": "UI/UX"
+     },
+     {
+      "name": "Testing, Maintenance & Support"
+     }
+    ]
+   },
+   {
+    "title": "Other partnership opportunities",
+    "items": [
+     {
+      "name": "IT & Software Franchise",
+      "to": "/franchise/it"
+     },
+     {
+      "name": "IT & Software Referral Partner",
+      "to": "/referral-partner/it"
+     }
+    ]
+   }
+  ]
+ },
+ "referral-partner": {
+  "note": "Product availability and vendor permissions are confirmed during onboarding. Technology integration does not imply reseller authorization.",
+  "groups": [
+   {
+    "title": "LAX360 own products",
+    "items": [
+     {
+      "name": "Healthcare & Hospital Management"
+     },
+     {
+      "name": "Business CRM",
+      "to": "/products/lax360-business-crm"
+     },
+     {
+      "name": "HR & Employee Management",
+      "to": "/products/lax360-hr-employee-management"
+     },
+     {
+      "name": "Inventory & Billing"
+     },
+     {
+      "name": "ERP Solutions"
+     },
+     {
+      "name": "Education & Institution Management"
+     },
+     {
+      "name": "SaaS Products"
+     }
+    ]
+   },
+   {
+    "title": "Technology partners & platforms",
+    "items": [
+     {
+      "name": "Zoho",
+      "desc": "Business applications"
+     },
+     {
+      "name": "Marg ERP",
+      "desc": "Billing, inventory and accounting"
+     },
+     {
+      "name": "OpenAI",
+      "desc": "AI integration technologies"
+     },
+     {
+      "name": "HexBis",
+      "desc": "Catalogue",
+      "tag": "Pending verification"
+     }
+    ]
+   },
+   {
+    "title": "IT & software services",
+    "items": [
+     {
+      "name": "Website Development",
+      "desc": "Static, dynamic, e-commerce, 3D and animated",
+      "to": "/services/software/website-development"
+     },
+     {
+      "name": "Custom Software",
+      "to": "/services/software/custom-software-development"
+     },
+     {
+      "name": "Web Applications",
+      "to": "/services/software/web-application-development"
+     },
+     {
+      "name": "Mobile Applications",
+      "to": "/services/software/mobile-application-development"
+     },
+     {
+      "name": "AI Solutions, Agents & Voice AI",
+      "to": "/services/ai"
+     },
+     {
+      "name": "Business & Workflow Automation",
+      "to": "/services/automation"
+     },
+     {
+      "name": "Headless SaaS & APIs",
+      "to": "/services/headless"
+     },
+     {
+      "name": "Cloud & Hosting"
+     },
+     {
+      "name": "UI/UX"
+     },
+     {
+      "name": "Testing, Maintenance & Support"
+     }
+    ]
+   },
+   {
+    "title": "Other partnership opportunities",
+    "items": [
+     {
+      "name": "IT & Software Franchise",
+      "to": "/franchise/it"
+     },
+     {
+      "name": "IT & Software Authorized Partner",
+      "to": "/authorized-partner/it"
+     }
+    ]
+   }
+  ]
+ }
+}

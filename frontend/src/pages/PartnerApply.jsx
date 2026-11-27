@@ -5,16 +5,19 @@ import PageContainer from '../components/layout/PageContainer.jsx'
 import Button from '../components/ui/Button.jsx'
 import FormField from '../components/ui/FormField.jsx'
 import { Crumbs, PartnerHero } from '../components/partner/PartnerUI.jsx'
-import { CATEGORIES, DIVISIONS, PARTNER_PAGES } from '../data/partnership.js'
+import DivisionPicker, { emptyDivisions } from '../components/partner/DivisionPicker.jsx'
+import { divisionFields } from '../components/partner/PartnerEnquiryForm.jsx'
+import { usePartnerDivisions } from '../hooks/usePartnerDivisions.js'
+import { CATEGORIES, PARTNER_PAGES } from '../data/partnership.js'
 import { branches } from '../data/branches.js'
-import { submitApplication, useDivisionItems, usePartnerContent } from '../services/partnershipService.js'
+import { submitApplication, usePartnerContent } from '../services/partnershipService.js'
 import { warmBackend } from '../services/backendWake.js'
 import { trackEvent } from '../utils/analytics.js'
 
 const meta = PARTNER_PAGES.apply
 const CATEGORY_KEY = { franchise: 'franchise', 'authorized-partner': 'authorized', 'referral-partner': 'referral' } // the server stores the short names
 const STEPS = ['Opportunity', 'Your details', 'Business', 'Partnership', 'Consultation', 'Review']
-const EMPTY = { category: '', division: '', preferred_location: '', preferred_branch: '', full_name: '', email: '', phone: '', country: 'India', state: '', city: '', occupation: '', entity_type: 'individual', organization: '', industry: '', years_experience: '', office_available: '', relevant_experience: '',
+const EMPTY = { category: '', dv: emptyDivisions(), preferred_location: '', preferred_branch: '', full_name: '', email: '', phone: '', country: 'India', state: '', city: '', occupation: '', entity_type: 'individual', organization: '', industry: '', years_experience: '', office_available: '', relevant_experience: '',
   proposed_location: '', franchise_interest: '', investment_budget: '', business_experience: '', start_date: '', existing_infrastructure: '', participation: '', additional_info: '', customer_network: '', sales_experience: '', preferred_products: '', target_segment: '', operating_region: '',
   professional_background: '', areas_of_interest: '', referral_network: '', preferred_services: '', expected_categories: '', c_date: '', c_time: '', c_method: 'phone', c_mode: 'online', c_message: '', consent_processing: false, consent_marketing: false, website: '' }
 const ANSWER_FIELDS = ['franchise_interest', 'industry', 'years_experience', 'office_available', 'relevant_experience', 'proposed_location', 'investment_budget', 'business_experience', 'start_date', 'existing_infrastructure', 'participation', 'additional_info', 'customer_network', 'sales_experience',
@@ -23,7 +26,7 @@ const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/
 
 function stepErrors(step, v) {
   const e = {}
-  if (step === 0) { if (!v.category) e.category = 'Choose a partnership type.'; if (!v.division) e.division = 'Choose a business division.' }
+  if (step === 0) { if (!v.category) e.category = 'Choose a partnership type.'; if (!v.dv.divisions.length && !v.dv.other) e.divisions = 'Choose at least one business division.'; if (v.dv.other && !v.dv.otherText.trim()) e.other_interest = 'Tell us the business division, service or partnership interest you have in mind.' }
   if (step === 1) {
     if (v.full_name.trim().length < 2) e.full_name = 'Enter your full name.'
     if (!EMAIL.test(v.email.trim())) e.email = 'Enter a valid e-mail address.'
@@ -41,9 +44,9 @@ export default function PartnerApply() {
   const data = usePartnerContent()
   const topRef = useRef(null)
   const [step, setStep] = useState(0)
-  const [v, setV] = useState(() => ({ ...EMPTY, category: CATEGORIES.some((c) => c.slug === params.get('type')) ? params.get('type') : '', division: /^[a-z0-9][a-z0-9-]{0,38}[a-z0-9]$/.test(params.get('division') || '') ? params.get('division') : '' })) // the server checks it against the live menu (administrators can add divisions)
-  const options = useDivisionItems(CATEGORIES.some((c) => c.slug === v.category) ? v.category : 'franchise')
-  const optionLabel = (slug) => options.find((o) => o.slug === slug)?.label || DIVISIONS.find((d) => d.slug === slug)?.long
+  const [v, setV] = useState(() => ({ ...EMPTY, category: CATEGORIES.some((c) => c.slug === params.get('type')) ? params.get('type') : '', dv: emptyDivisions((params.get('division') || '').split(',').filter((x) => /^[a-z0-9][a-z0-9-]{0,38}[a-z0-9]$/.test(x))) })) // the server checks it against the live menu (administrators can add divisions)
+  const options = usePartnerDivisions() // the business divisions from the admin panel (plus the upcoming ones)
+  const divisionText = (dv) => [...dv.divisions.map((x) => options.find((o) => o.slug === x)?.label || x), ...(dv.other ? [`Others: ${dv.otherText.trim()}`] : [])].join(', ')
   const [errors, setErrors] = useState({})
   const [state, setState] = useState({ busy: false, error: '', done: null })
   useEffect(() => { warmBackend() }, [])
@@ -58,20 +61,20 @@ export default function PartnerApply() {
     if (Object.keys(all).length) { setErrors(all); const first = [0, 1, 2, 3, 5].find((s) => Object.keys(stepErrors(s, v)).length); go(first); return }
     setState({ busy: true, error: '', done: null })
     const answers = Object.fromEntries(ANSWER_FIELDS.filter((k) => String(v[k]).trim()).map((k) => [k, v[k]]))
-    const body = { category: CATEGORY_KEY[v.category] || v.category, division: v.division, full_name: v.full_name, email: v.email, phone: v.phone, country: v.country, state: v.state, city: v.city, occupation: v.occupation, entity_type: v.entity_type, organization: v.organization,
+    const body = { category: CATEGORY_KEY[v.category] || v.category, ...divisionFields(v.dv, options), full_name: v.full_name, email: v.email, phone: v.phone, country: v.country, state: v.state, city: v.city, occupation: v.occupation, entity_type: v.entity_type, organization: v.organization,
       preferred_location: v.preferred_location, preferred_branch: v.preferred_branch, answers, consultation: { date: v.c_date || undefined, time: v.c_time || undefined, method: v.c_method, mode: v.c_mode, message: v.c_message || undefined },
       consent_processing: v.consent_processing, consent_marketing: v.consent_marketing, source_page: `${window.location.pathname}`.slice(0, 160), website: v.website }
     try {
       const out = await submitApplication(body) // success is shown only after the server confirms the application is stored
-      trackEvent('partner_application', { partner_type: v.category, division: v.division })
+      trackEvent('partner_application', { partner_type: v.category, divisions: v.dv.divisions.join(',') })
       setState({ busy: false, error: '', done: out })
     } catch (err) {
-      if (err.fields) { const m = {}; Object.entries(err.fields).forEach(([k, t]) => { m[k.replace('answers.', '')] = t }); setErrors(m); go(1) }
+      if (err.fields) { const m = {}; Object.entries(err.fields).forEach(([k, t]) => { m[k.replace('answers.', '')] = t }); setErrors(m); go(m.divisions || m.other_interest || m.category ? 0 : 1) }
       setState({ busy: false, error: err.fields ? 'Please check the highlighted fields.' : err.code === 'timeout' || err.code === 'network' || err.code === 'backend_unavailable' ? 'The server is slow to respond or starting up. Your details have not been lost on this page: please wait a moment and press Submit again.' : err.message, done: null })
     }
   }
 
-  const summary = useMemo(() => [['Partnership', CATEGORIES.find((c) => c.slug === v.category)?.short], ['Division', optionLabel(v.division)], ['Name', v.full_name], ['E-mail', v.email], ['Mobile', v.phone], ['Location', [v.city, v.state, v.country].filter(Boolean).join(', ')],
+  const summary = useMemo(() => [['Partnership', CATEGORIES.find((c) => c.slug === v.category)?.short], ['Business divisions', divisionText(v.dv)], ['Name', v.full_name], ['E-mail', v.email], ['Mobile', v.phone], ['Location', [v.city, v.state, v.country].filter(Boolean).join(', ')],
     ['Preferred meeting', [v.c_date, v.c_time].filter(Boolean).join(' ') || 'Not specified']].filter(([, x]) => x), [v])
   const text = (k, label, extra = {}) => <FormField id={`pa-${k}`} label={label} value={v[k]} onChange={set(k)} error={errors[k]} {...extra} />
   const area = (k, label, extra = {}) => <FormField id={`pa-${k}`} as="textarea" label={label} value={v[k]} onChange={set(k)} error={errors[k]} maxLength={600} className="md:col-span-2" {...extra} />
@@ -105,7 +108,7 @@ export default function PartnerApply() {
             {step === 0 && <>
               <legend className="h3 mb-2 md:col-span-2">Select your opportunity</legend>
               <FormField id="pa-category" as="select" label="Partnership type" required value={v.category} onChange={set('category')} error={errors.category}><option value="">Choose…</option>{CATEGORIES.map((c) => <option key={c.slug} value={c.slug}>{c.short}</option>)}</FormField>
-              <FormField id="pa-division" as="select" label="Business division" required value={v.division} onChange={set('division')} error={errors.division}><option value="">Choose…</option>{options.map((d) => <option key={d.slug} value={d.slug}>{DIVISIONS.find((x) => x.slug === d.slug)?.long || d.label}</option>)}{v.division && !options.some((d) => d.slug === v.division) && <option value={v.division}>{optionLabel(v.division) || v.division}</option>}</FormField>
+              <DivisionPicker idPrefix="pa-dv" value={v.dv} onChange={(dv) => { setV((x) => ({ ...x, dv })); setErrors((x) => ({ ...x, divisions: undefined, other_interest: undefined })) }} error={errors.divisions} otherError={errors.other_interest} />
               {text('preferred_location', 'Preferred location (city or area)', { required: false, className: 'md:col-span-2' })}
               <FormField id="pa-branch" as="select" label="Nearest LAX360 office" className="md:col-span-2" value={v.preferred_branch} onChange={set('preferred_branch')} hint="Final assignment is made by LAX360."><option value="">No preference</option>{branches.map((b) => <option key={b.id} value={b.id}>{b.city}</option>)}</FormField>
             </>}

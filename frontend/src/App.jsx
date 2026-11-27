@@ -17,7 +17,7 @@ const Insights = lazy(() => import('./pages/Insights.jsx'))
 const ArticleDetail = lazy(() => import('./pages/ArticleDetail.jsx'))
 const Network = lazy(() => import('./pages/Network.jsx'))
 const Websites = lazy(() => import('./pages/Websites.jsx'))
-const EmergingTech = lazy(() => import('./pages/EmergingTech.jsx')) // Robotics and Blockchain: planned initiatives
+const UpcomingService = lazy(() => import('./pages/UpcomingService.jsx')) // CAD & Engineering, Robotics, Blockchain & Web 3.0: upcoming service categories (admin-managed)
 const WebsiteDetail = lazy(() => import('./pages/WebsiteDetail.jsx'))
 const Team = lazy(() => import('./pages/Team.jsx'))
 const TeamDepartment = lazy(() => import('./pages/TeamDepartment.jsx'))
@@ -75,8 +75,10 @@ export default function App() {
         <Route path="insights/:slug" element={<ArticleDetail />} />
         <Route path="our-network" element={<Network />} />
         <Route path="our-network/:slug" element={<NetworkPartner />} />
-        <Route path="robotics" element={<EmergingTech topic="robotics" />} />
-        <Route path="blockchain" element={<EmergingTech topic="blockchain" />} />
+        <Route path="cad-engineering" element={<UpcomingService slug="cad-engineering" />} />
+        <Route path="robotics" element={<UpcomingService slug="robotics" />} />
+        <Route path="blockchain" element={<UpcomingService slug="blockchain" />} />
+        <Route path="upcoming/:slug" element={<UpcomingService />} />
         <Route path="locations" element={<Locations />} />
         <Route path="locations/:slug" element={<Location />} />
         <Route path="websites" element={<Websites />} />

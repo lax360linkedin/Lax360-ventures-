@@ -1,11 +1,14 @@
 import Reveal from './Reveal.jsx'
 import BotHighlight from './BotHighlight.jsx'
+import { useH1Override } from '../../hooks/useSite.js'
 
 /**
  * Section opener: eyebrow with a drawn rule, heading, optional lead. Fades and rises into place once.
  * Pass `gradient` to render a selected phrase of the title in the accent gradient.
  */
 export default function SectionHeading({ eyebrow, title, gradient, lead, as: Tag = 'h2', id, className = '', center = false, bot = false, botDelay = 0.5 }) {
+  const h1 = useH1Override() // only used when this heading is the page's H1
+  const over = Tag === 'h1' ? h1 : null
   return (
     <Reveal className={`${center ? 'mx-auto text-center' : ''} max-w-3xl ${className}`}>
       {eyebrow && (
@@ -15,8 +18,8 @@ export default function SectionHeading({ eyebrow, title, gradient, lead, as: Tag
         </p>
       )}
       <Tag id={id} className="h2">
-        {title}
-        {gradient && (
+        {over || title}
+        {!over && gradient && (
           <>
             {' '}
             {bot ? <BotHighlight delay={botDelay}><span className="text-gradient">{gradient}</span></BotHighlight> : <span className="text-gradient">{gradient}</span>}

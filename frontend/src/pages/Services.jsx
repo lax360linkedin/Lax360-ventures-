@@ -3,6 +3,7 @@ import ServicesHero from '../components/sections/services/ServicesHero.jsx'
 import CategoryNav from '../components/sections/services/CategoryNav.jsx'
 import ServiceCategories from '../components/sections/services/ServiceCategories.jsx'
 import CmsServices from '../components/cms/CmsServices.jsx'
+import UpcomingServicesSection from '../components/upcoming/UpcomingUI.jsx'
 import ProcessTimeline from '../components/sections/ProcessTimeline.jsx'
 import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
@@ -13,7 +14,7 @@ import { useFaqs } from '../hooks/useSite.js'
 
 /**
  * /services — the single entry point for everything we do. Hero with photo mosaic, sticky quick-access navigation,
- * six category sections in different layouts (Headless SaaS & API Solutions is the featured one), process, FAQ and a closing call to action.
+ * seven category sections in different layouts (Headless SaaS & API Solutions is the featured one), process, FAQ and a closing call to action.
  */
 export default function Services() {
   const faqs = useFaqs('services', servicesFaq)
@@ -21,12 +22,13 @@ export default function Services() {
     <PageContainer
       path="/services"
       title="Services"
-      description="Six service categories from LAX360 Pvt Ltd: software and IT services, AI and business automation, digital marketing, headless SaaS and API solutions, workflow automation and integration, and mobile and business applications."
+      description="Seven service categories from LAX360 Pvt Ltd: software and IT services, AI and business automation, digital marketing, headless SaaS and API solutions, workflow automation, mobile and business applications, and education and training."
     >
       <ServicesHero />
       <CategoryNav />
       <ServiceCategories />
       <CmsServices />
+      <UpcomingServicesSection />
       <ProcessTimeline eyebrow="How we work" title="Every service follows the same four steps." />
       <section className="wrap section" aria-labelledby="faq-title">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">

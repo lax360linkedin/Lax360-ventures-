@@ -7,6 +7,8 @@ export const categoryLinks = [
   { id: 'headless', label: 'Headless SaaS & APIs' },
   { id: 'automation', label: 'Workflow Integration' },
   { id: 'mobile', label: 'Mobile & Business Apps' },
+  { id: 'education', label: 'Education & Training' },
+  { id: 'upcoming', label: 'Upcoming Services' },
 ]
 
 /** Smooth-scroll to a section (instant under reduced motion) and keep the URL hash in sync. */

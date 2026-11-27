@@ -6,6 +6,7 @@ passwords) are NOT settings: they stay in the backend environment and can never 
 
 from __future__ import annotations
 
+import json
 import re
 import uuid
 
@@ -30,10 +31,61 @@ EXTRA_THEMES = ("ivory-gold", "deep-teal", "copper", "mocha", "burgundy", "viole
                 "slate-grey", "dusty-rose", "sage-green", "sky-blue", "terracotta", "plum", "mustard", "navy-beige", "royal-crimson")  # keep in step with frontend/src/data/themes.js (a test checks)
 THEMES = ("visitor", "dark", "light", "snow", "rose", "sage", *EXTRA_THEMES)
 
+# Custom themes built in the admin panel (Theme builder). Stored as a validated list of small colour definitions; the website turns them into CSS variables in the browser.
+_HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
+_THEME_ID = re.compile(r"^custom-[a-z0-9]+(?:-[a-z0-9]+)*$")
+_PRESET_ID = re.compile(r"^preset-[a-z0-9]+(?:-[a-z0-9]+)*$")
+THEME_COLOR_KEYS = ("primary", "secondary", "accent", "bg", "surface", "text", "heading", "button", "buttonText", "header", "footer", "nav", "card", "border", "icon", "hover", "active", "gradA", "gradB", "gradC")
+MAX_CUSTOM_THEMES = 40
+
+
+def clean_custom_themes(raw) -> list[dict]:
+    """Parse and validate the custom theme list (a JSON string from the admin panel). Raises ValueError with a readable message."""
+    try:
+        data = json.loads(raw) if isinstance(raw, str) else raw
+    except ValueError:
+        raise ValueError("The theme list is not valid JSON.") from None
+    if not isinstance(data, list) or len(data) > MAX_CUSTOM_THEMES:
+        raise ValueError(f"Provide at most {MAX_CUSTOM_THEMES} themes.")
+    out, seen = [], set()
+    for t in data:
+        if not isinstance(t, dict):
+            raise ValueError("Each theme must be an object.")
+        tid, name = str(t.get("id", "")), str(t.get("name", "")).strip()
+        if not _THEME_ID.match(tid) or len(tid) > 50 or tid in seen:
+            raise ValueError("Each theme needs a unique id like custom-ocean.")
+        if not name or len(name) > 60:
+            raise ValueError("Each theme needs a name of up to 60 characters.")
+        mode = t.get("mode", "light")
+        if mode not in ("light", "dark", "both"):
+            raise ValueError("Theme mode must be light, dark or both.")
+        seen.add(tid)
+        item = {"id": tid, "name": name, "mode": mode, "note": str(t.get("note", ""))[:120], "gradient": bool(t.get("gradient"))}
+        for field in ("colors", "darkColors"):
+            colors = t.get(field) or {}
+            if not isinstance(colors, dict):
+                raise ValueError("Theme colours must be an object.")
+            clean = {}
+            for k, v in colors.items():
+                if k not in THEME_COLOR_KEYS:
+                    raise ValueError(f"Unknown theme colour: {k}.")
+                if v in (None, ""):
+                    continue
+                if not isinstance(v, str) or not _HEX.match(v):
+                    raise ValueError(f"{k} must be a HEX colour such as #1a2b3c.")
+                clean[k] = v.lower()
+            item[field] = clean
+        if not item["colors"].get("bg") or not (item["colors"].get("primary") or item["colors"].get("accent")):
+            raise ValueError("Each theme needs at least a background and a primary colour.")
+        out.append(item)
+    return out
+
+
 SPEC: dict[str, dict] = {
     # appearance (Super Admin only: enforced in the route)
     "site_theme": S("Website theme", "appearance", "choice", options=list(THEMES),
                     help="Applies to the whole public website for every visitor. “visitor” keeps the Dark / Light switch in the menu."),
+    "custom_themes": S("Custom themes", "appearance", "themes", max_len=200000, help="Created in the Theme builder; not edited as text."),
     # general (shown as the About page's tagline)
     "tagline": S("Tagline (About page)", "general", max_len=160),
     # contact
@@ -45,7 +97,7 @@ SPEC: dict[str, dict] = {
     "contact_description": S("Contact page introduction", "contact", "text", max_len=500),
     "map_link": S("Google Maps / location link", "contact", "url"),
     "whatsapp_number": S("WhatsApp number", "contact", "phone", help="Digits with country code, e.g. 919876543210"),
-    "business_hours": S("Business hours", "contact", "text", max_len=300, help="Shown on the Contact page, e.g. Monday to Saturday, 9:30 am to 6:30 pm. Leave empty to show none (nothing is assumed)."),
+    "business_hours": S("Business hours", "contact", "text", max_len=300, help="Shown on the Contact page, e.g. Monday to Saturday, 9:30 AM – 7:00 PM. Leave empty to show the built-in hours (9:30 AM – 7:00 PM)."),
     "contact_form_enabled": S("Contact form enabled", "contact", "bool"),
     "contact_form_notice": S("Notice above the contact form", "contact", "text", max_len=300, help="Optional message shown above the enquiry form."),
     # social
@@ -79,7 +131,7 @@ SPEC: dict[str, dict] = {
 }
 CHATBOT_KEYS = tuple(k for k, v in SPEC.items() if v["group"] == "chatbot")
 SITE_KEYS = tuple(k for k in SPEC if k not in CHATBOT_KEYS)
-SUPER_ONLY_KEYS = ("site_theme",)
+SUPER_ONLY_KEYS = ("site_theme", "custom_themes")
 
 
 def _validate(key: str, value, db: Session | None = None):
@@ -89,6 +141,10 @@ def _validate(key: str, value, db: Session | None = None):
         if not isinstance(value, bool):
             raise ValueError("Must be true or false.")
         return value
+    if kind == "themes":
+        if isinstance(value, str) and not value.strip():
+            return None
+        return clean_custom_themes(value)
     if not isinstance(value, str):
         raise ValueError("Must be text.")
     value = value.strip()
@@ -96,6 +152,8 @@ def _validate(key: str, value, db: Session | None = None):
         raise ValueError(f"Keep it under {spec['max']} characters.")
     if value == "":
         return None  # empty = remove the override and fall back to the website default
+    if key == "site_theme" and (_THEME_ID.match(value) or _PRESET_ID.match(value)) and len(value) <= 60:
+        return value  # a custom theme (its existence is checked in update(), with the theme list) or a built-in preset of the website's theme builder
     if kind == "choice" and value not in (spec["options"] or ()):
         raise ValueError("Choose one of the available options.")
     if kind == "email" and not EMAIL.match(value):
@@ -155,6 +213,11 @@ def update(db: Session, user: User, values: dict, *, allowed: tuple[str, ...]) -
             clean[key] = _validate(key, raw, db)
         except ValueError as exc:
             errors[key] = str(exc)
+    chosen = clean.get("site_theme")
+    if chosen and chosen.startswith("custom-"):
+        known = clean["custom_themes"] if "custom_themes" in clean else get(db, "custom_themes", [])
+        if chosen not in {t["id"] for t in (known or [])}:
+            errors["site_theme"] = "That custom theme no longer exists."
     if errors:
         raise ApiError(422, "validation_error", "Please check the highlighted fields.", fields=errors)
     media_service.make_public(db, {uuid.UUID(v) for k, v in clean.items() if v and SPEC[k]["type"] == "image"})

@@ -411,6 +411,111 @@
       ],
       "destination": "https://lax360.in/$1",
       "permanent": true
+    },
+    {
+      "source": "/services/growth/meta-ads-management",
+      "destination": "https://lax360.in/services/digitalmarketing/paid-advertising",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/growth/meta-ads-management",
+      "destination": "https://lax360.in/ta/services/digitalmarketing/paid-advertising",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/growth/meta-ads-management",
+      "destination": "https://lax360.in/hi/services/digitalmarketing/paid-advertising",
+      "permanent": true
+    },
+    {
+      "source": "/services/growth/google-ads-management",
+      "destination": "https://lax360.in/services/digitalmarketing/paid-advertising",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/growth/google-ads-management",
+      "destination": "https://lax360.in/ta/services/digitalmarketing/paid-advertising",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/growth/google-ads-management",
+      "destination": "https://lax360.in/hi/services/digitalmarketing/paid-advertising",
+      "permanent": true
+    },
+    {
+      "source": "/services/growth/content-creation",
+      "destination": "https://lax360.in/services/digitalmarketing/content-publishing",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/growth/content-creation",
+      "destination": "https://lax360.in/ta/services/digitalmarketing/content-publishing",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/growth/content-creation",
+      "destination": "https://lax360.in/hi/services/digitalmarketing/content-publishing",
+      "permanent": true
+    },
+    {
+      "source": "/services/growth/website-and-landing-page-optimization",
+      "destination": "https://lax360.in/services/software/website-development",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/growth/website-and-landing-page-optimization",
+      "destination": "https://lax360.in/ta/services/software/website-development",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/growth/website-and-landing-page-optimization",
+      "destination": "https://lax360.in/hi/services/software/website-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/growth/digital-marketing-strategy",
+      "destination": "https://lax360.in/services/digitalmarketing",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/growth/digital-marketing-strategy",
+      "destination": "https://lax360.in/ta/services/digitalmarketing",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/growth/digital-marketing-strategy",
+      "destination": "https://lax360.in/hi/services/digitalmarketing",
+      "permanent": true
+    },
+    {
+      "source": "/services/growth",
+      "destination": "https://lax360.in/services/digitalmarketing",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/growth",
+      "destination": "https://lax360.in/ta/services/digitalmarketing",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/growth",
+      "destination": "https://lax360.in/hi/services/digitalmarketing",
+      "permanent": true
+    },
+    {
+      "source": "/services/growth/:path*",
+      "destination": "https://lax360.in/services/digitalmarketing/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/growth/:path*",
+      "destination": "https://lax360.in/ta/services/digitalmarketing/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/growth/:path*",
+      "destination": "https://lax360.in/hi/services/digitalmarketing/:path*",
+      "permanent": true
     }
   ],
   "rewrites": [

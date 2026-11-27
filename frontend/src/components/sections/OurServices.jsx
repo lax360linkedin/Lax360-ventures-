@@ -14,10 +14,11 @@ const PHOTO = {
   headless: '/assets/services/headless.webp',
   automation: '/assets/services/automation.webp',
   mobile: '/assets/services/mobile.webp',
+  education: '/assets/services/education.webp',
 }
 
 /** Home "Our Services": heading, short introduction and a card per major service (photo, icon, short description), then a button to the Services page. */
-export default function OurServices({ eyebrow = 'What we do', title = 'Our', gradient = 'Services', lead = 'Six areas of expertise — software, AI, marketing, APIs, automation and mobile apps — from one accountable team — planned, built and supported around how your business works.' }) {
+export default function OurServices({ eyebrow = 'What we do', title = 'Our', gradient = 'Services', lead = 'Seven areas of expertise — software, AI, marketing, APIs, automation, mobile apps and education and training — from one accountable team — planned, built and supported around how your business works.' }) {
   return (
     <section aria-labelledby="our-services-title" className="wrap section">
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -31,7 +32,7 @@ export default function OurServices({ eyebrow = 'What we do', title = 'Our', gra
         />
         <Reveal delay={0.1} className="shrink-0"><Button to="/services" arrow>View All Services</Button></Reveal>
       </div>
-      <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:[&>li:last-child:nth-child(3n+1)]:col-start-2">
         {allDivisions.map((d, i) => {
           const Icon = divisionIcons[d.slug]
           return (

@@ -13,6 +13,7 @@ import { EDUR } from './educationReferral.js'
 import { ITF } from './itFranchise.js'
 import { ITA } from './itAuthorized.js'
 import { ITR } from './itReferral.js'
+import { DM, DMA, DMR } from './dmPartners.js'
 
 export const CATEGORIES = [
   {
@@ -297,6 +298,23 @@ export function customOpportunity(category, divisionSlug, label, description) {
   })
 }
 
+// The Digital Marketing Authorized Partner and Referral Partner pages are written from "Digital_Marketing_Partner_Program_Website_Content.docx_20261125_220245_0000.pdf" (data/dmPartners.js).
+// That document has no responsibilities, fees, policies or FAQs, so none are published for these two pages (the generic ones are left empty on purpose).
+for (const [slug, P] of [['authorized-partner/digital-marketing', DMA], ['referral-partner/digital-marketing', DMR]]) {
+  const o = opportunityBySlug(slug)
+  Object.assign(o, {
+    heroHeading: DM.hero.heading,
+    heroLead: DM.hero.lead,
+    intro: [P.tagline, P.intro],
+    opportunities: [], model: [], infrastructure: null,
+    eligibility: P.who,
+    responsibilities: { partner: [], lax: [] },
+    benefits: P.benefits, support: [], process: P.how, policies: [],
+    faqs: [],
+    disclaimers: ['Submitting a partnership enquiry does not by itself make you a partner.'],
+  })
+}
+
 // The IT & Software Referral Partner page is written from "LAX360_IT_Software_Referral_Partner_Website_Content.docx" (data/itReferral.js).
 {
   const ir = opportunityBySlug('referral-partner/it')
@@ -443,10 +461,10 @@ const SEO = {
   'franchise/digital-marketing': ['Digital Marketing Franchise Opportunity', 'Operate an approved LAX360 digital marketing business: SEO, social media, paid ads, branding and lead generation. No results are guaranteed.'],
   'franchise/it': ['IT & Software Franchise Opportunity', 'Explore the LAX360 IT & Software franchise: software and SaaS sales, websites, apps, AI and automation, with branding, training, CRM and delivery support.'],
   'authorized-partner/education': ['Education Authorized Partner Program', 'Become a LAX360 Education Authorized Partner: college MoUs, training partnerships, workshops, internships and branding support, under an agreement.'],
-  'authorized-partner/digital-marketing': ['Digital Marketing Authorized Partner Program', 'Become a LAX360 Digital Marketing Authorized Partner: find clients and support sales while LAX360 prepares proposals and delivers the work.'],
+  'authorized-partner/digital-marketing': ['Digital Marketing Authorized Partner Program', 'Become a LAX360 Digital Marketing Authorized Partner: offer SEO, social media, ads, websites and design to your clients, backed by our team.'],
   'authorized-partner/it': ['IT & Software Authorized Partner Program', 'Become a LAX360 IT & Software Authorized Partner: free registration, eligible commission, demos, quotations and a partner portal.'],
   'referral-partner/education': ['Education Referral Partner Program', 'Join the LAX360 Education Referral Partnership: refer students and colleges to IT certification courses, with tracking and commission under an agreement.'],
-  'referral-partner/digital-marketing': ['Digital Marketing Referral Partner Program', 'Refer businesses that need marketing to LAX360. LAX360 qualifies the lead and discusses the service; commission applies only to eligible, converted referrals.'],
+  'referral-partner/digital-marketing': ['Digital Marketing Referral Partner Program', 'Refer businesses that need digital marketing to LAX360 and earn a reward for every successful referral. We handle the consultation and delivery.'],
   'referral-partner/it': ['IT & Software Referral Partner Program', 'Join the LAX360 IT & Software Referral Partner programme: free registration, refer customers needing software or AI, and track eligible commission.'],
   'page:overview': ['Franchise & Partnership Opportunities in India', 'Partner with LAX360 Pvt Ltd: franchise, authorized partner and referral programs across Education, Digital Marketing and IT & Software. Apply online.'],
   'page:apply': ['Apply to Become a LAX360 Partner', 'Apply for a LAX360 franchise, authorized partner or referral partner program. An application is an enquiry; approval follows consultation and an agreement.'],

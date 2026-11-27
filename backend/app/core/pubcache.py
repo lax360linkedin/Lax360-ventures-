@@ -19,9 +19,10 @@ from fastapi.responses import Response
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
-TTL_SECONDS = 5.0
-STALE_SECONDS = 60.0  # an expired entry is still served (and refreshed in the background) for this long
-_WATCHED = {"ContentItem", "SiteSetting", "MediaAsset", "Branch", "ContactChannel", "HeroVideo", "HeroVideoConfig"}
+TTL_SECONDS = 15.0
+STALE_SECONDS = 300.0  # an expired entry is still served (and refreshed in the background) for this long
+KEEP_WARM_SECONDS = 12.0  # while the server runs, entries are rebuilt in the background before they go stale, so no visitor waits for the (remote) database
+_WATCHED = {"ContentItem", "SiteSetting", "MediaAsset", "Branch", "ContactChannel", "HeroVideo", "HeroVideoConfig", "PartnershipPage", "PartnershipFaq", "PartnershipPolicy", "PartnershipSetting", "PartnershipMenuItem"}
 _lock = threading.Lock()
 _store: dict[str, tuple[float, int, object]] = {}
 _version = 0
@@ -31,6 +32,7 @@ def bump() -> None:
     global _version
     with _lock:
         _version += 1
+    _rebuild_all_soon()  # an administrator's save: rebuild the public responses right away, before the next visitor asks
 
 
 def get(key: str, *, max_age: float = TTL_SECONDS):
@@ -46,6 +48,53 @@ def put(key: str, value: object) -> None:
 
 
 _refreshing: set[str] = set()
+_builders: dict[str, tuple[Callable[[Session], object], Callable[[], Session]]] = {}  # key -> how to rebuild it (registered by cached_json)
+_key_locks: dict[str, threading.Lock] = {}  # one build per key at a time: simultaneous visitors share it instead of each querying the database
+_warm_started = False
+
+
+def _rebuild(key: str) -> None:
+    b = _builders.get(key)
+    if b is None:
+        return
+    db = b[1]()
+    try:
+        with _key_locks.setdefault(key, threading.Lock()):
+            put(key, _pack(b[0](db)))
+    except Exception:  # noqa: BLE001 - the next request rebuilds it in the foreground
+        pass
+    finally:
+        db.close()
+
+
+def _rebuild_all_soon() -> None:
+    if not _builders:
+        return
+
+    def run() -> None:
+        time.sleep(0.4)  # the save is committing: let it finish so the rebuild sees it
+        for key in list(_builders):
+            _rebuild(key)
+
+    threading.Thread(target=run, name="pubcache-rebuild", daemon=True).start()
+
+
+def _keep_warm() -> None:
+    while True:
+        time.sleep(KEEP_WARM_SECONDS)
+        for key in list(_builders):
+            hit = _store.get(key)
+            if hit is None or hit[1] != _version or time.monotonic() - hit[0] > TTL_SECONDS * 0.6:
+                _rebuild(key)
+
+
+def _start_warm() -> None:
+    global _warm_started
+    with _lock:
+        if _warm_started:
+            return
+        _warm_started = True
+    threading.Thread(target=_keep_warm, name="pubcache-warm", daemon=True).start()
 
 
 def _refresh_in_background(key: str, build: Callable[[Session], object], session_factory: Callable[[], Session]) -> None:
@@ -96,6 +145,9 @@ def cached_json(request: Request, enabled: bool, key: str, build: Callable[[Sess
     """JSON response built once per `TTL_SECONDS` (until something is saved), compressed with gzip for clients that accept it (the content bundle is ~100 KB).
     When an entry has just expired (and nothing was saved since) the previous one is still served instantly while a fresh one is built in the background:
     visitors never wait for the database except the very first one after a quiet minute or a save."""
+    if enabled and session_factory is not None and key not in _builders:
+        _builders[key] = (build, session_factory)
+        _start_warm()
     entry = get(key) if enabled else None
     if entry is None and enabled and session_factory is not None:
         stale = get(key, max_age=STALE_SECONDS)
@@ -103,9 +155,12 @@ def cached_json(request: Request, enabled: bool, key: str, build: Callable[[Sess
             _refresh_in_background(key, build, session_factory)
             entry = stale
     if entry is None:
-        entry = _pack(build(db))
-        if enabled:
-            put(key, entry)
+        with _key_locks.setdefault(key, threading.Lock()):  # simultaneous visitors wait for ONE build instead of all querying the database
+            entry = get(key) if enabled else None
+            if entry is None:
+                entry = _pack(build(db))
+                if enabled:
+                    put(key, entry)
     body, packed = entry
     use_gzip = packed is not None and "gzip" in request.headers.get("accept-encoding", "")
     out = {**headers, "Vary": "Accept-Encoding"}

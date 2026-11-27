@@ -7,7 +7,7 @@ import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { WebsiteCard } from '../components/websites/WebsiteBits.jsx'
 import { useWebsites, websiteKinds, websiteTypes } from '../hooks/useWebsites.js'
-import { useContentReady } from '../hooks/useSite.js'
+import { useContentReady, useH1Override } from '../hooks/useSite.js'
 
 const chip = (on) => `shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${on ? 'border-transparent bg-primary text-white shadow-lg' : 'border-edge-strong bg-glass hover:border-lav'}`
 
@@ -16,6 +16,7 @@ const chip = (on) => `shrink-0 rounded-full border px-4 py-2 text-sm font-semibo
  * (Website content > Websites). Filter by industry, kind and type, or search; each card opens the live website in a new tab or its details page.
  */
 export default function Websites() {
+  const h1 = useH1Override()
   const sites = useWebsites()
   const ready = useContentReady()
   const [cat, setCat] = useState('all')
@@ -38,7 +39,7 @@ export default function Websites() {
           <nav aria-label="Breadcrumb" className="text-sm text-soft"><ol className="flex items-center gap-2"><li><Link to="/" className="hover:text-lav">Home</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" /><li><Link to="/products" className="hover:text-lav">Products</Link></li><ChevronRight className="size-3.5 text-lav" aria-hidden="true" /><li aria-current="page" className="font-semibold text-fg">Websites</li></ol></nav>
           <Reveal y={12} className="mt-8 max-w-3xl">
             <p className="eyebrow text-lav">Explore our websites</p>
-            <h1 id="websites-title" className="h1 mt-4 !text-[clamp(2.3rem,4.8vw,4.3rem)]">Our Websites <span className="text-gradient">&amp; Live Demos.</span></h1>
+            <h1 id="websites-title" className="h1 mt-4 !text-[clamp(2.3rem,4.8vw,4.3rem)]">{h1 || <>Our Websites <span className="text-gradient">&amp; Live Demos.</span></>}</h1>
             <p className="lead mt-6 text-soft">Open real websites and industry demos built by LAX360, and see what each one is, how it is built and what it can do.</p>
             <ul className="mt-6 flex flex-wrap gap-2 text-sm text-soft" aria-label="Kinds of website">{Object.values(websiteKinds).map((k) => <li key={k.label} className="rounded-full border border-edge bg-glass px-3 py-1"><span className="font-semibold text-fg">{k.label}:</span> {k.note}</li>)}</ul>
           </Reveal>

@@ -31,7 +31,10 @@ class PartnershipApplication(UUIDPk, Base):
 
     reference: Mapped[str] = mapped_column(String(32))
     category: Mapped[str] = mapped_column(String(12))
-    division: Mapped[str] = mapped_column(String(20))
+    division: Mapped[str] = mapped_column(String(40))  # the primary (first) selected division; the full selection is `divisions`
+    divisions: Mapped[list] = mapped_column(JSON, default=list, server_default=text("'[]'"))  # every selected division slug (an empty list on older rows: they only have `division`)
+    all_divisions: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")  # the applicant chose "All Business Divisions"
+    other_interest: Mapped[str | None] = mapped_column(String(300))  # free text entered under "Others"
     status: Mapped[str] = mapped_column(String(30), default="new", server_default="new")
     full_name: Mapped[str] = mapped_column(String(120))
     email: Mapped[str] = mapped_column(String(254))
@@ -52,6 +55,7 @@ class PartnershipApplication(UUIDPk, Base):
     consent_marketing: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     source_page: Mapped[str | None] = mapped_column(String(160))
+    sheets_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))  # every worksheet copy is in the Google Spreadsheet (NULL: not yet, retried)
     fingerprint: Mapped[str] = mapped_column(String(64))  # hash of e-mail + category + division: the same person sending the same form twice is stored once
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useSyncExternalStore } from 'react'
 import { fetchSession, login, logout, register, updateProfile } from '../services/authService.js'
 import { onSessionExpired, setCsrfToken } from '../services/apiClient.js'
+import { trackEvent } from '../utils/analytics.js'
 
 // Session store (same pattern as useTheme). The signed-in state comes from the backend (`GET /api/auth/me`), never from
 // browser storage. `status` is "loading" until that first check finishes, so guarded pages and the header avoid a flash.
@@ -42,6 +43,7 @@ async function signUp({ fullName, email, password, details }) {
     const s = await register({ fullName, email, password, details })
     setCsrfToken(s.csrf_token)
     set({ user: s.user, status: 'ready', notice: null })
+    trackEvent('sign_up', { method: 'email' }) // only after the account was created (no name or e-mail is sent)
     return { ok: true }
   } catch (e) {
     return { ok: false, error: e.message, fields: e.fields || null, code: e.code }

@@ -5,7 +5,7 @@ import { productCategories, productStatuses } from '../../data/products.js'
 
 const STATUS_CLS = {
   live: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
-  beta: 'border-sky/50 bg-sky/10 text-sky-700 dark:text-sky',
+  beta: 'border-sky/50 bg-sky/10 text-sky',
   in_development: 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300',
   soon: 'border-edge-strong bg-glass text-soft',
 }

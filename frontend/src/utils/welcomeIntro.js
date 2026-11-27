@@ -5,7 +5,7 @@
 //   revealing – the intro is fading out and the homepage content is animating in
 //   done      – finished or skipped
 //
-// There is deliberately NO sessionStorage / localStorage here: the intro plays on every full page load (a browser refresh starts it again
+// The intro plays on every full page load (a browser refresh starts it again
 // from the beginning). It does not restart on normal in-app navigation, because this module's state lives only as long as the page does.
 // The server / prerender snapshot is always "off", so hydration matches the prerendered HTML.
 //
@@ -40,7 +40,11 @@ export function setIntroState(next) {
   if (typeof document !== 'undefined') {
     const root = document.documentElement
     if (next === 'pending' || next === 'playing' || next === 'revealing') root.setAttribute('data-intro', next)
-    else root.removeAttribute('data-intro')
+    else {
+      root.setAttribute('data-intro-ending', '') // transitions stay off for the frame in which the page is revealed (see index.css)
+      root.removeAttribute('data-intro')
+      requestAnimationFrame(() => requestAnimationFrame(() => root.removeAttribute('data-intro-ending')))
+    }
   }
   listeners.forEach((l) => l())
 }

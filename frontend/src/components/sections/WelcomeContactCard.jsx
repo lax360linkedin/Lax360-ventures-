@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { AlertCircle, ArrowRight, Bot, CheckCircle2, Code2, GraduationCap, Megaphone, Send, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth.js'
+import { useContent } from '../../hooks/useSite.js'
 import { enquiryTypes } from '../../data/navigation.js'
 import { submitEnquiry } from '../../services/enquiryService.js'
 import { whatsappLink } from '../../utils/whatsapp.js'
@@ -24,6 +25,8 @@ const Err = ({ id, children }) => (children ? <p id={id} className="mt-1 flex it
 export default function WelcomeContactCard({ open, onClose }) {
   const reduce = useReducedMotion()
   const { user } = useAuth()
+  const page = useContent('welcome_page')?.[0]?.data || {} // admin panel: Welcome Experience settings (heading and introduction of this card)
+  const title = page.contact_card_title || "Let's build something great together."
   const panelRef = useRef(null)
   const returnRef = useRef(null)
   const [v, setV] = useState({ name: '', email: '', phone: '', interest: 'project', note: '', consent: false, website: '' })
@@ -110,8 +113,8 @@ export default function WelcomeContactCard({ open, onClose }) {
               <div className="relative">
                 <span className="grid size-14 place-items-center rounded-2xl border border-white/30 bg-white/15 backdrop-blur-md" style={{ boxShadow: '0 16px 36px -14px rgb(var(--glow) / 0.9), inset 0 1px 0 rgba(255,255,255,0.35)' }}><Send className="size-6" aria-hidden="true" /></span>
                 <p className="mt-6 text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-white/75">LAX360 Pvt Ltd</p>
-                <h2 id="wc-title" className="mt-2 font-display text-[1.9rem] font-bold leading-[1.08] tracking-tight [text-wrap:balance]">Let&apos;s build something great together.</h2>
-                <p id="wc-desc" className="mt-3 text-[0.92rem] leading-relaxed text-white/80">Leave your details and tell us what you need. The team will get back to you. It takes less than a minute, and you can skip it and just explore.</p>
+                <h2 id="wc-title" className="mt-2 font-display text-[1.9rem] font-bold leading-[1.08] tracking-tight [text-wrap:balance]">{title}</h2>
+                <p id="wc-desc" className="mt-3 text-[0.92rem] leading-relaxed text-white/80">{page.contact_card_text || 'Leave your details and tell us what you need. The team will get back to you. It takes less than a minute, and you can skip it and just explore.'}</p>
               </div>
               <ul className="relative mt-6 space-y-2.5">
                 {bullets.map(([Icon, text]) => <li key={text} className="flex items-center gap-3 text-[0.88rem] font-medium text-white/90"><span className="grid size-8 shrink-0 place-items-center rounded-full border border-white/25 bg-white/12"><Icon className="size-4" aria-hidden="true" /></span>{text}</li>)}
@@ -131,7 +134,7 @@ export default function WelcomeContactCard({ open, onClose }) {
               ) : (
                 <form onSubmit={submit} noValidate aria-busy={status === 'sending'} className="space-y-3 sm:space-y-3.5">
                   <div className="pr-10">
-                    <h2 className="mb-2 font-display text-[1.25rem] font-bold leading-tight md:hidden">Let&apos;s build something great together.</h2>
+                    <h2 className="mb-2 font-display text-[1.25rem] font-bold leading-tight md:hidden">{title}</h2>
                     <p className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-primary md:mt-0">Get in touch</p>
                     <p className="mt-1 text-[1.15rem] font-bold leading-snug text-slate-800 md:text-[1.3rem]">Share your contact details <span className="font-medium text-slate-500">(optional)</span></p>
                   </div>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { api } from '../services/apiClient.js'
 import { BUILT_IN_THEMES, PALETTE_THEMES, THEME_CATEGORIES } from '../data/themes.js'
-import { endPreview, previewTheme } from '../hooks/useTheme.js'
+import { THEME_PRESETS, PRESET_GROUPS } from '../data/themePresets.js'
+import { endPreview, previewTheme, setCustomDefs } from '../hooks/useTheme.js'
+import ThemeBuilder, { ThemeSwatch } from './ThemeBuilder.jsx'
 import { MediaField } from './MediaPicker.jsx'
 import { Btn, Card, Field, Input, Textarea, Toggle, label, useToast } from './ui.jsx'
 
@@ -12,17 +14,17 @@ const GROUPS = { appearance: 'Appearance', general: 'General', global: 'Global w
 const ALL_CHOICES = [...BUILT_IN_THEMES.map((t) => ({ ...t, colors: t.colors })), ...PALETTE_THEMES.map((t) => ({ ...t, colors: t.accent2 ? [t.bg, t.text, t.accent, t.accent2, t.surface] : [t.bg, t.text || '#222222', t.accent] }))]
 const swatch = (colors) => ({ background: colors[0], '--sw-text': colors[1], '--sw-accent': colors[2] })
 
-function ThemeCard({ t, selected, previewing, onSelect, onPreview, name }) {
+function ThemeCard({ t, selected, saved, previewing, onSelect, onPreview, name }) {
   return (
     <div className={`flex flex-col gap-2 rounded-xl border p-3 transition-colors ${selected ? 'border-primary bg-glass-strong' : previewing ? 'border-lav' : 'border-edge hover:border-edge-strong'}`}>
       <label className="flex cursor-pointer items-start gap-3 focus-within:outline focus-within:outline-2 focus-within:outline-lav">
         <input type="radio" name={name} value={t.id} checked={selected} onChange={() => onSelect(t.id)} className="sr-only" />
-        <span aria-hidden="true" className="mt-0.5 flex h-11 w-16 shrink-0 flex-col justify-between overflow-hidden rounded-md border border-edge-strong p-1.5" style={swatch(t.colors)}>
+        {t.def ? <ThemeSwatch def={t.def} className="mt-0.5 w-16 shrink-0" /> : <span aria-hidden="true" className="mt-0.5 flex h-11 w-16 shrink-0 flex-col justify-between overflow-hidden rounded-md border border-edge-strong p-1.5" style={swatch(t.colors)}>
           <span className="h-1 w-9 rounded-full" style={{ background: t.colors[1] }} />
           <span className="flex gap-1"><span className="h-2.5 w-7 rounded-full" style={{ background: t.colors[2] }} />{t.colors[3] && t.id !== 'visitor' && PALETTE_THEMES.some((p) => p.id === t.id && p.accent2) && <span className="h-2.5 w-4 rounded-full" style={{ background: t.colors[3] }} />}</span>
-        </span>
+        </span>}
         <span className="min-w-0">
-          <span className="block text-sm font-semibold">{t.name}{selected && <span className="ml-2 text-xs font-medium text-lav">Selected</span>}</span>
+          <span className="block text-sm font-semibold">{t.name}{selected && <span className="ml-2 text-xs font-medium text-lav">Selected</span>}{saved && <span className="ml-2 rounded-full bg-primary px-1.5 py-0.5 text-[0.65rem] font-semibold text-white">Active</span>}</span>
           <span className="block text-xs text-soft">{t.note}</span>
           <span className="mt-1 flex flex-wrap gap-x-2 text-[0.7rem] text-soft">{t.colors.map((c, i) => <span key={i} className="inline-flex items-center gap-1"><span aria-hidden="true" className="size-2.5 rounded-full border border-edge-strong" style={{ background: c }} />{c.toUpperCase()}</span>)}</span>
         </span>
@@ -40,11 +42,16 @@ function ThemeCard({ t, selected, previewing, onSelect, onPreview, name }) {
  * Website theme picker: every theme with its name and colours, grouped by category. “Preview” shows a theme on this page (the admin panel itself) without saving
  * anything; choosing a theme and pressing Save changes the whole public website for every visitor. Leaving the page ends a preview.
  */
-function ThemePicker({ field, value, onChange, error }) {
+function ThemePicker({ field, value, savedValue, onChange, error, themes, onThemes, themesError }) {
   const current = value || 'visitor'
+  const savedId = savedValue || 'visitor'
+  setCustomDefs(themes) // custom themes can be previewed and chosen straight away
   const [previewing, setPreviewing] = useState('')
   useEffect(() => () => endPreview(), [])
   const preview = (id) => { if (previewing === id) { endPreview(); setPreviewing('') } else { previewTheme(id); setPreviewing(id) } }
+  const presetChoices = THEME_PRESETS.map((t) => ({ ...t, note: t.mode === 'dark' ? 'Dark' : 'Light + Dark', colors: [t.colors.bg, t.colors.text || '#222222', t.colors.primary], def: t }))
+  const customChoices = themes.map((t) => ({ ...t, note: t.mode === 'both' ? 'Light + Dark' : t.mode === 'dark' ? 'Dark' : 'Light', colors: [t.colors.bg, t.colors.text || '#222222', t.colors.primary], def: t }))
+  const nameOf = (id) => ALL_CHOICES.find((t) => t.id === id)?.name || presetChoices.find((t) => t.id === id)?.name || customChoices.find((t) => t.id === id)?.name || id
   const allowed = new Set(field.options || [])
   return (
     <fieldset className="md:col-span-2">
@@ -52,7 +59,7 @@ function ThemePicker({ field, value, onChange, error }) {
       {field.help && <p className="mb-3 text-xs text-soft">{field.help}</p>}
       {previewing && (
         <p role="status" className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-lav bg-glass px-3 py-2 text-sm">
-          Previewing <strong>{ALL_CHOICES.find((t) => t.id === previewing)?.name}</strong> on this page. Nothing has been saved.
+          Previewing <strong>{nameOf(previewing)}</strong> on this page. Nothing has been saved.
           <button type="button" className="font-semibold text-lav hover:underline" onClick={() => { onChange(previewing); endPreview(); setPreviewing('') }}>Use this theme</button>
           <button type="button" className="font-semibold text-lav hover:underline" onClick={() => { endPreview(); setPreviewing('') }}>Stop previewing</button>
         </p>
@@ -64,11 +71,37 @@ function ThemePicker({ field, value, onChange, error }) {
             <div key={cat.id}>
               <h3 className="mb-2 text-sm font-semibold">{cat.label} <span className="font-normal text-soft">({list.length})</span></h3>
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {list.map((t) => <ThemeCard key={t.id} t={t} name={field.key} selected={current === t.id} previewing={previewing === t.id} onSelect={onChange} onPreview={preview} />)}
+                {list.map((t) => <ThemeCard key={t.id} t={t} name={field.key} selected={current === t.id} saved={savedId === t.id} previewing={previewing === t.id} onSelect={onChange} onPreview={preview} />)}
               </div>
             </div>
           )
         })}
+        <div>
+          <h3 className="mb-1 text-sm font-semibold">Ready-made colour themes <span className="font-normal text-soft">({presetChoices.length})</span></h3>
+          <p className="mb-3 text-xs text-soft">Each works in Light and Dark. Choose one, or open it in the builder below (“Start from a preset”) to change any colour.</p>
+          {PRESET_GROUPS.map((g) => {
+            const list = presetChoices.filter((t) => t.group === g.id)
+            return (
+              <div key={g.id} className="mb-4">
+                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-soft">{g.label}</h4>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {list.map((t) => <ThemeCard key={t.id} t={t} name={field.key} selected={current === t.id} saved={savedId === t.id} previewing={previewing === t.id} onSelect={onChange} onPreview={preview} />)}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <div>
+          <h3 className="mb-2 text-sm font-semibold">Custom theme builder</h3>
+          <ThemeBuilder themes={themes} onChange={onThemes} activeId={current} savedActiveId={savedId} onUse={onChange}
+            onPreviewTheme={(def, tab) => { previewTheme(def, tab === 'dark' ? 'dark' : 'light'); setPreviewing(def.id) }} onStopPreview={() => { endPreview(); setPreviewing('') }} />
+          {themesError && <p role="alert" className="mt-2 text-xs font-medium text-error">{themesError}</p>}
+        </div>
+      </div>
+      <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl border border-edge p-3">
+        <Btn onClick={() => { endPreview(); setPreviewing(''); onChange('') }}>Reset to default theme</Btn>
+        <Btn kind="primary" onClick={(e) => e.currentTarget.closest('form')?.requestSubmit()}>Save and publish theme</Btn>
+        <span className="text-xs text-soft">“Reset” returns to the original look (visitors choose Dark or Light); it takes effect when saved. Your custom themes are kept.</span>
       </div>
       {error && <p role="alert" className="mt-2 text-xs font-medium text-error">{error}</p>}
     </fieldset>
@@ -82,13 +115,15 @@ export default function SettingsForm({ endpoint, payload, onSaved, groups }) {
   const [errors, setErrors] = useState({})
   const [busy, setBusy] = useState(false)
   const fields = payload.fields.filter((f) => !groups || groups.includes(f.group))
-  const get = (f) => (f.type === 'bool' ? (draft[f.key] ?? ON.has(f.key)) : (draft[f.key] ?? ''))
-  const dirty = fields.some((f) => get(f) !== (f.type === 'bool' ? (payload.values[f.key] ?? ON.has(f.key)) : (payload.values[f.key] ?? '')))
+  const same = (a, b) => (Array.isArray(a) || Array.isArray(b) ? JSON.stringify(a || []) === JSON.stringify(b || []) : a === b)
+  const baseline = (f) => (f.type === 'bool' ? (payload.values[f.key] ?? ON.has(f.key)) : f.type === 'themes' ? (payload.values[f.key] ?? []) : (payload.values[f.key] ?? ''))
+  const get = (f) => (f.type === 'bool' ? (draft[f.key] ?? ON.has(f.key)) : f.type === 'themes' ? (draft[f.key] ?? payload.values[f.key] ?? []) : (draft[f.key] ?? ''))
+  const dirty = fields.some((f) => !same(get(f), baseline(f)))
 
   const save = async (e) => {
     e.preventDefault()
     const values = {}
-    fields.forEach((f) => { const now = get(f); const before = f.type === 'bool' ? (payload.values[f.key] ?? ON.has(f.key)) : (payload.values[f.key] ?? ''); if (now !== before) values[f.key] = now })
+    fields.forEach((f) => { const now = get(f); if (!same(now, baseline(f))) values[f.key] = f.type === 'themes' ? (now.length ? JSON.stringify(now) : '') : now }) // custom themes travel as one JSON text
     if (!Object.keys(values).length) return
     setBusy(true)
     setErrors({})
@@ -101,9 +136,10 @@ export default function SettingsForm({ endpoint, payload, onSaved, groups }) {
         <Card key={g}>
           <h2 className="mb-4 font-display text-lg font-semibold">{GROUPS[g] || label(g)}</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {fields.filter((f) => f.group === g).map((f) => (
+            {fields.filter((f) => f.group === g && f.type !== 'themes').map((f) => (
               f.type === 'choice'
-                ? <ThemePicker key={f.key} field={f} value={get(f)} error={errors[f.key]} onChange={(v) => setDraft({ ...draft, [f.key]: v })} />
+                ? <ThemePicker key={f.key} field={f} value={get(f)} savedValue={payload.values[f.key] || ''} error={errors[f.key]} onChange={(v) => setDraft({ ...draft, [f.key]: v })}
+                    themes={draft.custom_themes ?? payload.values.custom_themes ?? []} onThemes={(list) => setDraft((d) => ({ ...d, custom_themes: list }))} themesError={errors.custom_themes} />
                 : f.type === 'bool'
                 ? <div key={f.key} className="flex flex-col justify-center gap-1"><Toggle checked={get(f)} onChange={(v) => setDraft({ ...draft, [f.key]: v })} label={f.label} />{f.help && <p className="text-xs text-soft">{f.help}</p>}{errors[f.key] && <p role="alert" className="text-xs font-medium text-error">{errors[f.key]}</p>}</div>
                 : (

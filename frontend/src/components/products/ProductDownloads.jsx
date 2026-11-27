@@ -5,6 +5,7 @@ import Reveal from '../ui/Reveal.jsx'
 import SectionHeading from '../ui/SectionHeading.jsx'
 import { api } from '../../services/apiClient.js'
 import { useAuth } from '../../hooks/useAuth.js'
+import { trackFileDownload } from '../../utils/analytics.js'
 
 const TYPE = { demo_pdf: ['Demo PDF', MonitorPlay], brochure: ['Brochure', FileText], documentation: ['Documentation', BookOpen], other: ['Resource', FileText] }
 const size = (b) => (b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`)
@@ -58,6 +59,7 @@ export default function ProductDownloads({ resources }) {
       a.click()
       a.remove()
       setTimeout(() => URL.revokeObjectURL(url), 1000)
+      trackFileDownload((r.info?.filename || '').split('.').pop() || 'pdf', 'product') // only after the server delivered the file; the file name is never sent
     } catch (e) {
       if (e.code === 'login_required' || e.status === 401) setPrompt(r)
       else setError(e.message || 'The file could not be downloaded. Please try again.')

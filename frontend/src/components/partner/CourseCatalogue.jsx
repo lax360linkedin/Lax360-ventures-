@@ -2,18 +2,19 @@ import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } fro
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { BookOpen, ChevronDown, Search, X } from 'lucide-react'
-import { COURSE_COUNT, COURSE_GROUPS, COURSE_SUMMARY } from '../../data/educationCourses.js'
+import { useCourseCatalogue } from '../../hooks/useEducation.js'
 
 const matches = (c, term) => !term || `${c.name} ${c.software}`.toLowerCase().includes(term)
-const filterGroups = (term) => COURSE_GROUPS.map((g) => ({ ...g, courses: g.courses.filter((c) => matches(c, term)) })).filter((g) => g.courses.length)
+const filterGroups = (all, term) => all.map((g) => ({ ...g, courses: g.courses.filter((c) => matches(c, term)) })).filter((g) => g.courses.length)
 
 /** The full course list for a page section: every course under its category, with the document's numbering and software. Shared by the three Education programme pages. */
 export function CourseGroupsList({ accent = 'var(--color-primary)' }) {
+  const { groups: COURSE_GROUPS } = useCourseCatalogue() // the approved catalogue plus any changes made in the admin panel
   return (
     <div className="grid gap-px overflow-hidden rounded-xl border border-edge bg-edge md:grid-cols-2 xl:grid-cols-3">
       {COURSE_GROUPS.map((g) => (
         <div key={g.title} className="bg-night p-5">
-          <h3 className="border-b border-edge pb-2 font-display text-lg font-semibold" style={{ color: accent }}>{g.title}</h3>
+          <h2 className="border-b border-edge pb-2 font-display text-lg font-semibold" style={{ color: accent }}>{g.title}</h2>
           <ol className="mt-3 space-y-1.5">{g.courses.map((c) => <li key={c.no} value={c.no} className="flex gap-2.5 text-[0.9375rem]"><span className="w-7 shrink-0 text-right font-semibold tabular-nums text-soft">{c.no}.</span><span className="min-w-0">{c.name}{c.software && <span className="block text-xs text-soft">Software: {c.software}</span>}</span></li>)}</ol>
         </div>
       ))}
@@ -26,6 +27,7 @@ export function CourseDialog({ open, onClose, accent = 'var(--color-primary)' })
   const titleId = useId()
   const ref = useRef(null)
   const [q, setQ] = useState('')
+  const cat = useCourseCatalogue()
   useEffect(() => {
     if (!open) return undefined
     const prev = document.activeElement
@@ -45,7 +47,7 @@ export function CourseDialog({ open, onClose, accent = 'var(--color-primary)' })
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = overflow; prev?.focus?.() }
   }, [open, onClose])
   const term = q.trim().toLowerCase()
-  const groups = useMemo(() => filterGroups(term), [term])
+  const groups = useMemo(() => filterGroups(cat.groups, term), [cat.groups, term])
   if (!open) return null
   const shown = groups.reduce((n, g) => n + g.courses.length, 0)
   if (typeof document === 'undefined') return null
@@ -54,17 +56,17 @@ export function CourseDialog({ open, onClose, accent = 'var(--color-primary)' })
       <div ref={ref} role="dialog" aria-modal="true" aria-labelledby={titleId} className="flex max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden rounded-t-2xl border border-edge-strong bg-night text-fg shadow-menu sm:rounded-2xl">
         <header className="flex items-start justify-between gap-4 border-b border-edge px-5 py-4 sm:px-7">
           <div><p className="eyebrow flex items-center gap-2" style={{ color: accent }}><BookOpen className="size-4" aria-hidden="true" />LAX360 Education</p><h2 id={titleId} className="mt-1 font-display text-2xl font-semibold">All courses</h2>
-            <p className="mt-1 text-sm text-soft">{COURSE_SUMMARY}. These are the only courses LAX360 Education offers; what a partner delivers depends on the approved partnership, infrastructure and faculty.</p></div>
+            <p className="mt-1 text-sm text-soft">{cat.summary}. These are the only courses LAX360 Education offers; what a partner delivers depends on the approved partnership, infrastructure and faculty.</p></div>
           <button type="button" onClick={onClose} aria-label="Close course list" className="grid size-11 shrink-0 place-items-center rounded-lg text-soft hover:bg-glass-strong hover:text-fg"><X className="size-5" aria-hidden="true" /></button>
         </header>
         <div className="border-b border-edge px-5 py-3 sm:px-7">
           <label className="relative block"><span className="sr-only">Search courses</span><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-soft" aria-hidden="true" />
             <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search courses" className="h-11 w-full rounded-lg border border-edge bg-glass pl-10 pr-3 text-sm text-fg placeholder:text-soft/70 focus:border-lav focus:outline-none" /></label>
-          <p className="mt-2 text-xs text-soft" role="status" aria-live="polite">{term ? `${shown} of ${COURSE_COUNT} courses match` : `Showing all ${COURSE_COUNT} courses`}</p>
+          <p className="mt-2 text-xs text-soft" role="status" aria-live="polite">{term ? `${shown} of ${cat.count} courses match` : `Showing all ${cat.count} courses`}</p>
         </div>
         <div className="overflow-y-auto px-5 py-5 sm:px-7">
           <section aria-labelledby={`${titleId}-it`}>
-            <h3 id={`${titleId}-it`} className="font-display text-xl font-semibold">IT certification courses <span className="text-base font-normal text-soft">· {COURSE_SUMMARY}</span></h3>
+            <h2 id={`${titleId}-it`} className="font-display text-xl font-semibold">IT certification courses <span className="text-base font-normal text-soft">· {cat.summary}</span></h2>
             {groups.length === 0 ? <p className="mt-4 text-soft">No course matches “{q}”.</p> : (
               <div className="mt-4 grid gap-6 md:grid-cols-2">
                 {groups.map((g) => (
@@ -100,9 +102,10 @@ export function CourseAccordion({ accent = 'var(--color-primary)', applyTo = '/p
   const open = useOpen()
   const id = useId()
   const [q, setQ] = useState('')
+  const cat = useCourseCatalogue()
   useEffect(() => { store.mounted += 1; return () => { store.mounted -= 1; if (!store.mounted) store.open = false } }, [])
   const term = q.trim().toLowerCase()
-  const groups = useMemo(() => filterGroups(term), [term])
+  const groups = useMemo(() => filterGroups(cat.groups, term), [cat.groups, term])
   const shown = groups.reduce((n, g) => n + g.courses.length, 0)
   return (
     <section id={PANEL_ID} aria-label="Education courses" className="mt-4 scroll-mt-44 rounded-2xl border border-edge bg-glass lg:scroll-mt-48">
@@ -113,15 +116,15 @@ export function CourseAccordion({ accent = 'var(--color-primary)', applyTo = '/p
       <div id={`${id}-body`} role="region" aria-label="All Education courses" inert={!open} className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="min-h-0 overflow-hidden">
           <div className="p-4">
-            <p className="text-xs text-soft">{COURSE_SUMMARY}: the only courses LAX360 Education offers. What a partner delivers depends on the approved partnership and its agreement.</p>
+            <p className="text-xs text-soft">{cat.summary}: the only courses LAX360 Education offers. What a partner delivers depends on the approved partnership and its agreement.</p>
             <label className="relative mt-3 block"><span className="sr-only">Search courses</span><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-soft" aria-hidden="true" />
               <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search courses" className="h-11 w-full rounded-lg border border-edge bg-night pl-9 pr-3 text-sm text-fg placeholder:text-soft/70 focus:border-lav focus:outline-none" /></label>
-            <p className="mt-2 text-xs text-soft" role="status" aria-live="polite">{term ? `${shown} of ${COURSE_COUNT} courses match` : `Showing all ${COURSE_COUNT} courses`}</p>
+            <p className="mt-2 text-xs text-soft" role="status" aria-live="polite">{term ? `${shown} of ${cat.count} courses match` : `Showing all ${cat.count} courses`}</p>
             {groups.length === 0 ? <p className="mt-3 text-sm text-soft">No course matches “{q}”.</p> : (
               <div className="mt-3 space-y-5">
                 {groups.map((g) => (
                   <div key={g.title}>
-                    <h3 className="mb-1.5 border-b border-edge pb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: accent }}>{g.title}</h3>
+                    <h2 className="mb-1.5 border-b border-edge pb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: accent }}>{g.title}</h2>
                     <ol className="space-y-1">{g.courses.map((c) => <li key={c.no} value={c.no} className="flex gap-2 text-sm"><span className="w-6 shrink-0 text-right font-semibold tabular-nums text-soft">{c.no}.</span><span className="min-w-0">{c.name}{c.software && <span className="block text-xs text-soft">Software: {c.software}</span>}</span></li>)}</ol>
                   </div>
                 ))}
