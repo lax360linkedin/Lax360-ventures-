@@ -43,7 +43,21 @@ export default function CookieBanner() {
 
   const holdForIntro = intro === 'pending' || intro === 'playing' || intro === 'revealing'
   const open = reopened || !consent.decided
-  if (!open || holdForIntro) return null
+  const visible = open && !holdForIntro
+  // While the banner is on screen its height is published as --cookie-lift, so the floating assistant / WhatsApp buttons can sit above it instead of underneath it (styles/index.css).
+  useEffect(() => {
+    const el = ref.current
+    const root = document.documentElement
+    if (!visible || !el) { root.style.removeProperty('--cookie-lift'); return undefined }
+    // how far the banner reaches up from the bottom of the screen (its own height plus whatever space it keeps from the edge)
+    const set = () => root.style.setProperty('--cookie-lift', `${Math.max(0, Math.round(window.innerHeight - el.getBoundingClientRect().top))}px`)
+    set()
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(set)
+    ro?.observe(el)
+    window.addEventListener('resize', set)
+    return () => { ro?.disconnect(); window.removeEventListener('resize', set); root.style.removeProperty('--cookie-lift') }
+  }, [visible, settings])
+  if (!visible) return null
 
   const decide = (value) => { setConsent({ analytics: value }); setSettings(false); setReopened(false) }
   const close = () => { setSettings(false); setReopened(false) } // closing a reopened panel keeps the saved choice

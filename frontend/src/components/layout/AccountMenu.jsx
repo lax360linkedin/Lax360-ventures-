@@ -15,9 +15,10 @@ export default function AccountMenu() {
     return (
       <Link
         to="/login"
-        className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-primary px-5 text-[0.9375rem] font-semibold text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[var(--btn-hover)] hover:shadow-[0_14px_34px_-10px_rgb(var(--glow2)/0.9)]"
+        aria-label="Login"
+        className="hdr-login group inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-primary px-5 text-[0.9375rem] font-semibold text-white shadow-[0_8px_24px_-10px_rgb(var(--glow)/0.9)] transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[var(--btn-hover)] hover:shadow-[0_14px_34px_-10px_rgb(var(--glow2)/0.9)]"
       >
-        <LogIn className="size-4" aria-hidden="true" /> Login
+        <LogIn className="size-4" aria-hidden="true" /> <span className="hdr-label">Login</span>
       </Link>
     )
   }

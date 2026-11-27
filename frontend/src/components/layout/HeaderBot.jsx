@@ -42,7 +42,7 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
   useEffect(() => {
     const el = elRef.current
     if (!el) return undefined
-    const st = { x: 0, y: 0, token: 0, at: 'rest', hoverPath: null, clicking: false, lastScroll: 0, alive: true, hoverTimer: 0, leaveTimer: 0, idleTimer: 0, placed: false }
+    const st = { x: 0, y: 0, token: 0, at: 'rest', hoverPath: null, clicking: false, lastScroll: 0, alive: true, hoverTimer: 0, leaveTimer: 0, idleTimer: 0, watchTimer: 0, placed: false, dirty: false, lastMove: Date.now() }
     const dims = () => ({ w: props.current.size, h: props.current.size * 1.25 })
     const tf = (x, y, r = 0, sx = 1, sy = 1) => {
       const { w, h } = dims()
@@ -55,6 +55,20 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
       el.style.visibility = 'visible'
       st.placed = true
     }
+    // A new action takes over from whatever is in flight: the bot is frozen where it visually is (mid-hop included), the old animation is cancelled, and the old action
+    // (which checks its token) stops. Without this a superseded hop kept running and, when it finished, put the bot back on a position that was no longer wanted:
+    // that is how it ended up "stuck" above a link it had only been hovering over.
+    const next = () => {
+      const running = el.getAnimations()
+      if (running.length) {
+        const m = new DOMMatrixReadOnly(getComputedStyle(el).transform)
+        const { w, h } = dims()
+        if (Number.isFinite(m.e) && Number.isFinite(m.f)) { st.x = m.e + w / 2; st.y = m.f + h }
+        el.style.transform = tf(st.x, st.y)
+        running.forEach((a) => a.cancel())
+      }
+      return ++st.token
+    }
     const restPt = () => props.current.measureRest()
     const linkPt = (p) => props.current.measureLink(p)
     const say = (p) => st.alive && setPose(p)
@@ -62,8 +76,15 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
     // Run keyframes, then commit the final position so animations never accumulate.
     const animate = (frames, duration, final) =>
       new Promise((resolve) => {
+        const stamp = st.token
         const a = el.animate(frames, { duration, fill: 'forwards' })
-        a.onfinish = () => { place(final.x, final.y); a.cancel(); resolve(true) }
+        a.onfinish = () => {
+          a.cancel()
+          if (st.token !== stamp || !st.alive) { resolve(false); return } // superseded: the newer action owns the position
+          place(final.x, final.y)
+          st.lastMove = Date.now()
+          resolve(true)
+        }
         a.oncancel = () => resolve(false)
       })
 
@@ -137,7 +158,7 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
         if (props.current.reduce) return
         clearTimeout(st.hoverTimer)
         clearTimeout(st.leaveTimer)
-        const my = ++st.token
+        const my = next()
         st.clicking = true
         if (!(await reachLink(path, my))) { if (st.token === my) st.clicking = false; return }
         await sleep(1500)
@@ -156,8 +177,10 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
         st.hoverTimer = setTimeout(async () => {
           if (st.clicking) return
           if (st.at === path || (st.at === 'rest' && props.current.active === path)) { say(POSE_FOR[path] || 'point'); return }
-          const my = ++st.token
+          const my = next()
           await reachLink(path, my)
+          // the pointer left while it was still on its way: do not stay on a link nobody is pointing at
+          if (st.token === my && !st.hoverPath && !st.clicking && st.at !== 'rest') goRest(next())
         }, 220) // debounce: fast mouse sweeps don't make it jump around
       },
       // The active page changed (link click, logo, footer, back button…): settle above the new active page.
@@ -165,10 +188,11 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
         if (!st.placed || st.clicking) return
         if (props.current.reduce) { const r = restPt(); if (r) place(r.x, r.y); st.at = 'rest'; return }
         if (st.hoverPath) return // pointer on the nav: leave() sends it to the (new) active page afterwards
-        goRest(++st.token)
+        goRest(next())
       },
       refresh() {
-        if (!st.placed || el.getAnimations().length) return
+        if (!st.placed) return
+        if (el.getAnimations().length) return // moving: the watchdog below puts it back on its mark once it has been still for a moment
         const target = st.at === 'rest' ? restPt() : linkPt(st.at) || restPt()
         if (target) place(target.x, target.y)
       },
@@ -177,8 +201,9 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
         clearTimeout(st.hoverTimer)
         clearTimeout(st.leaveTimer)
         st.leaveTimer = setTimeout(() => {
-          if (st.at !== 'rest' && !st.clicking) goRest(++st.token)
-          else if (st.at === 'rest') say('idle')
+          if (st.clicking || st.hoverPath) return
+          if (st.at !== 'rest' || el.getAnimations().length) goRest(next())
+          else say('idle')
         }, 700)
       },
     }
@@ -188,7 +213,7 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
     const intro = async () => {
       const r = restPt()
       if (!r) return
-      const my = ++st.token
+      const my = next()
       st.x = r.x
       st.y = r.y
       el.style.visibility = 'visible'
@@ -215,7 +240,7 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
         const calm = !document.hidden && Date.now() - st.lastScroll > 3500 && !st.hoverPath && !st.clicking && st.at === 'rest'
         const canTravel = window.matchMedia('(hover: hover)').matches && !props.current.active && Boolean(linkPt('/about'))
         if (calm && !props.current.reduce) {
-          const my = ++st.token
+          const my = next()
           if (canTravel && Math.random() < 0.35) {
             if (await reachLink('/about', my)) { await sleep(1300); if (st.token === my) await goRest(my) }
           } else {
@@ -229,6 +254,15 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
 
     const refresh = () => api.refresh()
     const onScroll = () => { st.lastScroll = Date.now() }
+    const onVisibility = () => { if (document.hidden) { st.hoverPath = null; clearTimeout(st.hoverTimer); if (!st.clicking) goRest(next()) } else api.refresh() }
+    // Safety net: if for any reason the bot is neither busy nor at its resting place for a few seconds, send it home / put it back on its mark.
+    st.watchTimer = setInterval(() => {
+      if (!st.alive || document.hidden || !st.placed || el.getAnimations().length || st.clicking || st.hoverPath) return
+      if (Date.now() - st.lastMove < 2500) return
+      const wanted = st.at === 'rest' ? restPt() : linkPt(st.at)
+      if (st.at !== 'rest' && !props.current.reduce) { goRest(next()); return }
+      if (wanted && (Math.abs(wanted.x - st.x) > 3 || Math.abs(wanted.y - st.y) > 3)) place(wanted.x, wanted.y)
+    }, 2500)
 
     let cancelled = false
     const start = async () => {
@@ -250,9 +284,14 @@ const HeaderBot = forwardRef(function HeaderBot({ active, measureRest, measureLi
 
     window.addEventListener('resize', refresh)
     window.addEventListener('scroll', onScroll, { passive: true })
+    document.documentElement.addEventListener('mouseleave', api.leave)
+    document.addEventListener('visibilitychange', onVisibility)
     return () => {
       cancelled = true
       st.alive = false
+      clearInterval(st.watchTimer)
+      document.documentElement.removeEventListener('mouseleave', api.leave)
+      document.removeEventListener('visibilitychange', onVisibility)
       clearTimeout(st.hoverTimer)
       clearTimeout(st.leaveTimer)
       clearTimeout(st.idleTimer)

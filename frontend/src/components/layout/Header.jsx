@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import Logo from './Logo.jsx'
@@ -11,7 +11,8 @@ import { useNav } from '../../hooks/useSite.js'
 import { useScrolledPast } from '../../hooks/useScrollDirection.js'
 import { useMediaQuery } from '../../hooks/useMediaQuery.js'
 
-const linkCls = 'relative z-10 inline-flex min-h-11 items-center whitespace-nowrap px-1.5 text-[0.8125rem] min-[1140px]:px-2 min-[1140px]:text-sm xl:px-2.5 xl:text-[0.9375rem] 2xl:px-[1.125rem] font-medium tracking-tight transition-colors duration-200'
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
+const linkCls = 'hdr-link relative z-10 inline-flex min-h-11 items-center whitespace-nowrap px-1.5 text-[0.8125rem] min-[1140px]:px-2 min-[1140px]:text-sm xl:px-2.5 xl:text-[0.9375rem] font-medium tracking-tight transition-colors duration-200'
 
 /**
  * The one shared header. It is `position: fixed` on every page and never hides on scroll; its height is constant
@@ -121,18 +122,60 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
     botRef.current?.leave()
   }
 
+
+  // ---- fit: the header never overlaps itself ----
+  // The widths of the logo, the menu and the buttons depend on the screen, the language, the zoom, the fonts, the admin-edited menu and whether somebody is signed in, so no fixed breakpoint can
+  // be right everywhere. Instead the header measures itself: it tries the full layout first, then a compact one, then icon-only buttons, and finally the menu button (the phone layout), and
+  // keeps the first that fits. data-fit = 0 | 1 | 2 | 3 on <header> (styles in index.css, ".hdr-*"). The decision depends only on the available width, so it never flips back and forth.
+  const gridRef = useRef(null)
+  const actionsRef = useRef(null)
+  useIsoLayoutEffect(() => {
+    const header = headerRef.current
+    const grid = gridRef.current
+    const root = document.documentElement
+    if (!header || !grid) return undefined
+    let raf = 0
+    const run = () => {
+      raf = 0
+      const logo = aRef.current?.closest('a')
+      const pill = navRef.current
+      const actions = actionsRef.current
+      if (!logo || !pill || !actions) return
+      let level = 0
+      if (window.innerWidth >= 1024) {
+        const gap = parseFloat(getComputedStyle(grid).columnGap) || 0
+        for (; level < 3; level += 1) {
+          header.dataset.fit = String(level)
+          const room = grid.clientWidth - logo.offsetWidth - actions.offsetWidth - gap * 2
+          if (Math.max(pill.offsetWidth, pill.scrollWidth) + 24 <= room) break // scrollWidth: the menu's natural width even when the grid squeezes its column // 24px of breathing room: at least 12px on each side of the menu
+        }
+      } else header.dataset.fit = '0'
+      header.dataset.fit = String(level)
+      if (level === 3) root.setAttribute('data-hdr-menu', ''); else root.removeAttribute('data-hdr-menu')
+      botRef.current?.refresh()
+    }
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(run) }
+    run()
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(schedule)
+    ;[grid, actionsRef.current, aRef.current?.closest('a')].forEach((el) => el && ro?.observe(el))
+    window.addEventListener('resize', schedule)
+    document.fonts?.ready?.then(schedule)
+    return () => { cancelAnimationFrame(raf); ro?.disconnect(); window.removeEventListener('resize', schedule); root.removeAttribute('data-hdr-menu') }
+  }, [nav.length])
+
   const color = (active) => (active ? 'text-fg' : 'text-soft hover:text-fg focus-visible:text-fg')
 
   return (
     <header
       ref={headerRef}
-      className={`a-drop fixed inset-x-0 top-[var(--topbar-offset,0px)] z-40 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${scrolled ? 'border-edge bg-night/75 shadow-[0_10px_40px_-18px_rgb(var(--glow)/0.5)] backdrop-blur-xl' : 'border-edge/60 bg-night/40 backdrop-blur-md [[data-theme=light]_&]:bg-night/85' /* light mode: solid enough to read over the vivid hero video */}`}
+      data-fit="0"
+      className={`hdr a-drop fixed inset-x-0 top-[var(--topbar-offset,0px)] z-40 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${scrolled ? 'border-edge bg-night/75 shadow-[0_10px_40px_-18px_rgb(var(--glow)/0.5)] backdrop-blur-xl' : 'border-edge/60 bg-night/40 backdrop-blur-md [[data-theme=light]_&]:bg-night/85' /* light mode: solid enough to read over the vivid hero video */}`}
       style={{ '--d': '0.1s' }}
     >
-      <div className="wrap flex h-[72px] items-center justify-between gap-3 pt-2 lg:grid lg:h-[92px] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-2 min-[1140px]:gap-4 xl:gap-6 lg:pt-3">
+      <div ref={gridRef} className="wrap flex h-[72px] items-center justify-between gap-3 pt-2 lg:grid lg:h-[92px] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-2 min-[1140px]:gap-4 xl:gap-6 lg:pt-3">
         <Logo aRef={aRef} priority className="lg:justify-self-start" />
 
-        <nav aria-label="Primary" className="a-fade hidden items-center lg:flex lg:justify-self-center" style={{ '--d': '0.75s' }}>
+        <nav aria-label="Primary" className="a-fade hdr-desk hidden min-w-0 items-center lg:flex lg:justify-self-center" style={{ '--d': '0.75s' }}>
           <div
             ref={navRef}
             className="relative flex items-center rounded-full border border-edge bg-glass px-1.5"
@@ -163,16 +206,16 @@ export default function Header({ onOpenMenu, menuButtonRef }) {
           </div>
         </nav>
 
-        <div className="a-fade ml-auto flex items-center gap-2 sm:gap-3 lg:gap-2 xl:gap-3 lg:justify-self-end" style={{ '--d': '0.85s' }}>
+        <div ref={actionsRef} className="a-fade ml-auto flex items-center gap-2 sm:gap-3 lg:gap-2 xl:gap-3 lg:justify-self-end" style={{ '--d': '0.85s' }}>
           <ThemeToggle />
-          <div className="hidden lg:block"><PartnerMenu bot={botRef} /></div>
-          <div className="hidden lg:block"><AccountMenu /></div>
+          <div className="hdr-desk hidden lg:block"><PartnerMenu bot={botRef} /></div>
+          <div className="hdr-desk hidden lg:block"><AccountMenu /></div>
           <button
             ref={menuButtonRef}
             type="button"
             onClick={onOpenMenu}
             aria-label="Open menu"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-edge-strong bg-glass px-4 text-sm font-semibold lg:hidden"
+            className="hdr-menu inline-flex min-h-11 items-center gap-2 rounded-full border border-edge-strong bg-glass px-4 text-sm font-semibold lg:hidden"
           >
             <Menu className="size-5" aria-hidden="true" /> <span className="hidden min-[400px]:inline">Menu</span>
           </button>

@@ -14,6 +14,7 @@ export default function WhatsAppFloat() {
       href={whatsappLink()}
       target="_blank"
       rel="noopener noreferrer"
+      data-whatsapp-float
       aria-label="Chat with the LAX360 team on WhatsApp (opens in a new tab)"
       className="a-pop group fixed bottom-[6.75rem] right-6 z-30 hidden items-center gap-2 rounded-full border border-edge bg-night/70 p-3 text-fg shadow-[0_10px_30px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-[background-color,border-color,transform] duration-300 hover:scale-105 hover:border-[#25d366] hover:bg-[#25d366]/20 lg:flex"
       style={{ '--d': '1.9s' }}

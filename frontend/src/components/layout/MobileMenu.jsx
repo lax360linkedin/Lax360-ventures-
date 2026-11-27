@@ -75,7 +75,7 @@ export default function MobileMenu({ open, onClose, returnFocusRef }) {
           animate={{ opacity: 1 }}
           exit={reduce ? undefined : { opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-night/90 backdrop-blur-2xl lg:hidden"
+          className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-night/90 backdrop-blur-2xl mm-panel"
         >
           <div className="wrap flex h-[72px] shrink-0 items-center justify-between pt-2">
             <Logo />

@@ -707,3 +707,25 @@ html:lang(ta) :is(p, li, dd, span, label), html:lang(hi) :is(p, li, dd, span, la
 /* expandable lists (View All Courses / Our Products) */
 .pp section[aria-label="Education courses"], .pp section[aria-label="Our products"] { border-color: var(--color-edge-strong); box-shadow: 0 18px 40px -26px rgb(var(--glow) / 0.6); }
 @media (prefers-reduced-motion: reduce) { .pp .grid[class*="gap-px"] > *, .pp .grid[class*="gap-px"] > *::before { transition: none; } }
+
+/* ---- Header fit levels (set by Header.jsx; see the comment there) ---- */
+@media (min-width: 1024px) { html:not([data-hdr-menu]) .mm-panel { display: none; } }
+header.hdr[data-fit="1"] .hdr-link { padding-inline: 0.5rem; font-size: 0.8125rem; }
+header.hdr[data-fit="1"] .hdr-partner { padding-inline: 0.875rem; font-size: 0.8125rem; }
+header.hdr[data-fit="1"] .hdr-login { padding-inline: 1rem; font-size: 0.8125rem; }
+header.hdr[data-fit="2"] .hdr-link { padding-inline: 0.375rem; font-size: 0.8125rem; }
+header.hdr[data-fit="2"] .hdr-partner { padding-inline: 0.75rem; font-size: 0.8125rem; }
+header.hdr[data-fit="2"] .hdr-partner .hdr-icon { display: none; }
+header.hdr[data-fit="2"] .hdr-login { width: 2.75rem; padding-inline: 0; }
+header.hdr[data-fit="2"] .hdr-login .hdr-label { display: none; }
+header.hdr[data-fit="3"] .hdr-desk { display: none !important; }
+header.hdr[data-fit="3"] .hdr-menu { display: inline-flex !important; }
+
+/* Floating buttons never sit under the cookie banner: where the banner is wide enough to reach them (below ~1100px), they are lifted by its height. */
+@media (max-width: 1100px) {
+  [data-chat-launcher], [data-whatsapp-float] { margin-bottom: var(--cookie-lift, 0px); transition: margin-bottom 0.2s ease; }
+}
+/* Very large screens: the page content may grow a little instead of leaving wide empty margins. */
+@media (min-width: 1920px) { .wrap { max-width: 1440px; } }
+@media (min-width: 2560px) { .wrap { max-width: 1680px; } }
+
