@@ -3,6 +3,7 @@ import { Clock, MapPin } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import BotCall from '../components/contact/BotCall.jsx'
 import EnquiryForm from '../components/sections/EnquiryForm.jsx'
+import { builtinIndex } from '../data/solutions.js'
 import LeadForm from '../components/contact/LeadForm.jsx'
 import ChannelIcon, { opensNewTab } from '../components/layout/ChannelIcon.jsx'
 import Button from '../components/ui/Button.jsx'
@@ -34,6 +35,8 @@ export default function Contact() {
   const page = useContactPageText()
   const [params] = useSearchParams()
   const type = params.get('type') || 'quote'
+  const solution = builtinIndex.solutions.find((s) => s.slug === params.get('solution'))
+  const solutionExtra = type === 'product' ? { source_page: solution ? `/solutions/${solution.slug}` : '/contact', ...(solution ? { service: solution.name, service_category: builtinIndex.categories.find((c) => c.slug === solution.category)?.name || '', product_slug: solution.slug } : {}), ...(params.get('intent') ? { intent: params.get('intent') } : {}) } : {}
   const course = courses.find((c) => c.slug === params.get('course'))
   const lead = type in LEAD_TYPES && !course
 
@@ -84,7 +87,7 @@ export default function Contact() {
             <div className="ct-form glass p-5 md:p-8">
               {lead
                 ? <LeadForm key={type} defaultType={type === 'quote' ? 'quote' : 'project'} initialMains={LEAD_TYPES[type]} />
-                : <EnquiryForm key={`${type}-${course?.slug}`} defaultType={type} presets={course ? { course: course.title } : {}} idPrefix="contact" source="contact" />}
+                : <EnquiryForm key={`${type}-${course?.slug}-${solution?.slug}`} defaultType={type} presets={course ? { course: course.title } : solution ? { message: `I would like to discuss ${solution.name} for my business.` } : {}} extra={solutionExtra} idPrefix="contact" source={type === 'product' ? 'solutions' : 'contact'} />}
             </div>
           </div>
         </div>

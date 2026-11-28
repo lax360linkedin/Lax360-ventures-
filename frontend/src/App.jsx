@@ -16,6 +16,8 @@ const IndustryDetail = lazy(() => import('./pages/IndustryDetail.jsx'))
 const Insights = lazy(() => import('./pages/Insights.jsx'))
 const ArticleDetail = lazy(() => import('./pages/ArticleDetail.jsx'))
 const Network = lazy(() => import('./pages/Network.jsx'))
+const Solutions = lazy(() => import('./pages/Solutions.jsx')) // the Software & IT solutions portfolio
+const SolutionDetail = lazy(() => import('./pages/SolutionDetail.jsx'))
 const Websites = lazy(() => import('./pages/Websites.jsx'))
 const UpcomingService = lazy(() => import('./pages/UpcomingService.jsx')) // CAD & Engineering, Robotics, Blockchain & Web 3.0: upcoming service categories (admin-managed)
 const WebsiteDetail = lazy(() => import('./pages/WebsiteDetail.jsx'))
@@ -73,8 +75,11 @@ export default function App() {
         <Route path="industries/:slug" element={<IndustryDetail />} />
         <Route path="insights" element={<Insights />} />
         <Route path="insights/:slug" element={<ArticleDetail />} />
+        <Route path="solutions" element={<Solutions />} />
+        <Route path="solutions/:slug" element={<SolutionDetail />} />
         <Route path="our-network" element={<Network />} />
         <Route path="our-network/:slug" element={<NetworkPartner />} />
+        <Route path="artificial-intelligence" element={<UpcomingService slug="ai" />} />
         <Route path="cad-engineering" element={<UpcomingService slug="cad-engineering" />} />
         <Route path="robotics" element={<UpcomingService slug="robotics" />} />
         <Route path="blockchain" element={<UpcomingService slug="blockchain" />} />

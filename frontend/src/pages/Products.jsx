@@ -1,18 +1,19 @@
-import { useMemo, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { AnimatePresence, m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { ArrowUpRight, BadgeCheck, ChevronRight, Search, X } from 'lucide-react'
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { ArrowUpRight, BadgeCheck, ChevronRight } from 'lucide-react'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import BotHighlight from '../components/ui/BotHighlight.jsx'
 import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
-import { ProductCard, ProductMark, ProductVisual } from '../components/products/ProductBits.jsx'
-import { productCategories } from '../data/products.js'
+import { ProductMark, ProductVisual } from '../components/products/ProductBits.jsx'
+import { usePortfolio } from '../hooks/usePortfolio.js'
+import { useSolutionIndex } from '../hooks/useSolutions.js'
 import { useProducts } from '../hooks/useProducts.js'
 import { useH1Override } from '../hooks/useSite.js'
-import { useWebsites } from '../hooks/useWebsites.js'
-import { WebsiteCard } from '../components/websites/WebsiteBits.jsx'
+import PortfolioCatalogue from '../components/products/PortfolioCatalogue.jsx'
+import { CustomStatement } from '../components/solutions/SolutionBits.jsx'
 
 const EASE = [0.2, 0.8, 0.2, 1]
 const scrollToList = (e) => { e.preventDefault(); document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }) }
@@ -25,17 +26,13 @@ const scrollToList = (e) => { e.preventDefault(); document.getElementById('produ
 export default function Products() {
   const h1 = useH1Override()
   const products = useProducts()
-  const websites = useWebsites()
-  const [cat, setCat] = useState('all')
-  const [query, setQuery] = useState('')
+  const portfolio = usePortfolio()
+  const { categories } = useSolutionIndex()
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const up = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -40])
   const down = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 30])
-  const cats = useMemo(() => Object.keys(productCategories).filter((c) => products.some((p) => p.category === c)), [products])
-  const q = query.trim().toLowerCase()
-  const shown = products.filter((p) => (cat === 'all' || p.category === cat) && (!q || `${p.name} ${productCategories[p.category] || ''} ${p.summary}`.toLowerCase().includes(q)))
   const rise = (delay) => (reduce ? {} : { initial: { opacity: 0, y: 22 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay, ease: EASE } })
   const mosaic = products.slice(0, 4)
   return (
@@ -72,53 +69,17 @@ export default function Products() {
                   <span className="absolute inset-x-3 bottom-3 flex items-center gap-2 text-white"><ProductMark product={p} className="size-8 !rounded-xl" /><span className="font-display text-sm font-semibold leading-tight">{p.name.replace('LAX360 ', '')}</span></span>
                 </m.div>
               ))}
-              <span className="glass absolute -bottom-4 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap px-4 py-2 text-sm font-semibold">{products.length} products · {cats.length} categories</span>
+              <span className="glass absolute -bottom-4 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap px-4 py-2 text-sm font-semibold">{portfolio.length} products and websites · {categories.length} categories</span>
             </div>
           </m.div>
         </div>
       </section>
 
       <section id="products" aria-labelledby="list-title" className="wrap section scroll-mt-[calc(var(--header-bottom,92px)+1rem)]">
-        <SectionHeading id="list-title" eyebrow="Our products" title="The LAX360" gradient="product portfolio." lead="Software and SaaS platforms developed and owned by LAX360 Pvt Ltd. Each product shows its current development status." />
-        <div className="mt-10 flex flex-col gap-4">
-          <div className="relative max-w-xl">
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-soft" aria-hidden="true" />
-            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products by name or category" aria-label="Search products by name or category"
-              className="h-12 w-full rounded-full border border-edge-strong bg-glass pl-12 pr-12 text-base text-fg outline-none transition-colors placeholder:text-soft focus:border-lav" />
-            {query && <button type="button" onClick={() => setQuery('')} aria-label="Clear search" className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-soft hover:text-lav"><X className="size-4" aria-hidden="true" /></button>}
-          </div>
-          <div role="group" aria-label="Filter by category" className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
-            {['all', ...cats].map((c) => (
-              <button key={c} type="button" onClick={() => setCat(c)} aria-pressed={cat === c}
-                className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${cat === c ? 'border-transparent bg-primary text-white shadow-lg' : 'border-edge-strong bg-glass hover:border-lav'}`}>
-                {c === 'all' ? `All (${products.length})` : productCategories[c]}
-              </button>
-            ))}
-          </div>
-        </div>
-        <p className="mt-6 text-sm text-soft" role="status" aria-live="polite">{shown.length} {shown.length === 1 ? 'product' : 'products'}{cat !== 'all' ? ` in ${productCategories[cat]}` : ''}{q ? ` matching “${query.trim()}”` : ''}</p>
-        <AnimatePresence mode="wait">
-          <m.ul key={`${cat}|${q}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {shown.map((p, i) => <ProductCard key={p.slug} product={p} delay={(i % 3) * 0.07} />)}
-          </m.ul>
-        </AnimatePresence>
-        {shown.length === 0 && (
-          <div className="glass mt-6 p-8 text-center">
-            <p className="font-display text-xl font-semibold">No products match your search.</p>
-            <button type="button" onClick={() => { setCat('all'); setQuery('') }} className="link-underline mt-3 inline-flex min-h-11 items-center font-semibold text-lav">Show all products</button>
-          </div>
-        )}
-      </section>
-
-      {/* Explore Our Websites: the portfolio teaser (managed in the admin panel under Website portfolio) */}
-      <section id="websites" className="wrap section scroll-mt-[calc(var(--header-bottom,92px)+1rem)]" aria-labelledby="websites-teaser-title">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <SectionHeading id="websites-teaser-title" eyebrow="Explore our websites" title="Our Websites" gradient="& Live Demos." lead="Company websites, client websites and industry demos built by LAX360. Open the live website, or view its features and modules." />
-          <Button to="/websites" variant="secondary" arrow className="shrink-0">View all {websites.length > 0 ? websites.length : ''} websites</Button>
-        </div>
-        {websites.length > 0
-          ? <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{websites.slice(0, 6).map((w, i) => <WebsiteCard key={w.slug} site={w} delay={(i % 3) * 0.06} />)}</ul>
-          : <div className="glass mt-10 p-8 text-center"><p className="font-display text-xl font-semibold">Websites will appear here soon.</p></div>}
+        <SectionHeading id="list-title" eyebrow="Our products" title="The LAX360" gradient="product portfolio." lead="Software, web applications, mobile apps, live websites, APIs and AI agents in one place. Each card says plainly whether it is available, built to order or still under development." />
+        <div className="mt-8"><PortfolioCatalogue /></div>
+        <div className="mt-10"><CustomStatement /></div>
+        <p className="mt-8 text-center"><Link to="/websites" className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Browse every live website and demo <ArrowUpRight className="size-4" aria-hidden="true" /></Link></p>
       </section>
 
       <section className="border-y border-edge bg-glass" aria-labelledby="diff-title">

@@ -10,7 +10,7 @@ import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { IndustryCard, IndustryIcon, PairCard } from '../components/industries/IndustryBits.jsx'
 import { StatusBadge } from '../components/products/ProductBits.jsx'
 import { industryGroups } from '../data/industries.js'
-import { getDivision } from '../data/services.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 import { categoryLabel, formatDate, useArticles, useIndustries } from '../hooks/useCmsPages.js'
 import { useProducts } from '../hooks/useProducts.js'
@@ -123,6 +123,7 @@ function Hero({ ind }) {
  * Everything loads from the admin-panel Industries (or the built-in set). No delivered projects, clients or results are claimed.
  */
 export default function IndustryDetail() {
+  const { getDivision } = useDivisionTools()
   const { slug } = useParams()
   const industries = useIndustries()
   const articles = useArticles()

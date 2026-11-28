@@ -16,7 +16,7 @@ import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { branches } from '../data/branches.js'
 import { networkCta, networkIntro, partnershipCategories, partnershipProcess, whyPartner } from '../data/partnerships.js'
 import { networkCategories, ownershipLabels, partnerTypes, relationshipLabels, softwareCategories } from '../data/network.js'
-import { allDivisions, getDivision } from '../data/services.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 import PartnerEcosystem, { ECOSYSTEM_SECTIONS } from '../components/network/PartnerEcosystem.jsx'
 import NetworkHubArt from '../components/sections/NetworkHubArt.jsx'
@@ -57,7 +57,7 @@ const PURCHASE = [['Enquire', 'Tell us what the business needs.'], ['Review', 'W
 const CAPABILITIES = [
   [Plug, 'Technology integration', 'Connecting business systems so data moves between them.', 'automation'], [PackageCheck, 'Software deployment', 'Installing and configuring software for a customer’s environment.', 'software'],
   [Code2, 'API integration', 'Linking applications and services through their APIs.', 'headless'], [BriefcaseBusiness, 'Business application implementation', 'Setting up CRM, ERP and business tools around real processes.', 'software'],
-  [Cloud, 'Cloud solutions', 'Hosted business applications and cloud-based services.', 'software'], [Sparkles, 'AI and automation integration', 'Adding assistants and automated workflows to existing tools.', 'ai'],
+  [Cloud, 'Cloud solutions', 'Hosted business applications and cloud-based services.', 'software'], [Sparkles, 'AI and automation integration', 'Adding assistants and automated workflows to existing tools.', 'automation'],
   [LifeBuoy, 'Technical support', 'Help with questions, fixes and improvements after go-live.', 'software'], [GraduationCap, 'Training and onboarding', 'Getting teams confident with new software.', 'software'],
 ]
 const JOURNEY = [
@@ -141,6 +141,7 @@ function Section({ s, children, tone = '', eyebrow, title, gradient, lead }) {
  * (Website content > Network); the built-in starter entries show until entries are published there. A partnership designation is shown only when verified.
  */
 export default function Network() {
+  const { allDivisions, getDivision } = useDivisionTools()
   const companies = useNetwork()
   const np = useNetworkPageText()
   const h1 = useH1Override()
@@ -312,7 +313,7 @@ export default function Network() {
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CAPABILITIES.map(([Icon, t, d, svc], i) => { const sv = getDivision(svc); return (
             <Reveal as="li" key={t} delay={(i % 4) * 0.05}>
-              <Link to={`/services/${divisionUrl(svc)}`} className="glass-flat lift group flex h-full flex-col gap-2 p-5"><span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white"><Icon className="size-5" aria-hidden="true" /></span><span className="font-display text-lg font-semibold leading-tight">{t}</span><span className="flex-1 text-sm text-soft">{d}</span><span className="inline-flex items-center gap-1 text-sm font-semibold text-lav">{sv?.name} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span></Link>
+              <Link to={`/services/${divisionUrl(sv?.slug || svc)}`} className="glass-flat lift group flex h-full flex-col gap-2 p-5"><span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white"><Icon className="size-5" aria-hidden="true" /></span><span className="font-display text-lg font-semibold leading-tight">{t}</span><span className="flex-1 text-sm text-soft">{d}</span><span className="inline-flex items-center gap-1 text-sm font-semibold text-lav">{sv?.name} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span></Link>
             </Reveal>
           ) })}
         </ul>

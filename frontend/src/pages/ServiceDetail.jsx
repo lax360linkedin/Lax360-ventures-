@@ -6,11 +6,13 @@ import Accordion from '../components/ui/Accordion.jsx'
 import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
-import { heroes, serviceSections } from '../components/sections/services/CategoryLayouts.jsx'
+import { Crumb, heroes, serviceSections } from '../components/sections/services/CategoryLayouts.jsx'
 import ServiceTestimonials from '../components/sections/ServiceTestimonials.jsx'
 import ServiceClients from '../components/sections/ServiceClients.jsx'
 import CmsServiceDetail from '../components/cms/CmsServiceDetail.jsx'
-import { getDivision, divisions } from '../data/services.js'
+import { REMOVED_CATEGORIES } from '../data/services.js'
+import SolutionsExplorer from '../components/solutions/SolutionsExplorer.jsx'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 import { divisionUrl } from '../utils/slugify.js'
 import { CourseGroupsList } from '../components/partner/CourseCatalogue.jsx'
@@ -23,14 +25,32 @@ import NotFound from './NotFound.jsx'
  * (see components/sections/services/CategoryLayouts.jsx); the shared parts below are the overview, category extras, use cases, process, FAQ,
  * related categories and the closing call to action.
  */
+/** The hero of a division an administrator added: its own heading and short description, in the site's theme. */
+function GenericHero({ d }) {
+  return (
+    <section className="relative isolate overflow-hidden border-b border-edge bg-gradient-to-b from-night via-base2 to-night" aria-labelledby="cat-title">
+      <div className="wrap pb-14 pt-10 md:pb-20 md:pt-16">
+        <Crumb d={d} />
+        <h1 id="cat-title" className="h1 mt-5 !text-[clamp(2.2rem,4.6vw,4rem)]">{d.heroLine || d.name}</h1>
+        <p className="lead mt-5 max-w-2xl text-soft">{d.short}</p>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Button to={`/contact?type=${d.enquiryType}`} arrow>Enquire about {d.name}</Button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function ServiceDetail() {
   const { slug } = useParams()
+  const { getDivision, divisions } = useDivisionTools()
   const d = getDivision(slug)
   const { pathname } = useLocation()
   const edu = useEducationPage() // Education & Training: text set in the admin panel (empty = built-in)
   const cmsServices = useContent('service')
   const cmsCategories = useContent('service_category')
   const ready = useContentReady()
+  if (REMOVED_CATEGORIES[slug]) return <Navigate to={REMOVED_CATEGORIES[slug]} replace /> // the former AI category is now the upcoming AI division
   if (!d) { // not one of the built-in categories: maybe a service created in the admin panel
     const svc = cmsServices?.find((s) => s.slug === slug)
     if (svc) return <CmsServiceDetail service={svc} categoryTitle={cmsCategories?.find((c) => c.slug === svc.data.category)?.title} />
@@ -39,8 +59,8 @@ export default function ServiceDetail() {
   }
   if (slug !== divisionUrl(d.slug)) return <Navigate to={pathname.replace(`/services/${slug}`, `/services/${divisionUrl(d.slug)}`)} replace /> // an old address (/services/growth): go to the current one
   const isAi = d.slug === 'ai'
-  const Hero = heroes[d.slug]
-  const Services = serviceSections[d.slug]
+  const Hero = heroes[d.slug] || GenericHero // a division added in the admin panel gets a standard hero built from its own text
+  const Services = serviceSections[d.slug] || serviceSections.software
   const related = d.related.map(getDivision).filter(Boolean)
   const Icon = divisionIcons[d.slug]
 
@@ -59,6 +79,7 @@ export default function ServiceDetail() {
       }}
     >
       <Hero d={d} />
+
 
       {/* overview + problems */}
       <section className="wrap section grid gap-10 lg:grid-cols-12 lg:gap-16" aria-labelledby="overview-title">
@@ -84,6 +105,15 @@ export default function ServiceDetail() {
           <div className="mt-10"><Services d={d} /></div>
         </div>
       </section>
+
+      {d.slug === 'software' && (
+        <section id="solutions" className="scroll-mt-[calc(var(--header-bottom,92px)+1rem)]" aria-labelledby="sw-solutions-title">
+          <div className="wrap section">
+            <SectionHeading id="sw-solutions-title" eyebrow="Solutions portfolio" title="Our Software & IT" gradient="Solutions." lead="Six categories of solutions across software, web applications, mobile apps, websites, APIs and AI agents. Each links to its own page, and every one can be adapted to your requirements." />
+            <div className="mt-8"><SolutionsExplorer idPrefix="sw-sol" /></div>
+          </div>
+        </section>
+      )}
 
       {d.slug === 'education' && (
         <>

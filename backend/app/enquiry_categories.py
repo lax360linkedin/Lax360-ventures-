@@ -19,6 +19,7 @@ CATEGORIES: list[tuple[str, str, str, str]] = [
     ("authorized", "Authorized Partner Enquiries", "Authorized Partner Enquiries", "Authorized Partner applications and enquiries"),
     ("referral", "Referral Partner Enquiries", "Referral Partner Enquiries", "Referral Partner applications and enquiries"),
     ("upcoming", "Upcoming Service Enquiries", "Upcoming Services", "Interest registered in services that are not launched yet"),
+    ("product", "Product & Solution Enquiries", "Product & Solution Enquiries", "Enquiries from the product and solution pages (Software & IT portfolio)"),
     ("consultation", "Consultation Requests", "Consultation Requests", "Meeting, demo and consultation requests"),
     ("other", "Other Enquiries", "Other Enquiries", "Every other website form"),
 ]
@@ -34,7 +35,7 @@ TYPE_CATEGORY = {
     "marketing": "digital_marketing",
     "course": "course", "workshop": "education",
     "career": "other",  # a career enquiry is an internship enquiry only when it says so (see contact_category)
-    "upcoming-interest": "upcoming",
+    "upcoming-interest": "upcoming", "product": "product",
     "partner-franchise": "franchise",
     "partner-authorised": "authorized", "partner-business": "authorized", "partner-technology": "authorized", "partner-reseller": "authorized", "partner-implementation": "authorized",
     "partnership": "other", "partner-education": "other", "partner-associate": "other", "partner-other": "other",

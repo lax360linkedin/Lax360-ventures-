@@ -86,11 +86,32 @@ export const EDUA = {
     ['Training & orientation', 'Conduct the required faculty, staff and operational orientation.'], ['Programme implementation', 'Launch approved courses, seminars, workshops, internships, add-on value courses or institutional activities.'],
     ['Monitoring & review', 'Review performance, student feedback and partnership activities periodically.'],
   ],
+  // Commercial terms: no figures, tables or percentages are published; they are agreed with each partner and put in a written agreement.
   commercial: {
-    lead: 'Partnership commercial terms depend on the selected model and scope of services. Applicable charges are confirmed in writing in your proposal and agreement.',
-    rows: [['Partnership Registration', 'As per approved model'], ['Authorization Charges', 'If applicable'], ['Annual Renewal', 'As per agreement'], ['Course Training Charges', 'As per selected programme'], ['Certification Charges', 'As per approved certification policy'], ['Branding Kit', 'Included or separately charged'], ['CRM Access', 'As per selected package'], ['Faculty Training', 'As per agreed scope'], ['Marketing Support', 'As per approved package'], ['Revenue Sharing', 'As per written commercial agreement'], ['Institutional Workshops', 'Customized quotation'], ['Corporate Training', 'Customized quotation']],
-    policies: ['All fees and charges must be communicated in writing.', 'Applicable GST and statutory taxes will be handled as required.', 'Payment terms must be included in the agreement.', 'Revenue sharing must be agreed upon before programme implementation.', 'Refund and cancellation conditions must be documented.', 'No partner should collect money on behalf of LAX360 without written authorization.'],
+    lead: 'All commercial arrangements, including revenue-sharing percentages, referral commissions, incentives, payment structures and other financial terms, will be discussed individually with the respective Authorized Business Partner or Referral Partner.',
+    paragraphs: [
+      'These commercial terms will be mutually agreed upon through direct discussions and documented separately in a written agreement, wherever applicable.',
+      'Commercial terms and revenue-sharing details are not published on the LAX360 website and will be communicated directly to the concerned partner.',
+    ],
   },
+  ip: [
+    'All company-owned logos, trademarks, software, designs, course materials, documents and other intellectual property remain the property of LAX360 or their respective owners.',
+    'Partners must not copy, distribute, modify, sell or commercially use company materials beyond the permitted authorization.',
+    'Upon termination, partners must stop using company branding and return or delete confidential materials as instructed.',
+  ],
+  legal: [
+    'All partners must comply with applicable laws, regulations and company policies.',
+    'LAX360 reserves the right to update or modify these Terms & Conditions when necessary.',
+    'Any disputes will initially be addressed through mutual discussion.',
+    'If a dispute cannot be resolved mutually, it will be subject to the jurisdiction of the competent courts in Chennai, Tamil Nadu, subject to applicable law.',
+  ],
+  termination: [
+    "Either party may terminate the partnership by providing 15 days' prior written notice.",
+    'LAX360 reserves the right to terminate the partnership immediately in cases of fraud, financial misconduct, unauthorized fee collection, false representations, misuse of company branding, disclosure of confidential information or serious violations of these Terms & Conditions.',
+    'Upon termination, the partner must immediately stop representing themselves as an active partner of LAX360.',
+    'The partner must discontinue the use of company branding and return or delete confidential company materials as instructed.',
+    'Any outstanding obligations will be handled according to the applicable written agreement.',
+  ],
   documents: {
     lead: 'The following documents may be requested depending on the partner category.',
     colleges: ['Institution profile.', 'Registration or recognition details, as applicable.', 'Institution address proof.', 'Authorized signatory details.', 'Principal / Director / Management details.', 'Institutional contact information.', 'Proposed collaboration details.', 'Relevant authorization or approval documents.'],

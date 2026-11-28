@@ -5,14 +5,15 @@ import SectionHeading from '../ui/SectionHeading.jsx'
 import ServiceSlider from './ServiceSlider.jsx'
 import { branchCities, branchSentence } from '../../data/branches.js'
 import { site } from '../../data/site.js'
-import { allDivisions } from '../../data/services.js'
+import { useDivisionTools } from '../../hooks/useDivisions.js'
 import { divisionIcons } from '../../utils/divisionIcons.js'
 
-const divisions = allDivisions.map((d) => ({ icon: divisionIcons[d.slug], label: d.name }))
 
 /** "Who We Are": introduction to LAX360 Pvt Ltd. Text and the division list on the left, a service photo slider on the right
  *  (an auto-advancing slider of the services). Stacks on small screens with the panel after the text. */
 export default function WhoWeAre() {
+  const { allDivisions } = useDivisionTools()
+  const divisions = allDivisions.map((d) => ({ icon: divisionIcons[d.slug], label: d.name }))
   return (
     <section aria-labelledby="who-title" className="relative overflow-hidden border-b border-edge">
       <div aria-hidden="true" className="pointer-events-none absolute -right-24 top-10 size-96 rounded-full bg-primary/15 blur-3xl" />

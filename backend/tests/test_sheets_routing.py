@@ -92,7 +92,7 @@ def application(db, **kw):
 
 
 def test_there_is_a_worksheet_with_its_own_headers_for_every_category():
-    assert set(DEFAULT_TABS) == set(KEYS) and len(KEYS) == 13 and len(set(DEFAULT_TABS.values())) == 13
+    assert set(DEFAULT_TABS) == set(KEYS) and len(KEYS) == 14 and len(set(DEFAULT_TABS.values())) == 14
     assert ss.headers_of("course")[:6] == ["Enquiry ID", "Submission Date", "Submission Time", "Full Name", "Email Address", "Mobile Number"]
     assert "Selected Business Divisions" in ss.headers_of("franchise") and "Investment Budget" in ss.headers_of("franchise") and "Investment Budget" not in ss.headers_of("referral")
     assert "Selected Course" in ss.headers_of("course") and "Selected Course" not in ss.headers_of("franchise")
@@ -194,7 +194,7 @@ def test_worksheet_names_and_switches_are_managed_in_the_admin_and_validated(env
     with pytest.raises(ValueError):
         ss.save_tab_config(db, {"course": {"name": "Bad/Name", "enabled": True}}, None)
     status = ss.admin_status(db, get_settings())
-    assert status["configured"] and len(status["tabs"]) == 13 and "…" in status["spreadsheet"] and "service_account" in status and all("private_key" not in json.dumps(t) for t in status["tabs"])
+    assert status["configured"] and len(status["tabs"]) == 14 and "…" in status["spreadsheet"] and "service_account" in status and all("private_key" not in json.dumps(t) for t in status["tabs"])
 
 
 def test_a_demo_request_goes_to_consultation_requests(env):
@@ -217,7 +217,7 @@ def test_enquiry_center_counts_every_form_by_category_and_the_admin_list_filters
     application(db, category="franchise", divisions=["it", "robotics"], consultation={"date": date.today().isoformat()})
     out = center.overview(None, db)
     by = {c["key"]: c for c in out["categories"]}
-    assert len(out["categories"]) == 13 and by["course"]["total"] == 1 and by["intro"]["total"] == 1 and by["upcoming"]["total"] == 2  # the interest form and the application naming Robotics
+    assert len(out["categories"]) == 14 and by["course"]["total"] == 1 and by["intro"]["total"] == 1 and by["upcoming"]["total"] == 2  # the interest form and the application naming Robotics
     assert by["franchise"]["total"] == 1 and by["consultation"]["total"] == 1 and out["totals"]["submissions"] == 4 and by["course"]["new"] == 1
     assert [c["key"] for c in center.categories(None)] == KEYS
     kw = dict(q=None, status=None, date_from=None, date_to=None, archived="no", assigned_to=None)

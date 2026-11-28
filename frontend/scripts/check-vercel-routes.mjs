@@ -22,7 +22,7 @@ for (const r of literal) {
 for (const r of literal) if (known.has(r.source)) problems.push(`redirect source ${r.source} is a live page`)
 const rewrites = new Set(v.rewrites.map((r) => r.source.replace(/\(\[a-z0-9-\]\{1,80\}\)/g, '')))
 for (const r of v.rewrites) if (/:(slug|dept|service)(\/|$)/.test(r.source) && !/:(slug|dept|service)\(\[a-z0-9-\]\{1,80\}\)/.test(r.source)) problems.push(`rewrite ${r.source} must restrict the slug to [a-z0-9-] (up to 80 characters) so junk URLs get a real 404`)
-for (const s of ['/products/:slug', '/industries/:slug', '/insights/:slug', '/our-network/:slug', '/websites/:slug', '/services/:slug', '/services/:slug/:service', '/locations/:slug', '/our-team/:dept', '/api/:path*']) if (!rewrites.has(s)) problems.push(`missing rewrite ${s}`)
+for (const s of ['/products/:slug', '/solutions/:slug', '/industries/:slug', '/insights/:slug', '/our-network/:slug', '/websites/:slug', '/services/:slug', '/services/:slug/:service', '/locations/:slug', '/our-team/:dept', '/api/:path*']) if (!rewrites.has(s)) problems.push(`missing rewrite ${s}`)
 // 5) response headers: both sitemaps carry "X-Robots-Tag: noindex" (the sitemap file itself must not be indexed; it stays a public 200 and is NOT blocked in robots.txt), and no public page does
 const noindexRules = (v.headers || []).filter((h) => h.headers.some((x) => x.key.toLowerCase() === 'x-robots-tag' && /noindex/i.test(x.value)))
 const noindexSources = new Set(noindexRules.map((h) => h.source))

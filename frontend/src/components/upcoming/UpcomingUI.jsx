@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowUpRight, Blocks, Bot, Cog, DraftingCompass, Sparkles } from 'lucide-react'
+import { ArrowUpRight, Blocks, Bot, BrainCircuit, Cog, DraftingCompass, Sparkles } from 'lucide-react'
 import Reveal from '../ui/Reveal.jsx'
 import SectionHeading from '../ui/SectionHeading.jsx'
 import { STATUSES, isLive } from '../../data/upcomingServices.js'
@@ -11,7 +11,7 @@ const TONES = {
   green: 'border-emerald-500/50 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
   rose: 'border-rose-400/60 bg-rose-400/15 text-rose-700 dark:text-rose-300',
 }
-const ICONS = { cad: DraftingCompass, robot: Bot, chain: Blocks }
+const ICONS = { cad: DraftingCompass, robot: Bot, chain: Blocks, ai: BrainCircuit }
 export const upcomingIcon = (c) => ICONS[c?.icon] || (c?.services ? Cog : Sparkles)
 
 /** "Coming Soon" / "Under Development" / "Available" / "Temporarily Unavailable": the status of an upcoming service, as a badge (the text is always there, never colour alone). */

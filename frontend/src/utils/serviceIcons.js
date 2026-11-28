@@ -19,5 +19,7 @@ export const serviceIcons = {
   'appointment-booking-applications': CalendarCheck, 'field-staff-and-task-tracking-applications': ClipboardList, 'employee-location-tracking-applications': MapPin,
   'technical-training': Laptop, 'professional-certification-courses': Award, 'internship-programs': Briefcase, 'ai-and-software-development-training': BrainCircuit,
   'workshops-and-seminars': Presentation, 'corporate-training': Building2, 'college-and-institutional-training': School, 'skill-development-programs': Rocket,
+  'enterprise-software-solutions': Building2, 'saas-product-development': Layers, 'headless-saas-and-api-solutions': Server, 'ai-workflow-automations-and-integrations': Workflow,
+  'third-party-software-integrations': Plug, 'it-consulting-and-technology-solutions': Briefcase, 'software-maintenance-and-support': Wrench,
   'business-billing-applications': Receipt, 'inventory-management-applications': Package, 'custom-business-mobile-applications': Wrench,
 }

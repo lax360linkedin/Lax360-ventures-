@@ -799,16 +799,108 @@ def migrate_content(args: argparse.Namespace) -> None:
             return
         print("Backup written to:", sc.backup(db))
         existing = {(i.kind, i.slug) for i in db.scalars(select(ContentItem))}
-        added = {"Our Network": sc.seed_network(db, existing), "Upcoming services": sc.seed_upcoming(db, existing), "Education courses": sc.seed_courses(db, existing), "Home page hero": sc.seed_hero(db, existing), "Partner product lists": sc.seed_partner_products(db, existing),
+        added = {"Our Network": sc.seed_network(db, existing), "Upcoming services": sc.seed_upcoming(db, existing), "Service divisions": sc.seed_divisions(db, existing), "Solutions portfolio": sc.seed_solutions(db, existing), "Education courses": sc.seed_courses(db, existing), "Home page hero": sc.seed_hero(db, existing), "Partner product lists": sc.seed_partner_products(db, existing),
                  "Partnership pages": sc.seed_partnership_pages(db)}
-        for domain in ("network", "upcoming", "courses", "partner-products"):
+        for domain in ("network", "upcoming", "divisions", "solutions", "courses", "partner-products"):
             sc.mark(db, existing, domain)
         db.commit()
     for name, n in added.items():
         print(f"{name}: {n} item(s) added")
     seed_industries(Namespace(remove=False))
     seed_products(Namespace(remove=False))
+    with _factory()() as _db:  # merge the solutions that are the same thing as an existing product into it (content only added, never replaced), and mark the product list as database-driven
+        _ex = {(i.kind, i.slug) for i in _db.scalars(select(ContentItem).where(ContentItem.kind.in_(("content_seed", "product_module"))))}
+        _rep = sc.seed_solution_merges(_db, _ex)
+        sc.mark(_db, _ex, "products")
+        _db.commit()
+    print(f"Solutions merged into existing products: {_rep['merged']} (fields updated {_rep['fields']}, modules added {_rep['modules']}); products not found: {_rep['missing_product'] or 'none'}")
+    with _factory()() as _db:  # the live website portfolio: loaded only when it is empty (an entry an administrator deleted is never brought back)
+        from app.models import ContentItem as _CI
+        _empty = _db.scalar(select(_CI.id).where(_CI.kind == "website").limit(1)) is None
+    if _empty:
+        seed_websites(Namespace(remove=False))
+    from pathlib import Path as _P
+    pics = _P(__file__).resolve().parents[2] / "frontend" / "public" / "assets" / "solutions"
+    if pics.is_dir():  # the solution previews go into the media library too, so every picture shows in (and can be replaced from) the admin panel
+        attach_solution_images(Namespace(dry_run=False, replace=False, dir=""))
+    else:
+        print("Solution preview pictures not found next to the backend: run `python -m app.cli attach-solution-images --dir <folder with the .webp files>` from a full checkout.")
     print("Done. Review the sections in the admin panel; run again at any time: nothing is added twice.")
+
+
+def refresh_upcoming(args: argparse.Namespace) -> None:
+    """Bring the four upcoming service divisions in the database in line with the revised service structure (Artificial Intelligence, IoT / Embedded Systems & Robotics, CAD Designing & Training,
+    Blockchain & Web 3.0, each with its sub-services, status "Under Development").
+
+    Administrator edits are PRESERVED: a field is replaced only when it is empty or still exactly what the website originally seeded (`seed_data/upcoming_previous.json`, the content the database was
+    filled with); a field an administrator changed is kept and reported. A sub-service that is no longer in the structure is saved as a draft only when it is untouched. A backup is written first.
+    Run it without --apply to see what it would do."""
+    from app import seed_content as sc
+    from app.models import ContentItem
+
+    class Collect:
+        def __init__(self) -> None:
+            self.items: list[ContentItem] = []
+
+        def add(self, item: ContentItem) -> None:
+            self.items.append(item)
+
+    get_settings()
+    with _factory()() as db:
+        new_box, old_box = Collect(), Collect()
+        sc.seed_upcoming(new_box, set())  # the new structure, built exactly as a first-time seed would build it
+        sc.seed_upcoming(old_box, set(), "upcoming_previous.json")  # what the database was originally filled with
+        old = {(i.kind, i.slug): i for i in old_box.items}
+        have = {(i.kind, i.slug): i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(("upcoming_category", "upcoming_service"))))}
+        wanted = {(i.kind, i.slug) for i in new_box.items}
+        cats = {i.slug for i in new_box.items if i.kind == "upcoming_category"}
+        new = [i for i in new_box.items if (i.kind, i.slug) not in have]
+        changes, kept = [], []  # (row, merged data, merged title)
+        for i in new_box.items:
+            row = have.get((i.kind, i.slug))
+            if row is None:
+                continue
+            was = old.get((i.kind, i.slug))
+            data = dict(row.data or {})
+            changed = False
+            for key, value in (i.data or {}).items():
+                cur = data.get(key)
+                if cur in (None, "", []) or (was is not None and cur == (was.data or {}).get(key)):
+                    if cur != value:
+                        data[key] = value
+                        changed = True
+                elif cur != value:
+                    kept.append((i.kind, i.slug, key))
+            title = i.title if (row.title == (was.title if was is not None else None) or not row.title) else row.title
+            if changed or title != row.title:
+                changes.append((row, data, title))
+        stale = []
+        for k, row in have.items():
+            if k not in wanted and row.kind == "upcoming_service" and (row.data or {}).get("category") in cats and row.status == "published":
+                was = old.get(k)
+                if was is not None and (row.data or {}) == (was.data or {}) and row.title == was.title:
+                    stale.append(row)
+        print(f"New: {len(new)} | updated (unedited fields only): {len(changes)} | administrator-edited fields kept: {len(kept)} | hidden as drafts (untouched, no longer in the structure): {len(stale)}")
+        for i in new:
+            print("  + ", i.kind, i.slug)
+        for row, _, _ in changes:
+            print("  ~ ", row.kind, row.slug)
+        for kind, slug, key in kept:
+            print("  = kept your edit:", kind, slug, key)
+        for row in stale:
+            print("  - ", row.kind, row.slug, "(saved as a draft)")
+        if not args.apply:
+            print("Dry run: nothing was written. Re-run with --apply to write it (a backup is written first).")
+            return
+        print("Backup written to:", sc.backup(db))
+        for i in new:
+            db.add(i)
+        for row, data, title in changes:
+            row.title, row.data = title, data
+        for row in stale:
+            row.status = "draft"
+        db.commit()
+    print("Done. Check Admin > Services > Upcoming service categories / Upcoming services.")
 
 
 def optimize_media(args: argparse.Namespace) -> None:
@@ -850,6 +942,57 @@ def optimize_media(args: argparse.Namespace) -> None:
                 media_service.replace(db, settings, SimpleNamespace(id=None), a, prep, delete_previous=False)
                 db.commit()
     print(f"{'Would convert' if args.dry_run else 'Converted'} {done} picture(s): {before / 1048576:.1f} MB -> {after / 1048576:.1f} MB. Originals are kept as private 'previous-' items in the media library.")
+
+
+def attach_solution_images(args: argparse.Namespace) -> None:
+    """Upload the solution preview pictures (frontend/public/assets/solutions/<slug>.webp) to the media library and set them as the main image of each solution and category in the CMS,
+    so they can be replaced, removed or re-ordered in the admin panel (Website content > Solutions). An image an administrator already set is kept unless --replace is given.
+    Old "Illustrative mockup" captions are updated to the new preview labels; edited captions are kept. --dry-run only reports."""
+    import shutil
+    import tempfile
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    from sqlalchemy.orm.attributes import flag_modified
+
+    from app.models import ContentItem
+    from app.services import media_service
+
+    settings = get_settings()
+    folder = Path(args.dir) if args.dir else Path(__file__).resolve().parents[2] / "frontend" / "public" / "assets" / "solutions"
+    done = kept = missing = 0
+    with _factory()() as db:
+        items = list(db.scalars(select(ContentItem).where(ContentItem.kind.in_(("solution", "solution_category")))))
+        for it in items:
+            slug = (it.data or {}).get("url_slug") or it.slug
+            f = folder / (f"category-{slug}.webp" if it.kind == "solution_category" else f"{slug}.webp")
+            if not f.exists():
+                missing += 1
+                print(f"  no picture for {it.kind} {slug}")
+                continue
+            data = dict(it.data or {})
+            if data.get("image") and not args.replace:
+                kept += 1
+                continue
+            print(f"  {it.kind} {slug}: {f.name} ({f.stat().st_size // 1024} KB)")
+            done += 1
+            if args.dry_run:
+                continue
+            with tempfile.TemporaryDirectory() as tmpdir:  # the library takes (moves) the file it is given, so it gets a copy and the original stays in place
+                tmp = Path(tmpdir) / f.name
+                shutil.copyfile(f, tmp)
+                prep = media_service.Prepared(tmp, tmp.stat().st_size, "image/webp", ".webp", "image", f.name, media_service._hash(tmp))
+                asset, _dup = media_service.create(db, settings, SimpleNamespace(id=None), prep, alt=data.get("image_alt") or it.title, is_public=True)
+            data["image"] = str(asset.id)
+            if "llustrative" in (data.get("mockup_note") or ""):
+                from app.seed_content import _preview_note
+                data["mockup_note"] = _preview_note({"status": data.get("status", "custom"), "category": data.get("category", "")})
+            if "llustrative" in (data.get("image_alt") or ""):
+                data["image_alt"] = (data["image_alt"].replace("Illustrative mockup", "Solution Preview"))
+            it.data = data
+            flag_modified(it, "data")
+            db.commit()
+    print(f"{'Would attach' if args.dry_run else 'Attached'} {done} picture(s); kept {kept} existing; {missing} without a file.")
 
 
 def seed_service_demo(args: argparse.Namespace) -> None:
@@ -1079,10 +1222,18 @@ def main(argv: list[str] | None = None) -> None:
     smc = sub.add_parser("migrate-content", help="back up, then move the built-in Our Network, Upcoming services, Education courses, Industries and Products content into the database (idempotent)")
     smc.add_argument("--dry-run", action="store_true")
     smc.set_defaults(func=migrate_content)
+    sru = sub.add_parser("refresh-upcoming", help="update the four upcoming service divisions in the database to the revised structure (report only unless --apply; backup first)")
+    sru.add_argument("--apply", action="store_true", help="write the changes")
+    sru.set_defaults(func=refresh_upcoming)
     som = sub.add_parser("optimize-media", help="convert the big PNG / JPEG pictures in the media library to right-sized WebP (originals are kept); --dry-run only reports")
     som.add_argument("--dry-run", action="store_true")
     som.add_argument("--limit", type=int, default=0)
     som.set_defaults(func=optimize_media)
+    sai = sub.add_parser("attach-solution-images", help="upload the solution preview pictures to the media library and set them on the solutions in the CMS (--dry-run reports only)")
+    sai.add_argument("--dry-run", action="store_true")
+    sai.add_argument("--replace", action="store_true", help="also replace images that were already set")
+    sai.add_argument("--dir", default="", help="folder with the <slug>.webp files")
+    sai.set_defaults(func=attach_solution_images)
     ssd = sub.add_parser("seed-service-demo", help="load FICTIONAL demonstration clients and testimonials for every individual service page (labelled 'Sample'), or --remove them")
     ssd.add_argument("--remove", action="store_true")
     ssd.set_defaults(func=seed_service_demo)

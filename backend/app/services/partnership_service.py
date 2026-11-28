@@ -35,7 +35,7 @@ STATUS_LABELS = {s: s.replace("_", " ").capitalize() for s in STATUSES}
 COMMERCIAL_FIELDS = ("registration_fee", "initial_investment", "infrastructure_investment", "working_capital", "security_deposit", "royalty", "revenue_sharing", "agreement_duration", "renewal_fee",
                      "territory", "exclusivity", "refund_conditions", "exit_conditions", "commission_model")
 ALL_KEY, OTHER_KEY = "all", "other"  # "All Business Divisions" and "Others" in a selection
-UPCOMING_BUILTIN = ("cad-engineering", "robotics", "blockchain")  # the upcoming service categories that ship with the website (more can be added in the admin panel)
+UPCOMING_BUILTIN = ("ai", "robotics", "cad-engineering", "blockchain")  # the upcoming service categories that ship with the website (more can be added in the admin panel)
 COMMON_ANSWERS = {"industry": 120, "years_experience": 20, "office_available": 10, "relevant_experience": 600}
 ANSWER_KEYS: dict[str, dict[str, int]] = {
     "franchise": {"proposed_location": 160, "investment_budget": 80, "business_experience": 600, "start_date": 60, "existing_infrastructure": 400, "participation": 20, "additional_info": 800, "franchise_interest": 40},

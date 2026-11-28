@@ -27,7 +27,14 @@ _LINK_FIELDS = ("link", "cta_link", "apply_link", "cta_primary_link", "cta_secon
 
 
 UPCOMING_STATUSES = [{"value": v, "label": l} for v, l in (("coming_soon", "Coming Soon"), ("under_development", "Under Development"), ("available", "Available"), ("unavailable", "Temporarily Unavailable"))]
-UPCOMING_BUILTIN_CATEGORIES = [{"value": v, "label": l} for v, l in (("cad-engineering", "CAD & Engineering Design Services"), ("robotics", "Robotics Services"), ("blockchain", "Blockchain & Web 3.0 Services"))]
+UPCOMING_BUILTIN_CATEGORIES = [{"value": v, "label": l} for v, l in (("ai", "Artificial Intelligence (AI)"), ("robotics", "IoT, Embedded Systems & Robotics"), ("cad-engineering", "CAD Designing & Training"), ("blockchain", "Blockchain & Web 3.0"))]
+
+
+# external links of a product, website or application: (field, admin label, default button text). A button is shown only when a valid address is entered.
+LINK_FIELDS = [("live_website_url", "Live Website URL", "View Live Website"), ("live_app_url", "Live Application URL", "Launch Application"), ("landing_url", "Product Landing Page URL", "Explore Product"),
+               ("play_store_url", "Android Play Store URL", "Get it on Google Play"), ("app_store_url", "Apple App Store URL", "Download on the App Store"),
+               ("desktop_download_url", "Desktop Application Download URL", "Download Application"), ("docs_url", "Product Documentation URL", "View Documentation"),
+               ("custom_link_url", "Custom External Link URL", "Learn more")]
 
 
 def F(name, label, kind="text", required=False, max_len=300, options=None, help="", options_from=None, default=None, ui=None):
@@ -35,7 +42,7 @@ def F(name, label, kind="text", required=False, max_len=300, options=None, help=
 
 
 WELCOME_THEMES = [{"value": v, "label": l} for v, l in (("welcome", "Welcome (violet and electric blue)"), ("software", "Software (code and interface)"), ("marketing", "Marketing (growth and reach)"),
-                                                       ("education", "Education (learning paths)"), ("ai", "AI & Automation (neural network)"), ("robotics", "Robotics (circuits and motion)"),
+                                                       ("education", "Education (learning paths)"), ("ai", "Artificial Intelligence (neural network)"), ("robotics", "Robotics (circuits and motion)"),
                                                        ("blockchain", "Blockchain (linked blocks)"), ("celebration", "Celebration (festival, announcement or offer)"))]
 CAROUSEL_SHAPES = [{"value": "landscape", "label": "Landscape (wide)"}, {"value": "portrait", "label": "Portrait (narrow)"}]
 CAROUSEL_SPEEDS = [{"value": "slow", "label": "Slow"}, {"value": "normal", "label": "Normal"}, {"value": "fast", "label": "Fast"}]
@@ -43,7 +50,7 @@ WELCOME_CARD_TYPES = [{"value": v, "label": l} for v, l in (("regular", "Regular
 EDUCATION_PROGRAMS = [("technical-training", "Technical Training"), ("professional-certification-courses", "Professional Certification Courses"), ("internship-programs", "Internship Programs"),
                       ("ai-and-software-development-training", "AI & Software Development Training"), ("workshops-and-seminars", "Workshops and Seminars"), ("corporate-training", "Corporate Training"),
                       ("college-and-institutional-training", "College and Institutional Training"), ("skill-development-programs", "Skill Development Programs")]
-DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("ai", "AI & Business Automation"), ("growth", "Digital Marketing"), ("headless", "Headless SaaS & API Solutions"), ("automation", "Workflow Automation & Integration"), ("mobile", "Mobile & Business Applications"), ("education", "Education & Training"))]
+DIVISIONS = [{"value": v, "label": l} for v, l in (("software", "Software & IT Services"), ("growth", "Digital Marketing"), ("education", "Education & Training"), ("ai", "Software & IT Services (former AI category)"), ("headless", "Software & IT Services (former Headless SaaS & API category)"), ("automation", "Software & IT Services (former Workflow Automation category)"), ("mobile", "Software & IT Services (former Mobile & Business Apps category)"))]
 SECTION_KEYS = [{"value": v, "label": l} for v, l in (
     ("marquee", "Scrolling strip under the hero"), ("whoweare", "Who We Are"), ("purpose", "Our Vision & Our Mission"), ("services", "Services overview"), ("outcomes", "Why Choose Us"), ("clients", "Our Clients"), ("testimonials", "Client & student testimonials"),
     ("process", "How we work"), ("gallery", "Image carousel (between Testimonials and Our Clients)"),
@@ -136,7 +143,7 @@ KINDS: dict[str, dict] = {
     # ---- Services -------------------------------------------------------------------------------------------------------------------
     "service_category": {
         "label": "Service categories", "group": "Services", "module": "services", "single": False, "preview_path": "/services",
-        "help": "The groups your services are listed under (for example Software & IT Services, AI & Automation, Digital Marketing, Training). Add, rename or remove them freely.",
+        "help": "The groups your services are listed under (for example Software & IT Services, Digital Marketing, Education & Training). Add, rename or remove them freely.",
         "title_label": "Category name",
         "fields": [F("description", "Short description", "textarea", max_len=400), F("icon", "Icon / image", "image")],
     },
@@ -193,9 +200,109 @@ KINDS: dict[str, dict] = {
             F("hidden", "Hidden", "bool", default=False, help="Removes the course (the one named above, or this entry's own name) from every course list."),
         ],
     },
+    "division": {
+        "label": "Service divisions", "group": "Services", "module": "services", "single": False, "slug_field": "url_slug", "preview_path": "/services",
+        "help": "The ACTIVE service divisions (Software & IT Services, Digital Marketing, Education & Training). Add a division, rename it, change its text, reorder the list (the order here is the order on the website), "
+                "or save one as a draft to hide it. The built-in divisions have the page addresses software, growth (Digital Marketing, address /services/digitalmarketing) and education. "
+                "A division that is not launched yet belongs under Upcoming service categories; when it launches, create it here (or change its status there to Available). Describe only what LAX360 really offers.",
+        "title_label": "Division name",
+        "fields": [
+            F("url_slug", "Page URL", max_len=80, help="The address segment: /services/<this>. Keep the built-in ones unchanged (software, growth, education); a new division can use any lower-case text."),
+            F("short", "Short description (cards and menus)", "textarea", True, max_len=400),
+            F("outcome", "One-line outcome", max_len=200), F("tags", "Highlights", "textarea", max_len=400, help="One per line (short labels)."),
+            F("enquiry_type", "Enquiry form type", max_len=30, help="The enquiry type the Enquire buttons pre-select, for example project, marketing or course."),
+            F("hero_line", "Page heading (H1)", max_len=160, help="The big heading of the division page. Put the part that should be accented in [square brackets], for example: Software that [fits how you work.] Without brackets the last sentence (or last three words) is accented."), F("overview", "Overview", "textarea", max_len=2500),
+            F("challenges", "Helps when (problems it addresses)", "textarea", max_len=1500, help="One per line."),
+            F("use_cases", "Typical uses", "textarea", max_len=1500, help="One per line."),
+            F("stack", "Technology / tools", "textarea", max_len=600, help="One per line."), F("stack_note", "Technology note", "textarea", max_len=400),
+            F("engagement", "How we work together", "textarea", max_len=400),
+            F("faqs", "Questions and answers", "textarea", max_len=4000, help="One per line, written as: Question | Answer"),
+            F("meta_title", "Search title", max_len=120), F("meta_description", "Search description", "textarea", max_len=300),
+            F("image", "Main image", "image", help="Leave empty to keep the built-in image."), F("icon", "Icon", "image", help="Optional. A built-in icon is used when empty."),
+        ],
+    },
+    "division_service": {
+        "label": "Division sub-services", "group": "Services", "module": "services", "single": False, "slug_field": "url_slug", "preview_path": "/services",
+        "help": "The sub-services of the active divisions. Each published sub-service is listed under its division and has its own detail page (/services/<division>/<page URL>). "
+                "To move one to another division, change its Division. The order here is the order on the website. Save as a draft to hide it.",
+        "title_label": "Sub-service name",
+        "fields": [
+            F("url_slug", "Page URL", max_len=80, help="The address segment: /services/<division>/<this>. Changing a built-in one changes its web address (set a redirect under SEO first)."),
+            F("division", "Division", "select", True, options_from="division"),
+            F("group", "Group on the division page", max_len=80, help="Sub-services with the same group are listed together, for example Build or Headless SaaS & API Solutions."),
+            F("text", "Short description (card text)", "textarea", True, max_len=400),
+            F("intro", "One-line summary (page heading text)", max_len=300),
+            F("about", "About (paragraphs)", "textarea", max_len=3000, help="Plain paragraphs. A blank line starts a new paragraph."),
+            F("offers", "What LAX360 provides", "textarea", max_len=1500, help="One per line."),
+            F("solves", "Problems it addresses", "textarea", max_len=1500, help="One per line."),
+            F("features", "Capabilities", "textarea", max_len=4000, help="One per line, written as: Title: short explanation. Optional bullets after the text: Title: explanation || first bullet; second bullet"),
+            F("benefits", "Practical gains", "textarea", max_len=1500, help="One per line."),
+            F("uses", "Examples", "textarea", max_len=2500, help="One per line, written as: Title: short explanation"),
+            F("image", "Main image", "image", help="Leave empty to use the division's image."), F("icon", "Icon", "image", help="Optional. A built-in icon is used when empty."),
+        ],
+    },
+    "solution_category": {
+        "label": "Product categories (portfolio)", "group": "Products", "module": "services", "single": False, "slug_field": "url_slug", "bundle": False, "preview_path": "/solutions",
+        "help": "The six categories of the Software & IT solutions portfolio (Software Development, Web Application Development, Mobile Application Development, Website Development, Headless SaaS & API Solutions, "
+                "AI Agents & Business Automation). Add, rename, reorder or hide a category; the order here is the order on the website. Solutions are managed under Solutions.",
+        "title_label": "Category name",
+        "fields": [
+            F("url_slug", "Reference name", max_len=60, help="Short address-style name, for example software or mobile."),
+            F("intro", "Introduction", "textarea", True, max_len=800),
+            F("custom_name", "Custom development heading", max_len=120), F("custom_text", "Custom development text", "textarea", max_len=800),
+            F("platforms", "Platforms", "textarea", max_len=400, help="One per line."),
+            F("service_link", "Link to the matching service page", max_len=200, help="For example /services/software/custom-software-development"),
+            F("accent", "Accent colour", max_len=9, help="A HEX colour such as #2563eb (used on illustrations)."),
+            F("types", "Types shown on the category (optional)", "textarea", max_len=3000, help="One per line, written as: Name: short explanation"),
+            F("image", "Category image", "image", help="Leave empty to keep the built-in illustration."),
+        ],
+    },
+    "solution": {
+        "label": "Solutions (products by category)", "group": "Products", "module": "services", "single": False, "slug_field": "url_slug", "bundle": False, "preview_path": "/solutions",
+        "help": "Every solution and industry category of the portfolio, shown on the Products page, the Software & IT Services page, its own page (/solutions/<page URL>) and the partnership pages. "
+                "Leave the availability on Offered unless the solution is not offered yet (Under development, Coming soon, Temporarily unavailable): no label is shown on the website for an offered solution, and LAX360 presents it as provided and customisable. "
+                "Do not describe capabilities, customers, prices or dates that are not confirmed. Save as a draft to hide a solution; Preview shows it before publishing.",
+        "title_label": "Solution name",
+        "fields": [
+            F("url_slug", "Page URL", max_len=80, help="/solutions/<this>. Keep the built-in ones unchanged (set a redirect under SEO before changing one)."),
+            F("category", "Category", "select", True, options_from="solution_category"),
+            F("kind", "Type", "select", True, options=[{"value": "product", "label": "Solution"}, {"value": "industry", "label": "Industry category (websites)"}], default="product"),
+            F("status", "Availability", "select", True, options=[{"value": "available", "label": "Offered (a LAX360 product exists)"}, {"value": "custom", "label": "Offered (default)"},
+                                                              {"value": "under_development", "label": "Under development"}, {"value": "coming_soon", "label": "Coming soon"},
+                                                              {"value": "live", "label": "Offered (live for customers)"}, {"value": "demo_available", "label": "Offered (demo available)"},
+                                                              {"value": "temporarily_unavailable", "label": "Temporarily unavailable"}], default="custom",
+              help="The status decides what visitors see: the badge, the note, which buttons appear and whether the live links are shown (they are hidden while under development, coming soon or temporarily unavailable)."),
+            F("linked_product", "Linked LAX360 product", max_len=80, help="The page address of an existing product under Products (for example lax360-clinic-management). Leave empty when none."),
+            F("pitch", "Short description (cards)", "textarea", True, max_len=400),
+            F("overview", "Overview", "textarea", max_len=3000, help="Plain paragraphs. A blank line starts a new paragraph."),
+            F("problems", "Business problems addressed", "textarea", max_len=1500, help="One per line."),
+            F("features", "Key features", "textarea", max_len=1500, help="One per line."),
+            F("modules", "Modules and functionalities", "textarea", max_len=1500, help="One per line."),
+            F("how", "How it works", "textarea", max_len=3000, help="One step per line, written as: Title: explanation"),
+            F("customers", "Target customers", "textarea", max_len=800, help="One per line."), F("industries", "Suitable industries", "textarea", max_len=800, help="One per line."),
+            F("benefits", "Business benefits", "textarea", max_len=1200, help="One per line."), F("platforms", "Supported platforms and devices", "textarea", max_len=600, help="One per line."),
+            F("customization", "Customization possibilities", "textarea", max_len=1200, help="One per line."), F("integrations", "Available integrations", "textarea", max_len=800, help="One per line."),
+            F("faqs", "Questions and answers", "textarea", max_len=4000, help="One per line, written as: Question | Answer"),
+            F("related", "Related solutions", "textarea", max_len=600, help="Page URLs of related solutions, one per line."),
+            F("image", "Main image", "image", help="Upload or replace the preview image (use a real screenshot when you have one). Leave empty to keep the built-in design preview."),
+            F("gallery", "Gallery (screenshots, previews)", "gallery", max_len=4000, help="One image address per line. Use real screenshots only when they are of a real product; label mockups as illustrations."),
+            F("image_alt", "Image description (alt text)", max_len=160), F("mockup_note", "Image note", max_len=160, help="For example: Product Interface Preview, or Screenshot of the live product. Shown under the image."),
+            F("demo_link", "Demo URL", max_len=300, ui="url-or-page", help="A full https:// URL of a working demo, or a page like /contact?type=product. Leave empty to show no demo button."),
+            F("demo_link_label", "Demo button text", max_len=40, help="Default: Try Live Demo."),
+            *[x for key, label, default in LINK_FIELDS for x in (F(key, label, max_len=300, ui="url", help="Full https:// address. Leave empty and no button is shown."),
+                                                                F(key + "_label", label.replace(" URL", "") + " button text", max_len=40, help=f"Default: {default}."))],
+            F("video_link", "Demo video URL", max_len=300, ui="url", help="Full https:// address (YouTube, Vimeo or a file). Shown as Watch Demo."), F("video_link_label", "Demo video button text", max_len=40, help="Default: Watch Demo."),
+            F("cta_label", "Button text (overrides the default)", max_len=40), F("cta_link", "Button link (overrides the default)", max_len=300),
+            F("seo_title", "Search title", max_len=70), F("seo_description", "Search description", "textarea", max_len=300), F("keywords", "Keywords", "textarea", max_len=300, help="One per line."),
+            F("featured", "Featured", "bool", default=False),
+            F("partner_franchise", "Listed under Franchise Opportunities (Our Products)", "bool", default=True),
+            F("partner_authorized", "Listed under the Authorized Partner Program (Our Products)", "bool", default=True),
+            F("partner_referral", "Listed under the Referral Partner Program (Our Products)", "bool", default=True),
+        ],
+    },
     "upcoming_category": {
         "label": "Upcoming service categories", "group": "Services", "module": "services", "single": False, "slug_field": "url_slug", "preview_path": "/services#upcoming",
-        "help": "Service categories that LAX360 is planning or building: CAD & Engineering Design, Robotics, Blockchain & Web 3.0. They are shown with a status badge (Coming Soon, Under Development, Available or Temporarily Unavailable) "
+        "help": "Service categories that LAX360 is planning or building: Artificial Intelligence, IoT / Embedded Systems & Robotics, CAD Designing & Training, Blockchain & Web 3.0. They are shown with a status badge (Coming Soon, Under Development, Available or Temporarily Unavailable) "
                 "on the home page, the Services page, the menus and the partnership pages, and visitors can register their interest. Built-in entries exist for the three categories: to change one, add an entry whose Page URL is "
                 "cad-engineering, robotics or blockchain (and set its status). To launch a category, change its status to Available: no code change is needed. Remember to describe only what really exists.",
         "title_label": "Category name",
@@ -539,6 +646,8 @@ KINDS: dict[str, dict] = {
         "fields": [
             F("category", "Category", "select", True, options=PRODUCT_CATEGORIES),
             F("status", "Availability", "select", True, options=PRODUCT_STATUSES, default="soon"),
+            F("portfolio_category", "Portfolio category (Products page filter)", "select", options_from="solution_category",
+              help="Which filter of the Products page this product appears under. Leave empty to use the default for this product."),
             F("summary", "Short description (card text)", "textarea", True, max_len=300),
             F("overview", "Overview", "textarea", max_len=4000, help="Plain paragraphs. A blank line starts a new paragraph."),
             F("problems", "Business problems addressed", "textarea", max_len=2000, help="One problem per line."),
@@ -553,8 +662,13 @@ KINDS: dict[str, dict] = {
             F("screenshot_5", "Screenshot 5", "image"), F("screenshot_6", "Screenshot 6", "image"), F("screenshot_7", "Screenshot 7", "image"), F("screenshot_8", "Screenshot 8", "image"),
             F("product_link", "Product / access link", max_len=300, help="Where visitors open or sign up for the product (https:// URL or a page like /contact)."),
             F("demo_link", "Demo request link", max_len=300, help="Optional: a page where visitors can request a demo."),
+            *[x for key, label, default in LINK_FIELDS for x in (F(key, label, max_len=300, ui="url", help="Full https:// address. Leave empty and no button is shown."),
+                                                                F(key + "_label", label.replace(" URL", "") + " button text", max_len=40, help=f"Default: {default}."))],
+            F("video_link", "Demo video URL", max_len=300, ui="url", help="Full https:// address. Shown as Watch Demo."), F("video_link_label", "Demo video button text", max_len=40, help="Default: Watch Demo."),
             F("demo_site_link", "Demo website / live preview link", max_len=300, help="A working demo of the software that anyone can open without logging in (https:// URL). Shown on the card and the product page, whatever the status."),
             F("cta_label", "Main button text", max_len=40, help="Defaults to \"Enquire about this product\"."),
+            F("seo_title", "Search title", max_len=70, help="The page title in search results. Leave empty to use the product name."),
+            F("seo_description", "Search description", "textarea", max_len=300, help="The text under the title in search results. Leave empty to use the short description."),
             F("enabled", "Show on the website", "bool", default=True, help="Untick to hide this entry from the website without deleting it. Publishing and unpublishing work as well: hiding is the quick on/off switch."),
         ],
     },
@@ -840,6 +954,21 @@ def _options(db: Session, f: dict) -> set[str]:
     return static
 
 
+_BAD_LABELS = {"example", "localhost", "test", "placeholder", "yourcompany", "yourdomain", "domain", "lorem", "invalid"}
+
+
+def valid_link(value: str, allow_page: bool = False) -> bool:
+    """A usable external address: https://real.host/..., or (when allowed) a page of this site such as /contact. Placeholders, #, javascript: and empty hosts are refused."""
+    v = (value or "").strip()
+    if allow_page and re.match(r"^/(?!/)[A-Za-z0-9/_.~%?=&#-]*$", v) and len(v) > 1:
+        return True
+    m = re.match(r"^https?://([A-Za-z0-9.-]+)(:\d+)?(/[^\s]*)?$", v)
+    if not m:
+        return False
+    host = m.group(1).lower()
+    return "." in host and not host.startswith(".") and not host.endswith(".") and not (set(host.split(".")) & _BAD_LABELS)
+
+
 def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict]:
     spec = KINDS[kind]
     errors: dict[str, str] = {}
@@ -874,6 +1003,24 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
             errors[name] = f"{f['label']} is required."
         elif len(value) > f["max"]:
             errors[name] = f"Keep it under {f['max']} characters."
+        elif kind_t == "gallery" and value:
+            entries = gallery_entries(value)
+            bad = None
+            if len(entries) > 24:
+                bad = "At most 24 images."
+            for ref, cap in entries:
+                if len(cap) > 160:
+                    bad = "Keep each caption under 160 characters."
+                elif _is_uuid(ref):
+                    a = db.get(MediaAsset, uuid.UUID(ref))
+                    if a is None or a.kind != "image":
+                        bad = "One of the pictures is no longer in the media library. Remove it or choose another."
+                elif not (re.match(r"^/assets/[A-Za-z0-9/_.-]+\.(webp|jpg|jpeg|png|svg)$", ref) or valid_link(ref)):
+                    bad = "Use pictures from the media library."
+            if bad:
+                errors[name] = bad
+            else:
+                value = "\n".join(f"{r}|{c}" if c else r for r, c in entries)
         elif kind_t in ("image", "video", "document") and value:
             try:
                 asset = db.get(MediaAsset, uuid.UUID(value))
@@ -889,6 +1036,9 @@ def _validate(db: Session, kind: str, title: str, data: dict) -> tuple[str, dict
                 errors[name] = "Choose only from the listed options."
             else:
                 value = ",".join(dict.fromkeys(chosen))
+        elif f.get("ui") in ("url", "url-or-page") and value:
+            if not valid_link(value, allow_page=f["ui"] == "url-or-page"):
+                errors[name] = "Enter a full, real https:// address (no placeholders such as example.com or #)" + (", or a page on this website starting with /." if f["ui"] == "url-or-page" else ".")
         elif name == "logo_url":
             if value and not re.match(r"^/assets/clients/[A-Za-z0-9._-]+\.(svg|png|webp)$", value):
                 errors[name] = "Leave this empty, or use a built-in artwork path such as /assets/clients/sample-1.svg"
@@ -973,11 +1123,31 @@ def list_items(db: Session, kind: str, *, status: str | None = None) -> list[Con
     return list(db.scalars(q.order_by(ContentItem.sort_order, ContentItem.created_at)))
 
 
+def gallery_entries(value: str) -> list[tuple[str, str]]:
+    """The lines of a gallery field: "<library image id or /assets/... path or https address> | caption", in display order."""
+    out = []
+    for line in (value or "").splitlines():
+        ref, _, cap = line.partition("|")
+        if ref.strip():
+            out.append((ref.strip(), cap.strip()))
+    return out
+
+
+def _is_uuid(v: str) -> bool:
+    try:
+        uuid.UUID(v)
+        return True
+    except ValueError:
+        return False
+
+
 def _media_ids(kind: str, data: dict) -> set[uuid.UUID]:
     ids = set()
     for f in KINDS[kind]["fields"]:
         if f["type"] in ("image", "video") and data.get(f["name"]):
             ids.add(uuid.UUID(data[f["name"]]))
+        if f["type"] == "gallery":
+            ids |= {uuid.UUID(r) for r, _ in gallery_entries(data.get(f["name"])) if _is_uuid(r)}
     return ids
 
 
@@ -1138,6 +1308,20 @@ def _resolve(db: Session, settings: Settings, kind: str, data: dict, preview: bo
     """Replace media ids with the URL a browser can load (None when the file is gone or not public, so a deleted file never breaks a page)."""
     out = dict(data or {})
     for f in KINDS[kind]["fields"]:
+        if f["type"] == "gallery":  # library ids become addresses; a picture that is gone or not public is skipped, so a deleted file never breaks a page
+            items = []
+            for ref, cap in gallery_entries(out.get(f["name"])):
+                if _is_uuid(ref):
+                    asset = _asset(db, assets, ref)
+                    if asset is None or not (asset.is_public or preview):
+                        continue
+                    url = media_service.url_of(settings, asset) if asset.is_public or asset.storage == "supabase" else f"/api/admin/media/{asset.id}/file"
+                    items.append({"url": url, "caption": cap, "alt": asset.alt_text or cap})
+                else:
+                    items.append({"url": ref, "caption": cap, "alt": cap})
+            out[f["name"] + "_items"] = items
+            out[f["name"]] = "\n".join(i["url"] for i in items)
+            continue
         if f["type"] == "document" and out.get(f["name"]):  # a private download: the browser only gets the file's name, size and type, never a link to it
             asset = _asset(db, assets, out[f["name"]])
             if asset is None:
@@ -1203,7 +1387,8 @@ def public_items(db: Session, settings: Settings, kind: str, *, include_drafts: 
 def public_bundle(db: Session, settings: Settings) -> dict[str, list[dict]]:
     """Every kind's published items in one response (the website fetches this once instead of once per section).
     Two queries in total (all published items, then every picture they use), whatever the number of kinds or pictures: each query is a network round trip."""
-    rows = list(db.scalars(select(ContentItem).where(ContentItem.status == "published", ContentItem.kind.in_(list(KINDS))).order_by(ContentItem.sort_order, ContentItem.created_at)))
+    in_bundle = [k for k, v in KINDS.items() if v.get("bundle", True)]  # the solutions portfolio is large: it has its own endpoints (services/solutions_service.py)
+    rows = list(db.scalars(select(ContentItem).where(ContentItem.status == "published", ContentItem.kind.in_(in_bundle)).order_by(ContentItem.sort_order, ContentItem.created_at)))
     wanted: set[uuid.UUID] = set()
     for i in rows:
         for f in KINDS[i.kind]["fields"]:
@@ -1213,8 +1398,10 @@ def public_bundle(db: Session, settings: Settings) -> dict[str, list[dict]]:
                     wanted.add(uuid.UUID(raw))
                 except ValueError:
                     pass
+            elif raw and f["type"] == "gallery":
+                wanted |= {uuid.UUID(r) for r, _ in gallery_entries(raw) if _is_uuid(r)}
     assets = {a.id: a for a in db.scalars(select(MediaAsset).where(MediaAsset.id.in_(wanted)))} if wanted else {}
-    out: dict[str, list[dict]] = {kind: [] for kind in KINDS}
+    out: dict[str, list[dict]] = {kind: [] for kind in in_bundle}
     for i in rows:
         flt = KINDS[i.kind].get("public_filter")
         if flt and (((i.data or {}).get(flt[0]) == flt[1]) if len(flt) > 2 else ((i.data or {}).get(flt[0]) != flt[1])):

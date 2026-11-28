@@ -4,12 +4,12 @@ from app import seed_welcome as seed
 from app.services import content_service as cs
 from tests.admin_helpers import staff
 
-EXISTING_PAGES = {"/services/software", "/services/digitalmarketing", "/services/ai", "/our-network/cadpoint-academy-salem", "/robotics", "/blockchain"}
+EXISTING_PAGES = {"/services/software", "/services/software/ai-workflow-automations-and-integrations", "/services/digitalmarketing", "/services/ai", "/our-network/cadpoint-academy-salem", "/robotics", "/blockchain"}
 
 
 def test_seed_has_the_six_cards_in_order_with_the_requested_buttons(db):  # the opening intro card was removed
     rows = seed.card_rows()
-    assert [r["title"] for r in rows] == ["Software & IT Services", "Digital Marketing", "Education & Training", "AI & Automation", "Robotics", "Blockchain"]
+    assert [r["title"] for r in rows] == ["Software & IT Services", "Digital Marketing", "Education & Training", "AI Workflow Automations", "Robotics", "Blockchain"]
     assert [r["sort_order"] for r in rows] == sorted(r["sort_order"] for r in rows)
     by = {r["title"]: r["data"] for r in rows}
     assert "Welcome to LAX360 Pvt Ltd" not in by  # the intro card is gone

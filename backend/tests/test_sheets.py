@@ -37,7 +37,7 @@ class FakeGoogle:
             for r in json.loads(request.content)["requests"]:
                 self.tabs.setdefault(r["addSheet"]["properties"]["title"], [])
             return httpx.Response(200, json={})
-        if request.method == "GET" and path.endswith("!A1:Z1"):
+        if request.method == "GET" and re.search(r"!A1:[A-Z]+1$", path):  # the header row (the service reads as many columns as the widest worksheet has)
             rows = self.tabs.get(tab(path), [])
             return httpx.Response(200, json={"values": rows[:1]} if rows else {})
         if request.method == "GET" and path.endswith("!A:A"):
@@ -95,7 +95,7 @@ def test_a_demo_request_lands_in_consultation_requests(sheet, client, db):
     csrf = login(client, "cust@example.com")
     r = client.post("/api/demo-requests", json=demo_payload(branch_id=branch_id(client, "Salem"), company="Acme", interest="CRM"), headers=csrf)
     assert r.status_code == 201
-    assert cell(sheet, "consultation", "Enquiry ID") == r.json()["id"] and cell(sheet, "consultation", "Full Name") == "Ada Lovelace" and cell(sheet, "consultation", "Products or Services") == "CRM"
+    assert cell(sheet, "consultation", "Enquiry ID") == r.json()["id"] and cell(sheet, "consultation", "Full Name") == "Ada Lovelace" and cell(sheet, "consultation", "Enquiry Type") == "Demo request"
     assert db.scalar(select(DemoRequest.sheets_synced_at)) is not None
 
 

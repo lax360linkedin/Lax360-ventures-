@@ -17,27 +17,18 @@ COMPANY_NAME = "LAX360 Pvt Ltd"
 
 COMPANY = (
     "The company is LAX360 Pvt Ltd (the legal wording is still to be confirmed by the business). "
-    "Tagline: '360° Execution'. One team handles software and IT services, AI and business automation, digital marketing, headless SaaS and API solutions, workflow automation and integration, mobile and business applications, and training. "
-    "LAX360 also publishes its own software and SaaS products on the Products page (/products); the portfolio includes the LAX360 API Hub, Business CRM, Clinic Management and more; each is shown as an available product. Never describe third-party software as a LAX360 product and never claim a product is available unless the website says so."
+    "Tagline: '360° Execution'. LAX360 has THREE currently active service divisions: Software & IT Services, Digital Marketing, and Education & Training. Headless SaaS & API Solutions, AI Workflow Automations & Integrations and mobile and business applications are part of Software & IT Services (they are not separate divisions). LAX360 also has FOUR upcoming divisions that are under development and not available yet: Artificial Intelligence (AI), IoT, Embedded Systems & Robotics, CAD Designing & Training, and Blockchain & Web 3.0. LAX360 also publishes its own software and SaaS products on the Products page (/products); the portfolio includes the LAX360 API Hub, Business CRM, Clinic Management and more; each is shown as an available product. Never describe third-party software as a LAX360 product and never claim a product is available unless the website says so."
 )
 
 DIVISIONS = [
-    ("Software & IT Services (/services/software)",
-     "Custom software development, website development, web application development, mobile application development, CRM & ERP development, business management systems and e-commerce development, built around the customer's existing workflow. "
-     "Technology is chosen per requirement. Engagement model (fixed scope or monthly) is agreed during discovery."),
-    ("AI & Business Automation (/services/ai)",
-     "AI application development, AI chatbots & virtual assistants, AI agent development, business process automation, workflow automation, RAG-based AI solutions and AI integration & consulting. "
-     "People stay in the loop for decisions that matter; data handling is discussed and agreed before anything is built. Starts with an AI consultation."),
-    ("Digital Marketing (/services/digitalmarketing)",
+    ("Software & IT Services (/services/software) - ACTIVE",
+     "Sub-services: Custom Software Development, Website Development, Web Application Development, Mobile Application Development (Android and iOS; booking, field-staff, location-tracking, billing and inventory apps), Business Application Development, Enterprise Software Solutions, ERP & CRM Solutions, SaaS Product Development, "
+     "Headless SaaS & API Solutions (reusable backend services and ready-to-integrate APIs: API hub, headless backend, authentication, billing and subscription, booking, CRM, notification, payment and file APIs, multi-tenant and white-label SaaS; a product page for the LAX360 API Hub will be linked later, do not claim it is live), "
+     "AI Workflow Automations & Integrations (n8n workflows, WhatsApp, email and CRM automation, AI-assisted workflow steps, third-party and webhook integrations; this is the AI work available today), Third-Party Software Integrations, IT Consulting & Technology Solutions, and Software Maintenance & Support, plus e-commerce development. "
+     "Technology is chosen per requirement. Engagement model (fixed scope or monthly) is agreed during discovery. Do not describe AI bots, AI agents or AI employees as available: those belong to the upcoming AI division."),
+    ("Digital Marketing (/services/digitalmarketing) - ACTIVE",
      "Social media management (Meta, LinkedIn, Pinterest, X), search engine optimization (on-page, local, off-page and technical SEO), creatives (poster and graphic design, video shooting, video editing), content publishing (article writing, Blogger, Reddit) and paid advertising (Meta, Google, LinkedIn and X ads, with audience targeting, budget management, A/B testing and regular performance reports). Exact scope and reporting are agreed per business."),
-    ("Headless SaaS & API Solutions (/services/headless)",
-     "Reusable backend services and ready-to-integrate APIs for developers, startups, agencies and businesses: API hub development, headless backend development, authentication APIs, billing & subscription APIs, booking & appointment APIs, CRM APIs, notification APIs, payment gateway integration, "
-     "file & media APIs, AI APIs, multi-tenant SaaS development and white-label SaaS solutions. A product page for the LAX360 API Hub will be linked from the website later; do not claim it is live."),
-    ("Workflow Automation & Integration (/services/automation)",
-     "n8n workflow automation, business process automation, WhatsApp automation, email automation, CRM automation, AI agent workflows, third-party application integration and webhook integration."),
-    ("Mobile & Business Applications (/services/mobile)",
-     "Appointment booking applications, field staff & task tracking applications, employee location tracking applications, business billing applications, inventory management applications and custom business mobile applications."),
-    ("Education & Training (/services/education)",
+    ("Education & Training (/services/education) - ACTIVE",
      "LAX360 Education is the education and skill development division of LAX360 Pvt Ltd: technical training, professional certification courses, internship programs, AI & software development training, workshops and seminars, corporate training, college and institutional training and skill development programs. "
      "Certification courses are only those on the approved LAX360 Education course catalogue (programming languages, web designing, databases, full stack development with AI, software testing, cloud computing, DevOps, data and AI, cyber security, digital marketing and frameworks); the full list is on the Education & Training page. "
      "Enquire via /contact?type=course. Training and college workshops. Courses on the website: 'AI Tools & Prompt Engineering' (5-hour college workshop: 2 hours theory + 3 hours practicals), "
@@ -67,9 +58,13 @@ DEMO_PROCESS = (
 
 CAREERS = "Careers (/career): no open roles are listed on the website; interested people can send an enquiry of type 'Careers' via /contact."
 
-UPCOMING = ("Upcoming services (not available yet, currently under development, to be launched in the future; statuses are managed by the team): CAD & Engineering Design Services (/cad-engineering: Mechanical CAD, Civil CAD), "
-            "Robotics Services (/robotics: Robotics Solutions, Robotics Development and Integration), Blockchain & Web 3.0 Services (/blockchain: Blockchain Development, Web 3.0 Solutions). "
-            "Never offer them as available, quote them or promise dates. Visitors can register interest on those pages (enquiry type 'Interest in an upcoming service'); this is not a partnership or an order.")
+UPCOMING = ("Upcoming divisions (NOT available yet: they are under development and will be launched in the future; statuses are managed by the team and an administrator can change them): "
+            "Artificial Intelligence (/artificial-intelligence: AI Bots & Intelligent Assistants, AI Employees, AI Agents, AI CRM Solutions, AI Voice Assistants, AI Receptionists, AI Sales Assistants, AI Customer Support Agents, AI Personal Assistants, Multi-Agent AI Systems, AI-Powered Business Intelligence, Custom AI Solutions); "
+            "IoT, Embedded Systems & Robotics (/robotics: IoT Solutions, Embedded Systems Development, Hardware and Software Integration, Robotics Solutions, Industrial Automation, Smart Device Development, Sensor Integration, Intelligent Monitoring Systems, IoT Dashboards, Connected Device Solutions); "
+            "CAD Designing & Training (/cad-engineering: Mechanical and Civil CAD Designing, 2D Drafting, 3D Modeling, Product Design, Engineering Design Solutions, Architectural Design, CAD Software Training, Professional Engineering Training); "
+            "Blockchain & Web 3.0 (/blockchain: Blockchain Application Development, Web 3.0 Development, Smart Contract Development, DApps, Blockchain Integrations, Digital Identity Solutions, Enterprise Blockchain Solutions). "
+            "The upcoming AI division is different from the AI Workflow Automations & Integrations that is available now under Software & IT Services. The existing CADPOINT education partnership and its training programs ARE available under Education & Training; only the new CAD designing and CAD training division is upcoming. "
+            "Never offer upcoming services as available, quote them or promise dates. Visitors can register interest on those pages (enquiry type 'Interest in an upcoming service'); this is not a partnership or an order.")
 
 UNCONFIRMED = [
     "pricing, quotes or fees (a written scope and estimate is provided before work starts, after an enquiry)",

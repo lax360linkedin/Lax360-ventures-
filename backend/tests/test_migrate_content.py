@@ -40,7 +40,7 @@ def test_the_public_content_is_all_in_the_database_after_the_migration(db):
     assert count(db, "network_partner") == 7 and count(db, "software_product") == 7 and count(db, "network_page") == 1
     names = {i.title for i in db.scalars(select(ContentItem).where(ContentItem.kind == "network_partner"))}
     assert names == {"Fatcat Wealthy", "Marg ERP", "Zoho", "HexBis", "OpenAI", "ShieldByte InfoSec", "CADPOINT Salem Branch"}
-    assert count(db, "upcoming_category") == 3 and count(db, "upcoming_service") == 6 and count(db, "education_course") == 53
+    assert count(db, "upcoming_category") == 4 and count(db, "upcoming_service") == 38 and count(db, "education_course") == 53
     assert {i.slug for i in db.scalars(select(ContentItem).where(ContentItem.kind == "content_seed"))} == {"network", "upcoming", "courses", "partner-products"}
     cad = db.scalar(select(ContentItem).where(ContentItem.kind == "network_partner", ContentItem.slug == "cadpoint-salem"))
     assert cad.data["category"] == "education" and cad.data["verification"] == "verified" and cad.data["website_link"] == "https://www.cadpoint.co.in/" and cad.status == "published"
@@ -56,7 +56,7 @@ def test_running_it_again_adds_nothing_and_never_overwrites_an_edit(db):
     db.delete(gone)
     db.commit()
     again = run(db)
-    assert first == 77 + 1 + 67 + 12 and again == 1  # only the deleted HexBis is added back by a re-run; everything else is untouched
+    assert first == 190 and again == 1  # only the deleted HexBis is added back by a re-run; everything else is untouched
     db.expire_all()
     assert db.scalar(select(ContentItem).where(ContentItem.slug == "zoho", ContentItem.kind == "network_partner")).data["description"] == "Edited by an administrator"
 

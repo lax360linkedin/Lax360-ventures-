@@ -5,6 +5,9 @@ import { DM, DMA, DMR } from '../../data/dmPartners.js'
 // In-page navigation of the two Digital Marketing partner pages, in page order (PartnerOpportunity appends FAQs when an administrator has added some).
 export const DM_NAV = [['program', 'The program'], ['choose', 'Choose your partnership'], ['services', 'Digital marketing services'], ['benefits', 'Benefits'], ['who', 'Who can join'], ['how', 'How it works'], ['support', 'Partner support'], ['why', 'Why partner with us']]
 
+/** The Authorized Partner page also carries the customer payment and commercial arrangement terms. */
+export const DM_NAV_AUTH = [...DM_NAV, ['payments', 'Customer payments'], ['arrangements', 'Commercial arrangements']]
+
 const NumList = ({ items }) => <ol className="grid gap-x-10 gap-y-3 md:grid-cols-2">{items.map((t, i) => <li key={t} className="flex gap-3"><span className="w-7 shrink-0 text-right font-semibold tabular-nums text-soft">{i + 1}.</span><span>{t}</span></li>)}</ol>
 
 /** The sections of the Digital Marketing Authorized Partner (kind="authorized") and Referral Partner (kind="referral") pages. Content: data/dmPartners.js (LAX360's own supplied text). */
@@ -55,6 +58,8 @@ export default function DmPartnerBlocks({ kind, accent }) {
       </Block>
 
       <Block id="why" eyebrow="Why partner with us" title="Why Partner with Us?" tint><Checklist items={DM.why} accent={accent} cols /></Block>
+      {auth && <Block id="payments" eyebrow="Terms" title="Customer payment restrictions"><NumList items={DMA.payments} /></Block>}
+      {auth && <Block id="arrangements" eyebrow="Terms" title="Commercial arrangements" tint><NumList items={DMA.arrangements} /></Block>}
     </>
   )
 }

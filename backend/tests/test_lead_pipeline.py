@@ -9,7 +9,7 @@ PDF = b"%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R
 
 LEAD = {
     "designation": "Operations Head", "whatsapp": "+919000000009", "contact_method": "whatsapp", "industry": "Healthcare", "company_size": "11–50 people", "business_type": "small",
-    "location": "Salem", "website": "https://clinic.example", "service_mains": "ai-solutions,seo", "service_subs": "ai/rag-based-ai-solutions,growth/search-engine-optimization-seo",
+    "location": "Salem", "website": "https://clinic.example", "service_mains": "ai-solutions,seo", "service_subs": "software/ai-workflow-automations-and-integrations,growth/search-engine-optimization-seo",
     "project_name": "Patient assistant", "project_description": "We want an assistant for patient questions.", "challenges": "Too many repeated calls.", "expected_solution": "Answers from our documents.",
     "budget": "₹2,00,000 – ₹5,00,000", "timeline": "1–3 months", "start_date": "2026-12-01", "referral": "Google search", "meeting_type": "online", "meeting_time": "Weekday mornings",
 }
@@ -18,8 +18,8 @@ LEAD = {
 def test_form_options_are_public_and_describe_the_service_hierarchy(client):
     o = client.get("/api/public/contact-options").json()
     mains = {m["value"]: m for m in o["services"]}
-    assert len(mains) == 11 and mains["other"]["subs"] == []
-    assert any(s["value"] == "ai/rag-based-ai-solutions" for s in mains["ai-solutions"]["subs"])
+    assert len(mains) == 12 and mains["other"]["subs"] == []
+    assert any(s["value"] == "software/ai-workflow-automations-and-integrations" for s in mains["ai-solutions"]["subs"])
     assert {b["value"] for b in o["business_types"]} == {"startup", "small", "medium", "enterprise", "individual"}
     assert o["limits"]["files"] == 3
 
@@ -28,11 +28,11 @@ def test_structured_enquiry_is_validated_stored_and_deduplicated(client, db):
     ok = client.post("/api/contact", json=enquiry_payload(enquiry_type="quote", company="Clinic Co", extra=LEAD))
     assert ok.status_code == 201, ok.text
     row = db.scalar(select(ContactEnquiry).where(ContactEnquiry.company == "Clinic Co"))
-    assert row.enquiry_type == "quote" and row.extra["service_subs"].startswith("ai/rag") and row.extra["budget"] == "₹2,00,000 – ₹5,00,000"
+    assert row.enquiry_type == "quote" and row.extra["service_subs"].startswith("software/ai-workflow") and row.extra["budget"] == "₹2,00,000 – ₹5,00,000"
     from app import contact_catalog
 
     assert contact_catalog.validate_lead(LEAD) == {}
-    for bad in ({"industry": "Space mining"}, {"business_type": "giant"}, {"service_mains": "nope"}, {"service_mains": "seo", "service_subs": "ai/rag-based-ai-solutions"}, {"website": "javascript:alert(1)"}):
+    for bad in ({"industry": "Space mining"}, {"business_type": "giant"}, {"service_mains": "nope"}, {"service_mains": "seo", "service_subs": "software/ai-workflow-automations-and-integrations"}, {"website": "javascript:alert(1)"}):
         assert contact_catalog.validate_lead({**LEAD, **bad}), bad  # each is rejected (the API answers 422 with these field errors)
     r = client.post("/api/contact", json=enquiry_payload(email="other@example.com", message="A different valid message to avoid duplicates.", extra={**LEAD, "industry": "Space mining"}))
     assert r.status_code == 422 and "industry" in r.json()["error"]["fields"]

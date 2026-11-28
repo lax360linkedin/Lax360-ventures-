@@ -6,12 +6,8 @@ const SWIPE_MIN = 40
 
 // One slide per service. Photos are free-licence images from Unsplash (see public/assets/services/CREDITS.md), cropped to 1000x800 WebP.
 const slides = [
-  { id: 'software', title: 'Software & IT Services', text: 'Custom software, websites, web and mobile apps, CRM and ERP.', photo: '/assets/services/software.webp' },
-  { id: 'ai', title: 'AI & Business Automation', text: 'AI applications, chatbots, agents and automated workflows.', photo: '/assets/services/ai.webp' },
+  { id: 'software', title: 'Software & IT Services', text: 'Custom software, websites, web and mobile apps, ERP and CRM, headless SaaS and APIs, and AI workflow automation.', photo: '/assets/services/software.webp' },
   { id: 'marketing', title: 'Digital Marketing', text: 'Social media, ads, SEO and content.', photo: '/assets/services/marketing.webp' },
-  { id: 'headless', title: 'Headless SaaS & API Solutions', text: 'Reusable backend services and ready-to-integrate APIs.', photo: '/assets/services/headless.webp' },
-  { id: 'automation', title: 'Workflow Automation & Integration', text: 'n8n, WhatsApp, email and CRM automation, and integrations.', photo: '/assets/services/automation.webp' },
-  { id: 'mobile', title: 'Mobile & Business Applications', text: 'Booking, field staff, billing and inventory apps.', photo: '/assets/services/mobile.webp' },
   { id: 'education', title: 'Education & Training', text: 'Certification courses, internships and workshops for students and professionals.', photo: '/assets/services/education.webp' },
 ]
 

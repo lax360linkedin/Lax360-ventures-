@@ -5,7 +5,7 @@ import { PROGRAMS, PROGRAM_BY_SLUG, STATUSES, isLive } from '../../data/upcoming
 import { useUpcoming, useUpcomingForProgram } from '../../hooks/useUpcoming.js'
 
 /**
- * The upcoming service categories (CAD & Engineering Design, Robotics, Blockchain & Web 3.0) inside the partnership pages. They are listed under all three programs as PLANNED
+ * The upcoming service categories (Artificial Intelligence, IoT / Embedded Systems & Robotics, CAD Designing & Training, Blockchain & Web 3.0) inside the partnership pages. They are listed under all three programs as PLANNED
  * additions with their status: they are never described as open divisions, and the wording says that registering interest is an enquiry and does not make anyone a partner.
  * Which categories and services appear under which program is set per item in Admin > Services.
  */

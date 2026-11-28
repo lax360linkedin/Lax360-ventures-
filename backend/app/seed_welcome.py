@@ -1,7 +1,7 @@
 """The 7-card Welcome Experience (`python -m app.cli seed-welcome`): the master switch and the seven cards, loaded into the CMS so they are managed in the admin panel
 (Welcome Experience > Welcome cards / Welcome Experience settings).
 
-Honesty: Software, Digital Marketing, Education and AI & Automation describe what LAX360 does today. Robotics and Blockchain are described only as planned / emerging
+Honesty: Software & IT Services (including AI Workflow Automations), Digital Marketing and Education describe what LAX360 does today. The AI, IoT / Robotics, CAD and Blockchain divisions are described only as planned / emerging
 initiatives, with a "Planned initiative" badge: no product, launch or availability is claimed. Page links point only at pages that exist on the website; the Education
 card links to CADPOINT Academy, the training centre operated by LAX360 (there is no separate Education & Training page).
 """
@@ -21,9 +21,9 @@ CARDS = [  # (the opening "Welcome to LAX360" intro card was removed on request:
     ("education-training", "Education & Training", "education", "Learn Today. Lead Tomorrow.",
      "We empower students, professionals, and aspiring technology experts through industry-focused training, practical learning experiences, technology workshops, and "
      "career-oriented skill development programs.", "", "Explore Education", "/our-network/cadpoint-academy-salem", True, "Education & Training"),
-    ("ai-automation", "AI & Automation", "ai", "Transform Workflows. Unlock Intelligence.",
-     "We bring businesses closer to the future through AI-powered applications, intelligent agents, business process automation, conversational AI, and workflow integrations. "
-     "Our solutions help organizations reduce repetitive work and improve operational efficiency.", "", "Explore AI & Automation", "/services/ai", False, ""),
+    ("ai-automation", "AI Workflow Automations", "ai", "Transform Workflows. Unlock Intelligence.",
+     "AI Workflow Automations & Integrations, part of Software & IT Services, connect your tools and add AI-assisted steps so teams spend less time on repetitive work. "
+     "A separate Artificial Intelligence division (AI agents, assistants and digital employees) is under development and is not available yet.", "", "Explore AI Workflow Automations", "/services/software/ai-workflow-automations-and-integrations", False, ""),
     ("robotics", "Robotics", "robotics", "Bringing Intelligent Machines to Life.",
      "We are exploring the future of robotics and intelligent automation, combining software, AI, sensors, and connected technologies to create innovative solutions for "
      "real-world applications.\n\nRobotics is an emerging technology initiative that we are planning to introduce and expand as part of our future innovation capabilities.",

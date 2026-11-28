@@ -1,5 +1,6 @@
 import { articles } from './data/articles.js'
 import { divisions } from './data/services.js'
+import solutionsIndex from './data/solutions-index.json' with { type: 'json' }
 import portfolio from './data/products.json' with { type: 'json' }
 import industryPortfolio from './data/industries.json' with { type: 'json' }
 import networkPortfolio from './data/network.json' with { type: 'json' }
@@ -14,14 +15,12 @@ export const routes = [
   '/about',
   '/services',
   '/services/software',
-  '/services/ai',
   `/services/${divisionUrl('growth')}`, // Digital Marketing: /services/digitalmarketing
-  '/services/headless',
-  '/services/automation',
-  '/services/mobile',
   '/services/education',
-  ...divisions.flatMap((d) => d.offerings.map((o) => `/services/${divisionUrl(d.slug)}/${slugify(o.name)}`)), // one page per individual service
+  ...divisions.flatMap((d) => d.offerings.map((o) => `/services/${divisionUrl(d.slug)}/${o.slug}`)), // one page per individual service
   '/products',
+  '/solutions',
+  ...solutionsIndex.solutions.map((s) => `/solutions/${s.slug}`), // one page per showcased solution (solutions added in the admin panel are rendered in the browser)
   ...portfolio.map((p) => `/products/${p.slug}`), // built-in products (products published in the admin panel are rendered in the browser)
   '/industries',
   ...industryPortfolio.map((i) => `/industries/${i.slug}`), // built-in industries (industries published in the admin panel are rendered in the browser)
@@ -32,8 +31,9 @@ export const routes = [
   '/our-team',
   '/websites',
   '/work',
-  '/cad-engineering',
+  '/artificial-intelligence',
   '/robotics',
+  '/cad-engineering',
   '/blockchain',
   '/career',
   PARTNER_PAGES.overview.path, PARTNER_PAGES.apply.path, PARTNER_PAGES.faq.path, PARTNER_PAGES.privacy.path, PARTNER_PAGES.terms.path, // Partner With Us

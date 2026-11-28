@@ -9,7 +9,7 @@ const TYPE = { regular: 'Regular card', festival: 'Festival greeting', announcem
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
 /** Where a card is in its schedule: expired (end date passed), scheduled (start date not reached) or active. */
 const windowOf = (d) => { const t = today(); return d.end_date && d.end_date < t ? 'expired' : d.start_date && d.start_date > t ? 'scheduled' : 'active' }
-const THEME = { celebration: 'Celebration', welcome: 'Welcome', software: 'Software', marketing: 'Marketing', education: 'Education', ai: 'AI & Automation', robotics: 'Robotics', blockchain: 'Blockchain' }
+const THEME = { celebration: 'Celebration', welcome: 'Welcome', software: 'Software', marketing: 'Marketing', education: 'Education', ai: 'AI', robotics: 'IoT & Robotics', blockchain: 'Blockchain' }
 
 /**
  * Welcome cards management: the master switch and every card of the 7-card welcome experience shown after the intro animation. It edits the same content as

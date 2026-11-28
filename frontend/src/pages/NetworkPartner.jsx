@@ -5,7 +5,7 @@ import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { asCompany, canonicalSlug, ownershipLabels, pinnedProfiles, relationshipLabels, softwareCategories } from '../data/network.js'
-import { getDivision } from '../data/services.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import OwnerLinks from '../components/layout/OwnerLinks.jsx'
 import { offeringHref, divisionUrl } from '../utils/slugify.js'
 import { useContentReady, useSeeded } from '../hooks/useSite.js'
@@ -29,7 +29,7 @@ const Bullets = ({ items }) => <ul className="space-y-2">{items.map((t) => <li k
 const Pending = ({ what }) => <p role="note" className="rounded-2xl border border-dashed border-edge-strong bg-glass px-5 py-4 text-soft">{what} are being confirmed with the partner and will be published here once verified.</p>
 
 /** A related LAX360 service id ("<category>/*" or "<category>/<service>") as a link with its name. */
-function serviceLink(key) {
+function serviceLink(key, getDivision) {
   const [cat, sub] = key.split('/')
   const d = getDivision(cat)
   if (!d) return null
@@ -44,6 +44,7 @@ function serviceLink(key) {
  * entered says the details are being confirmed. No authorization, level, certification or benefit is stated unless an administrator has entered it.
  */
 export default function NetworkPartner() {
+  const { getDivision } = useDivisionTools()
   const { slug } = useParams()
   const companies = useNetwork()
   const software = useSoftware()
@@ -62,7 +63,7 @@ export default function NetworkPartner() {
 
   const products = software.filter((s) => s.vendor === c.slug)
   const label = relationshipLabels[c.relationship]
-  const related = c.relatedServices.map(serviceLink).filter(Boolean)
+  const related = c.relatedServices.map((k) => serviceLink(k, getDivision)).filter(Boolean)
   const intro = c.overview.length ? c.overview : [c.description]
   const hasPartnership = c.partnershipNature.length || c.partnershipType || c.collaboration.length || c.weOffer.length || c.solutions.length || c.implementationServices.length || c.supportServices.length
   const hasProducts = c.products.length || products.length || c.softwareCategories.length || c.features.length || c.adoptionHelp.length || related.length

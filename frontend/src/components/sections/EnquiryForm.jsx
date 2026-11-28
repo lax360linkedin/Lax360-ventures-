@@ -66,7 +66,7 @@ function validate(values, fields) {
  * Shared enquiry form → POST /api/contact (via `enquiryService`). The backend re-validates, rate-limits and stores the
  * enquiry; it does not send email, so the success state never says one was sent.
  */
-export default function EnquiryForm({ defaultType = 'project', tone = 'light', compact = false, idPrefix = 'enq', source = 'contact', presets = {} }) {
+export default function EnquiryForm({ defaultType = 'project', tone = 'light', compact = false, idPrefix = 'enq', source = 'contact', presets = {}, extra: baseExtra = {}, lockType = false }) {
   const validType = enquiryTypes.some((t) => t.id === defaultType) ? defaultType : 'project'
   const [type, setType] = useState(validType)
   const [values, setValues] = useState({ name: '', phone: '', email: '', company: '', message: '', consent: false, website: '', branch: '', ...presets })
@@ -109,7 +109,7 @@ export default function EnquiryForm({ defaultType = 'project', tone = 'light', c
     }
     setStatus('submitting')
     setServerError('')
-    const extra = Object.fromEntries(fields.map((f) => [f.id, values[f.id] || '']).filter(([, v]) => v))
+    const extra = { ...baseExtra, ...Object.fromEntries(fields.map((f) => [f.id, values[f.id] || '']).filter(([, v]) => v)) }
     try {
       const result = await submitEnquiry({
         type, name: values.name.trim(), phone: values.phone.trim(), email: values.email.trim(), company: values.company.trim(), message: values.message.trim(),
@@ -182,7 +182,7 @@ export default function EnquiryForm({ defaultType = 'project', tone = 'light', c
         </div>
       )}
 
-      <fieldset>
+      {!lockType && <fieldset>
         <legend className={`mb-2 text-sm font-bold ${dark ? 'text-fg' : 'text-fg'}`}>What is this about? <span aria-hidden="true">*</span></legend>
         <div className="flex flex-wrap gap-2">
           {enquiryTypes.map((t) => (
@@ -194,7 +194,7 @@ export default function EnquiryForm({ defaultType = 'project', tone = 'light', c
             </label>
           ))}
         </div>
-      </fieldset>
+      </fieldset>}
 
       <div className="grid gap-5 md:grid-cols-2">
         <FormField id={fid('name')} label="Name" required tone={tone} autoComplete="name" value={values.name} onChange={set('name')} error={errors.name} />

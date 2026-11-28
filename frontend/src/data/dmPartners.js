@@ -4,6 +4,8 @@
 // Drafting instructions in the document ("Buttons: ...") are not page text. The two programmes keep separate content; only what the document states for BOTH (the comparison, the services, the
 // Partner Support Program and "Why partner with us") is shown on both pages.
 
+import { ITA } from './itAuthorized.js'
+
 export const DM = {
   hero: { heading: 'Partner with Us for Digital Marketing', lead: 'Grow your business by partnering with an IT company that has a dedicated digital marketing team.', sub: 'Choose the partnership that fits you: become an Authorized Partner and deliver digital marketing services under our brand, or become a Referral Partner and earn by connecting businesses with us.' },
   compare: {
@@ -53,6 +55,8 @@ export const DM = {
 
 export const DMA = {
   title: 'Authorized Partner Program',
+  payments: ITA.payments, // customer payment restrictions (Authorized Business Partner Agreement)
+  arrangements: ITA.arrangements, // commercial arrangements (no figures are published)
   tagline: 'Offer digital marketing services to your clients, backed by our team.',
   intro: 'As an Authorized Partner, you add digital marketing to your business offering without building a team from scratch. You bring the clients, and we bring the expertise, tools, and technical support.',
   benefits: ['Authorized partner status backed by an established IT company', 'Access to our full range of digital marketing services', 'Training and onboarding support', 'Marketing materials, presentations, and service information', 'Technical assistance from our IT team', 'Ongoing guidance for your client projects', 'Opportunity to build recurring client relationships through monthly packages'],

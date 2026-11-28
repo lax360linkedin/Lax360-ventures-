@@ -23,7 +23,7 @@ class PartnershipApplication(UUIDPk, Base):
     __tablename__ = "pt_applications"
     __table_args__ = (
         CheckConstraint("category in ('franchise','authorized','referral')", name="category"),
-        UniqueConstraint("reference", name="reference"),
+        UniqueConstraint("reference", name="uq_pt_applications_reference"),
         Index("ix_pt_applications_status_created", "status", "created_at"),
         Index("ix_pt_applications_category_division", "category", "division"),
         Index("ix_pt_applications_fingerprint", "fingerprint", "created_at"),
@@ -68,7 +68,7 @@ class PartnershipMenuItem(UUIDPk, Base):
     __tablename__ = "pt_menu_items"
     __table_args__ = (
         CheckConstraint("category in ('franchise','authorized-partner','referral-partner')", name="category"),
-        UniqueConstraint("category", "slug", name="category_slug"),
+        UniqueConstraint("category", "slug", name="uq_pt_menu_items_category_slug"),
         Index("ix_pt_menu_items_category_sort", "category", "sort_order"),
     )
 
@@ -139,7 +139,7 @@ class PartnershipPolicy(UUIDPk, Base):
     __tablename__ = "pt_policies"
     __table_args__ = (
         CheckConstraint("status in ('draft','published','archived')", name="status"),
-        UniqueConstraint("key", "scope", "version", name="key_scope_version"),
+        UniqueConstraint("key", "scope", "version", name="uq_pt_policies_key_scope_version"),
         Index("ix_pt_policies_key_scope", "key", "scope", "status"),
     )
 

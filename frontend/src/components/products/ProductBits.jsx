@@ -13,7 +13,7 @@ const STATUS_CLS = {
 // Each product's own mark (used when it has no uploaded logo).
 const ICONS = { users: Users, stethoscope: Stethoscope, graduation: GraduationCap, receipt: Receipt, server: Server, map: Map, calendar: Calendar, boxes: Boxes, idcard: IdCard, kanban: Kanban, workflow: Workflow, package: Package }
 
-export const StatusBadge = ({ status }) => (
+export const StatusBadge = ({ status }) => status === 'live' ? null : (
   <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_CLS[status] || STATUS_CLS.soon}`}>
     <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />{productStatuses[status] || productStatuses.soon}
   </span>

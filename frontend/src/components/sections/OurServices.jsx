@@ -3,7 +3,7 @@ import { ArrowUpRight } from 'lucide-react'
 import Button from '../ui/Button.jsx'
 import Reveal from '../ui/Reveal.jsx'
 import SectionHeading from '../ui/SectionHeading.jsx'
-import { allDivisions } from '../../data/services.js'
+import { useDivisionTools } from '../../hooks/useDivisions.js'
 import { divisionIcons } from '../../utils/divisionIcons.js'
 
 // One photo per major service (free-licence Unsplash images, see public/assets/services/CREDITS.md).
@@ -18,7 +18,8 @@ const PHOTO = {
 }
 
 /** Home "Our Services": heading, short introduction and a card per major service (photo, icon, short description), then a button to the Services page. */
-export default function OurServices({ eyebrow = 'What we do', title = 'Our', gradient = 'Services', lead = 'Seven areas of expertise — software, AI, marketing, APIs, automation, mobile apps and education and training — from one accountable team — planned, built and supported around how your business works.' }) {
+export default function OurServices({ eyebrow = 'What we do', title = 'Our', gradient = 'Services', lead = 'Three active divisions — Software & IT Services, Digital Marketing, and Education & Training — from one accountable team, planned, built and supported around how your business works. Four more divisions are under development.' }) {
+  const { allDivisions } = useDivisionTools()
   return (
     <section aria-labelledby="our-services-title" className="wrap section">
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">

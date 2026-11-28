@@ -2,11 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 export const categoryLinks = [
   { id: 'software', label: 'Software & IT' },
-  { id: 'ai', label: 'AI & Automation' },
   { id: 'growth', label: 'Digital Marketing' },
-  { id: 'headless', label: 'Headless SaaS & APIs' },
-  { id: 'automation', label: 'Workflow Integration' },
-  { id: 'mobile', label: 'Mobile & Business Apps' },
   { id: 'education', label: 'Education & Training' },
   { id: 'upcoming', label: 'Upcoming Services' },
 ]

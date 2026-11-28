@@ -6,7 +6,7 @@ import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import BranchMap from '../components/ui/BranchMap.jsx'
 import OwnerLinks from '../components/layout/OwnerLinks.jsx'
-import { allDivisions } from '../data/services.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import { useBranchDirectory } from '../hooks/useBranches.js'
 import { useContentReady, useSite } from '../hooks/useSite.js'
 import { localBusinessSchemas } from '../utils/seo.js'
@@ -23,6 +23,7 @@ const areaOf = (b) => (b.address && b.address.length >= 3 ? b.address[1].replace
  * (Admin Panel > Branch locations) gets its page automatically; the three built-in offices are prerendered. The text is built from the branch's own details, so no page repeats another's.
  */
 export default function Location() {
+  const { allDivisions } = useDivisionTools()
   const { slug } = useParams()
   const { branches, live } = useBranchDirectory()
   const ready = useContentReady()

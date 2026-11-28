@@ -14,7 +14,7 @@ import { useFaqs } from '../hooks/useSite.js'
 
 /**
  * /services — the single entry point for everything we do. Hero with photo mosaic, sticky quick-access navigation,
- * seven category sections in different layouts (Headless SaaS & API Solutions is the featured one), process, FAQ and a closing call to action.
+ * the three active divisions in different layouts (Software & IT Services contains Headless SaaS & API Solutions, AI Workflow Automations & Integrations and Mobile & Business Applications), the four upcoming divisions, process, FAQ and a closing call to action.
  */
 export default function Services() {
   const faqs = useFaqs('services', servicesFaq)
@@ -22,7 +22,7 @@ export default function Services() {
     <PageContainer
       path="/services"
       title="Services"
-      description="Seven service categories from LAX360 Pvt Ltd: software and IT services, AI and business automation, digital marketing, headless SaaS and API solutions, workflow automation, mobile and business applications, and education and training."
+      description="LAX360 Pvt Ltd has three active service divisions: Software & IT Services (including headless SaaS and API solutions, AI workflow automations and integrations, and mobile and business applications), Digital Marketing, and Education & Training. Four more divisions are under development: AI, IoT / Embedded Systems & Robotics, CAD Designing & Training, and Blockchain & Web 3.0."
     >
       <ServicesHero />
       <CategoryNav />

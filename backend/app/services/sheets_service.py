@@ -47,7 +47,7 @@ COLUMNS = {
     "org": "Organization Name", "type": "Enquiry Type", "ptype": "Partnership Type", "divs": "Selected Business Divisions", "products": "Products or Services", "course": "Selected Course",
     "other": "Other Business Interests", "city": "City", "state": "State", "location": "Preferred Location", "budget": "Investment Budget", "message": "Message", "source": "Source Page",
     "branch": "Assigned Branch", "employee": "Assigned Employee", "status": "Enquiry Status", "followup": "Follow-up Date", "updated": "Last Updated", "details": "Additional Details",
-    "cdate": "Consultation Date", "ctime": "Consultation Time", "cmethod": "Contact Method", "cmode": "Meeting Mode",
+    "scat": "Service Category", "cdate": "Consultation Date", "ctime": "Consultation Time", "cmethod": "Contact Method", "cmode": "Meeting Mode",
 }
 _BASE = ["id", "date", "time", "name", "email", "phone"]
 _TAIL = ["message", "source", "branch", "employee", "status", "followup", "updated"]
@@ -63,6 +63,7 @@ TAB_COLUMNS: dict[str, list[str]] = {
     "franchise": [*_PARTNER, "budget", *_TAIL],
     "authorized": [*_PARTNER, *_TAIL],
     "referral": [*_PARTNER, *_TAIL],
+    "product": [*_BASE, "org", "scat", "products", "budget", "details", *_TAIL],
     "upcoming": [*_BASE, "org", "type", "ptype", "products", "divs", "other", *_TAIL[:2], "status", "updated"],
     "consultation": [*_BASE, "org", "type", "ptype", "divs", "cdate", "ctime", "cmethod", "cmode", "message", "source", "branch", "employee", "status", "updated"],
     "other": [*_BASE, "org", "type", "details", "message", "source", "status", "updated"],
@@ -237,15 +238,16 @@ def enquiry_text(e: ContactEnquiry) -> str:
 def _enquiry_record(db: Session, e: ContactEnquiry, settings: Settings) -> dict:
     x = e.extra or {}
     rec = {"id": str(e.id), "name": e.name, "email": e.email, "phone": e.phone, "org": e.company or x.get("college") or x.get("company"), "type": ENQUIRY_TYPES.get(e.enquiry_type, e.enquiry_type),
-           "message": e.message, "source": e.source, "branch": e.branch.city if e.branch else "", "employee": _employee(db, e.assigned_to), "status": e.status, "followup": _followup(db, e.id)}
+           "message": e.message, "source": x.get("source_page") or e.source, "branch": e.branch.city if e.branch else "", "employee": _employee(db, e.assigned_to), "status": e.status, "followup": _followup(db, e.id)}
     rec["course"] = x.get("course")
+    rec["scat"] = x.get("service_category")
     rec["products"] = x.get("service_subs") or x.get("service_mains") or x.get("service") or x.get("projectType") or x.get("task") or x.get("goal")
     rec["budget"] = x.get("investment_capacity") or x.get("investment") or x.get("budget")
     rec["city"], rec["state"], rec["location"] = x.get("city"), x.get("state"), x.get("preferred_location") or x.get("location") or x.get("city")
     rec["divs"] = x.get("business_division")
     rec["ptype"] = x.get("interestedAs") or x.get("partnership_category") or (ENQUIRY_TYPES.get(e.enquiry_type) if e.enquiry_type.startswith("partner") else "")
     rec["details"] = _details(x, {"course", "service_subs", "service_mains", "service", "projectType", "task", "goal", "college", "company", "business_division", "partnership_category", "interestedAs", "investment_capacity",
-                                  "investment", "budget", "city", "state", "preferred_location", "location"})
+                                  "investment", "budget", "city", "state", "preferred_location", "location", "service_category", "source_page"})
     _stamp(rec, e.created_at, e.updated_at, settings)
     return rec
 

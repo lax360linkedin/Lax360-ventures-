@@ -14,7 +14,7 @@ import ContactCta from '../components/sections/ContactCta.jsx'
 import { AboutIntro, AboutMore, useAboutBlocks } from '../components/cms/AboutBlocks.jsx'
 import { useAboutSections } from '../hooks/useCmsPages.js'
 import { useSite, useH1Override } from '../hooks/useSite.js'
-import { allDivisions } from '../data/services.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 
 // Built-in About content (LAX360 Pvt Ltd). Introduction, story steps (with their pictures), vision, mission and values can be replaced, and any section hidden,
@@ -44,7 +44,6 @@ const motto = [
   { word: 'Inspire', icon: Sparkles, text: 'Encourage continuous learning, improvement, and new possibilities through technology.' },
 ]
 
-const expertise = allDivisions.map((d, i) => ({ letter: String.fromCharCode(65 + i), icon: divisionIcons[d.slug], title: d.name, to: `/services#${d.slug}`, img: d.photo, text: d.short }))
 
 const features = [
   { icon: Layers, title: 'Multi-Domain Expertise', text: 'Capabilities across software, AI, and digital marketing.' },
@@ -283,6 +282,8 @@ function Purpose({ blocks }) {
 
 /** Core expertise: five photo cards (a different photograph each) linking to the matching part of the Services page. */
 function Expertise() {
+  const { allDivisions } = useDivisionTools()
+  const expertise = allDivisions.map((d, i) => ({ letter: String.fromCharCode(65 + i), icon: divisionIcons[d.slug], title: d.name, to: `/services#${d.slug}`, img: d.photo, text: d.short }))
   return (
     <section className="border-y border-edge bg-base2/50" aria-labelledby="expertise-title">
       <div className="wrap section">

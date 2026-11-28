@@ -156,14 +156,14 @@ CREATE TABLE ai_usage (
 
 CREATE INDEX ix_ai_usage_created_at ON ai_usage (created_at);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('4c23975c-8053-4cf3-bc9f-1cd2a1ef5b5e', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('97b77de4-e469-4810-9879-1c8bd5c1fbd6', 'salem', 'LAX360 Ventures — Salem Branch', 'Salem', 'LAX360 Pvt Ltd
 1st Floor, 16, CPS Tower
 Advaitha Ashram Rd, Fairlands
 Salem, Tamil Nadu 636007', 1);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('a73de0bf-0519-4b9c-af1a-29cdf1def7c7', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('d1ce9ea1-c46c-4f5a-9f98-56087a5ddb66', 'bangalore', 'LAX360 Ventures — Bangalore Branch', 'Bangalore', NULL, 2);
 
-INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('46cb35ff-1545-4ec1-83d4-0d8f9b4ee954', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
+INSERT INTO branches (id, slug, name, city, address, sort_order) VALUES ('d552a73b-daa4-40b0-9618-65cb9f3b3257', 'mumbai', 'LAX360 Ventures — Mumbai Branch', 'Mumbai', NULL, 3);
 
 INSERT INTO alembic_version (version_num) VALUES ('0001') RETURNING alembic_version.version_num;
 
@@ -679,7 +679,7 @@ INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_
 
 INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('2ac41554-2f65-57db-a206-86e919f34785', 'contact', 'phone', 'Phone', '+91 95666 79928', 'Salem & Bangalore', '["header", "footer", "contact"]', true, 40, 'contact:phone:919566679928');
 
-INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('c5c1c102-d26f-5217-8703-c66ea2b7b2a6', 'contact', 'email', 'Email', 'admin@lax360.in', NULL, '["header", "footer", "contact"]', true, 50, 'contact:email:admin@lax360.in');
+INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('54ca31ae-a46d-5c93-8ce7-ed2805dfb9f8', 'contact', 'email', 'Email', 'admin@lax360.in', NULL, '["header", "footer", "contact"]', true, 50, 'contact:email:admin@lax360.in');
 
 INSERT INTO contact_channels (id, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) VALUES ('41dc71d7-b45c-59a5-b935-c6369fb8ff00', 'contact', 'phone', 'Phone', '+91 95666 05272', 'Mumbai', '["footer", "contact"]', true, 60, 'contact:phone:919566605272');
 
@@ -768,6 +768,536 @@ UPDATE branches SET phone = '+91 95666 79928, +91 86676 30258' WHERE slug = 'sal
 INSERT INTO contact_channels (id, owner_type, owner_ref, kind, type, label, value, note, locations, is_active, sort_order, dedupe_key) SELECT CAST('3d5f0f0e-5b6e-5a39-9a43-8667630258aa' AS uuid), 'global', NULL, 'contact', 'phone', 'Phone', '+91 86676 30258', 'Salem', CAST('["footer", "contact"]' AS json), true, COALESCE((SELECT MAX(sort_order) FROM contact_channels WHERE owner_type = 'global'), 0) + 10, 'contact:phone:918667630258' WHERE NOT EXISTS (SELECT 1 FROM contact_channels WHERE dedupe_key = 'contact:phone:918667630258');
 
 UPDATE alembic_version SET version_num='0025' WHERE alembic_version.version_num = '0024';
+
+-- Running upgrade 0025 -> 0026
+
+CREATE TABLE pz_profiles (
+    id UUID NOT NULL, 
+    user_id UUID NOT NULL, 
+    nickname VARCHAR(24) NOT NULL, 
+    nickname_key VARCHAR(24) NOT NULL, 
+    avatar VARCHAR(32) DEFAULT 'star-collector' NOT NULL, 
+    preferences JSON DEFAULT '{}' NOT NULL, 
+    stats JSON DEFAULT '{}' NOT NULL, 
+    games_played INTEGER DEFAULT '0' NOT NULL, 
+    verified_points INTEGER DEFAULT '0' NOT NULL, 
+    last_played_at TIMESTAMP WITH TIME ZONE, 
+    hidden BOOLEAN DEFAULT false NOT NULL, 
+    moderation_note VARCHAR(300), 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_profiles PRIMARY KEY (id), 
+    CONSTRAINT uq_pz_profiles_user_id UNIQUE (user_id), 
+    CONSTRAINT uq_pz_profiles_nickname_key UNIQUE (nickname_key), 
+    CONSTRAINT fk_pz_profiles_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_pz_profiles_verified_points ON pz_profiles (verified_points);
+
+CREATE TABLE pz_game_sessions (
+    id UUID NOT NULL, 
+    user_id UUID NOT NULL, 
+    game VARCHAR(20) NOT NULL, 
+    level_id VARCHAR(40) DEFAULT 'main' NOT NULL, 
+    config JSON DEFAULT '{}' NOT NULL, 
+    request_key VARCHAR(64), 
+    status VARCHAR(12) DEFAULT 'started' NOT NULL, 
+    started_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+    completed_at TIMESTAMP WITH TIME ZONE, 
+    duration_ms INTEGER, 
+    client_result JSON, 
+    verdict VARCHAR(12), 
+    reasons JSON DEFAULT '[]' NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_game_sessions PRIMARY KEY (id), 
+    CONSTRAINT ck_pz_game_sessions_ck_pz_game_sessions_status CHECK (status in ('started','completed','rejected','expired')), 
+    CONSTRAINT uq_pz_game_sessions_request UNIQUE (user_id, request_key), 
+    CONSTRAINT fk_pz_game_sessions_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_pz_game_sessions_user_game_started ON pz_game_sessions (user_id, game, started_at);
+
+CREATE INDEX ix_pz_game_sessions_status_expires ON pz_game_sessions (status, expires_at);
+
+CREATE TABLE pz_scores (
+    id UUID NOT NULL, 
+    session_id UUID NOT NULL, 
+    user_id UUID NOT NULL, 
+    game VARCHAR(20) NOT NULL, 
+    level_id VARCHAR(40) DEFAULT 'main' NOT NULL, 
+    score INTEGER NOT NULL, 
+    points INTEGER NOT NULL, 
+    status VARCHAR(10) DEFAULT 'accepted' NOT NULL, 
+    flags JSON DEFAULT '[]' NOT NULL, 
+    details JSON DEFAULT '{}' NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_scores PRIMARY KEY (id), 
+    CONSTRAINT ck_pz_scores_ck_pz_scores_status CHECK (status in ('accepted','flagged','hidden')), 
+    CONSTRAINT uq_pz_scores_session_id UNIQUE (session_id), 
+    CONSTRAINT fk_pz_scores_session_id_pz_game_sessions FOREIGN KEY(session_id) REFERENCES pz_game_sessions (id) ON DELETE CASCADE, 
+    CONSTRAINT fk_pz_scores_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_pz_scores_board ON pz_scores (game, level_id, status, created_at);
+
+CREATE INDEX ix_pz_scores_game_score ON pz_scores (game, status, score);
+
+CREATE INDEX ix_pz_scores_user_game ON pz_scores (user_id, game, created_at);
+
+CREATE TABLE pz_progress (
+    user_id UUID NOT NULL, 
+    game VARCHAR(20) NOT NULL, 
+    data JSON DEFAULT '{}' NOT NULL, 
+    version INTEGER DEFAULT '1' NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_progress PRIMARY KEY (user_id, game), 
+    CONSTRAINT fk_pz_progress_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE pz_achievement_defs (
+    code VARCHAR(40) NOT NULL, 
+    title VARCHAR(60) NOT NULL, 
+    description VARCHAR(200) NOT NULL, 
+    game VARCHAR(20), 
+    icon VARCHAR(30) DEFAULT 'trophy' NOT NULL, 
+    sort_order INTEGER DEFAULT '0' NOT NULL, 
+    active BOOLEAN DEFAULT true NOT NULL, 
+    CONSTRAINT pk_pz_achievement_defs PRIMARY KEY (code)
+);
+
+CREATE TABLE pz_player_achievements (
+    user_id UUID NOT NULL, 
+    code VARCHAR(40) NOT NULL, 
+    earned_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    session_id UUID, 
+    CONSTRAINT pk_pz_player_achievements PRIMARY KEY (user_id, code), 
+    CONSTRAINT fk_pz_player_achievements_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
+    CONSTRAINT fk_pz_player_achievements_code_pz_achievement_defs FOREIGN KEY(code) REFERENCES pz_achievement_defs (code) ON DELETE CASCADE, 
+    CONSTRAINT fk_pz_player_achievements_session_id_pz_game_sessions FOREIGN KEY(session_id) REFERENCES pz_game_sessions (id) ON DELETE SET NULL
+);
+
+CREATE TABLE pz_challenges (
+    id UUID NOT NULL, 
+    challenge_date DATE NOT NULL, 
+    code VARCHAR(40) NOT NULL, 
+    title VARCHAR(80) NOT NULL, 
+    description VARCHAR(200) NOT NULL, 
+    metric VARCHAR(30) NOT NULL, 
+    game VARCHAR(20), 
+    target INTEGER NOT NULL, 
+    reward_points INTEGER NOT NULL, 
+    starts_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+    CONSTRAINT pk_pz_challenges PRIMARY KEY (id), 
+    CONSTRAINT uq_pz_challenges_day_code UNIQUE (challenge_date, code)
+);
+
+CREATE INDEX ix_pz_challenges_date ON pz_challenges (challenge_date);
+
+CREATE TABLE pz_challenge_progress (
+    user_id UUID NOT NULL, 
+    challenge_id UUID NOT NULL, 
+    progress INTEGER DEFAULT '0' NOT NULL, 
+    games JSON DEFAULT '[]' NOT NULL, 
+    completed_at TIMESTAMP WITH TIME ZONE, 
+    claimed_at TIMESTAMP WITH TIME ZONE, 
+    reward_points INTEGER, 
+    CONSTRAINT pk_pz_challenge_progress PRIMARY KEY (user_id, challenge_id), 
+    CONSTRAINT fk_pz_challenge_progress_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
+    CONSTRAINT fk_pz_challenge_progress_challenge_id_pz_challenges FOREIGN KEY(challenge_id) REFERENCES pz_challenges (id) ON DELETE CASCADE
+);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('first-steps', 'First Steps', 'Play your first game in the Play Zone.', NULL, 'footprints', 10);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('all-rounder', 'All-Rounder', 'Play all four games with a signed-in account.', NULL, 'gamepad', 20);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('star-collector', 'Star Collector', 'Collect 100 stars in Catch the Stars.', 'catch-the-stars', 'star', 30);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('cloud-explorer', 'Cloud Explorer', 'Complete Cloud Kingdom in LAXBOT Jump.', 'laxbot-jump', 'cloud', 40);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('sky-climber', 'Sky Climber', 'Complete all five LAXBOT Jump worlds.', 'laxbot-jump', 'mountain', 50);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('crystal-gardener', 'Crystal Gardener', 'Complete the five levels of Crystal Garden in Puzzle Pop.', 'puzzle-pop', 'flower', 60);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('puzzle-master', 'Puzzle Master', 'Complete 10 Puzzle Pop levels.', 'puzzle-pop', 'puzzle', 70);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('bug-squasher', 'Bug Squasher', 'Capture 50 bugs in Bug Hunter.', 'bug-hunter', 'bug', 80);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('cyber-defender', 'Cyber Defender', 'Defeat the Core Corruptor, the final Bug Hunter boss.', 'bug-hunter', 'shield', 90);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('daily-hero', 'Daily Hero', 'Claim your first daily challenge reward.', NULL, 'calendar', 100);
+
+INSERT INTO pz_achievement_defs (code, title, description, game, icon, sort_order) VALUES ('champion', 'Champion', 'Reach 2,500 verified overall points.', NULL, 'trophy', 110);
+
+ALTER TABLE public."pz_profiles" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_game_sessions" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_scores" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_progress" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_achievement_defs" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_player_achievements" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_challenges" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_challenge_progress" ENABLE ROW LEVEL SECURITY;
+
+UPDATE alembic_version SET version_num='0026' WHERE alembic_version.version_num = '0025';
+
+-- Running upgrade 0026 -> 0027
+
+ALTER TABLE pz_profiles ADD COLUMN suspended BOOLEAN DEFAULT 'false' NOT NULL;
+
+ALTER TABLE pz_profiles ADD COLUMN suspended_at TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE pz_profiles ADD COLUMN suspended_reason VARCHAR(300);
+
+ALTER TABLE pz_achievement_defs ADD COLUMN rule_type VARCHAR(30);
+
+ALTER TABLE pz_achievement_defs ADD COLUMN rule_params JSON DEFAULT '{}' NOT NULL;
+
+ALTER TABLE pz_achievement_defs ADD COLUMN reward_points INTEGER DEFAULT '0' NOT NULL;
+
+ALTER TABLE pz_achievement_defs ADD COLUMN icon_media_id UUID;
+
+ALTER TABLE pz_achievement_defs ADD CONSTRAINT fk_pz_achievement_defs_icon_media_id_media_assets FOREIGN KEY(icon_media_id) REFERENCES media_assets (id) ON DELETE SET NULL;
+
+CREATE TABLE pz_game_configs (
+    game VARCHAR(20) NOT NULL, 
+    enabled BOOLEAN DEFAULT 'true' NOT NULL, 
+    published BOOLEAN DEFAULT 'true' NOT NULL, 
+    visibility VARCHAR(10) DEFAULT 'public' NOT NULL, 
+    maintenance BOOLEAN DEFAULT 'false' NOT NULL, 
+    featured BOOLEAN DEFAULT 'false' NOT NULL, 
+    sort_order INTEGER DEFAULT '0' NOT NULL, 
+    title VARCHAR(60), 
+    short_description VARCHAR(200), 
+    instructions TEXT, 
+    thumbnail_media_id UUID, 
+    banner_media_id UUID, 
+    disabled_levels JSON DEFAULT '[]' NOT NULL, 
+    params JSON DEFAULT '{}' NOT NULL, 
+    config_version INTEGER DEFAULT '1' NOT NULL, 
+    updated_by UUID, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_game_configs PRIMARY KEY (game), 
+    CONSTRAINT fk_pz_game_configs_thumbnail_media_id_media_assets FOREIGN KEY(thumbnail_media_id) REFERENCES media_assets (id) ON DELETE SET NULL, 
+    CONSTRAINT fk_pz_game_configs_banner_media_id_media_assets FOREIGN KEY(banner_media_id) REFERENCES media_assets (id) ON DELETE SET NULL, 
+    CONSTRAINT fk_pz_game_configs_updated_by_users FOREIGN KEY(updated_by) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE pz_game_config_versions (
+    id UUID NOT NULL, 
+    game VARCHAR(20) NOT NULL, 
+    version INTEGER NOT NULL, 
+    params JSON DEFAULT '{}' NOT NULL, 
+    changed_by UUID, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_game_config_versions PRIMARY KEY (id), 
+    CONSTRAINT uq_pz_game_config_versions_game_version UNIQUE (game, version), 
+    CONSTRAINT fk_pz_game_config_versions_changed_by_users FOREIGN KEY(changed_by) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE pz_settings (
+    key VARCHAR(40) NOT NULL, 
+    value JSON DEFAULT '{}' NOT NULL, 
+    updated_by UUID, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_settings PRIMARY KEY (key), 
+    CONSTRAINT fk_pz_settings_updated_by_users FOREIGN KEY(updated_by) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE pz_moderation_events (
+    id UUID NOT NULL, 
+    target_type VARCHAR(10) NOT NULL, 
+    target_id UUID NOT NULL, 
+    user_id UUID, 
+    action VARCHAR(20) NOT NULL, 
+    reason VARCHAR(300) NOT NULL, 
+    admin_id UUID, 
+    admin_email VARCHAR(200) NOT NULL, 
+    detail JSON, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_moderation_events PRIMARY KEY (id), 
+    CONSTRAINT ck_pz_moderation_events_ck_pz_moderation_events_target_type CHECK (target_type in ('score','player')), 
+    CONSTRAINT fk_pz_moderation_events_user_id_users FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE SET NULL, 
+    CONSTRAINT fk_pz_moderation_events_admin_id_users FOREIGN KEY(admin_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_pz_moderation_events_target ON pz_moderation_events (target_type, target_id, created_at);
+
+CREATE INDEX ix_pz_moderation_events_user ON pz_moderation_events (user_id, created_at);
+
+CREATE TABLE pz_challenge_templates (
+    id UUID NOT NULL, 
+    code VARCHAR(40) NOT NULL, 
+    title VARCHAR(80) NOT NULL, 
+    description VARCHAR(200) NOT NULL, 
+    metric VARCHAR(30) NOT NULL, 
+    game VARCHAR(20), 
+    targets JSON DEFAULT '[]' NOT NULL, 
+    reward_points INTEGER DEFAULT '20' NOT NULL, 
+    active BOOLEAN DEFAULT 'true' NOT NULL, 
+    starts_on DATE, 
+    ends_on DATE, 
+    artwork_media_id UUID, 
+    sort_order INTEGER DEFAULT '0' NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_challenge_templates PRIMARY KEY (id), 
+    CONSTRAINT uq_pz_challenge_templates_code UNIQUE (code), 
+    CONSTRAINT fk_pz_challenge_templates_artwork_media_id_media_assets FOREIGN KEY(artwork_media_id) REFERENCES media_assets (id) ON DELETE SET NULL
+);
+
+CREATE TABLE pz_media_links (
+    id UUID NOT NULL, 
+    media_id UUID NOT NULL, 
+    purpose VARCHAR(20) NOT NULL, 
+    game VARCHAR(20), 
+    label VARCHAR(100), 
+    created_by UUID, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pz_media_links PRIMARY KEY (id), 
+    CONSTRAINT uq_pz_media_links_media_id UNIQUE (media_id), 
+    CONSTRAINT ck_pz_media_links_ck_pz_media_links_purpose CHECK (purpose in ('game_thumbnail','game_banner','world_preview','achievement_icon','challenge_art','promo')), 
+    CONSTRAINT fk_pz_media_links_media_id_media_assets FOREIGN KEY(media_id) REFERENCES media_assets (id) ON DELETE CASCADE, 
+    CONSTRAINT fk_pz_media_links_created_by_users FOREIGN KEY(created_by) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_pz_media_links_purpose ON pz_media_links (purpose);
+
+CREATE INDEX ix_pz_game_sessions_started_at ON pz_game_sessions (started_at);
+
+CREATE INDEX ix_pz_scores_created_at ON pz_scores (created_at);
+
+CREATE INDEX ix_pz_profiles_created_at ON pz_profiles (created_at);
+
+CREATE INDEX ix_pz_player_achievements_earned_at ON pz_player_achievements (earned_at);
+
+INSERT INTO pz_challenge_templates (id, code, title, description, metric, game, targets, reward_points, sort_order) VALUES ('ce7b5f14-0db9-4dee-af51-dbf030d84631', 'stars', 'Collect {n} stars', 'Collect {n} stars in Catch the Stars (verified rounds only).', 'stars_collected', 'catch-the-stars', '[20, 25, 30, 20, 25, 30, 35]', 20, 10);
+
+INSERT INTO pz_challenge_templates (id, code, title, description, metric, game, targets, reward_points, sort_order) VALUES ('7f2b920a-1d1d-46b2-b3f8-fce6ad0278a2', 'platform', 'Finish {n} platform level{s}', 'Complete {n} LAXBOT Jump level{s} (verified runs only).', 'platform_levels', 'laxbot-jump', '[1, 1, 1, 1, 1, 2, 2]', 20, 20);
+
+INSERT INTO pz_challenge_templates (id, code, title, description, metric, game, targets, reward_points, sort_order) VALUES ('58dd8f02-9c99-416c-a0cd-2d57b522d800', 'puzzle', 'Win {n} puzzle level{s}', 'Win {n} Puzzle Pop level{s} (verified replays only).', 'puzzle_levels', 'puzzle-pop', '[1, 1, 1, 1, 1, 2, 2]', 20, 30);
+
+INSERT INTO pz_challenge_templates (id, code, title, description, metric, game, targets, reward_points, sort_order) VALUES ('563cfd43-1e4f-42df-b382-52b5e656932b', 'bugs', 'Capture {n} bugs', 'Capture {n} bugs in Bug Hunter (verified runs only).', 'bugs_captured', 'bug-hunter', '[15, 12, 15, 18, 15, 20, 20]', 20, 40);
+
+INSERT INTO pz_challenge_templates (id, code, title, description, metric, game, targets, reward_points, sort_order) VALUES ('3cd31541-b3f3-4a49-821d-92890bf9e145', 'two-games', 'Play {n} different games', 'Finish a verified round in {n} different Play Zone games today.', 'distinct_games', NULL, '[2, 2, 2, 2, 2, 3, 3]', 30, 50);
+
+ALTER TABLE public."pz_game_configs" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_game_config_versions" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_settings" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_moderation_events" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_challenge_templates" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pz_media_links" ENABLE ROW LEVEL SECURITY;
+
+UPDATE alembic_version SET version_num='0027' WHERE alembic_version.version_num = '0026';
+
+-- Running upgrade 0027 -> 0028
+
+CREATE TABLE pt_applications (
+    id UUID NOT NULL, 
+    reference VARCHAR(32) NOT NULL, 
+    category VARCHAR(12) NOT NULL, 
+    division VARCHAR(20) NOT NULL, 
+    status VARCHAR(30) DEFAULT 'new' NOT NULL, 
+    full_name VARCHAR(120) NOT NULL, 
+    email VARCHAR(254) NOT NULL, 
+    phone VARCHAR(20) NOT NULL, 
+    country VARCHAR(80) NOT NULL, 
+    state VARCHAR(80), 
+    city VARCHAR(80), 
+    occupation VARCHAR(120), 
+    entity_type VARCHAR(20), 
+    organization VARCHAR(160), 
+    preferred_location VARCHAR(160), 
+    answers JSON DEFAULT '{}' NOT NULL, 
+    consultation JSON DEFAULT '{}' NOT NULL, 
+    preferred_branch VARCHAR(40), 
+    assigned_branch VARCHAR(40), 
+    assigned_to UUID, 
+    consent_processing BOOLEAN DEFAULT 'false' NOT NULL, 
+    consent_marketing BOOLEAN DEFAULT 'false' NOT NULL, 
+    consent_at TIMESTAMP WITH TIME ZONE, 
+    source_page VARCHAR(160), 
+    fingerprint VARCHAR(64) NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pt_applications PRIMARY KEY (id), 
+    CONSTRAINT uq_pt_applications_reference UNIQUE (reference), 
+    CONSTRAINT ck_pt_applications_ck_pt_applications_category CHECK (category in ('franchise','authorized','referral')), 
+    CONSTRAINT fk_pt_applications_assigned_to_users FOREIGN KEY(assigned_to) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_pt_applications_status_created ON pt_applications (status, created_at);
+
+CREATE INDEX ix_pt_applications_category_division ON pt_applications (category, division);
+
+CREATE INDEX ix_pt_applications_fingerprint ON pt_applications (fingerprint, created_at);
+
+CREATE TABLE pt_application_events (
+    id UUID NOT NULL, 
+    application_id UUID NOT NULL, 
+    kind VARCHAR(14) NOT NULL, 
+    from_status VARCHAR(30), 
+    to_status VARCHAR(30), 
+    note TEXT, 
+    author_id UUID, 
+    author_name VARCHAR(120) DEFAULT 'Applicant' NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pt_application_events PRIMARY KEY (id), 
+    CONSTRAINT ck_pt_application_events_ck_pt_application_events_kind CHECK (kind in ('submitted','status','note','assign','consultation','followup')), 
+    CONSTRAINT fk_pt_application_events_application_id_pt_applications FOREIGN KEY(application_id) REFERENCES pt_applications (id) ON DELETE CASCADE, 
+    CONSTRAINT fk_pt_application_events_author_id_users FOREIGN KEY(author_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_pt_application_events_app ON pt_application_events (application_id, created_at);
+
+CREATE TABLE pt_pages (
+    slug VARCHAR(60) NOT NULL, 
+    published BOOLEAN DEFAULT 'true' NOT NULL, 
+    content JSON DEFAULT '{}' NOT NULL, 
+    seo_title VARCHAR(160), 
+    seo_description VARCHAR(320), 
+    noindex BOOLEAN DEFAULT 'false' NOT NULL, 
+    commercial JSON DEFAULT '{}' NOT NULL, 
+    hero_media_id UUID, 
+    hero_alt VARCHAR(200), 
+    brochure_media_id UUID, 
+    brochure_published BOOLEAN DEFAULT 'false' NOT NULL, 
+    brochure_version INTEGER DEFAULT '0' NOT NULL, 
+    version INTEGER DEFAULT '1' NOT NULL, 
+    updated_by UUID, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pt_pages PRIMARY KEY (slug), 
+    CONSTRAINT fk_pt_pages_hero_media_id_media_assets FOREIGN KEY(hero_media_id) REFERENCES media_assets (id) ON DELETE SET NULL, 
+    CONSTRAINT fk_pt_pages_brochure_media_id_media_assets FOREIGN KEY(brochure_media_id) REFERENCES media_assets (id) ON DELETE SET NULL, 
+    CONSTRAINT fk_pt_pages_updated_by_users FOREIGN KEY(updated_by) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE pt_faqs (
+    id UUID NOT NULL, 
+    scope VARCHAR(60) DEFAULT 'general' NOT NULL, 
+    question VARCHAR(300) NOT NULL, 
+    answer TEXT NOT NULL, 
+    sort_order INTEGER DEFAULT '0' NOT NULL, 
+    published BOOLEAN DEFAULT 'true' NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pt_faqs PRIMARY KEY (id)
+);
+
+CREATE INDEX ix_pt_faqs_scope_sort ON pt_faqs (scope, sort_order);
+
+CREATE TABLE pt_policies (
+    id UUID NOT NULL, 
+    key VARCHAR(30) NOT NULL, 
+    scope VARCHAR(60) DEFAULT 'general' NOT NULL, 
+    title VARCHAR(160) NOT NULL, 
+    body TEXT NOT NULL, 
+    version INTEGER DEFAULT '1' NOT NULL, 
+    status VARCHAR(10) DEFAULT 'draft' NOT NULL, 
+    effective_date DATE, 
+    reviewed_by VARCHAR(160), 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pt_policies PRIMARY KEY (id), 
+    CONSTRAINT uq_pt_policies_key_scope_version UNIQUE (key, scope, version), 
+    CONSTRAINT ck_pt_policies_ck_pt_policies_status CHECK (status in ('draft','published','archived'))
+);
+
+CREATE INDEX ix_pt_policies_key_scope ON pt_policies (key, scope, status);
+
+CREATE TABLE pt_settings (
+    key VARCHAR(40) NOT NULL, 
+    value JSON DEFAULT '{}' NOT NULL, 
+    updated_by UUID, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pt_settings PRIMARY KEY (key), 
+    CONSTRAINT fk_pt_settings_updated_by_users FOREIGN KEY(updated_by) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE pt_menu_items (
+    id UUID NOT NULL, 
+    category VARCHAR(24) NOT NULL, 
+    slug VARCHAR(40) NOT NULL, 
+    label VARCHAR(60) NOT NULL, 
+    description VARCHAR(300), 
+    sort_order INTEGER DEFAULT '0' NOT NULL, 
+    enabled BOOLEAN DEFAULT 'true' NOT NULL, 
+    builtin BOOLEAN DEFAULT 'false' NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    CONSTRAINT pk_pt_menu_items PRIMARY KEY (id), 
+    CONSTRAINT uq_pt_menu_items_category_slug UNIQUE (category, slug), 
+    CONSTRAINT ck_pt_menu_items_ck_pt_menu_items_category CHECK (category in ('franchise','authorized-partner','referral-partner'))
+);
+
+CREATE INDEX ix_pt_menu_items_category_sort ON pt_menu_items (category, sort_order);
+
+ALTER TABLE public."pt_applications" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pt_application_events" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pt_pages" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pt_faqs" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pt_policies" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pt_settings" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public."pt_menu_items" ENABLE ROW LEVEL SECURITY;
+
+UPDATE alembic_version SET version_num='0028' WHERE alembic_version.version_num = '0027';
+
+-- Running upgrade 0028 -> 0029
+
+ALTER TABLE pt_applications ALTER COLUMN division TYPE VARCHAR(40);
+
+ALTER TABLE pt_applications ADD COLUMN divisions JSON DEFAULT '[]' NOT NULL;
+
+ALTER TABLE pt_applications ADD COLUMN all_divisions BOOLEAN DEFAULT 'false' NOT NULL;
+
+ALTER TABLE pt_applications ADD COLUMN other_interest VARCHAR(300);
+
+update pt_applications set divisions = json_build_array(division);
+
+UPDATE alembic_version SET version_num='0029' WHERE alembic_version.version_num = '0028';
+
+-- Running upgrade 0029 -> 0030
+
+CREATE TABLE sheet_sync (
+    id UUID NOT NULL, 
+    record_kind VARCHAR(12) NOT NULL, 
+    record_id UUID NOT NULL, 
+    category VARCHAR(30) NOT NULL, 
+    tab VARCHAR(120) NOT NULL, 
+    status VARCHAR(10) DEFAULT 'pending' NOT NULL, 
+    attempts INTEGER DEFAULT '0' NOT NULL, 
+    last_error VARCHAR(300), 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    synced_at TIMESTAMP WITH TIME ZONE, 
+    CONSTRAINT pk_sheet_sync PRIMARY KEY (id), 
+    CONSTRAINT uq_sheet_sync_record_category UNIQUE (record_kind, record_id, category)
+);
+
+CREATE INDEX ix_sheet_sync_status ON sheet_sync (status, updated_at);
+
+ALTER TABLE public."sheet_sync" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE pt_applications ADD COLUMN sheets_synced_at TIMESTAMP WITH TIME ZONE;
+
+UPDATE alembic_version SET version_num='0030' WHERE alembic_version.version_num = '0029';
 
 COMMIT;
 

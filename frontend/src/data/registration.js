@@ -11,7 +11,7 @@ export const CATEGORY_LABEL = { student: 'Student', professional: 'Working profe
 
 export const PURPOSES = [
   { value: 'software', label: 'Looking for Software Development Services' },
-  { value: 'ai', label: 'Interested in AI & Automation Solutions' },
+  { value: 'ai', label: 'Interested in AI Workflow Automations & Integrations' },
   { value: 'marketing', label: 'Interested in Digital Marketing Services' },
   { value: 'products', label: 'Looking for Business Software / SaaS Products' },
   { value: 'training', label: 'Interested in Courses and Training' },

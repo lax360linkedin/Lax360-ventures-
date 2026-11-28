@@ -1,0 +1,1186 @@
+[
+ {
+  "product": "lax360-smart-billing-pos",
+  "solution": {
+   "slug": "inventory-and-billing-software",
+   "category": "software",
+   "kind": "product",
+   "name": "Inventory & Billing Software",
+   "status": "available",
+   "linked_product": "lax360-smart-billing-pos",
+   "order": 1,
+   "pitch": "Stock, purchase, sales and billing in one program, so the shop counter, the store room and the accounts agree.",
+   "overview": [
+    "Stock, purchase, sales and billing in one program, so the shop counter, the store room and the accounts agree.",
+    "LAX360 provides Inventory & Billing Software, and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the program should do, and adapt it to match."
+   ],
+   "problems": [
+    "Stock counts in a notebook never match what is on the shelf",
+    "Bills are written by hand or in spreadsheets and corrections take time",
+    "Nobody knows which items are running out until a customer asks"
+   ],
+   "features": [
+    "Barcode-ready item entry",
+    "Tax-ready invoice formats as required",
+    "Low-stock alerts",
+    "Customer and supplier ledgers"
+   ],
+   "modules": [
+    "Item and price master",
+    "Purchase and supplier entries",
+    "Sales billing and invoices",
+    "Stock movement and alerts",
+    "Daily and monthly reports"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We visit or call to understand how Inventory & Billing Software would sit inside your daily routine, and write down your current process and forms."
+    },
+    {
+     "title": "Design",
+     "text": "We agree a written scope: screens, rules and reports for item and price master and purchase and supplier entries, and whether it runs on a desktop, in the cloud, offline or both."
+    },
+    {
+     "title": "Develop",
+     "text": "We build in stages and show working software early, so your staff can try sales billing and invoices before everything is finished."
+    },
+    {
+     "title": "Deploy & support",
+     "text": "We install it, move over your existing data where possible, train your team and agree how support works."
+    }
+   ],
+   "customers": [
+    "Retail shops",
+    "Wholesalers and distributors",
+    "Small trading businesses"
+   ],
+   "industries": [
+    "Retail",
+    "Wholesale",
+    "Trading",
+    "Distribution"
+   ],
+   "benefits": [
+    "Fewer billing mistakes",
+    "A stock figure the whole team can trust",
+    "End-of-day reports without manual totals"
+   ],
+   "platforms": [
+    "Windows desktop",
+    "Web browser (cloud)",
+    "Offline or hybrid on request"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Desktop, cloud-based, offline or hybrid deployment"
+   ],
+   "integrations": [
+    "Barcode scanners",
+    "Receipt printers",
+    "Accounting tools",
+    "Payment gateways"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for inventory & billing software?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: Barcode scanners, Receipt printers, Accounting tools, Payment gateways. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "Inventory & Billing Software",
+   "seo_description": "Stock, purchase, sales and billing in one program, so the shop counter, the store room and the accounts agree.",
+   "keywords": [
+    "inventory & billing software",
+    "software development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/inventory-and-billing-software.webp",
+   "image_alt": "Product Interface Preview of Inventory & Billing Software",
+   "mock": "desktop",
+   "accent": "#2563eb",
+   "featured": true,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "clinic-management-software",
+    "textile-and-garment-management-software"
+   ],
+   "vi": 0
+  }
+ },
+ {
+  "product": "lax360-clinic-management",
+  "solution": {
+   "slug": "clinic-management-software",
+   "category": "software",
+   "kind": "product",
+   "name": "Clinic Management Software",
+   "status": "available",
+   "linked_product": "lax360-clinic-management",
+   "order": 2,
+   "pitch": "Patient registration, appointments, consultation notes and billing for a clinic, designed around the front desk and the doctor's day.",
+   "overview": [
+    "Patient registration, appointments, consultation notes and billing for a clinic, designed around the front desk and the doctor's day.",
+    "LAX360 provides Clinic Management Software, and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the program should do, and adapt it to match."
+   ],
+   "problems": [
+    "Patient files are scattered across registers and phones",
+    "Appointments double-book and walk-ins are hard to track",
+    "Billing and prescriptions are written separately"
+   ],
+   "features": [
+    "Doctor-wise schedules",
+    "Printable prescriptions",
+    "Patient visit history",
+    "Daily collection summary"
+   ],
+   "modules": [
+    "Patient registration",
+    "Appointment scheduling",
+    "Consultation and prescription notes",
+    "Billing and receipts",
+    "Visit history and reports"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We visit or call to understand how Clinic Management Software would sit inside your daily routine, and write down your current process and forms."
+    },
+    {
+     "title": "Design",
+     "text": "We agree a written scope: screens, rules and reports for patient registration and appointment scheduling, and whether it runs on a desktop, in the cloud, offline or both."
+    },
+    {
+     "title": "Develop",
+     "text": "We build in stages and show working software early, so your staff can try consultation and prescription notes before everything is finished."
+    },
+    {
+     "title": "Deploy & support",
+     "text": "We install it, move over your existing data where possible, train your team and agree how support works."
+    }
+   ],
+   "customers": [
+    "Single-doctor clinics",
+    "Multi-doctor clinics",
+    "Specialty practices"
+   ],
+   "industries": [
+    "Healthcare",
+    "Dental",
+    "Diagnostics",
+    "Wellness"
+   ],
+   "benefits": [
+    "A shorter queue at the front desk",
+    "Records found in seconds",
+    "Clear daily billing totals"
+   ],
+   "platforms": [
+    "Windows desktop",
+    "Web browser (cloud)",
+    "Offline or hybrid on request"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Desktop, cloud-based, offline or hybrid deployment"
+   ],
+   "integrations": [
+    "SMS and WhatsApp reminders",
+    "Payment gateways",
+    "Lab report uploads"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for clinic management software?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: SMS and WhatsApp reminders, Payment gateways, Lab report uploads. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "Clinic Management Software",
+   "seo_description": "Patient registration, appointments, consultation notes and billing for a clinic, designed around the front desk and the doctor's day.",
+   "keywords": [
+    "clinic management software",
+    "software development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/clinic-management-software.webp",
+   "image_alt": "Product Interface Preview of Clinic Management Software",
+   "mock": "desktop",
+   "accent": "#2563eb",
+   "featured": true,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "hospital-management-software",
+    "inventory-and-billing-software",
+    "clinic-management-web-application"
+   ],
+   "vi": 1
+  }
+ },
+ {
+  "product": "lax360-inventory-management",
+  "solution": {
+   "slug": "warehouse-management-software",
+   "category": "software",
+   "kind": "product",
+   "name": "Warehouse Management Software",
+   "status": "available",
+   "linked_product": "lax360-inventory-management",
+   "order": 10,
+   "pitch": "Goods in, goods out and stock location tracking for one or more warehouses.",
+   "overview": [
+    "Goods in, goods out and stock location tracking for one or more warehouses.",
+    "LAX360 provides Warehouse Management Software, and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the program should do, and adapt it to match."
+   ],
+   "problems": [
+    "Nobody knows where an item is stored",
+    "Goods receipts and dispatches are matched manually",
+    "Stock between warehouses is not visible"
+   ],
+   "features": [
+    "Location-wise stock",
+    "Barcode-ready receipts and dispatches",
+    "Transfer approvals",
+    "Ageing stock report"
+   ],
+   "modules": [
+    "Goods receipt",
+    "Storage location mapping",
+    "Dispatch and delivery notes",
+    "Inter-warehouse transfer",
+    "Stock reports"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We visit or call to understand how Warehouse Management Software would sit inside your daily routine, and write down your current process and forms."
+    },
+    {
+     "title": "Design",
+     "text": "We agree a written scope: screens, rules and reports for goods receipt and storage location mapping, and whether it runs on a desktop, in the cloud, offline or both."
+    },
+    {
+     "title": "Develop",
+     "text": "We build in stages and show working software early, so your staff can try dispatch and delivery notes before everything is finished."
+    },
+    {
+     "title": "Deploy & support",
+     "text": "We install it, move over your existing data where possible, train your team and agree how support works."
+    }
+   ],
+   "customers": [
+    "Warehousing companies",
+    "Distributors",
+    "Manufacturers with stores"
+   ],
+   "industries": [
+    "Logistics",
+    "Wholesale",
+    "Manufacturing"
+   ],
+   "benefits": [
+    "Items found faster",
+    "Fewer dispatch errors",
+    "One view across warehouses"
+   ],
+   "platforms": [
+    "Windows desktop",
+    "Web browser (cloud)",
+    "Offline or hybrid on request"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Desktop, cloud-based, offline or hybrid deployment"
+   ],
+   "integrations": [
+    "Barcode scanners",
+    "Accounting tools",
+    "Transport management tools"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for warehouse management software?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: Barcode scanners, Accounting tools, Transport management tools. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "Warehouse Management Software",
+   "seo_description": "Goods in, goods out and stock location tracking for one or more warehouses.",
+   "keywords": [
+    "warehouse management software",
+    "software development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/warehouse-management-software.webp",
+   "image_alt": "Product Interface Preview of Warehouse Management Software",
+   "mock": "desktop",
+   "accent": "#2563eb",
+   "featured": false,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "textile-and-garment-management-software",
+    "hotel-management-software"
+   ],
+   "vi": 9
+  }
+ },
+ {
+  "product": "lax360-business-crm",
+  "solution": {
+   "slug": "customer-relationship-management-crm",
+   "category": "webapps",
+   "kind": "product",
+   "name": "Customer Relationship Management (CRM)",
+   "status": "available",
+   "linked_product": "lax360-business-crm",
+   "order": 1,
+   "pitch": "Leads, customers, follow-ups and sales stages in one browser-based workspace for the whole team.",
+   "overview": [
+    "Leads, customers, follow-ups and sales stages in one browser-based workspace for the whole team.",
+    "LAX360 provides Customer Relationship Management (CRM), and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the web application should do, and adapt it to match."
+   ],
+   "problems": [
+    "Leads live in personal phones and are lost when people leave",
+    "Follow-ups are forgotten",
+    "Managers cannot see the pipeline"
+   ],
+   "features": [
+    "Pipeline board",
+    "Activity history",
+    "Team assignment",
+    "Import from spreadsheets"
+   ],
+   "modules": [
+    "Lead capture",
+    "Contact and company records",
+    "Pipeline stages",
+    "Follow-up reminders",
+    "Sales reports"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We map who will use Customer Relationship Management (CRM), what each role must be able to do, and what data it replaces."
+    },
+    {
+     "title": "Design",
+     "text": "We agree the modules, the screens for lead capture and contact and company records, user roles and the integrations needed."
+    },
+    {
+     "title": "Develop",
+     "text": "We build in stages with a working version for review, including the admin dashboard."
+    },
+    {
+     "title": "Launch & improve",
+     "text": "We host or hand over the application, train users and plan improvements after real use."
+    }
+   ],
+   "customers": [
+    "Sales teams",
+    "Service businesses",
+    "Agencies"
+   ],
+   "industries": [
+    "Services",
+    "Real estate",
+    "Education",
+    "IT"
+   ],
+   "benefits": [
+    "No lead left unattended",
+    "A shared view of the pipeline",
+    "Better follow-up discipline"
+   ],
+   "platforms": [
+    "Any modern browser",
+    "Responsive on tablet and phone"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Hosting and deployment options agreed with you"
+   ],
+   "integrations": [
+    "Email",
+    "WhatsApp (as agreed)",
+    "Website forms",
+    "Calendars"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for customer relationship management (crm)?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: Email, WhatsApp (as agreed), Website forms, Calendars. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "Customer Relationship Management (CRM)",
+   "seo_description": "Leads, customers, follow-ups and sales stages in one browser-based workspace for the whole team.",
+   "keywords": [
+    "customer relationship management (crm)",
+    "web application development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/customer-relationship-management-crm.webp",
+   "image_alt": "Product Interface Preview of Customer Relationship Management (CRM)",
+   "mock": "webapp",
+   "accent": "#7c3aed",
+   "featured": true,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "hr-and-employee-management-system",
+    "hospital-management-web-application",
+    "ai-customer-support-agent"
+   ],
+   "vi": 11
+  }
+ },
+ {
+  "product": "lax360-hr-employee-management",
+  "solution": {
+   "slug": "hr-and-employee-management-system",
+   "category": "webapps",
+   "kind": "product",
+   "name": "HR & Employee Management System",
+   "status": "available",
+   "linked_product": "lax360-hr-employee-management",
+   "order": 2,
+   "pitch": "Employee records, attendance, leave and payroll inputs managed from a browser.",
+   "overview": [
+    "Employee records, attendance, leave and payroll inputs managed from a browser.",
+    "LAX360 provides HR & Employee Management System, and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the web application should do, and adapt it to match."
+   ],
+   "problems": [
+    "Employee details are scattered across files",
+    "Leave and attendance are calculated by hand each month",
+    "Payroll inputs arrive late and wrong"
+   ],
+   "features": [
+    "Leave balances",
+    "Shift rosters",
+    "Employee self-service",
+    "Monthly attendance summary"
+   ],
+   "modules": [
+    "Employee records",
+    "Attendance",
+    "Leave management",
+    "Shifts",
+    "Payroll inputs and reports"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We map who will use HR & Employee Management System, what each role must be able to do, and what data it replaces."
+    },
+    {
+     "title": "Design",
+     "text": "We agree the modules, the screens for employee records and attendance, user roles and the integrations needed."
+    },
+    {
+     "title": "Develop",
+     "text": "We build in stages with a working version for review, including the admin dashboard."
+    },
+    {
+     "title": "Launch & improve",
+     "text": "We host or hand over the application, train users and plan improvements after real use."
+    }
+   ],
+   "customers": [
+    "Small and mid-size companies",
+    "Agencies",
+    "Retail chains"
+   ],
+   "industries": [
+    "IT",
+    "Retail",
+    "Services",
+    "Manufacturing"
+   ],
+   "benefits": [
+    "Fewer payroll corrections",
+    "Leave balances visible to employees",
+    "HR time freed from paperwork"
+   ],
+   "platforms": [
+    "Any modern browser",
+    "Responsive on tablet and phone"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Hosting and deployment options agreed with you"
+   ],
+   "integrations": [
+    "Biometric devices (where supported)",
+    "Accounting tools",
+    "Email"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for hr & employee management system?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: Biometric devices (where supported), Accounting tools, Email. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "HR & Employee Management System",
+   "seo_description": "Employee records, attendance, leave and payroll inputs managed from a browser.",
+   "keywords": [
+    "hr & employee management system",
+    "web application development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/hr-and-employee-management-system.webp",
+   "image_alt": "Product Interface Preview of HR & Employee Management System",
+   "mock": "webapp",
+   "accent": "#7c3aed",
+   "featured": true,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "enterprise-resource-planning-erp",
+    "customer-relationship-management-crm",
+    "employee-management-app",
+    "ai-hr-and-recruitment-agent"
+   ],
+   "vi": 12
+  }
+ },
+ {
+  "product": "lax360-learning-platform",
+  "solution": {
+   "slug": "learning-management-system-lms",
+   "category": "webapps",
+   "kind": "product",
+   "name": "Learning Management System (LMS)",
+   "status": "available",
+   "linked_product": "lax360-learning-platform",
+   "order": 4,
+   "pitch": "Courses, lessons, quizzes and learner progress for training providers and companies.",
+   "overview": [
+    "Courses, lessons, quizzes and learner progress for training providers and companies.",
+    "LAX360 provides Learning Management System (LMS), and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the web application should do, and adapt it to match."
+   ],
+   "problems": [
+    "Training material is shared by chat and gets lost",
+    "Progress and attendance are not recorded",
+    "Assessments are marked manually"
+   ],
+   "features": [
+    "Video, document and quiz lessons",
+    "Batch management",
+    "Learner dashboard",
+    "Completion certificates"
+   ],
+   "modules": [
+    "Course and lesson management",
+    "Learner enrolment",
+    "Quizzes and assignments",
+    "Progress tracking",
+    "Certificates and reports"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We map who will use Learning Management System (LMS), what each role must be able to do, and what data it replaces."
+    },
+    {
+     "title": "Design",
+     "text": "We agree the modules, the screens for course and lesson management and learner enrolment, user roles and the integrations needed."
+    },
+    {
+     "title": "Develop",
+     "text": "We build in stages with a working version for review, including the admin dashboard."
+    },
+    {
+     "title": "Launch & improve",
+     "text": "We host or hand over the application, train users and plan improvements after real use."
+    }
+   ],
+   "customers": [
+    "Training institutes",
+    "Colleges",
+    "Corporate training teams"
+   ],
+   "industries": [
+    "Education",
+    "Corporate training"
+   ],
+   "benefits": [
+    "Training delivered consistently",
+    "Learner progress visible",
+    "Less manual assessment work"
+   ],
+   "platforms": [
+    "Any modern browser",
+    "Responsive on tablet and phone"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Hosting and deployment options agreed with you"
+   ],
+   "integrations": [
+    "Video hosting",
+    "Payment gateways",
+    "Email and SMS"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for learning management system (lms)?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: Video hosting, Payment gateways, Email and SMS. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "Learning Management System (LMS)",
+   "seo_description": "Courses, lessons, quizzes and learner progress for training providers and companies.",
+   "keywords": [
+    "learning management system (lms)",
+    "web application development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/learning-management-system-lms.webp",
+   "image_alt": "Product Interface Preview of Learning Management System (LMS)",
+   "mock": "webapp",
+   "accent": "#7c3aed",
+   "featured": false,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "franchise-discovery-platform",
+    "enterprise-resource-planning-erp",
+    "education-and-learning-app"
+   ],
+   "vi": 14
+  }
+ },
+ {
+  "product": "lax360-bookings",
+  "solution": {
+   "slug": "appointment-and-booking-management-system",
+   "category": "webapps",
+   "kind": "product",
+   "name": "Appointment & Booking Management System",
+   "status": "available",
+   "linked_product": "lax360-bookings",
+   "order": 6,
+   "pitch": "Online booking with staff availability, reminders and a calendar view for service businesses.",
+   "overview": [
+    "Online booking with staff availability, reminders and a calendar view for service businesses.",
+    "LAX360 provides Appointment & Booking Management System, and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the web application should do, and adapt it to match."
+   ],
+   "problems": [
+    "Appointments are booked by phone and written on paper",
+    "No-shows are not followed up",
+    "Staff schedules clash"
+   ],
+   "features": [
+    "Slot rules per service",
+    "Reschedule and cancel by customer",
+    "Staff-wise calendars",
+    "Reminder messages"
+   ],
+   "modules": [
+    "Service and staff setup",
+    "Availability calendar",
+    "Online booking page",
+    "Reminders",
+    "Booking reports"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We map who will use Appointment & Booking Management System, what each role must be able to do, and what data it replaces."
+    },
+    {
+     "title": "Design",
+     "text": "We agree the modules, the screens for service and staff setup and availability calendar, user roles and the integrations needed."
+    },
+    {
+     "title": "Develop",
+     "text": "We build in stages with a working version for review, including the admin dashboard."
+    },
+    {
+     "title": "Launch & improve",
+     "text": "We host or hand over the application, train users and plan improvements after real use."
+    }
+   ],
+   "customers": [
+    "Clinics and salons",
+    "Consultants",
+    "Service centres"
+   ],
+   "industries": [
+    "Healthcare",
+    "Beauty & wellness",
+    "Professional services"
+   ],
+   "benefits": [
+    "Fewer clashes and no-shows",
+    "Bookings taken any time",
+    "A clear daily schedule"
+   ],
+   "platforms": [
+    "Any modern browser",
+    "Responsive on tablet and phone"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Hosting and deployment options agreed with you"
+   ],
+   "integrations": [
+    "Calendars",
+    "SMS and WhatsApp reminders",
+    "Payment gateways"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for appointment & booking management system?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: Calendars, SMS and WhatsApp reminders, Payment gateways. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "Appointment & Booking Management System",
+   "seo_description": "Online booking with staff availability, reminders and a calendar view for service businesses.",
+   "keywords": [
+    "appointment & booking management system",
+    "web application development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/appointment-and-booking-management-system.webp",
+   "image_alt": "Product Interface Preview of Appointment & Booking Management System",
+   "mock": "webapp",
+   "accent": "#7c3aed",
+   "featured": false,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "business-analytics-and-reporting-platform",
+    "franchise-discovery-platform",
+    "appointment-booking-app",
+    "home-service-booking-app"
+   ],
+   "vi": 16
+  }
+ },
+ {
+  "product": "lax360-clinic-management",
+  "solution": {
+   "slug": "clinic-management-web-application",
+   "category": "webapps",
+   "kind": "product",
+   "name": "Clinic Management Web Application",
+   "status": "available",
+   "linked_product": "lax360-clinic-management",
+   "order": 8,
+   "pitch": "The clinic's day in the browser: appointments, patient records and billing from any device at the practice.",
+   "overview": [
+    "The clinic's day in the browser: appointments, patient records and billing from any device at the practice.",
+    "LAX360 provides Clinic Management Web Application, and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the web application should do, and adapt it to match."
+   ],
+   "problems": [
+    "The clinic software is tied to one computer",
+    "Doctors cannot see schedules from outside the clinic",
+    "Multiple branches cannot share patient records"
+   ],
+   "features": [
+    "Access from any device with a browser",
+    "Branch-wise reports",
+    "Role-based access",
+    "Printable prescriptions and receipts"
+   ],
+   "modules": [
+    "Patient records",
+    "Appointment calendar",
+    "Consultation notes",
+    "Billing",
+    "Multi-branch administration"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We map who will use Clinic Management Web Application, what each role must be able to do, and what data it replaces."
+    },
+    {
+     "title": "Design",
+     "text": "We agree the modules, the screens for patient records and appointment calendar, user roles and the integrations needed."
+    },
+    {
+     "title": "Develop",
+     "text": "We build in stages with a working version for review, including the admin dashboard."
+    },
+    {
+     "title": "Launch & improve",
+     "text": "We host or hand over the application, train users and plan improvements after real use."
+    }
+   ],
+   "customers": [
+    "Clinics",
+    "Multi-branch practices",
+    "Polyclinics"
+   ],
+   "industries": [
+    "Healthcare"
+   ],
+   "benefits": [
+    "Work from any device",
+    "One record across branches",
+    "No installation on each computer"
+   ],
+   "platforms": [
+    "Any modern browser",
+    "Responsive on tablet and phone"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Hosting and deployment options agreed with you"
+   ],
+   "integrations": [
+    "SMS and WhatsApp reminders",
+    "Payment gateways"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for clinic management web application?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: SMS and WhatsApp reminders, Payment gateways. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "Clinic Management Web Application",
+   "seo_description": "The clinic's day in the browser: appointments, patient records and billing from any device at the practice.",
+   "keywords": [
+    "clinic management web application",
+    "web application development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/clinic-management-web-application.webp",
+   "image_alt": "Product Interface Preview of Clinic Management Web Application",
+   "mock": "webapp",
+   "accent": "#7c3aed",
+   "featured": false,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "hospital-management-web-application",
+    "business-analytics-and-reporting-platform",
+    "clinic-management-software"
+   ],
+   "vi": 18
+  }
+ },
+ {
+  "product": "lax360-field-operations",
+  "solution": {
+   "slug": "field-staff-and-location-tracking-app",
+   "category": "mobile",
+   "kind": "product",
+   "name": "Field Staff & Location Tracking App",
+   "status": "available",
+   "linked_product": "lax360-field-operations",
+   "order": 4,
+   "pitch": "Task assignment and location-aware visit reports for teams that work away from the office.",
+   "overview": [
+    "Task assignment and location-aware visit reports for teams that work away from the office.",
+    "LAX360 provides Field Staff & Location Tracking App, and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the app should do, and adapt it to match."
+   ],
+   "problems": [
+    "Managers do not know where field staff are",
+    "Visit proof is a message with a photo",
+    "Daily reports are written at night"
+   ],
+   "features": [
+    "Location capture with consent",
+    "Offline-friendly visit forms",
+    "Photo attachments",
+    "Daily activity summary"
+   ],
+   "modules": [
+    "Task assignment",
+    "Check-in at visit location",
+    "Visit report with photos",
+    "Route and location view",
+    "Manager dashboard"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We agree who the app is for, the problem it solves and which phones it must support."
+    },
+    {
+     "title": "Design",
+     "text": "We design the screens and flows for task assignment and check-in at visit location and confirm what works offline and what needs a connection."
+    },
+    {
+     "title": "Develop",
+     "text": "We build the Android and iOS app (or the platform you choose) and share test builds as it grows."
+    },
+    {
+     "title": "Publish & support",
+     "text": "We help prepare the store listings, release the app and agree updates and support."
+    }
+   ],
+   "customers": [
+    "Sales and service teams",
+    "Delivery and installation teams",
+    "Survey teams"
+   ],
+   "industries": [
+    "Logistics",
+    "Field services",
+    "FMCG",
+    "Utilities"
+   ],
+   "benefits": [
+    "Visits that can be verified",
+    "Less end-of-day reporting",
+    "Better route planning"
+   ],
+   "platforms": [
+    "Android",
+    "iOS"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Your branding, user roles and permissions",
+    "Integrations from the list above, or others you use",
+    "Hosting and deployment options agreed with you"
+   ],
+   "integrations": [
+    "Maps services",
+    "CRM tools",
+    "Payroll tools"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for field staff & location tracking app?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: Maps services, CRM tools, Payroll tools. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "Field Staff & Location Tracking App",
+   "seo_description": "Task assignment and location-aware visit reports for teams that work away from the office.",
+   "keywords": [
+    "field staff & location tracking app",
+    "mobile application development",
+    "lax360"
+   ],
+   "image": "/assets/solutions/field-staff-and-location-tracking-app.webp",
+   "image_alt": "Product Interface Preview of Field Staff & Location Tracking App",
+   "mock": "mobile",
+   "accent": "#0891b2",
+   "featured": false,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "appointment-booking-app",
+    "freelancing-marketplace-app"
+   ],
+   "vi": 23
+  }
+ },
+ {
+  "product": "lax360-workflow-automation",
+  "solution": {
+   "slug": "ai-business-workflow-automation",
+   "category": "ai-agents",
+   "kind": "product",
+   "name": "AI Business Workflow Automation",
+   "status": "available",
+   "linked_product": "lax360-workflow-automation",
+   "order": 10,
+   "pitch": "Available now as AI Workflow Automations & Integrations under Software & IT Services: automated workflows across your tools, with AI-assisted steps where they help.",
+   "overview": [
+    "Available now as AI Workflow Automations & Integrations under Software & IT Services: automated workflows across your tools, with AI-assisted steps where they help.",
+    "LAX360 provides AI Business Workflow Automation, and every business runs this a little differently, so we also customise it: we look at how you work today, agree what the agent should do, and adapt it to match."
+   ],
+   "problems": [
+    "Work is copied by hand between tools",
+    "Enquiries wait for someone to route them",
+    "Routine steps depend on reminders"
+   ],
+   "features": [
+    "Visual workflows",
+    "Integrations with the tools you use",
+    "AI-assisted steps with human review",
+    "Run history"
+   ],
+   "modules": [
+    "Workflow design",
+    "App and webhook integrations",
+    "WhatsApp, email and CRM steps",
+    "AI-assisted steps (classify, draft, route)",
+    "Monitoring and adjustment"
+   ],
+   "how": [
+    {
+     "title": "Discover",
+     "text": "We agree the task the agent would take over, the information it may use and where a person must decide."
+    },
+    {
+     "title": "Design",
+     "text": "We design the conversation or workflow, including workflow design and app and webhook integrations, and the rules and limits it must follow."
+    },
+    {
+     "title": "Build & test",
+     "text": "We build in stages and test with your own examples before anything reaches customers."
+    },
+    {
+     "title": "Launch & review",
+     "text": "We release carefully, review the results with you and keep people in control."
+    }
+   ],
+   "customers": [
+    "Businesses with repeated manual steps",
+    "Agencies",
+    "Sales and support teams"
+   ],
+   "industries": [
+    "Services",
+    "Retail",
+    "Education",
+    "Real estate"
+   ],
+   "benefits": [
+    "Less repetitive work",
+    "Faster response to enquiries",
+    "Fewer copy-and-paste errors"
+   ],
+   "platforms": [
+    "Web dashboard",
+    "WhatsApp, email and chat channels as agreed"
+   ],
+   "customization": [
+    "Fields, forms, screens and reports adapted to your process",
+    "Rules, tone and limits for what the agent may do",
+    "Integrations from the list above, or others you use",
+    "Hosting and deployment options agreed with you"
+   ],
+   "integrations": [
+    "WhatsApp, email and CRM tools",
+    "Webhooks and APIs"
+   ],
+   "faqs": [
+    {
+     "q": "What does LAX360 provide for ai business workflow automation?",
+     "a": "LAX360 provides this solution, and it can be customised to your requirements. Tell us what else you need and we will confirm what is included."
+    },
+    {
+     "q": "Can it be customised for my business?",
+     "a": "Yes. Fields, forms, screens and reports adapted to your process, integrations from the list above, or others you use. We confirm exactly what is included before work starts."
+    },
+    {
+     "q": "Which other tools can it connect to?",
+     "a": "Typical connections are: WhatsApp, email and CRM tools, Webhooks and APIs. Which of these are used is agreed per project, and some depend on the provider's own terms."
+    }
+   ],
+   "seo_title": "AI Business Workflow Automation",
+   "seo_description": "Available now as AI Workflow Automations & Integrations under Software & IT Services: automated workflows across your tools, with AI-assisted steps where…",
+   "keywords": [
+    "ai business workflow automation",
+    "ai agents & business automation",
+    "lax360"
+   ],
+   "image": "/assets/solutions/ai-business-workflow-automation.webp",
+   "image_alt": "Solution Preview of AI Business Workflow Automation",
+   "mock": "agent",
+   "accent": "#ea580c",
+   "featured": false,
+   "partner_franchise": true,
+   "partner_authorized": true,
+   "partner_referral": true,
+   "related": [
+    "ai-receptionist",
+    "ai-document-processing-agent"
+   ],
+   "vi": 63
+  }
+ }
+]

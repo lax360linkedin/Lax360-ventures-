@@ -4,7 +4,7 @@ import { ProductsButton } from './ProductCatalogue.jsx'
 import { ITA } from '../../data/itAuthorized.js'
 
 // In-page navigation of the IT & Software Authorized Partner page, in page order. PartnerOpportunity inserts Responsibilities and Process between the two lists.
-export const ITA_NAV_A = [['about', 'About'], ['who', 'Who can apply'], ['opportunities', 'Business opportunities'], ['provide', 'Benefits'], ['training', 'Training & sales support'], ['sales', 'Sales process'], ['portal', 'Partner portal'], ['tech', 'Technical support'], ['commission', 'Commission']]
+export const ITA_NAV_A = [['about', 'About'], ['who', 'Who can apply'], ['opportunities', 'Business opportunities'], ['provide', 'Benefits'], ['training', 'Training & sales support'], ['sales', 'Sales process'], ['portal', 'Partner portal'], ['tech', 'Technical support'], ['commission', 'Commission'], ['payments', 'Customer payments'], ['arrangements', 'Commercial arrangements']]
 export const ITA_NAV_B = [['apply-details', 'Apply']]
 
 const NumList = ({ items }) => <ol className="grid gap-x-10 gap-y-2 md:grid-cols-2">{items.map((t, i) => <li key={t} className="flex gap-3"><span className="w-6 shrink-0 text-right font-semibold tabular-nums text-soft">{i + 1}.</span><span>{t}</span></li>)}</ol>
@@ -32,6 +32,8 @@ export function ItAuthorizedA({ accent, published = {} }) {
         <h3 className="mt-10 font-display text-xl font-semibold">{e.commission.payoutTitle}</h3><div className="mt-4"><Checklist items={e.commission.payouts} accent={accent} /></div>
         <p className="mt-6 rounded-lg border border-edge p-4 text-sm font-semibold">{e.commission.note}</p>
       </Block>
+      <Block id="payments" eyebrow="Terms" title="Customer payment restrictions" tint><NumList items={e.payments} /></Block>
+      <Block id="arrangements" eyebrow="Terms" title="Commercial arrangements"><NumList items={e.arrangements} /></Block>
     </>
   )
 }

@@ -5,16 +5,17 @@ import DivisionArt from '../components/art/DivisionArt.jsx'
 import ContactCta from '../components/sections/ContactCta.jsx'
 import Button from '../components/ui/Button.jsx'
 import { projects, concepts } from '../data/projects.js'
-import { divisions } from '../data/services.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import { useContent } from '../hooks/useSite.js'
 
-const divisionName = Object.fromEntries(divisions.map((d) => [d.slug, d.name]))
 
 /**
  * Verified projects render here once added to data/projects.js. Until then the page shows an
  * honest empty state plus clearly labelled illustrative concepts (not client work).
  */
 export default function Projects() {
+  const { divisions } = useDivisionTools()
+  const divisionName = Object.fromEntries(divisions.map((d) => [d.slug, d.name]))
   const managed = useContent('project') // projects published in the admin panel
   const list = managed ? managed.map((p) => ({ id: p.id, title: p.title, division: p.data.division, summary: p.data.summary, image: p.data.image, video: p.data.video, link: p.data.link, category: p.data.category })) : projects
   const hasProjects = list.length > 0

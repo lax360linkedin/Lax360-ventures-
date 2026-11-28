@@ -69,7 +69,7 @@ export const ITR_PRODUCTS = {
     { title: 'IT & software services', items: [
       { name: 'Website Development', desc: 'Static, dynamic, e-commerce, 3D and animated', to: '/services/software/website-development' }, { name: 'Custom Software', to: '/services/software/custom-software-development' },
       { name: 'Web Applications', to: '/services/software/web-application-development' }, { name: 'Mobile Applications', to: '/services/software/mobile-application-development' },
-      { name: 'AI Solutions, Agents & Voice AI', to: '/services/ai' }, { name: 'Business & Workflow Automation', to: '/services/automation' }, { name: 'Headless SaaS & APIs', to: '/services/headless' },
+      { name: 'AI Solutions, Agents & Voice AI (under development)', to: '/artificial-intelligence' }, { name: 'Business & Workflow Automation', to: '/services/software/ai-workflow-automations-and-integrations' }, { name: 'Headless SaaS & APIs', to: '/services/software/headless-saas-and-api-solutions' },
       { name: 'Cloud & Hosting' }, { name: 'UI/UX' }, { name: 'Testing, Maintenance & Support' }] },
     { title: 'Other partnership opportunities', items: [{ name: 'IT & Software Franchise', to: '/franchise/it' }, { name: 'IT & Software Authorized Partner', to: '/authorized-partner/it' }] },
   ],

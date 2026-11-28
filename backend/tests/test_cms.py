@@ -145,7 +145,10 @@ def test_older_uploads_kept_in_the_database_still_work_and_are_not_touched(fake,
 # ---- content kinds, publishing and permissions ------------------------------------------------------------------------------------
 def test_super_admin_manages_every_cms_area_and_ordinary_admins_get_none_by_default(app, db, boss):
     kinds = {k["kind"] for k in boss[0].get("/api/admin/content/kinds").json()["kinds"]}
-    assert kinds == {"service_carousel_page", "service_card", "hero", "section", "faq_category", "faq", "about_section", "service_category", "service", "about_block", "project", "job", "career_page", "career_perk", "nav_item", "social_link", "seo_page", "seo_redirect", "contact_page", "industry", "article", "network_category", "network_partner", "software_product", "network_page", "team_member", "team_department", "team_gallery", "team_expertise", "team_page", "client", "testimonial", "product", "product_module", "product_resource", "website", "welcome_page", "welcome_card", "carousel_page", "carousel_image"}
+    from app.services import content_service as cs
+
+    assert kinds == set(cs.KINDS) - {"content_seed", "site_image"}  # (internal bookkeeping kinds are not editable areas)  # a Super Admin manages every content area, including the divisions and the solutions portfolio
+    assert {"division", "division_service", "solution", "solution_category", "upcoming_category", "upcoming_service"} <= kinds
     bare, bcsrf, _ = staff(app, db, role="admin", email="plain@example.com", permissions=[])
     assert bare.get("/api/admin/content/kinds").status_code == 403 and bare.get("/api/admin/content/service").status_code == 403
     assert bare.post("/api/admin/content/service", json={"title": "X"}, headers=bcsrf).status_code == 403
@@ -153,7 +156,11 @@ def test_super_admin_manages_every_cms_area_and_ordinary_admins_get_none_by_defa
 
 def test_each_cms_area_has_its_own_permission(app, db):
     svc_admin, csrf, _ = staff(app, db, role="admin", email="svc@example.com", permissions=["services"])
-    assert {k["kind"] for k in svc_admin.get("/api/admin/content/kinds").json()["kinds"]} == {"service_category", "service"}
+    from app.services import content_service as cs
+
+    services_area = {k for k, v in cs.KINDS.items() if v["module"] == "services"}
+    assert {k["kind"] for k in svc_admin.get("/api/admin/content/kinds").json()["kinds"]} == services_area  # exactly the Services area, nothing from other areas
+    assert {"service_category", "service", "division", "solution"} <= services_area and "job" not in services_area
     assert svc_admin.post("/api/admin/content/job", json={"title": "Dev", "data": {"description": "Build things"}}, headers=csrf).status_code == 403
     assert svc_admin.post("/api/admin/content/hero", json={"data": {}}, headers=csrf).status_code == 403
     hr, hcsrf, _ = staff(app, db, role="admin", email="hr@example.com", permissions=["careers"])
@@ -324,14 +331,14 @@ def test_network_seed_publishes_the_profiles_with_designations_pending_and_the_e
 
     cli.main(["seed-network"])
     rows = {i.slug: i for i in db.scalars(select(ContentItem).where(ContentItem.kind.in_(["network_partner", "software_product"])))}
-    assert {s for s in ("cadpoint-academy-salem", "fatcat-wealthy", "zoho", "openai", "marg-erp", "hexbis")} <= set(rows)
-    assert all(rows[s].data.get("verification") in ("pending", "verified") for s in ("zoho", "openai", "marg-erp", "hexbis", "cadpoint-academy-salem"))
+    assert {s for s in ("cadpoint-salem", "fatcat-wealthy", "zoho", "openai", "marg-erp", "hexbis", "shieldbyte-infosec")} <= set(rows)
+    assert all(rows[s].data.get("verification") in ("pending", "verified") for s in ("zoho", "openai", "marg-erp", "hexbis", "shieldbyte-infosec", "cadpoint-salem"))
     assert all(rows[s].data["verification"] == "pending" and not rows[s].data.get("designation") for s in ("zoho", "openai", "marg-erp", "hexbis"))  # no partnership claim is made
     titles = [i["title"] for i in client.get("/api/public/content?kind=network_partner").json()["items"]]
-    assert titles[:2] == ["CADPOINT Academy – Salem", "Fatcat Wealthy"] and {"Zoho", "OpenAI", "Marg ERP", "HexBis"} <= set(titles)
+    assert titles[0] == "Fatcat Wealthy" and {"Zoho", "OpenAI", "Marg ERP", "HexBis", "ShieldByte InfoSec", "CADPOINT Salem Branch"} <= set(titles)
     assert any(i["title"] == "Zoho CRM" and i["data"]["vendor"] == "zoho" and i["data"]["ownership"] == "third_party" for i in client.get("/api/public/content?kind=software_product").json()["items"])
     cli.main(["seed-network"])
-    assert db.scalar(select(func.count()).select_from(ContentItem).where(ContentItem.kind == "network_partner")) == 6  # idempotent
+    assert db.scalar(select(func.count()).select_from(ContentItem).where(ContentItem.kind == "network_partner")) == 7  # idempotent
     ok = client.post("/api/contact", json={"name": "Asha Rao", "email": "asha@example.com", "company": "Example Ltd", "enquiry_type": "partner-reseller", "message": "We would like to resell your software.", "extra": {"website": "https://example.com"}, "consent": True})
     assert ok.status_code in (200, 201), ok.text
     bad = client.post("/api/contact", json={"name": "Asha Rao", "email": "asha@example.com", "enquiry_type": "partner-unknown", "message": "We would like to resell your software.", "consent": True})

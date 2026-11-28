@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ArrowDown, ArrowUp, Copy, Eye, EyeOff, ExternalLink, Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, Copy, Eye, EyeOff, ExternalLink, LayoutGrid, List as ListIcon, Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import { api } from '../../services/apiClient.js'
-import { MediaField } from '../MediaPicker.jsx'
+import { MediaField, MediaPicker } from '../MediaPicker.jsx'
+import { productVisuals } from '../../data/products.js'
+import { Dropzone, imageLimit, uploadImage } from '../ImageUpload.jsx'
 import { Badge, Btn, Card, ConfirmDialog, EmptyState, ErrorState, Field, Input, Modal, PageHeader, Select, Spinner, Textarea, Toggle, cx, fmtDate, useFetch, useToast } from '../ui.jsx'
 
 /** The service hierarchy from a field's options: main services ("<category>/*") and their sub-services ("<category>/<service>"). */
@@ -89,9 +91,62 @@ function MultiSelect({ f, value, onChange, props }) {
   )
 }
 
-function FieldInput({ f, value, onChange, props }) {
+/** Gallery: several library pictures with a caption each. Drop, paste or click to add (uploaded straight away and optimised), reorder with the arrows, set one as the main image, remove.
+ *  Stored as lines "<picture id or built-in path> | caption" in display order. */
+const galleryParse = (v) => String(v || '').split('\n').map((l) => { const [ref, ...cap] = l.split('|'); return { ref: ref.trim(), cap: cap.join('|').trim() } }).filter((e) => e.ref)
+const galleryJoin = (list) => list.map((e) => (e.cap ? `${e.ref}|${e.cap}` : e.ref)).join('\n')
+const galleryUrl = (ref) => (/^[0-9a-f-]{36}$/i.test(ref) ? `/api/admin/media/${ref}/file` : ref)
+function GalleryField({ f, value, onChange, setValue, props }) {
+  const toast = useToast()
+  const list = galleryParse(value)
+  const [busy, setBusy] = useState('')
+  const [picking, setPicking] = useState(false)
+  const emit = (next) => onChange({ target: { value: galleryJoin(next) } })
+  const move = (i, d) => { const next = [...list]; const j = i + d; if (j < 0 || j >= next.length) return; [next[i], next[j]] = [next[j], next[i]]; emit(next) }
+  const take = async (files) => {
+    const max = await imageLimit()
+    const added = []
+    for (const file of files) {
+      if (file.size > max) { toast(`${file.name} is too large.`, 'error'); continue }
+      setBusy(`Uploading ${file.name}…`)
+      try { const asset = await uploadImage(file, () => {}); added.push({ ref: asset.id, cap: '' }) } catch (e) { toast(`${file.name}: ${e.message}`, 'error') }
+    }
+    setBusy('')
+    if (added.length) { emit([...list, ...added].slice(0, 24)); toast(`${added.length} picture${added.length === 1 ? '' : 's'} added. Save to keep them.`) }
+  }
+  return (
+    <div id={props?.id}>
+      {list.length > 0 && (
+        <ul className="mb-3 grid gap-3 sm:grid-cols-2">
+          {list.map((e, i) => (
+            <li key={`${e.ref}-${i}`} className="overflow-hidden rounded-xl border border-edge">
+              <img src={galleryUrl(e.ref)} alt="" loading="lazy" className="aspect-[3/2] w-full bg-glass-strong object-cover" />
+              <div className="space-y-2 p-2">
+                <Input aria-label={`Caption for picture ${i + 1}`} maxLength={160} placeholder="Caption (also used as the alt text)" value={e.cap} onChange={(ev) => emit(list.map((x, k) => (k === i ? { ...x, cap: ev.target.value.replace(/[|\n]/g, ' ') } : x)))} />
+                <div className="flex flex-wrap gap-1">
+                  <Btn kind="ghost" disabled={i === 0} onClick={() => move(i, -1)} aria-label={`Move picture ${i + 1} earlier`}><ArrowUp className="size-4" aria-hidden="true" /></Btn>
+                  <Btn kind="ghost" disabled={i === list.length - 1} onClick={() => move(i, 1)} aria-label={`Move picture ${i + 1} later`}><ArrowDown className="size-4" aria-hidden="true" /></Btn>
+                  {/^[0-9a-f-]{36}$/i.test(e.ref) && setValue && <Btn kind="ghost" onClick={() => { setValue('image', e.ref); toast('Set as the main image. Save to keep it.') }}>Main image</Btn>}
+                  <Btn kind="danger" onClick={() => emit(list.filter((_, k) => k !== i))} aria-label={`Remove picture ${i + 1}`}><Trash2 className="size-4" aria-hidden="true" /></Btn>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      {busy && <p className="mb-2 text-xs text-soft" aria-live="polite">{busy}</p>}
+      <Dropzone multiple compact={list.length > 0} busy={Boolean(busy)} onFiles={take} title="Add pictures: drop them, paste with Ctrl+V, or click" />
+      <button type="button" onClick={() => setPicking(true)} className="mt-2 text-sm font-semibold text-lav hover:underline">Choose one already in the library</button>
+      <MediaPicker open={picking} kind="image" onClose={() => setPicking(false)} onPick={(a) => { emit([...list, { ref: a.id, cap: '' }].slice(0, 24)); setPicking(false) }} />
+      <p className="mt-1 text-xs text-soft">{list.length} of 24 pictures. Use real screenshots only when they are of a real project; previews are labelled as previews.</p>
+    </div>
+  )
+}
+
+function FieldInput({ f, value, onChange, props, setValue }) {
   if (f.type === 'bool') return <Toggle checked={!!value} onChange={(v) => onChange({ target: { value: v } })} label={value ? 'On' : 'Off'} />
   if (f.type === 'document') return <MediaField {...props} kind="document" value={value} onChange={(v) => onChange({ target: { value: v } })} />
+  if (f.type === 'gallery') return <GalleryField f={f} props={props} value={value} onChange={onChange} setValue={setValue} />
   if (f.type === 'image' || f.type === 'video') return <MediaField {...props} kind={f.type} value={value} onChange={(v) => onChange({ target: { value: v } })} />
   if (f.ui === 'date') return <Input {...props} type="date" value={value} onChange={onChange} />
   if (f.type === 'textarea') return <Textarea {...props} maxLength={f.max} value={value} onChange={onChange} />
@@ -100,6 +155,16 @@ function FieldInput({ f, value, onChange, props }) {
   if (f.type === 'multiselect') return <MultiSelect f={f} value={value} onChange={onChange} props={props} />
   if (f.type === 'select') return <Select {...props} value={value} onChange={onChange}><option value="">Select…</option>{f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</Select>
   return <Input {...props} maxLength={f.max} value={value} onChange={onChange} />
+}
+
+/** The picture of a record (its main image, or the built-in preview a solution starts with), so the list shows what the public website shows. */
+function Thumb({ it, kind, large = false }) {
+  const raw = it.data?.image || it.data?.photo || it.data?.logo || it.data?.cover_image || ''
+  const slug = it.data?.url_slug || it.slug
+  const src = /^[0-9a-f-]{36}$/i.test(raw) ? `/api/media/${raw}` : raw.startsWith('/') ? raw : kind === 'product' ? productVisuals[slug]?.photo || '' : kind === 'solution' ? `/assets/solutions/${slug}-800.webp` : kind === 'solution_category' ? `/assets/solutions/category-${slug}-800.webp` : ''
+  if (!src) return null
+  if (large) return <img src={src} alt="" loading="lazy" className="size-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+  return <img src={src} alt="" loading="lazy" width="64" height="43" className="h-11 w-16 shrink-0 rounded-md border border-edge object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
 }
 
 /** A quick look at the content as entered. The exact result, in the real design, is one click away ("Preview on the website"). */
@@ -132,7 +197,9 @@ function Editor({ spec, item, onClose, onSaved, preset = {} }) {
   const visible = spec.fields.filter((f) => f.ui !== 'hidden') // built-in file paths: kept as they are, never shown or typed
   const optional = visible.filter(isOptional)
   const shown = visible.filter((f) => !isOptional(f))
-  const fieldRow = (f) => <Field key={f.name} label={f.label} required={f.required} hint={f.help} error={errors[f.name]}>{(p) => <FieldInput f={f} props={p} value={data[f.name]} onChange={(e) => setData({ ...data, [f.name]: e.target.value })} />}</Field>
+  const builtinSlug = data.url_slug || item?.slug
+  const builtinImage = builtinSlug && (spec.kind === 'product' ? productVisuals[builtinSlug]?.photo : spec.kind === 'solution' ? `/assets/solutions/${builtinSlug}-800.webp` : spec.kind === 'solution_category' ? `/assets/solutions/category-${builtinSlug}-800.webp` : '')
+  const fieldRow = (f) => <Field key={f.name} label={f.label} required={f.required} hint={f.help} error={errors[f.name]}>{(p) => <>{f.name === 'image' && !data.image && builtinImage && <figure className="mb-2 flex items-center gap-3 rounded-xl border border-edge p-2"><img src={builtinImage} alt="" className="h-20 w-32 rounded-lg object-cover" /><figcaption className="text-xs text-soft">This is the built-in preview the website shows now. Upload a picture below to replace it (a real screenshot, if you have one).</figcaption></figure>}<FieldInput f={f} props={p} value={data[f.name]} onChange={(e) => setData({ ...data, [f.name]: e.target.value })} setValue={(name, v) => setData((d) => ({ ...d, [name]: v }))} /></>}</Field>
 
   const save = async (status) => {
     setBusy(status)
@@ -189,6 +256,10 @@ export default function Content() {
   const [busy, setBusy] = useState(false)
   const [q, setQ] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [facets, setFacets] = useState({}) // extra filters from the type's choice fields (category, availability, type ...)
+  const [sort, setSort] = useState('order')
+  const [view, setViewState] = useState(() => { try { return localStorage.getItem('cms-view') || 'list' } catch { return 'list' } })
+  const setView = (v) => { setViewState(v); try { localStorage.setItem('cms-view', v) } catch { /* private window */ } }
   const [page, setPage] = useState(1)
   const [picked, setPicked] = useState(() => new Set())
   const [bulk, setBulk] = useState('')
@@ -200,16 +271,25 @@ export default function Content() {
   const inGroup = useMemo(() => kinds.filter((k) => k.group === activeGroup), [kinds, activeGroup])
   const spec = fromKind || inGroup[0]
   // changing the type resets the search, filters and selection
-  useEffect(() => { setQ(''); setStatusFilter('all'); setPage(1); setPicked(new Set()) }, [kind])
+  useEffect(() => { setQ(''); setStatusFilter('all'); setFacets({}); setSort('order'); setPage(1); setPicked(new Set()) }, [kind])
   useEffect(() => { if (spec && kind !== spec.kind) setKind(spec.kind) }, [spec, kind])
   useEffect(() => { if (kind && params.get('kind') !== kind) setParams({ kind, ...(productFilter ? { product: productFilter } : {}) }, { replace: true }) }, [kind]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const all = items.data || []
   const list = useMemo(() => {
     const t = q.trim().toLowerCase()
-    return all.filter((it) => (!productFilter || it.data?.product === productFilter) && (statusFilter === 'all' || it.status === statusFilter) && (!t || `${it.title} ${Object.values(it.data || {}).filter((v) => typeof v === 'string').join(' ')}`.toLowerCase().includes(t)))
-  }, [all, q, statusFilter, productFilter])
-  const filtering = Boolean(q.trim()) || statusFilter !== 'all' || Boolean(productFilter)
+    const out = all.filter((it) => (!productFilter || it.data?.product === productFilter) && (statusFilter === 'all' || it.status === statusFilter) && Object.entries(facets).every(([k, v]) => !v || String(it.data?.[k] ?? '') === v) && (!t || `${it.title} ${Object.values(it.data || {}).filter((v) => typeof v === 'string').join(' ')}`.toLowerCase().includes(t)))
+    if (sort === 'title') return [...out].sort((x, y) => x.title.localeCompare(y.title))
+    if (sort === 'updated') return [...out].sort((x, y) => String(y.updated_at).localeCompare(String(x.updated_at)))
+    return out
+  }, [all, q, statusFilter, productFilter, facets, sort])
+  const facetFields = (spec?.fields || []).filter((f) => f.type === 'select' && ['category', 'status', 'kind', 'type', 'program', 'division'].includes(f.name)).map((f) => {
+    const present = [...new Set(all.map((it) => it.data?.[f.name]).filter(Boolean))]
+    return { f, options: present.map((v) => ({ value: v, label: f.options.find((o) => o.value === v)?.label || (f.name === 'category' ? all.find((x) => x.slug === v)?.title : '') || v })) }
+  }).filter((x) => x.options.length > 1)
+  const facetOn = Object.values(facets).some(Boolean)
+  const filtering = Boolean(q.trim()) || statusFilter !== 'all' || Boolean(productFilter) || facetOn
+  const canMove = !filtering && sort === 'order'
   const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE))
   const shown = list.slice((Math.min(page, pages) - 1) * PAGE_SIZE, Math.min(page, pages) * PAGE_SIZE)
 
@@ -290,7 +370,15 @@ export default function Content() {
         <div className="mb-3 flex flex-wrap items-end gap-3" role="search" aria-label={`Search ${spec.label}`}>
           <Field label="Search" className="min-w-[14rem] flex-1">{(p) => <div className="relative"><Search className="pointer-events-none absolute left-3 top-3 size-4 text-soft" aria-hidden="true" /><Input {...p} className="pl-9" placeholder="Search by title or text" value={q} onChange={(e) => { setQ(e.target.value); setPage(1) }} /></div>}</Field>
           <Field label="Status">{(p) => <Select {...p} value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}><option value="all">All</option><option value="published">Published</option><option value="draft">Drafts</option></Select>}</Field>
-          {filtering && <Btn kind="ghost" onClick={() => { setQ(''); setStatusFilter('all') }}>Clear filters</Btn>}
+          {facetFields.map(({ f, options }) => (
+            <Field key={f.name} label={f.name === 'status' ? 'Availability' : f.label.replace(/ [(].*/, '')}>{(p) => <Select {...p} value={facets[f.name] || ''} onChange={(e) => { setFacets({ ...facets, [f.name]: e.target.value }); setPage(1) }}><option value="">All</option>{options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</Select>}</Field>
+          ))}
+          <Field label="Sort">{(p) => <Select {...p} value={sort} onChange={(e) => { setSort(e.target.value); setPage(1) }}><option value="order">Website order</option><option value="title">Title A to Z</option><option value="updated">Recently updated</option></Select>}</Field>
+          <div className="flex gap-1" role="group" aria-label="View">
+            <Btn kind={view === 'list' ? 'primary' : 'ghost'} onClick={() => setView('list')} aria-pressed={view === 'list'} aria-label="List view" title="List view"><ListIcon className="size-4" aria-hidden="true" /></Btn>
+            <Btn kind={view === 'grid' ? 'primary' : 'ghost'} onClick={() => setView('grid')} aria-pressed={view === 'grid'} aria-label="Grid view" title="Grid view"><LayoutGrid className="size-4" aria-hidden="true" /></Btn>
+          </div>
+          {filtering && <Btn kind="ghost" onClick={() => { setQ(''); setStatusFilter('all'); setFacets({}) }}>Clear filters</Btn>}
         </div>
       )}
       {picked.size > 0 && (
@@ -314,19 +402,43 @@ export default function Content() {
                   <span className="ml-auto">{filtering ? `${list.length} of ${all.length} shown` : `${all.length} item${all.length === 1 ? '' : 's'}`}</span>
                 </div>
               )}
-              <ul className="divide-y divide-edge">
+              {view === 'grid' && (
+                <ul className="grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {shown.map((it) => (
+                    <li key={it.id} className="flex flex-col overflow-hidden rounded-xl border border-edge bg-glass">
+                      <div className="relative aspect-[3/2] bg-glass-strong">
+                        <Thumb it={it} kind={spec.kind} large />
+                        {!spec.single && list.length > 1 && <input type="checkbox" className="absolute left-2 top-2 size-5 accent-[var(--color-primary)]" checked={picked.has(it.id)} onChange={() => toggle(it.id)} aria-label={`Select ${it.title}`} />}
+                        <span className="absolute right-2 top-2"><Badge value={it.status} /></span>
+                      </div>
+                      <div className="flex flex-1 flex-col gap-2 p-3">
+                        <p className="line-clamp-2 font-semibold">{it.title}</p>
+                        <p className="text-xs text-soft">Updated {fmtDate(it.updated_at)}{it.data?.status ? ` · ${String(it.data.status).replace(/_/g, ' ')}` : ''}</p>
+                        <div className="mt-auto flex flex-wrap gap-2 pt-1">
+                          <Btn onClick={() => setEdit({ item: it })} aria-label={`Edit ${it.title}`}><Pencil className="size-4" aria-hidden="true" /> Edit</Btn>
+                          <Btn onClick={() => flip(it)}>{it.status === 'published' ? <><EyeOff className="size-4" aria-hidden="true" /> Unpublish</> : <><Eye className="size-4" aria-hidden="true" /> Publish</>}</Btn>
+                          {!spec.single && <Btn kind="ghost" onClick={() => duplicate(it)} aria-label={`Duplicate ${it.title}`} title="Copy as a draft"><Copy className="size-4" aria-hidden="true" /></Btn>}
+                          <Btn kind="danger" onClick={() => setDel(it)} aria-label={`Delete ${it.title}`}><Trash2 className="size-4" aria-hidden="true" /></Btn>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <ul className={cx('divide-y divide-edge', view === 'grid' && 'hidden')}>
                 {shown.map((it) => {
                   const i = all.findIndex((x) => x.id === it.id)
                   return (
                     <li key={it.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                       <div className="flex min-w-0 items-center gap-3">
                         {!spec.single && list.length > 1 && <input type="checkbox" className="size-4 shrink-0 accent-[var(--color-primary)]" checked={picked.has(it.id)} onChange={() => toggle(it.id)} aria-label={`Select ${it.title}`} />}
-                        {!spec.single && all.length > 1 && !filtering && (
+                        {!spec.single && all.length > 1 && canMove && view === 'list' && (
                           <span className="flex flex-col">
                             <Btn kind="ghost" className="!min-h-7 !px-1.5" aria-label={`Move ${it.title} up`} disabled={i === 0} onClick={() => move(i, -1)}><ArrowUp className="size-4" aria-hidden="true" /></Btn>
                             <Btn kind="ghost" className="!min-h-7 !px-1.5" aria-label={`Move ${it.title} down`} disabled={i === all.length - 1} onClick={() => move(i, 1)}><ArrowDown className="size-4" aria-hidden="true" /></Btn>
                           </span>
                         )}
+                        <Thumb it={it} kind={spec.kind} />
                         <div className="min-w-0"><p className="truncate font-semibold">{it.title}</p><p className="text-xs text-soft">Updated {fmtDate(it.updated_at)}{!spec.single && ` · position ${i + 1}`}{it.data?.enabled === false && ' · hidden'}{it.data?.open === false && ' · closed'}{it.data?.active === false && ' · inactive'}</p></div>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">

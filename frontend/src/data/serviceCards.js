@@ -12,6 +12,6 @@ export const builtInServiceCards = [
   service('software', 'IT & Software Development', 'Websites, web and mobile apps, CRM and ERP, and business systems built around how your team actually works.'), service('growth', 'Digital Marketing', 'Social media, search and ad campaigns, and content that bring you more of the right customers.'), service('ai', 'AI & Automation', 'Chatbots, AI assistants and automated workflows that take repetitive work off your team.'),
   { id: 's-education', title: 'Education & Training', tag: 'Service', text: 'Technical training, certification courses, internships and workshops for students, professionals, colleges and companies.', href: '/services/education', label: 'Explore more', image: '/assets/services/education.webp', alt: 'Education & Training' },
   industry('healthcare-medical', 'Healthcare'), industry('banking-fintech', 'Finance & Business'), industry('retail-ecommerce', 'E-commerce'),
-  service('mobile', 'Mobile & Business Apps', 'Apps for bookings, field teams, billing and inventory, designed for everyday business use.'), industry('manufacturing-industrial', 'Manufacturing & Industrial'), industry('real-estate-property', 'Real Estate & Property'),
+  industry('manufacturing-industrial', 'Manufacturing & Industrial'), industry('real-estate-property', 'Real Estate & Property'),
   industry('logistics-transportation', 'Logistics & Transportation'), industry('hospitality-tourism', 'Hospitality & Tourism'),
 ].filter(Boolean)

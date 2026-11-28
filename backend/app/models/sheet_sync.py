@@ -15,7 +15,7 @@ from app.db.base import Base, UUIDPk
 class SheetSync(UUIDPk, Base):
     __tablename__ = "sheet_sync"
     __table_args__ = (
-        UniqueConstraint("record_kind", "record_id", "category", name="record_category"),
+        UniqueConstraint("record_kind", "record_id", "category", name="uq_sheet_sync_record_category"),
         Index("ix_sheet_sync_status", "status", "updated_at"),
     )
 

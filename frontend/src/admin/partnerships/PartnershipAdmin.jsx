@@ -8,7 +8,7 @@ import { MediaPicker } from '../MediaPicker.jsx'
 const qs = (p) => { const s = new URLSearchParams(Object.entries(p || {}).filter(([, v]) => v !== '' && v != null && v !== false)).toString(); return s ? `?${s}` : '' }
 const pt = (path, { params, ...o } = {}) => api(`/api/admin/partnerships${path}${qs(params)}`, { timeoutMs: 20000, ...o })
 const CAT = { franchise: 'Franchise', authorized: 'Authorized Partner', referral: 'Referral Partner' }
-const DIV = { education: 'Education', 'digital-marketing': 'Digital Marketing', it: 'IT & Software', 'cad-engineering': 'CAD & Engineering Design', robotics: 'Robotics', blockchain: 'Blockchain & Web 3.0', other: 'Others' }
+const DIV = { education: 'Education', 'digital-marketing': 'Digital Marketing', it: 'IT & Software', ai: 'Artificial Intelligence', 'cad-engineering': 'CAD Designing & Training', robotics: 'IoT, Embedded & Robotics', blockchain: 'Blockchain & Web 3.0', other: 'Others' }
 /** Division slug -> current name, from the list the server sends (it follows the divisions managed in the admin panel). */
 const divMap = (opts) => ({ ...DIV, ...Object.fromEntries((opts || []).map((o) => [o.value, o.label])) })
 /** Every division an application selected (older records only have the one). */

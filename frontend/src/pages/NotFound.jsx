@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 import PageContainer from '../components/layout/PageContainer.jsx'
 import Button from '../components/ui/Button.jsx'
-import { allDivisions } from '../data/services.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 
 export default function NotFound() {
+  const { allDivisions } = useDivisionTools()
   return (
     <PageContainer path="/404" noindex title="Page not found" description="The page you were looking for could not be found.">
       <section className="wrap section">

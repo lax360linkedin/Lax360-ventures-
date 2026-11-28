@@ -1,0 +1,3162 @@
+{
+ "divisions": [
+  {
+   "slug": "software",
+   "name": "Software & IT Services",
+   "short": "Custom software, websites, web and mobile apps, business applications, ERP and CRM, SaaS products, headless SaaS and API solutions, AI workflow automations and integrations, IT consulting and software support.",
+   "outcome": "Software that fits how your business already works.",
+   "tags": [
+    "Custom software",
+    "Web & mobile apps",
+    "ERP & CRM",
+    "Headless SaaS & APIs",
+    "AI workflow automation"
+   ],
+   "enquiryType": "project",
+   "metaTitle": "Software & IT Services — Custom Software, Web, Mobile, CRM, ERP and E-commerce",
+   "metaDescription": "Custom software, website, web application, mobile app, CRM, ERP, business management and e-commerce development from LAX360 Pvt Ltd.",
+   "heroLine": "Software that fits how you work.",
+   "overview": "Off-the-shelf tools rarely match the way a growing business actually runs. We design and build custom software, websites, applications and business systems around your processes, so your team spends less time working around the tools.",
+   "challenges": [
+    "Billing, stock and customer data live in different tools.",
+    "Spreadsheets have outgrown the team that maintains them.",
+    "Your website looks fine but does not turn visitors into enquiries.",
+    "Staff repeat manual steps that software could handle."
+   ],
+   "useCases": [
+    "Order and billing management",
+    "Sales pipeline tracking",
+    "Service request handling",
+    "Customer portals",
+    "Business websites",
+    "Online stores"
+   ],
+   "stack": [
+    "React",
+    "Node.js",
+    "REST APIs",
+    "Relational databases",
+    "Android / iOS"
+   ],
+   "stackNote": "Technology is chosen for your requirement — the list shows the kinds of tools we work with, not a fixed menu.",
+   "engagement": "Engagement model (fixed scope or monthly) is agreed during discovery.",
+   "faqs": [
+    {
+     "q": "Can you build on top of the tools we already use?",
+     "a": "Often yes. During discovery we review what you use today and decide whether to connect to it, extend it or replace it."
+    },
+    {
+     "q": "Do you build both websites and mobile apps?",
+     "a": "Yes. Web and mobile development sit in the same category, so they can share planning and design."
+    },
+    {
+     "q": "How do I get an estimate?",
+     "a": "Share your requirement through the enquiry form. We follow up to understand it, then provide a written scope before work starts."
+    }
+   ]
+  },
+  {
+   "slug": "growth",
+   "name": "Digital Marketing",
+   "short": "Social media management, SEO, creatives, content publishing and paid advertising.",
+   "outcome": "Help the right people find you and enquire.",
+   "tags": [
+    "Social media",
+    "SEO",
+    "Creatives",
+    "Paid advertising"
+   ],
+   "enquiryType": "marketing",
+   "metaTitle": "Digital Marketing — Social Media, SEO, Creatives, Content and Paid Advertising",
+   "metaDescription": "Social media management, SEO, creatives, content publishing and paid advertising on Meta, Google, LinkedIn and X from LAX360 Pvt Ltd.",
+   "heroLine": "Be found. Be remembered. Be contacted.",
+   "overview": "A good website needs visitors, and visitors need a reason to get in touch. Our digital marketing work pairs with the website and software we build, so the pieces work together. Exact scope is agreed per business.",
+   "challenges": [
+    "People find you, but they do not enquire.",
+    "You are not sure which marketing activity is worth the budget.",
+    "Your website and your campaigns are managed separately."
+   ],
+   "useCases": [
+    "New website with launch marketing",
+    "Local and regional search visibility",
+    "Lead generation campaigns",
+    "Social presence for a new brand"
+   ],
+   "stack": [],
+   "stackNote": "",
+   "engagement": "Scope and reporting approach are agreed with you before work begins.",
+   "faqs": [
+    {
+     "q": "Can marketing be added to a website project?",
+     "a": "Yes — a website and marketing bundle is a natural pairing, and we can plan both together."
+    },
+    {
+     "q": "How will I know what is working?",
+     "a": "We agree what to measure up front and report on it in plain language."
+    }
+   ]
+  },
+  {
+   "slug": "education",
+   "name": "Education & Training",
+   "short": "Technical training, certification courses, internships, AI and software development training, workshops, corporate and college programmes.",
+   "outcome": "Practical, industry-oriented skills for students, professionals and organisations.",
+   "tags": [
+    "Technical training",
+    "Certification courses",
+    "Internships",
+    "Corporate & college training"
+   ],
+   "enquiryType": "course",
+   "metaTitle": "Education & Training — Technical Training, Certification Courses and Internships",
+   "metaDescription": "Technical training, certification courses, internships, AI and software development training, workshops, corporate and college programmes from LAX360 Education.",
+   "heroLine": "Learn practical skills, step by step.",
+   "overview": "LAX360 Education is the education and skill development division of LAX360 Pvt Ltd. It brings technical education, professional training, practical learning and career development together for students, professionals, colleges and organisations, alongside our IT and software and digital marketing services.",
+   "challenges": [
+    "Classroom learning that stays far from real software work.",
+    "Not knowing which course or certificate fits your goal.",
+    "A college or company that needs a training programme without building one from scratch."
+   ],
+   "useCases": [
+    "A student choosing a first IT certification",
+    "A college adding a workshop or internship to its calendar",
+    "A company upskilling its team in AI and automation",
+    "A professional moving into software, cloud or data"
+   ],
+   "stack": [],
+   "stackNote": "",
+   "engagement": "Tell us who the training is for and what they need to learn. We recommend suitable courses or a programme and agree the details with you before anything starts.",
+   "faqs": [
+    {
+     "q": "Which courses do you offer?",
+     "a": "LAX360 Education offers the certification courses listed on this page, across programming, web design, databases, full stack development with AI, software testing, cloud, DevOps, data and AI, cyber security, digital marketing and frameworks."
+    },
+    {
+     "q": "Do you run internships?",
+     "a": "Yes. Internship programmes are domain-based, with real-time project exposure and technical mentoring. They are offered as 15-day, 30-day and long-term programmes, subject to approval. Ask us about eligibility."
+    },
+    {
+     "q": "Can you train our employees or students?",
+     "a": "Yes. We offer corporate training and college and institutional programmes. Topics, scope and schedule are agreed with you in advance."
+    },
+    {
+     "q": "Are fees and batch dates listed online?",
+     "a": "Fees and schedules depend on the course and the programme, so we share them when you enquire."
+    }
+   ]
+  }
+ ],
+ "services": [
+  {
+   "division": "software",
+   "slug": "custom-software-development",
+   "name": "Custom Software Development",
+   "group": "Build",
+   "text": "Tailored software for your own workflows, designed to be maintained and extended as the business changes.",
+   "intro": "Software designed around your own processes, not the other way round.",
+   "about": [
+    "Some work does not fit packaged software: an approval chain unique to your company, a pricing rule, a reporting format your customers expect. Custom software development builds an application specifically for that work.",
+    "We start from how your team works today, agree a written scope, then build in steps so you see working software early and can steer it."
+   ],
+   "offers": [
+    "Requirement discovery and written scope",
+    "Interface and workflow design",
+    "Development, testing and release support",
+    "Documentation and handover"
+   ],
+   "solves": [
+    "Off-the-shelf tools force your team to work around them",
+    "Critical processes live in spreadsheets and email",
+    "Different tools hold different copies of the same data"
+   ],
+   "features": [
+    [
+     "Built around your workflow",
+     "Screens and rules follow the way your team already works."
+    ],
+    [
+     "Role-based access",
+     "Each person sees and does only what their role allows."
+    ],
+    [
+     "Maintainable code",
+     "Structured so it can be extended as requirements change."
+    ],
+    [
+     "Reporting",
+     "The summaries and exports your managers ask for."
+    ]
+   ],
+   "benefits": [
+    "Less manual re-entry and fewer errors",
+    "One place to find the current information",
+    "A system that can change with the business"
+   ],
+   "uses": [
+    [
+     "Internal operations tool",
+     "Track jobs from request to completion, with status visible to everyone involved."
+    ],
+    [
+     "Pricing and quotation tool",
+     "Apply your own pricing rules and produce consistent quotations."
+    ],
+    [
+     "Customer service desk",
+     "Log, assign and close customer requests in one queue."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "website-development",
+   "name": "Website Development",
+   "group": "Build",
+   "text": "Fast, accessible, search-friendly business websites with a clear path from visitor to enquiry.",
+   "intro": "Business websites that load quickly, read clearly and lead visitors to get in touch.",
+   "about": [
+    "Your website is often the first impression of your business. We design and build responsive websites that present your services clearly and make the next step — a call, a message, an enquiry — easy to take.",
+    "Pages are built to be fast, accessible and search-friendly, and can be set up so your team can update content without a developer."
+   ],
+   "offers": [
+    "Structure and page planning",
+    "Responsive design for phones, tablets and desktops",
+    "Contact and enquiry forms",
+    "Basic search-engine set-up and launch support"
+   ],
+   "solves": [
+    "An outdated site that does not work well on phones",
+    "Visitors who leave without enquiring",
+    "Content that only a developer can change"
+   ],
+   "features": [
+    [
+     "Responsive layouts",
+     "Pages adapt to any screen size."
+    ],
+    [
+     "Accessible by design",
+     "Readable text, keyboard use and clear structure."
+    ],
+    [
+     "Enquiry paths",
+     "Clear calls to action and working forms."
+    ],
+    [
+     "Editable content",
+     "Updates managed through an admin area where required."
+    ]
+   ],
+   "benefits": [
+    "A credible, current online presence",
+    "More visitors able to reach you easily",
+    "Content you can keep up to date"
+   ],
+   "uses": [
+    [
+     "Company website",
+     "Introduce your business, services and contact details."
+    ],
+    [
+     "Service-business site",
+     "Present each service with an enquiry route."
+    ],
+    [
+     "Launch site for a new brand",
+     "Get an online presence live while the business grows."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "web-application-development",
+   "name": "Web Application Development",
+   "group": "Build",
+   "text": "Browser-based applications — portals, dashboards and internal tools — that your team or customers sign in to.",
+   "intro": "Browser-based applications that your team or customers sign in to and use every day.",
+   "about": [
+    "A web application goes beyond a website: it holds data, applies rules and responds to the person using it. Examples include customer portals, dashboards, booking systems and internal tools.",
+    "We design the data, the screens and the access rules together, so the application is simple to use and safe to operate."
+   ],
+   "offers": [
+    "Application architecture and data design",
+    "Sign-in and permission handling",
+    "Dashboards, forms and workflows",
+    "Testing, deployment and support"
+   ],
+   "solves": [
+    "Customers phone or email for information they could look up themselves",
+    "Staff need a shared view of the same records",
+    "Spreadsheets cannot handle several users at once"
+   ],
+   "features": [
+    [
+     "User accounts and roles",
+     "Secure sign-in with different access levels."
+    ],
+    [
+     "Dashboards",
+     "Live summaries of the data that matters."
+    ],
+    [
+     "Forms and workflows",
+     "Structured input, approvals and notifications."
+    ],
+    [
+     "Works anywhere",
+     "Used from any modern browser, no installation."
+    ]
+   ],
+   "benefits": [
+    "Self-service for customers and staff",
+    "A single, current source of data",
+    "Updates delivered once, available to everyone"
+   ],
+   "uses": [
+    [
+     "Customer portal",
+     "Let customers view orders, documents or requests."
+    ],
+    [
+     "Staff dashboard",
+     "Show targets, tasks and status in one view."
+    ],
+    [
+     "Request-tracking system",
+     "Submit, assign and follow up internal requests."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "mobile-application-development",
+   "name": "Mobile Application Development",
+   "group": "Build",
+   "text": "Android and iOS applications for customers or staff, planned together with your web platform.",
+   "intro": "Android and iOS applications for your customers or your team.",
+   "about": [
+    "Many interactions happen on a phone: a customer placing an order, a staff member updating a job. A mobile application puts the right tool in their hands, with the features that make sense on a small screen.",
+    "We plan the mobile app together with your web platform and backend, so data stays consistent across every device."
+   ],
+   "offers": [
+    "Android and iOS app design and development",
+    "Connection to your backend or web platform",
+    "Notifications and device features where needed",
+    "Release support for the app stores"
+   ],
+   "solves": [
+    "Customers expect to use your service from a phone",
+    "Staff in the field cannot reach desktop-only tools",
+    "Mobile and web systems hold different data"
+   ],
+   "features": [
+    [
+     "Native or cross-platform approach",
+     "Chosen to suit your requirement and budget."
+    ],
+    [
+     "Offline-friendly where needed",
+     "Designed for patchy connections when the use case calls for it."
+    ],
+    [
+     "Push notifications",
+     "Timely alerts for orders, tasks or reminders."
+    ],
+    [
+     "Shared backend",
+     "The same data as your web application."
+    ]
+   ],
+   "benefits": [
+    "Customers and staff reach you on their own phones",
+    "Less duplication between web and mobile",
+    "A clear path from first release to later improvements"
+   ],
+   "uses": [
+    [
+     "Customer ordering app",
+     "Browse, order and track from a phone."
+    ],
+    [
+     "Staff task app",
+     "Receive and update daily work."
+    ],
+    [
+     "Member or loyalty app",
+     "Give regular customers a simple way to engage."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "business-management-systems",
+   "name": "Business Application Development",
+   "group": "Build",
+   "text": "Applications for orders, billing, approvals and reporting that replace scattered spreadsheets.",
+   "intro": "One application for the daily running of your business — orders, billing, approvals and reports.",
+   "about": [
+    "A business management system covers the routine work that keeps an organisation moving: raising and approving requests, issuing bills, tracking tasks and producing reports. It replaces the patchwork of spreadsheets and messages many teams rely on.",
+    "We shape the modules around your own procedures so staff are not retrained to fit someone else’s model."
+   ],
+   "offers": [
+    "Process mapping and module planning",
+    "Order, billing and approval workflows",
+    "Role-based access and audit trail",
+    "Management reports and exports"
+   ],
+   "solves": [
+    "Approvals get stuck in email chains",
+    "Nobody has a reliable view of work in progress",
+    "Month-end reports take days to compile"
+   ],
+   "features": [
+    [
+     "Approval workflows",
+     "Requests routed to the right person with a clear status."
+    ],
+    [
+     "Activity history",
+     "A record of who changed what and when."
+    ],
+    [
+     "Billing and orders",
+     "Documents generated from the same data."
+    ],
+    [
+     "Management reports",
+     "Summaries you can export and share."
+    ]
+   ],
+   "benefits": [
+    "Work in progress is visible",
+    "Repeated paperwork is reduced",
+    "Routine reporting is quicker to produce"
+   ],
+   "uses": [
+    [
+     "Purchase approval flow",
+     "Raise, approve and record purchases."
+    ],
+    [
+     "Order-to-invoice process",
+     "Move an order through to billing without re-typing."
+    ],
+    [
+     "Task and approval tracker",
+     "Track routine work across departments."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "enterprise-software-solutions",
+   "name": "Enterprise Software Solutions",
+   "group": "Build",
+   "text": "Software for larger organisations and multi-team operations: role-based access, approvals, reporting and integration with the systems already in place, scoped and documented before development starts.",
+   "intro": "Software for larger organisations and multi-team operations, scoped and documented before it is built.",
+   "about": [
+    "Larger organisations need more than a simple app: several teams, role-based access, approvals, audit trails and reports that leadership can rely on, all connected to the systems that already exist.",
+    "We agree a written scope with you first, then build in stages so each team can review working software and steer the next step."
+   ],
+   "offers": [
+    "Requirement discovery across teams",
+    "Role-based access and approval workflows",
+    "Reporting and dashboards",
+    "Integration with existing systems",
+    "Documentation and handover"
+   ],
+   "solves": [
+    "Several departments use disconnected tools",
+    "Approvals and reporting depend on email and spreadsheets",
+    "Existing systems cannot share data with each other"
+   ],
+   "features": [
+    [
+     "Roles and permissions",
+     "Each person sees and does only what their role allows."
+    ],
+    [
+     "Approval workflows",
+     "Requests move through the people who need to approve them, with a visible history."
+    ],
+    [
+     "Reporting",
+     "Reports built around how your organisation measures its work."
+    ]
+   ],
+   "benefits": [
+    "One place for cross-team information",
+    "Clear accountability for each step",
+    "A system that can be extended as the organisation changes"
+   ],
+   "uses": [
+    [
+     "Multi-department operations tool",
+     "Track work as it moves between teams, with status visible to everyone involved."
+    ],
+    [
+     "Approvals and compliance records",
+     "Keep a clear trail of who approved what and when."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "crm-and-erp-development",
+   "name": "ERP & CRM Solutions",
+   "group": "Run the business",
+   "text": "Systems that bring customers, sales, stock and operations into one place, scoped to what you actually need.",
+   "intro": "Systems that connect customers, sales, stock and operations in one place.",
+   "about": [
+    "A CRM keeps track of customers, leads and conversations. An ERP joins operational areas such as orders, inventory, purchasing and accounts. Many growing businesses need a mix of both, scoped to their size.",
+    "We build only what you need and connect it to the tools you already use, rather than selling a large system your team will not fully use."
+   ],
+   "offers": [
+    "Lead, customer and pipeline tracking",
+    "Orders, stock and billing modules",
+    "Reports for owners and managers",
+    "Integration with existing tools"
+   ],
+   "solves": [
+    "Customer history is scattered across inboxes and sheets",
+    "Sales and stock figures never agree",
+    "Managers wait for manual reports"
+   ],
+   "features": [
+    [
+     "Customer records",
+     "Contacts, notes and activity in one profile."
+    ],
+    [
+     "Pipeline view",
+     "Where every opportunity stands."
+    ],
+    [
+     "Operational modules",
+     "Orders, inventory and billing connected to each other."
+    ],
+    [
+     "Reporting",
+     "Summaries by team, product or period."
+    ]
+   ],
+   "benefits": [
+    "A shared, current view of customers and operations",
+    "Fewer missed follow-ups",
+    "Decisions based on the same numbers"
+   ],
+   "uses": [
+    [
+     "Sales CRM",
+     "Track leads from first contact to closed order."
+    ],
+    [
+     "Distribution ERP",
+     "Link orders, stock levels and invoicing."
+    ],
+    [
+     "Service-company system",
+     "Connect customer records with jobs and billing."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "saas-product-development",
+   "name": "SaaS Product Development",
+   "group": "Build",
+   "text": "Designing and building software products that many customers use on subscription: multi-tenant architecture, accounts and billing, and an admin back office.",
+   "intro": "Designing and building software products that many customers use on subscription.",
+   "about": [
+    "A SaaS product needs more than features: customer accounts, separate data for each customer, subscriptions and billing, and a back office to run it.",
+    "We help you shape the product, plan the architecture and build it in stages, so you can put early versions in front of real users."
+   ],
+   "offers": [
+    "Product scoping and architecture",
+    "Multi-tenant application development",
+    "Accounts, subscriptions and billing integration",
+    "Admin back office",
+    "Release and improvement support"
+   ],
+   "solves": [
+    "An idea that needs a proper technical foundation",
+    "Customer data that must stay separate and secure",
+    "No back office to manage customers and plans"
+   ],
+   "features": [
+    [
+     "Multi-tenant design",
+     "One application serving many customers, with each customer’s data kept separate."
+    ],
+    [
+     "Subscriptions and billing",
+     "Plans, invoices and payment-gateway integration."
+    ],
+    [
+     "Admin back office",
+     "Tools to manage customers, plans and support."
+    ]
+   ],
+   "benefits": [
+    "A product foundation that can grow",
+    "Faster path to a first release",
+    "Clear separation between customers"
+   ],
+   "uses": [
+    [
+     "Industry-specific software product",
+     "A tool for one type of business, sold to many."
+    ],
+    [
+     "Client portal product",
+     "A branded portal each customer signs in to."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "headless-saas-and-api-solutions",
+   "name": "Headless SaaS & API Solutions",
+   "group": "Platforms & integration",
+   "text": "Reusable, API-first backend services (authentication, billing, bookings, notifications, payments, files) that developers, startups, agencies and businesses plug into their own products instead of building each one from scratch.",
+   "intro": "Reusable, API-first backend services that you plug into your own products.",
+   "about": [
+    "Most products need the same building blocks: sign-in, subscriptions, bookings, notifications, payments and file handling. Headless SaaS & API Solutions provides them as reusable services with no fixed front end.",
+    "Developers, startups, agencies and businesses can connect them to a website or app instead of building each from scratch. The detailed services in this group are listed below on this page and on the Software & IT Services page."
+   ],
+   "offers": [
+    "API hub and headless backend development",
+    "Authentication, billing and subscription APIs",
+    "Booking, CRM, notification, payment and file APIs",
+    "Multi-tenant and white-label SaaS"
+   ],
+   "solves": [
+    "Rebuilding the same backend features for every project",
+    "No single place to publish and document APIs",
+    "Front ends that are locked to one backend"
+   ],
+   "features": [
+    [
+     "API-first",
+     "Every capability is available through documented APIs."
+    ],
+    [
+     "Reusable",
+     "The same service can power web, mobile and partner apps."
+    ],
+    [
+     "Multi-tenant ready",
+     "One platform serving many customers with separate data."
+    ]
+   ],
+   "benefits": [
+    "Less backend work per project",
+    "One consistent set of APIs",
+    "Freedom to choose any front end"
+   ],
+   "uses": [
+    [
+     "Startup backend",
+     "Add accounts, billing and bookings through APIs while you build the front end."
+    ],
+    [
+     "Agency toolkit",
+     "Reuse the same backend services across client projects."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "ai-workflow-automations-and-integrations",
+   "name": "AI Workflow Automations & Integrations",
+   "group": "Platforms & integration",
+   "text": "Automated workflows across WhatsApp, email, CRM and your business tools, with AI steps where they help (classifying, drafting, routing), built on connectors and webhooks. This is the AI work that is available today; the separate AI Bots, Agents and Employees division is under development.",
+   "intro": "Automated workflows across your tools, with AI steps where they help. Available today.",
+   "about": [
+    "This is the AI work LAX360 offers now: workflows that connect WhatsApp, email, your CRM and other tools, with AI-assisted steps such as classifying a message, drafting a reply or routing a request.",
+    "It is different from the upcoming Artificial Intelligence division (AI bots, agents and AI employees), which is still under development and is not available yet."
+   ],
+   "offers": [
+    "Workflow design and automation (n8n and similar tools)",
+    "WhatsApp, email and CRM automation",
+    "AI-assisted steps inside workflows",
+    "Third-party and webhook integrations",
+    "Monitoring and adjustment"
+   ],
+   "solves": [
+    "Repeated manual steps between tools",
+    "Messages and leads that wait for someone to route them",
+    "Data copied by hand from one system to another"
+   ],
+   "features": [
+    [
+     "Connected tools",
+     "Messages, forms, CRM and spreadsheets work together."
+    ],
+    [
+     "AI-assisted steps",
+     "AI helps with classifying, drafting and routing; people stay in charge of decisions that matter."
+    ],
+    [
+     "Visible workflows",
+     "You can see what runs, when, and what it did."
+    ]
+   ],
+   "benefits": [
+    "Less repetitive work",
+    "Faster response to enquiries",
+    "Fewer copy-and-paste errors"
+   ],
+   "uses": [
+    [
+     "Lead follow-up",
+     "A new enquiry is recorded, acknowledged and assigned automatically."
+    ],
+    [
+     "Message routing",
+     "Incoming messages are sorted and sent to the right person."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "third-party-software-integrations",
+   "name": "Third-Party Software Integrations",
+   "group": "Platforms & integration",
+   "text": "Connecting your applications with payment gateways, accounting tools, messaging services, CRMs and other third-party software through their APIs and webhooks.",
+   "intro": "Connecting your applications with the other software you rely on.",
+   "about": [
+    "Businesses use many tools: payment gateways, accounting software, messaging services, CRMs. Integration makes them share data so people stop re-entering it.",
+    "We connect them through their APIs and webhooks, test the connection, and document what was built."
+   ],
+   "offers": [
+    "API and webhook integration",
+    "Payment, accounting and messaging integrations",
+    "Data mapping and testing",
+    "Documentation and support"
+   ],
+   "solves": [
+    "Data re-entered in several systems",
+    "Tools that do not talk to each other",
+    "Manual reconciliation"
+   ],
+   "features": [
+    [
+     "API integration",
+     "Direct connections through each tool’s documented API."
+    ],
+    [
+     "Webhooks",
+     "Events in one system trigger actions in another."
+    ],
+    [
+     "Tested and documented",
+     "Connections are tested and handed over with notes."
+    ]
+   ],
+   "benefits": [
+    "Consistent data across tools",
+    "Less manual work",
+    "Easier reporting"
+   ],
+   "uses": [
+    [
+     "Payments to accounts",
+     "Record a payment in your accounting tool automatically."
+    ],
+    [
+     "Website forms to CRM",
+     "Send new enquiries straight into your CRM."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "it-consulting-and-technology-solutions",
+   "name": "IT Consulting & Technology Solutions",
+   "group": "Advice & support",
+   "text": "Reviewing what you use today and recommending the right tools, architecture and next steps, with a written scope before any build starts.",
+   "intro": "Advice on tools, architecture and next steps, with a written scope before any build starts.",
+   "about": [
+    "Before building, it helps to know what you have, what you need and what it will take. IT consulting reviews your current setup and recommends practical next steps.",
+    "The result is a written recommendation and scope you can use with us or on your own."
+   ],
+   "offers": [
+    "Review of current tools and processes",
+    "Technology and architecture recommendations",
+    "Written scope and plan",
+    "Guidance during delivery"
+   ],
+   "solves": [
+    "Unclear which tools or approach to choose",
+    "Systems that have grown without a plan",
+    "Needing an outside view before investing"
+   ],
+   "features": [
+    [
+     "Practical review",
+     "We look at how your business works before recommending anything."
+    ],
+    [
+     "Written outcome",
+     "A clear document you can keep."
+    ],
+    [
+     "Independent of one tool",
+     "Recommendations follow your requirement."
+    ]
+   ],
+   "benefits": [
+    "Better-informed decisions",
+    "A clearer plan and scope",
+    "Fewer costly surprises later"
+   ],
+   "uses": [
+    [
+     "Choosing a platform",
+     "Compare options against your actual requirements."
+    ],
+    [
+     "Planning a rebuild",
+     "Decide what to keep, change or replace."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "software-maintenance-and-support",
+   "name": "Software Maintenance & Support",
+   "group": "Advice & support",
+   "text": "Fixes, updates, monitoring and improvements after launch, on a scope that is agreed with you.",
+   "intro": "Fixes, updates and improvements after launch, on a scope agreed with you.",
+   "about": [
+    "Software needs care after it goes live: fixes, security and dependency updates, small improvements and help when something goes wrong.",
+    "We agree what is covered and how requests are handled, so you know who to contact."
+   ],
+   "offers": [
+    "Bug fixes and updates",
+    "Monitoring and backups",
+    "Small improvements and changes",
+    "Support requests handled on an agreed scope"
+   ],
+   "solves": [
+    "Software nobody maintains after launch",
+    "Delayed fixes and updates",
+    "No clear contact for problems"
+   ],
+   "features": [
+    [
+     "Agreed scope",
+     "What is covered and how requests are handled is written down."
+    ],
+    [
+     "Regular updates",
+     "Updates and fixes are applied as agreed."
+    ],
+    [
+     "Clear contact",
+     "You know who to reach."
+    ]
+   ],
+   "benefits": [
+    "Software that stays current",
+    "Faster response to problems",
+    "Predictable support"
+   ],
+   "uses": [
+    [
+     "Website upkeep",
+     "Keep a business website updated and working."
+    ],
+    [
+     "Application support",
+     "Ongoing fixes and improvements for a business application."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "e-commerce-development",
+   "name": "E-commerce Development",
+   "group": "Build",
+   "text": "Online stores with catalogue, checkout and order handling, connected to the way you fulfil and bill.",
+   "intro": "Online stores with catalogue, checkout and order handling that fit how you sell and fulfil.",
+   "about": [
+    "An online store is more than a product page. It needs a catalogue that is easy to maintain, a checkout customers trust, and an order process your team can follow from payment to delivery.",
+    "We build stores around your products, pricing and delivery approach, and connect them to payment gateways and to your stock or billing records."
+   ],
+   "offers": [
+    "Product catalogue and category structure",
+    "Cart, checkout and payment integration",
+    "Order management for your team",
+    "Connection to stock and billing records"
+   ],
+   "solves": [
+    "Orders arrive by phone and message and are hard to track",
+    "Stock levels online differ from the real stock",
+    "Customers cannot pay online"
+   ],
+   "features": [
+    [
+     "Catalogue management",
+     "Add and update products, prices and images."
+    ],
+    [
+     "Checkout and payments",
+     "Integrated with the payment gateway you choose."
+    ],
+    [
+     "Order tracking",
+     "Statuses visible to your team and customers."
+    ],
+    [
+     "Mobile-friendly storefront",
+     "Shopping that works on any device."
+    ]
+   ],
+   "benefits": [
+    "Customers can order at any time",
+    "Orders and payments recorded in one place",
+    "A store you can grow product by product"
+   ],
+   "uses": [
+    [
+     "Retail store online",
+     "Sell an existing range to customers beyond your area."
+    ],
+    [
+     "Made-to-order products",
+     "Take specifications and payment up front."
+    ],
+    [
+     "Wholesale ordering",
+     "Let trade customers reorder from a catalogue."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "api-hub-development",
+   "name": "API Hub Development",
+   "group": "Headless SaaS & API Solutions",
+   "text": "A single place to publish, document and manage the APIs your products and partners use.",
+   "intro": "A single place to publish, document and manage the APIs your products and partners use.",
+   "about": [
+    "As the number of APIs grows, teams need one dependable entry point: consistent addresses, access keys, documentation and usage records. An API hub provides that structure.",
+    "We design the hub around your services, whether they are your own or ones you resell, and make it straightforward for developers to start using them."
+   ],
+   "offers": [
+    "API catalogue and consistent structure",
+    "Access keys and usage rules",
+    "Developer documentation",
+    "Usage monitoring"
+   ],
+   "solves": [
+    "APIs are scattered with no common standard",
+    "Partners cannot easily discover or test your services",
+    "No visibility of who calls what"
+   ],
+   "features": [
+    [
+     "Unified entry point",
+     "One consistent way to reach each service."
+    ],
+    [
+     "Access management",
+     "Keys and permissions per user or app."
+    ],
+    [
+     "Documentation",
+     "Clear guides for developers."
+    ],
+    [
+     "Usage records",
+     "See how services are called."
+    ]
+   ],
+   "benefits": [
+    "Faster onboarding for developers",
+    "Control over who can use what",
+    "A foundation for offering APIs to others"
+   ],
+   "uses": [
+    [
+     "Internal service catalogue",
+     "Give your own teams one place to find APIs."
+    ],
+    [
+     "Partner access",
+     "Let partners connect with their own keys."
+    ],
+    [
+     "Productised APIs",
+     "Prepare services to be offered to customers."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "headless-backend-development",
+   "name": "Headless Backend Development",
+   "group": "Headless SaaS & API Solutions",
+   "text": "API-first backends with no fixed front end, so the same logic can power web, mobile and partner apps.",
+   "intro": "API-first backends with no fixed front end, so the same logic can power web, mobile and partner apps.",
+   "about": [
+    "A headless backend holds your data and business rules and exposes them through APIs. Any front end — a website, an iOS app, an internal tool — can use it, and you can change the front end without rebuilding the backend.",
+    "This suits teams building several products on shared logic, or planning to add channels later."
+   ],
+   "offers": [
+    "Data model and API design",
+    "Business logic and validation",
+    "Security and access control",
+    "Documentation for front-end teams"
+   ],
+   "solves": [
+    "Each new front end duplicates backend work",
+    "Business rules are inconsistent between web and mobile",
+    "The backend is tied to one interface"
+   ],
+   "features": [
+    [
+     "API-first design",
+     "Contract defined before the front end."
+    ],
+    [
+     "Reusable logic",
+     "One set of rules for every channel."
+    ],
+    [
+     "Secure access",
+     "Authentication and permissions built in."
+    ],
+    [
+     "Documented endpoints",
+     "Easy for front-end developers."
+    ]
+   ],
+   "benefits": [
+    "Add or change front ends without rebuilding",
+    "Consistent behaviour across channels",
+    "Clear separation of concerns"
+   ],
+   "uses": [
+    [
+     "Web and mobile from one backend",
+     "Serve both from the same data."
+    ],
+    [
+     "Agency reuse",
+     "Share a backend across client projects."
+    ],
+    [
+     "Partner integrations",
+     "Expose selected data safely to partners."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "multi-tenant-saas-development",
+   "name": "Multi-Tenant SaaS Development",
+   "group": "Headless SaaS & API Solutions",
+   "text": "One application serving many customers, with each customer’s data and settings kept separate.",
+   "intro": "One application serving many customers, with each customer’s data and settings kept separate.",
+   "about": [
+    "Multi-tenant software lets many organisations use the same application while their data stays isolated. It is the common foundation of subscription software.",
+    "We design the data separation, tenant settings and administration tools together, so adding a new customer does not mean deploying a new system."
+   ],
+   "offers": [
+    "Tenant model and data isolation design",
+    "Per-tenant settings and branding options",
+    "Administration and onboarding tools",
+    "Plan and usage handling hooks"
+   ],
+   "solves": [
+    "Every new customer needs a separate installation",
+    "Hard to keep customer data cleanly apart",
+    "Updates must be repeated for each customer"
+   ],
+   "features": [
+    [
+     "Data isolation",
+     "Each customer’s data kept separate."
+    ],
+    [
+     "Per-tenant settings",
+     "Configuration and branding options."
+    ],
+    [
+     "Central administration",
+     "Manage all customers from one place."
+    ],
+    [
+     "Single codebase",
+     "Update once for everyone."
+    ]
+   ],
+   "benefits": [
+    "Easier to onboard new customers",
+    "Lower maintenance than separate installs",
+    "A route to a subscription model"
+   ],
+   "uses": [
+    [
+     "Software for multiple clinics or schools",
+     "One platform, separate data per organisation."
+    ],
+    [
+     "Agency platform",
+     "Serve many client accounts."
+    ],
+    [
+     "Product moving to SaaS",
+     "Convert a single-customer tool to multi-customer."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "white-label-saas-solutions",
+   "name": "White-Label SaaS Solutions",
+   "group": "Headless SaaS & API Solutions",
+   "text": "Software you can offer under your own brand, built on a reusable core.",
+   "intro": "Software you can offer under your own brand, built on a reusable core.",
+   "about": [
+    "White-label software is built once and presented under different brands. Agencies, consultants and businesses use it to offer a product to their customers without building one from scratch.",
+    "We build the core, then add branding, domain and configuration options so each reseller’s version feels like their own."
+   ],
+   "offers": [
+    "Reusable product core",
+    "Branding: logo, colours and domain options",
+    "Per-partner configuration",
+    "Handover and support arrangements"
+   ],
+   "solves": [
+    "You want to offer software but cannot build it from scratch",
+    "Customers expect a product under your name",
+    "Maintaining separate copies for each partner"
+   ],
+   "features": [
+    [
+     "Custom branding",
+     "Logo, colours and domain per brand."
+    ],
+    [
+     "Shared core",
+     "Improvements reach every brand."
+    ],
+    [
+     "Configurable features",
+     "Switch capabilities on or off per partner."
+    ],
+    [
+     "Partner administration",
+     "Manage branded instances centrally."
+    ]
+   ],
+   "benefits": [
+    "Launch a software offer faster",
+    "Your brand in front of your customers",
+    "One product to maintain"
+   ],
+   "uses": [
+    [
+     "Agency product",
+     "Resell a tool to clients under the agency name."
+    ],
+    [
+     "Industry software",
+     "Offer a ready platform to businesses in your sector."
+    ],
+    [
+     "Partner programme",
+     "Give each partner a branded version."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "authentication-apis",
+   "name": "Authentication APIs",
+   "group": "Headless SaaS & API Solutions",
+   "text": "Sign-up, sign-in, sessions and roles as a service, ready to connect to your app.",
+   "intro": "Sign-up, sign-in, sessions and roles as a service, ready to connect to your app.",
+   "about": [
+    "Almost every product needs accounts. Authentication APIs provide registration, login, password reset and permission handling, so you do not rebuild them for each project.",
+    "Security practices such as secure password storage and token-based sessions are built in, and the interface is simple for your developers to call."
+   ],
+   "offers": [
+    "Registration, login and logout endpoints",
+    "Password reset and verification flows",
+    "Roles and permissions",
+    "Session and token management"
+   ],
+   "solves": [
+    "Rebuilding sign-in for every new application",
+    "Inconsistent account handling between products",
+    "Risk from home-grown login code"
+   ],
+   "features": [
+    [
+     "Standard account flows",
+     "Sign-up, login, reset and verification."
+    ],
+    [
+     "Roles and permissions",
+     "Control what each user can do."
+    ],
+    [
+     "Token-based sessions",
+     "Secure, stateless access."
+    ],
+    [
+     "Single set of users",
+     "Share accounts between web and mobile."
+    ]
+   ],
+   "benefits": [
+    "Faster product development",
+    "Consistent, tested account handling",
+    "One user base across your apps"
+   ],
+   "uses": [
+    [
+     "Startup MVP",
+     "Add accounts without building them."
+    ],
+    [
+     "Multiple apps, one login",
+     "Let users sign in once across products."
+    ],
+    [
+     "Member area",
+     "Protect content behind accounts."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "billing-and-subscription-apis",
+   "name": "Billing & Subscription APIs",
+   "group": "Headless SaaS & API Solutions",
+   "text": "Plans, subscriptions and invoicing logic you can integrate rather than rebuild.",
+   "intro": "Plans, subscriptions and invoicing logic you can integrate rather than rebuild.",
+   "about": [
+    "Recurring billing has many details: plans, trials, renewals, upgrades, invoices and failed payments. Billing and subscription APIs handle that logic behind a simple interface.",
+    "They connect to the payment gateway you choose, and keep a clear record of who is subscribed to what."
+   ],
+   "offers": [
+    "Plan and pricing definitions",
+    "Subscription lifecycle: start, renew, change, cancel",
+    "Invoice generation",
+    "Payment status and webhook events"
+   ],
+   "solves": [
+    "Subscription logic is complicated to build and test",
+    "Invoices and plans are managed manually",
+    "Hard to track who has access to what"
+   ],
+   "features": [
+    [
+     "Plans and pricing",
+     "Define tiers and billing periods."
+    ],
+    [
+     "Lifecycle handling",
+     "Renewals, upgrades and cancellations."
+    ],
+    [
+     "Invoices",
+     "Generated from subscription records."
+    ],
+    [
+     "Event notifications",
+     "Your app is told when payments change."
+    ]
+   ],
+   "benefits": [
+    "A subscription offer without building billing logic",
+    "Accurate access tied to payment status",
+    "Less manual invoicing"
+   ],
+   "uses": [
+    [
+     "SaaS pricing tiers",
+     "Offer monthly and annual plans."
+    ],
+    [
+     "Membership",
+     "Charge regularly for access."
+    ],
+    [
+     "Usage-linked plans",
+     "Tie plans to defined limits."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "payment-gateway-integration",
+   "name": "Payment Gateway Integration",
+   "group": "Headless SaaS & API Solutions",
+   "text": "Connect your product to the payment gateway you choose, with orders and payment status kept in step.",
+   "intro": "Connect your product to the payment gateway you choose, with orders and payment status kept in step.",
+   "about": [
+    "Accepting payments online means connecting your system to a gateway, handling success and failure properly, and recording the result against the right order. Doing this carefully avoids lost or duplicated payments.",
+    "We integrate the gateway you prefer, test the flows end to end, and keep card details with the gateway rather than on your servers."
+   ],
+   "offers": [
+    "Gateway selection guidance",
+    "Checkout and payment flow integration",
+    "Payment confirmation and failure handling",
+    "Reconciliation records"
+   ],
+   "solves": [
+    "Customers cannot pay online",
+    "Payments and orders fall out of step",
+    "Uncertainty about secure handling of card data"
+   ],
+   "features": [
+    [
+     "Gateway of your choice",
+     "Integrated according to its documentation."
+    ],
+    [
+     "Status synchronisation",
+     "Orders updated when payments succeed or fail."
+    ],
+    [
+     "Refund handling",
+     "Support for reversing payments where needed."
+    ],
+    [
+     "Reconciliation records",
+     "Clear history for accounts."
+    ]
+   ],
+   "benefits": [
+    "Customers can pay online",
+    "Fewer manual checks of payment status",
+    "Card data stays with the gateway"
+   ],
+   "uses": [
+    [
+     "Online store",
+     "Take payment at checkout."
+    ],
+    [
+     "Booking deposits",
+     "Collect a fee when an appointment is booked."
+    ],
+    [
+     "Invoice payment link",
+     "Let customers pay a bill online."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "booking-and-appointment-apis",
+   "name": "Booking & Appointment APIs",
+   "group": "Headless SaaS & API Solutions",
+   "text": "Availability, bookings and reminders for services that run on appointments.",
+   "intro": "Availability, bookings and reminders for services that run on appointments.",
+   "about": [
+    "Appointment-based businesses need to show free times, prevent double bookings and remind people to attend. These APIs provide that engine for any front end you build.",
+    "Working hours, durations, staff and locations are configurable, so the same service fits a clinic, a salon or a training centre."
+   ],
+   "offers": [
+    "Availability and slot calculation",
+    "Booking, rescheduling and cancellation",
+    "Staff, resource and location settings",
+    "Reminder triggers"
+   ],
+   "solves": [
+    "Double bookings and scheduling clashes",
+    "Phone-based booking that ties up staff",
+    "Missed appointments without reminders"
+   ],
+   "features": [
+    [
+     "Real-time availability",
+     "Only free slots can be booked."
+    ],
+    [
+     "Rescheduling and cancellation",
+     "Changes handled consistently."
+    ],
+    [
+     "Staff and resource rules",
+     "Models who and what is booked."
+    ],
+    [
+     "Reminder hooks",
+     "Trigger notifications before appointments."
+    ]
+   ],
+   "benefits": [
+    "Fewer scheduling errors",
+    "Self-service booking for customers",
+    "One booking engine for several apps"
+   ],
+   "uses": [
+    [
+     "Clinic or salon",
+     "Book by service and practitioner."
+    ],
+    [
+     "Consultation scheduling",
+     "Offer slots for calls or meetings."
+    ],
+    [
+     "Training sessions",
+     "Reserve seats for workshops."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "crm-apis",
+   "name": "CRM APIs",
+   "group": "Headless SaaS & API Solutions",
+   "text": "Contacts, leads and activity records exposed through APIs for your own tools.",
+   "intro": "Contacts, leads and activity records exposed through APIs for your own tools.",
+   "about": [
+    "When customer data sits behind an API, any of your tools — a website form, a mobile app, an automation — can create and read records without opening a separate CRM screen.",
+    "We provide endpoints for contacts, companies, leads and activities, with the access rules and fields your business needs."
+   ],
+   "offers": [
+    "Contact, company and lead endpoints",
+    "Activity and note records",
+    "Custom fields and statuses",
+    "Search and filtering"
+   ],
+   "solves": [
+    "Leads captured in one tool never reach the CRM",
+    "Developers need customer data but only have screens",
+    "Customer records duplicated across systems"
+   ],
+   "features": [
+    [
+     "Standard CRM objects",
+     "Contacts, companies, leads, activities."
+    ],
+    [
+     "Custom fields",
+     "Fit the data to your business."
+    ],
+    [
+     "Search and filter",
+     "Find records by any field."
+    ],
+    [
+     "Access control",
+     "Permissions per user or app."
+    ]
+   ],
+   "benefits": [
+    "Data entered once, used everywhere",
+    "Easier integration with other tools",
+    "A CRM that fits your workflows"
+   ],
+   "uses": [
+    [
+     "Website form to CRM",
+     "Create a lead from every enquiry."
+    ],
+    [
+     "Mobile app customer lookup",
+     "Show a customer’s history in the field."
+    ],
+    [
+     "Automation source",
+     "Trigger follow-ups from lead changes."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "notification-apis",
+   "name": "Notification APIs",
+   "group": "Headless SaaS & API Solutions",
+   "text": "Email, SMS and in-app notifications sent through one consistent interface.",
+   "intro": "Email, SMS and in-app notifications sent through one consistent interface.",
+   "about": [
+    "Products send many messages: confirmations, reminders, alerts, receipts. A notification API gives your application one way to send them, whatever channel is used.",
+    "It handles templates, scheduling and delivery status, so your application does not need to manage each provider separately."
+   ],
+   "offers": [
+    "Email, SMS and in-app message endpoints",
+    "Reusable message templates",
+    "Scheduling and retries",
+    "Delivery status records"
+   ],
+   "solves": [
+    "Messages are sent from several unconnected places",
+    "No record of whether a message was delivered",
+    "Changing a provider means changing the app"
+   ],
+   "features": [
+    [
+     "Multiple channels",
+     "Send by email, SMS or in-app."
+    ],
+    [
+     "Templates",
+     "Consistent, reusable wording."
+    ],
+    [
+     "Scheduling and retries",
+     "Send at the right time, retry on failure."
+    ],
+    [
+     "Delivery records",
+     "See what was sent and when."
+    ]
+   ],
+   "benefits": [
+    "Consistent messaging",
+    "Easier to change providers",
+    "Visibility of delivery"
+   ],
+   "uses": [
+    [
+     "Order confirmations",
+     "Notify after purchase."
+    ],
+    [
+     "Appointment reminders",
+     "Message before a booking."
+    ],
+    [
+     "Account alerts",
+     "Tell users about changes."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "file-and-media-apis",
+   "name": "File & Media APIs",
+   "group": "Headless SaaS & API Solutions",
+   "text": "Upload, storage and delivery of documents and images through a simple interface.",
+   "intro": "Upload, storage and delivery of documents and images through a simple interface.",
+   "about": [
+    "Most applications need to accept files — profile photos, documents, product images — and show them again later. File and media APIs handle upload, storage, access control and delivery.",
+    "Images can be resized for different screens, and private files stay behind permissions so only the right people can open them."
+   ],
+   "offers": [
+    "Upload and download endpoints",
+    "Storage with access control",
+    "Image resizing and formats",
+    "File metadata and search"
+   ],
+   "solves": [
+    "Files stored on application servers are hard to manage",
+    "Large images slow down pages",
+    "Private documents need controlled access"
+   ],
+   "features": [
+    [
+     "Secure upload",
+     "Validated files stored safely."
+    ],
+    [
+     "Access control",
+     "Public or private per file."
+    ],
+    [
+     "Image processing",
+     "Sizes suited to each screen."
+    ],
+    [
+     "Metadata",
+     "Names, types and ownership recorded."
+    ]
+   ],
+   "benefits": [
+    "Simple file handling for any app",
+    "Faster-loading images",
+    "Controlled access to documents"
+   ],
+   "uses": [
+    [
+     "Product images",
+     "Store and serve catalogue photos."
+    ],
+    [
+     "Customer documents",
+     "Collect and keep ID or forms securely."
+    ],
+    [
+     "User profile pictures",
+     "Upload and display avatars."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "ai-apis",
+   "name": "AI APIs",
+   "group": "Headless SaaS & API Solutions",
+   "text": "AI capabilities such as text understanding and generation, offered as APIs your product can call.",
+   "intro": "AI capabilities — text understanding and generation — offered as APIs your product can call.",
+   "about": [
+    "Instead of wiring AI models into every project, an AI API gives your applications one interface for tasks such as summarising text, classifying messages or drafting replies.",
+    "We add the practical controls around it: usage limits, logging, prompt management and the ability to change the underlying model without changing your app."
+   ],
+   "offers": [
+    "Endpoints for summarising, classifying and drafting",
+    "Prompt and configuration management",
+    "Usage limits and logging",
+    "Model flexibility behind one interface"
+   ],
+   "solves": [
+    "AI code duplicated across projects",
+    "No control over usage and cost",
+    "Locked into one model provider"
+   ],
+   "features": [
+    [
+     "Task-based endpoints",
+     "Simple calls for defined AI tasks."
+    ],
+    [
+     "Prompt management",
+     "Change behaviour without redeploying."
+    ],
+    [
+     "Usage controls",
+     "Limits and records per user or app."
+    ],
+    [
+     "Provider flexibility",
+     "Swap models behind the interface."
+    ]
+   ],
+   "benefits": [
+    "Add AI to products faster",
+    "Controlled, measurable usage",
+    "Reduced dependence on one provider"
+   ],
+   "uses": [
+    [
+     "Summarise support tickets",
+     "Return a short summary through one call."
+    ],
+    [
+     "Classify incoming messages",
+     "Tag and route automatically."
+    ],
+    [
+     "Draft-reply service",
+     "Suggest replies inside your own app."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "n8n-workflow-automation",
+   "name": "n8n Workflow Automation",
+   "group": "AI Workflow Automations & Integrations",
+   "text": "Visual workflows built on n8n that connect your apps and run routine steps automatically.",
+   "intro": "Visual workflows built on n8n that connect your apps and run routine steps automatically.",
+   "about": [
+    "n8n is a workflow automation tool where each step — a trigger, an action, a condition — is a visible block. It connects hundreds of services and can run on your own server or in the cloud.",
+    "We design the workflow with you, build and test it in n8n, and document it so your team can follow what it does."
+   ],
+   "offers": [
+    "Workflow design in n8n",
+    "Connections to your apps and databases",
+    "Error handling and alerts",
+    "Hosting set-up and documentation"
+   ],
+   "solves": [
+    "Data is copied manually between tools",
+    "Regular tasks depend on someone remembering",
+    "Off-the-shelf connectors do not fit your process"
+   ],
+   "features": [
+    [
+     "Visual editor",
+     "Each step can be seen and understood."
+    ],
+    [
+     "Many integrations",
+     "Connect common apps and your own APIs."
+    ],
+    [
+     "Conditions and branches",
+     "Different paths for different cases."
+    ],
+    [
+     "Self-hosting option",
+     "Run on infrastructure you control."
+    ]
+   ],
+   "benefits": [
+    "Routine steps handled automatically",
+    "Transparent, adjustable workflows",
+    "Flexible hosting"
+   ],
+   "uses": [
+    [
+     "Form to CRM and email",
+     "Save each enquiry and send an acknowledgement."
+    ],
+    [
+     "Daily report",
+     "Collect figures and email a summary."
+    ],
+    [
+     "Order sync",
+     "Update the accounts tool when an order is placed."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "business-process-automation",
+   "name": "Business Process Automation",
+   "group": "AI Workflow Automations & Integrations",
+   "text": "Turn repeated manual processes — approvals, hand-offs, updates — into defined, automatic flows.",
+   "intro": "Turn repeated manual processes — hand-offs, approvals and updates — into defined, automatic flows.",
+   "about": [
+    "Many business processes follow the same steps every time and still depend on people to push each one along. Process automation maps the steps and automates the repeatable ones across your systems.",
+    "We focus on the processes where delays or errors cost you most, and automate step by step so staff can adopt the change."
+   ],
+   "offers": [
+    "Process mapping and prioritisation",
+    "Automation of repeatable steps",
+    "Hand-offs between teams and systems",
+    "Status tracking and reporting"
+   ],
+   "solves": [
+    "Work waits between departments",
+    "Errors from repeated manual entry",
+    "No overview of process status"
+   ],
+   "features": [
+    [
+     "Process map",
+     "Written, agreed steps before building."
+    ],
+    [
+     "Automated hand-offs",
+     "The next person is notified automatically."
+    ],
+    [
+     "Status tracking",
+     "Where each item stands."
+    ],
+    [
+     "Phased rollout",
+     "Start with one process, then extend."
+    ]
+   ],
+   "benefits": [
+    "Shorter turnaround for routine work",
+    "Fewer manual errors",
+    "Visibility of progress"
+   ],
+   "uses": [
+    [
+     "Employee onboarding",
+     "Trigger tasks in HR, IT and finance."
+    ],
+    [
+     "Order fulfilment",
+     "Pass an order from sales to dispatch."
+    ],
+    [
+     "Expense claims",
+     "Submit, approve and record automatically."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "whatsapp-automation",
+   "name": "WhatsApp Automation",
+   "group": "AI Workflow Automations & Integrations",
+   "text": "Automated messages and replies for common customer interactions, with a path to a person.",
+   "intro": "Automated messages and replies on WhatsApp for common customer interactions, with a path to a person.",
+   "about": [
+    "WhatsApp is where many customers already talk to businesses. Automation can send confirmations and reminders, answer common questions and collect details, using WhatsApp Business messaging.",
+    "We design conversation flows with clear options and a hand-over to your team, and follow WhatsApp’s messaging rules, including customer consent."
+   ],
+   "offers": [
+    "Conversation flow design",
+    "Confirmation, reminder and update messages",
+    "Lead and detail collection",
+    "Hand-over to your team"
+   ],
+   "solves": [
+    "Staff reply to the same WhatsApp messages repeatedly",
+    "Customers wait for simple confirmations",
+    "Enquiries from WhatsApp never reach your records"
+   ],
+   "features": [
+    [
+     "Menu-based replies",
+     "Customers choose from clear options."
+    ],
+    [
+     "Template messages",
+     "Confirmations and reminders."
+    ],
+    [
+     "Hand-over",
+     "A person takes over complex chats."
+    ],
+    [
+     "CRM connection",
+     "Conversations saved against the customer."
+    ]
+   ],
+   "benefits": [
+    "Faster replies on a channel customers use",
+    "Less repetitive typing",
+    "Enquiries captured in your system"
+   ],
+   "uses": [
+    [
+     "Appointment reminders",
+     "Remind customers on WhatsApp."
+    ],
+    [
+     "Order updates",
+     "Send status changes."
+    ],
+    [
+     "Enquiry capture",
+     "Collect requirement details before a call."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "email-automation",
+   "name": "Email Automation",
+   "group": "AI Workflow Automations & Integrations",
+   "text": "Triggered and scheduled emails — confirmations, reminders, follow-ups — sent without manual effort.",
+   "intro": "Triggered and scheduled emails — confirmations, reminders, follow-ups — sent without manual effort.",
+   "about": [
+    "Many emails are predictable: a thank-you after an enquiry, a reminder before an appointment, a follow-up after a quote. Email automation sends them at the right moment, with the right details filled in.",
+    "We set up the triggers, write the templates with you and make sure messages are sent from your own domain."
+   ],
+   "offers": [
+    "Trigger and schedule design",
+    "Reusable email templates",
+    "Personalisation from your data",
+    "Sending set-up and basic reporting"
+   ],
+   "solves": [
+    "Follow-ups depend on someone remembering",
+    "Inconsistent wording in routine emails",
+    "Customers do not hear back promptly"
+   ],
+   "features": [
+    [
+     "Triggered emails",
+     "Send when something happens."
+    ],
+    [
+     "Scheduled emails",
+     "Send at set times or intervals."
+    ],
+    [
+     "Personalisation",
+     "Names, dates and details inserted."
+    ],
+    [
+     "Opt-out handling",
+     "Respect unsubscribe preferences."
+    ]
+   ],
+   "benefits": [
+    "Prompt, consistent communication",
+    "Less manual follow-up",
+    "More reliable customer contact"
+   ],
+   "uses": [
+    [
+     "Enquiry acknowledgement",
+     "Reply instantly when a form is submitted."
+    ],
+    [
+     "Quote follow-up",
+     "Remind after a set number of days."
+    ],
+    [
+     "Payment reminder",
+     "Send a reminder before a due date."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "crm-automation",
+   "name": "CRM Automation",
+   "group": "AI Workflow Automations & Integrations",
+   "text": "Leads and customer records created, updated and followed up automatically.",
+   "intro": "Leads and customer records created, updated and followed up automatically.",
+   "about": [
+    "A CRM is only useful when it is current. CRM automation keeps it up to date by creating records from forms and messages, updating stages and prompting follow-ups.",
+    "It connects your CRM to your website, email and other tools, so staff spend less time entering data and more time talking to customers."
+   ],
+   "offers": [
+    "Lead capture into the CRM",
+    "Stage updates and task creation",
+    "Follow-up reminders and assignments",
+    "Data clean-up rules"
+   ],
+   "solves": [
+    "Leads sit in inboxes and never reach the CRM",
+    "Follow-up tasks are missed",
+    "Records are incomplete or duplicated"
+   ],
+   "features": [
+    [
+     "Automatic record creation",
+     "New leads appear without typing."
+    ],
+    [
+     "Task assignment",
+     "The right person is prompted to follow up."
+    ],
+    [
+     "Stage rules",
+     "Move records when conditions are met."
+    ],
+    [
+     "Duplicate checks",
+     "Reduce repeated entries."
+    ]
+   ],
+   "benefits": [
+    "A CRM that stays current",
+    "Fewer missed follow-ups",
+    "Time returned to selling"
+   ],
+   "uses": [
+    [
+     "Website lead routing",
+     "Assign new enquiries by service or region."
+    ],
+    [
+     "Quote follow-up tasks",
+     "Create reminders after sending a quote."
+    ],
+    [
+     "Customer review request",
+     "Trigger a message after a completed job."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "ai-agent-workflows",
+   "name": "AI Agent Workflows",
+   "group": "AI Workflow Automations & Integrations",
+   "text": "Workflows where an AI agent handles a step — such as drafting or classifying — with a person approving.",
+   "intro": "Workflows where an AI agent handles a step — such as drafting or classifying — with a person approving.",
+   "about": [
+    "Some workflow steps need interpretation: understanding an email, deciding a category, writing a reply. Placing an AI agent at that step lets the rest of the workflow keep running automatically.",
+    "Compared with building an AI application, this approach adds AI inside an automation you already use, with approval points and logs."
+   ],
+   "offers": [
+    "Identification of steps suited to AI",
+    "Agent step design within the workflow",
+    "Approval and fallback rules",
+    "Logging of agent actions"
+   ],
+   "solves": [
+    "A workflow stalls at steps that need reading or judgement",
+    "Staff must interpret each incoming message",
+    "AI use is unmanaged and unrecorded"
+   ],
+   "features": [
+    [
+     "AI in the flow",
+     "An agent completes one defined step."
+    ],
+    [
+     "Approval gates",
+     "A person confirms before action."
+    ],
+    [
+     "Fallbacks",
+     "Unclear cases are escalated."
+    ],
+    [
+     "Run logs",
+     "See what the agent decided."
+    ]
+   ],
+   "benefits": [
+    "End-to-end flows that include interpretation steps",
+    "People review rather than do",
+    "Traceable decisions"
+   ],
+   "uses": [
+    [
+     "Inbox triage",
+     "Classify emails, then route and draft replies."
+    ],
+    [
+     "Lead qualification",
+     "Read an enquiry and fill structured fields."
+    ],
+    [
+     "Document intake",
+     "Extract values from files and update records."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "third-party-application-integration",
+   "name": "Third-Party Application Integration",
+   "group": "AI Workflow Automations & Integrations",
+   "text": "Connect your systems to the other applications and services your business depends on.",
+   "intro": "Connect your systems to the other applications and services your business depends on.",
+   "about": [
+    "Few businesses run on one tool. Integration links your applications — accounting, e-commerce, CRM, support, payments — so information flows between them without re-typing.",
+    "We work with the applications’ APIs or connectors, map the fields between them and test the data flow in both directions where needed."
+   ],
+   "offers": [
+    "Integration planning and field mapping",
+    "API and connector development",
+    "Two-way or one-way data sync",
+    "Error handling and monitoring"
+   ],
+   "solves": [
+    "The same data is entered in several applications",
+    "Reports need figures from different systems combined",
+    "Tools do not connect out of the box"
+   ],
+   "features": [
+    [
+     "Field mapping",
+     "Agreed correspondence between systems."
+    ],
+    [
+     "API-based sync",
+     "Reliable connection using official interfaces."
+    ],
+    [
+     "Error alerts",
+     "Failures flagged, not hidden."
+    ],
+    [
+     "Scheduled or live sync",
+     "Updates in real time or at set times."
+    ]
+   ],
+   "benefits": [
+    "One entry, many systems updated",
+    "Consistent data across tools",
+    "Less reconciliation work"
+   ],
+   "uses": [
+    [
+     "Store to accounting",
+     "Send orders and payments to your accounts tool."
+    ],
+    [
+     "CRM to support desk",
+     "Show customer history to support staff."
+    ],
+    [
+     "Spreadsheet to application",
+     "Feed shared sheets into a database."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "webhook-integration",
+   "name": "Webhook Integration",
+   "group": "AI Workflow Automations & Integrations",
+   "text": "Send and receive events between systems in real time, so one change updates the others.",
+   "intro": "Send and receive events between systems in real time, so one change updates the others.",
+   "about": [
+    "A webhook is a message one system sends to another the moment something happens — a payment is made, a form is submitted, a status changes. It avoids constant checking and keeps systems in step.",
+    "We build and secure the endpoints that receive events and the logic that acts on them, with retries and logs for reliability."
+   ],
+   "offers": [
+    "Webhook endpoint development",
+    "Event verification and security",
+    "Processing and routing logic",
+    "Retries, logging and monitoring"
+   ],
+   "solves": [
+    "Systems learn about changes only after a delay",
+    "Polling wastes effort and misses events",
+    "Failures go unnoticed"
+   ],
+   "features": [
+    [
+     "Real-time events",
+     "Act as soon as something happens."
+    ],
+    [
+     "Signature checks",
+     "Confirm messages come from the expected sender."
+    ],
+    [
+     "Retries",
+     "Handle temporary failures."
+    ],
+    [
+     "Event logs",
+     "A record of what was received."
+    ]
+   ],
+   "benefits": [
+    "Faster reactions between systems",
+    "Less unnecessary polling",
+    "Better visibility into integrations"
+   ],
+   "uses": [
+    [
+     "Payment confirmed",
+     "Update an order the moment payment succeeds."
+    ],
+    [
+     "Form submitted",
+     "Start a workflow instantly."
+    ],
+    [
+     "Status change",
+     "Notify another system when a record changes."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "appointment-booking-applications",
+   "name": "Appointment Booking Applications",
+   "group": "Mobile & Business Applications",
+   "text": "Let customers book, change and cancel appointments, with reminders and a clear schedule for your team.",
+   "intro": "Let customers book, change and cancel appointments from their phone, with reminders and a clear schedule for your team.",
+   "about": [
+    "For appointment-based businesses, booking by phone call takes time and leads to mix-ups. A booking app shows real availability, confirms instantly and keeps the schedule in one place.",
+    "We tailor it to your services, staff and working hours, and connect reminders so fewer appointments are missed."
+   ],
+   "offers": [
+    "Service, staff and availability setup",
+    "Customer booking and rescheduling",
+    "Reminders and confirmations",
+    "Schedule view for your team"
+   ],
+   "solves": [
+    "Double bookings and clashes",
+    "Staff tied to phones taking bookings",
+    "No-shows without reminders"
+   ],
+   "features": [
+    [
+     "Live availability",
+     "Customers see free times."
+    ],
+    [
+     "Reminders",
+     "Notifications before the appointment."
+    ],
+    [
+     "Team calendar",
+     "Each person’s day at a glance."
+    ],
+    [
+     "Booking history",
+     "Past visits recorded per customer."
+    ]
+   ],
+   "benefits": [
+    "Fewer scheduling errors",
+    "Customers can book anytime",
+    "A tidier schedule for staff"
+   ],
+   "uses": [
+    [
+     "Clinic or consultation",
+     "Book by doctor or consultant."
+    ],
+    [
+     "Salon or spa",
+     "Book by service and stylist."
+    ],
+    [
+     "Service visits",
+     "Schedule home or site visits."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "field-staff-and-task-tracking-applications",
+   "name": "Field Staff & Task Tracking Applications",
+   "group": "Mobile & Business Applications",
+   "text": "Assign, update and complete tasks from the field, with progress visible to the office.",
+   "intro": "Assign, update and complete tasks from the field, with progress visible to the office.",
+   "about": [
+    "When staff work away from a desk, the office often learns what happened only after the fact. A task-tracking app gives each person their assigned work and lets them update it on the spot.",
+    "Managers see progress as it happens, with notes and photos attached, instead of chasing updates by phone."
+   ],
+   "offers": [
+    "Task assignment and scheduling",
+    "Status updates, notes and photo attachments",
+    "Manager dashboard and reports",
+    "Connection to your central system"
+   ],
+   "solves": [
+    "Updates arrive late by phone or message",
+    "Unclear who is doing what",
+    "Paper job sheets are lost or typed up later"
+   ],
+   "features": [
+    [
+     "Assigned task list",
+     "Each person sees their work."
+    ],
+    [
+     "Status and notes",
+     "Updated from the field."
+    ],
+    [
+     "Photo attachments",
+     "Evidence of completed work."
+    ],
+    [
+     "Manager view",
+     "Overall progress in one place."
+    ]
+   ],
+   "benefits": [
+    "Up-to-date view of field work",
+    "Less paperwork and re-entry",
+    "Clear accountability for tasks"
+   ],
+   "uses": [
+    [
+     "Service technicians",
+     "Receive jobs and record completion."
+    ],
+    [
+     "Delivery and collections",
+     "Track stops and outcomes."
+    ],
+    [
+     "Site inspections",
+     "Record findings with photos."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "employee-location-tracking-applications",
+   "name": "Employee Location Tracking Applications",
+   "group": "Mobile & Business Applications",
+   "text": "Location features for teams that work on the move, built with clear consent and privacy rules agreed with you.",
+   "intro": "Location features for teams that work on the move, built with clear consent and privacy rules agreed with you.",
+   "about": [
+    "Some work — field visits, deliveries, site attendance — benefits from knowing where staff are during working hours. These applications record location for defined purposes and times, such as check-in at a site.",
+    "Location data is personal, so we design around consent, limiting tracking to work hours and agreed purposes, and being transparent with employees."
+   ],
+   "offers": [
+    "Check-in and check-out at work locations",
+    "Visit and route records",
+    "Working-hours-only tracking options",
+    "Privacy and consent flow design"
+   ],
+   "solves": [
+    "No reliable record of site visits",
+    "Attendance for field staff is reported by hand",
+    "Disputes about where work took place"
+   ],
+   "features": [
+    [
+     "Location check-in",
+     "Mark arrival at a site."
+    ],
+    [
+     "Visit history",
+     "A record of where work was done."
+    ],
+    [
+     "Working-hours limits",
+     "Collect only during agreed times."
+    ],
+    [
+     "Consent and notice",
+     "Employees are informed and agree."
+    ]
+   ],
+   "benefits": [
+    "Verifiable visit records",
+    "Less manual attendance reporting",
+    "Tracking designed with privacy in mind"
+   ],
+   "uses": [
+    [
+     "Sales visits",
+     "Record customer visits."
+    ],
+    [
+     "Site attendance",
+     "Check-in at job sites."
+    ],
+    [
+     "Delivery runs",
+     "Log stops during a shift."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "business-billing-applications",
+   "name": "Business Billing Applications",
+   "group": "Mobile & Business Applications",
+   "text": "Create bills and invoices and record payments from a phone or counter.",
+   "intro": "Create bills and invoices and record payments from a phone or counter.",
+   "about": [
+    "Billing is a daily task for shops and service businesses. A billing app lets you choose items, apply taxes and discounts, produce the bill and record how it was paid, without a separate computer.",
+    "Bills can be shared digitally, and sales are recorded for daily and monthly summaries."
+   ],
+   "offers": [
+    "Item and price management",
+    "Bill and invoice creation",
+    "Payment recording and customer records",
+    "Daily and monthly sales summaries"
+   ],
+   "solves": [
+    "Handwritten or spreadsheet billing is slow and error-prone",
+    "Sales totals are hard to reconcile",
+    "No record of customer purchases"
+   ],
+   "features": [
+    [
+     "Quick bill creation",
+     "Pick items and generate a bill."
+    ],
+    [
+     "Taxes and discounts",
+     "Applied according to your rules."
+    ],
+    [
+     "Digital sharing",
+     "Send bills to customers."
+    ],
+    [
+     "Sales summaries",
+     "Totals by day, month or item."
+    ]
+   ],
+   "benefits": [
+    "Faster checkout",
+    "Accurate records",
+    "Easier end-of-day reconciliation"
+   ],
+   "uses": [
+    [
+     "Retail counter",
+     "Bill customers at the till or on a tablet."
+    ],
+    [
+     "Service business",
+     "Invoice after each job."
+    ],
+    [
+     "Wholesale orders",
+     "Create and track invoices for repeat buyers."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "inventory-management-applications",
+   "name": "Inventory Management Applications",
+   "group": "Mobile & Business Applications",
+   "text": "Track stock in and out, with levels visible wherever your team works.",
+   "intro": "Track stock in and out, with levels visible wherever your team works.",
+   "about": [
+    "Stock records fall out of date when they are updated at a desk later in the day. An inventory app lets staff record receipts, sales and adjustments on the spot, and check levels before promising an order.",
+    "We build it around your items, units and locations, and connect it to billing or your online store where needed."
+   ],
+   "offers": [
+    "Item, category and location setup",
+    "Stock in, out and adjustment records",
+    "Low-stock alerts",
+    "Reports and exports"
+   ],
+   "solves": [
+    "Stock counts differ from records",
+    "Staff cannot check availability quickly",
+    "Reordering is reactive"
+   ],
+   "features": [
+    [
+     "Barcode-ready entry",
+     "Scan or search items quickly."
+    ],
+    [
+     "Movement history",
+     "Every change recorded."
+    ],
+    [
+     "Low-stock alerts",
+     "Know when to reorder."
+    ],
+    [
+     "Multiple locations",
+     "Track by shop or warehouse."
+    ]
+   ],
+   "benefits": [
+    "More accurate stock records",
+    "Faster answers on availability",
+    "Fewer stock-outs"
+   ],
+   "uses": [
+    [
+     "Shop stock",
+     "Track a retail range."
+    ],
+    [
+     "Warehouse stock-take",
+     "Count and adjust with a phone or tablet."
+    ],
+    [
+     "Spare parts",
+     "Monitor parts used on service jobs."
+    ]
+   ]
+  },
+  {
+   "division": "software",
+   "slug": "custom-business-mobile-applications",
+   "name": "Custom Business Mobile Applications",
+   "group": "Mobile & Business Applications",
+   "text": "A mobile application designed around a process specific to your business.",
+   "intro": "A mobile application designed around a process specific to your business.",
+   "about": [
+    "Sometimes the right tool is not one of the common app types: an audit checklist, a site survey, a customer onboarding flow. A custom mobile application is designed from your process, not a template.",
+    "We begin with the most important workflow, release it to a small group and extend based on their feedback."
+   ],
+   "offers": [
+    "Process discovery and app design",
+    "Android and iOS development",
+    "Backend and data connection",
+    "Pilot release and iteration"
+   ],
+   "solves": [
+    "Paper forms and checklists are slow to process",
+    "A specific process has no suitable ready-made app",
+    "Information from the field arrives late"
+   ],
+   "features": [
+    [
+     "Designed from your process",
+     "Screens follow your steps."
+    ],
+    [
+     "Forms and checklists",
+     "Structured data capture."
+    ],
+    [
+     "Offline capability where required",
+     "Work without a signal and sync later."
+    ],
+    [
+     "Central data",
+     "Everything flows to your system."
+    ]
+   ],
+   "benefits": [
+    "Digital capture instead of paper",
+    "Real-time information for managers",
+    "A tool people actually fit to their work"
+   ],
+   "uses": [
+    [
+     "Inspection checklist",
+     "Complete and submit checks on site."
+    ],
+    [
+     "Survey app",
+     "Collect structured responses in the field."
+    ],
+    [
+     "Customer onboarding",
+     "Guide new customers through steps."
+    ]
+   ]
+  },
+  {
+   "division": "growth",
+   "slug": "social-media-management",
+   "name": "Social Media Management",
+   "group": "Reach",
+   "text": "We set up, manage, and grow your brand's presence on the platforms where your customers spend their time.",
+   "intro": "We set up, manage, and grow your brand's presence on the platforms where your customers spend their time.",
+   "about": [],
+   "offers": [
+    "Consistent branding, hashtag strategy, and monthly performance reports across all platforms"
+   ],
+   "solves": [],
+   "features": [
+    [
+     "Meta (Facebook and Instagram)",
+     "Page setup, profile optimization, content calendar, daily posting, stories, reels, and community engagement"
+    ],
+    [
+     "LinkedIn",
+     "Company page setup, professional posts, and B2B networking to build authority"
+    ],
+    [
+     "Pinterest",
+     "Business profile, boards, and pins that drive traffic to your website"
+    ],
+    [
+     "X (Twitter)",
+     "Profile setup, regular updates, trending topics, and audience interaction"
+    ]
+   ],
+   "benefits": [],
+   "uses": []
+  },
+  {
+   "division": "growth",
+   "slug": "search-engine-optimization-seo",
+   "name": "Search Engine Optimization (SEO)",
+   "group": "Be found",
+   "text": "A complete SEO service to improve your Google rankings and bring in consistent organic traffic.",
+   "intro": "A complete SEO service to improve your Google rankings and bring in consistent organic traffic.",
+   "about": [],
+   "offers": [],
+   "solves": [],
+   "features": [
+    [
+     "On-Page SEO",
+     "Keyword research, title and meta tag optimization, heading structure, content optimization, image optimization, and internal linking"
+    ],
+    [
+     "Local SEO",
+     "Google Business Profile optimization, local listings, citations, and review management to reach nearby customers"
+    ],
+    [
+     "Off-Page SEO",
+     "Quality backlink building, directory and bookmark submissions, guest posting, and brand mentions to build domain authority"
+    ],
+    [
+     "Technical SEO",
+     "Site speed optimization, mobile-friendliness, sitemap and robots.txt setup, crawl error fixes, schema markup, and Search Console setup"
+    ]
+   ],
+   "benefits": [],
+   "uses": []
+  },
+  {
+   "division": "growth",
+   "slug": "creatives",
+   "name": "Creatives",
+   "group": "Create & publish",
+   "text": "Eye-catching visuals and videos that make your brand stand out and keep audiences engaged.",
+   "intro": "Eye-catching visuals and videos that make your brand stand out and keep audiences engaged.",
+   "about": [],
+   "offers": [],
+   "solves": [],
+   "features": [
+    [
+     "Poster and Graphic Design",
+     "Social media posters, banners, brochures, and festival and offer creatives"
+    ],
+    [
+     "Video Shooting",
+     "Professional product, service, and promotional video shoots"
+    ],
+    [
+     "Video Editing",
+     "Reels, short videos, and promotional videos with music, text, and branding"
+    ]
+   ],
+   "benefits": [],
+   "uses": []
+  },
+  {
+   "division": "growth",
+   "slug": "content-publishing",
+   "name": "Content Publishing",
+   "group": "Create & publish",
+   "text": "Valuable content, published where your audience reads and searches.",
+   "intro": "Valuable content, published where your audience reads and searches.",
+   "about": [],
+   "offers": [
+    "Other article and content platforms for wider reach"
+   ],
+   "solves": [],
+   "features": [
+    [
+     "Article Writing",
+     "SEO-friendly blog articles, website content, and product descriptions"
+    ],
+    [
+     "Blogger",
+     "Regular blog posts to improve search visibility and build backlinks"
+    ],
+    [
+     "Reddit",
+     "Community-focused posts and discussions that bring relevant traffic and build trust"
+    ]
+   ],
+   "benefits": [],
+   "uses": []
+  },
+  {
+   "division": "growth",
+   "slug": "paid-advertising",
+   "name": "Paid Advertising",
+   "group": "Reach",
+   "text": "We plan, launch, and optimize ad campaigns that reach the right audience and bring you enquiries, leads, and sales.",
+   "intro": "We plan, launch, and optimize ad campaigns that reach the right audience and bring you enquiries, leads, and sales.",
+   "about": [],
+   "offers": [
+    "Audience targeting",
+    "Budget management",
+    "A/B testing",
+    "Regular performance reports"
+   ],
+   "solves": [],
+   "features": [
+    [
+     "Meta Ads (Facebook and Instagram)",
+     "",
+     [
+      "Lead Generation campaigns",
+      "Traffic campaigns",
+      "Engagement campaigns",
+      "Awareness campaigns",
+      "Messages campaigns (WhatsApp and Messenger)",
+      "Sales campaigns"
+     ]
+    ],
+    [
+     "Google Ads",
+     "",
+     [
+      "Search Ads campaigns",
+      "Performance Max campaigns",
+      "Display Ads campaigns",
+      "YouTube Video Ads campaigns"
+     ]
+    ],
+    [
+     "LinkedIn Ads",
+     "",
+     [
+      "Lead Generation campaigns",
+      "Website Visits campaigns",
+      "Brand Awareness campaigns",
+      "Engagement campaigns",
+      "Video Views campaigns"
+     ]
+    ],
+    [
+     "X (Twitter) Ads",
+     "",
+     [
+      "Awareness (Reach) campaigns",
+      "Website Traffic campaigns",
+      "Engagement campaigns",
+      "Video Views campaigns",
+      "Followers campaigns"
+     ]
+    ]
+   ],
+   "benefits": [],
+   "uses": []
+  },
+  {
+   "division": "education",
+   "slug": "technical-training",
+   "name": "Technical Training",
+   "group": "Learn",
+   "text": "Hands-on technical training in programming, web design, databases, software testing, cloud computing and DevOps, built around practical sessions.",
+   "intro": "Hands-on technical training for students and working professionals.",
+   "about": [
+    "Technical training at LAX360 Education is built around practical sessions: you learn a tool or language, then use it on exercises and small projects.",
+    "Training covers the areas in the LAX360 Education course list, including programming languages, web design, databases, software testing, cloud computing and DevOps."
+   ],
+   "offers": [
+    "Practical, hands-on sessions",
+    "Courses from the approved LAX360 Education list",
+    "Guidance on choosing a course",
+    "Project and assessment support"
+   ],
+   "solves": [
+    "Theory without enough practice",
+    "No clear starting point in a large technical field",
+    "Skills that do not match what employers ask for"
+   ],
+   "features": [
+    [
+     "Programming and web",
+     "Languages and web design courses from the course list."
+    ],
+    [
+     "Databases and testing",
+     "MySQL, MongoDB, SQL Server, manual and automation testing."
+    ],
+    [
+     "Cloud and DevOps",
+     "Cloud platform and DevOps tool courses."
+    ],
+    [
+     "Practical sessions",
+     "Exercises and project work alongside each topic."
+    ]
+   ],
+   "benefits": [
+    "Learn by doing",
+    "A course list you can see in full",
+    "Help picking the right starting point"
+   ],
+   "uses": [
+    [
+     "First IT course",
+     "Start with a programming or web design certificate."
+    ],
+    [
+     "Adding a tool",
+     "Learn one tool, such as Git, Docker or Selenium, for your current work."
+    ],
+    [
+     "Career change",
+     "Build a technical base before applying for IT roles."
+    ]
+   ]
+  },
+  {
+   "division": "education",
+   "slug": "professional-certification-courses",
+   "name": "Professional Certification Courses",
+   "group": "Certify",
+   "text": "Certificate courses from the LAX360 Education course list, from programming languages and databases to cloud, cyber security and digital marketing.",
+   "intro": "Certificate courses taken from the approved LAX360 Education course list.",
+   "about": [
+    "LAX360 Education offers only the courses on its approved catalogue. Each is a certificate course focused on one language, tool or platform, grouped by category so it is easy to compare.",
+    "The full list is on this page: programming languages, web designing, databases, full stack development with AI, software testing, cloud computing, DevOps, data and AI, cyber security, digital marketing and frameworks."
+   ],
+   "offers": [
+    "Certificate courses by category",
+    "Course completion certification for eligible participants",
+    "Software and tool named for every course",
+    "Advice on which course to take first"
+   ],
+   "solves": [
+    "Too many courses with unclear content",
+    "Not knowing which tool a course teaches",
+    "Wanting a recognised record of what you completed"
+   ],
+   "features": [
+    [
+     "Clear categories",
+     "Courses grouped so you can browse by field."
+    ],
+    [
+     "Tool named for each course",
+     "The software or language each course teaches is shown."
+    ],
+    [
+     "One catalogue",
+     "Every programme page reads the same approved list."
+    ],
+    [
+     "Enquiry first",
+     "Ask us for fees, duration and start dates."
+    ]
+   ],
+   "benefits": [
+    "A transparent course list",
+    "Focused, single-subject certificates",
+    "The same catalogue wherever you see it"
+   ],
+   "uses": [
+    [
+     "Student certificate",
+     "Add a certificate in Python, Java or web design."
+    ],
+    [
+     "Cloud or DevOps skills",
+     "Choose AWS, Azure, Docker or Kubernetes."
+    ],
+    [
+     "Digital marketing basics",
+     "Start with SEO, Google Ads or web analytics."
+    ]
+   ]
+  },
+  {
+   "division": "education",
+   "slug": "internship-programs",
+   "name": "Internship Programs",
+   "group": "Practise",
+   "text": "Domain-based internships with real-time project exposure and technical mentoring, subject to approval.",
+   "intro": "Domain-based internships with real project exposure and mentoring.",
+   "about": [
+    "Internship programmes give students practical exposure in a chosen domain, working on real-time tasks with technical mentoring.",
+    "Programmes are offered as 15-day, 30-day and long-term internships, subject to approval, and can include mini-project or final-year project guidance."
+   ],
+   "offers": [
+    "15-day, 30-day and long-term programmes, subject to approval",
+    "Domain-based internship tracks",
+    "Real-time project exposure",
+    "Technical mentoring and documentation"
+   ],
+   "solves": [
+    "Little practical experience before graduation",
+    "Academic projects without guidance",
+    "No route from learning to real work"
+   ],
+   "features": [
+    [
+     "Domain based",
+     "Choose a track that matches your interest."
+    ],
+    [
+     "Real-time projects",
+     "Work on practical tasks rather than only exercises."
+    ],
+    [
+     "Mentoring",
+     "Technical guidance throughout the programme."
+    ],
+    [
+     "Project support",
+     "Help with mini and final-year projects."
+    ]
+   ],
+   "benefits": [
+    "Practical experience to describe in interviews",
+    "Guided project work",
+    "Internship completion certification for eligible participants"
+   ],
+   "uses": [
+    [
+     "Summer internship",
+     "A short programme during a break."
+    ],
+    [
+     "Final-year project",
+     "Mentored project work with documentation."
+    ],
+    [
+     "Long-term internship",
+     "Extended practice in one domain."
+    ]
+   ]
+  },
+  {
+   "division": "education",
+   "slug": "ai-and-software-development-training",
+   "name": "AI & Software Development Training",
+   "group": "Learn",
+   "text": "Full stack development with AI, data science with Python and machine learning, learned through practical projects.",
+   "intro": "Learn to build software and AI solutions through practical projects.",
+   "about": [
+    "This training follows the way LAX360 builds software: full stack development with AI, databases, and data science with Python and machine learning.",
+    "It draws on the Full Stack Development with AI and Database & AI categories of the approved LAX360 Education course list."
+   ],
+   "offers": [
+    "Full stack development with AI courses",
+    "Data science, machine learning and analytics courses",
+    "Practical, project-based learning",
+    "Guidance on the right learning path"
+   ],
+   "solves": [
+    "AI topics that feel too abstract",
+    "Not knowing how front end, back end and data fit together",
+    "Learning tools without building anything"
+   ],
+   "features": [
+    [
+     "Full stack with AI",
+     "MERN, Java, MEAN, PHP and Python full stack courses with AI."
+    ],
+    [
+     "Data and machine learning",
+     "Python data science and machine learning courses."
+    ],
+    [
+     "Analytics tools",
+     "Tableau and Power BI courses."
+    ],
+    [
+     "Build as you learn",
+     "Projects instead of slides."
+    ]
+   ],
+   "benefits": [
+    "A path from basics to a working project",
+    "Skills used in real software work",
+    "Courses from one approved list"
+   ],
+   "uses": [
+    [
+     "Aspiring developer",
+     "Follow a full stack course end to end."
+    ],
+    [
+     "Analyst",
+     "Learn Python, machine learning and a dashboard tool."
+    ],
+    [
+     "Working developer",
+     "Add AI to your development skills."
+    ]
+   ]
+  },
+  {
+   "division": "education",
+   "slug": "workshops-and-seminars",
+   "name": "Workshops and Seminars",
+   "group": "Practise",
+   "text": "Technical workshops, industry-oriented seminars and guest lectures for students and professionals.",
+   "intro": "Technical workshops and industry-oriented seminars for students and professionals.",
+   "about": [
+    "Workshops and seminars bring a focused topic to a group: a technical workshop on a tool or technology, an industry-oriented seminar, or a guest lecture.",
+    "They can be arranged with colleges and institutions, and a participation certificate can be issued for eligible participants."
+   ],
+   "offers": [
+    "Technical workshops",
+    "Industry-oriented seminars",
+    "Guest lectures",
+    "Workshop and seminar participation certificates"
+   ],
+   "solves": [
+    "Students with no exposure to current technology",
+    "A department that wants an industry speaker",
+    "A team that needs a short, focused session"
+   ],
+   "features": [
+    [
+     "Technical workshops",
+     "Hands-on sessions on a defined topic."
+    ],
+    [
+     "Seminars",
+     "Industry-focused talks and discussions."
+    ],
+    [
+     "Guest lectures",
+     "Sessions led by industry professionals."
+    ],
+    [
+     "Participation certificates",
+     "Issued for eligible participants."
+    ]
+   ],
+   "benefits": [
+    "Current technology topics",
+    "Short, focused formats",
+    "Easy to fit into an academic or training calendar"
+   ],
+   "uses": [
+    [
+     "College workshop",
+     "A one-day technical workshop for a department."
+    ],
+    [
+     "Industry seminar",
+     "A talk on emerging technology."
+    ],
+    [
+     "Team session",
+     "A short upskilling session for staff."
+    ]
+   ]
+  },
+  {
+   "division": "education",
+   "slug": "corporate-training",
+   "name": "Corporate Training",
+   "group": "Organisations",
+   "text": "Employee technical training, software and technology workshops, AI and automation training and customised programmes for companies.",
+   "intro": "Technical and AI training for your employees, planned around your needs.",
+   "about": [
+    "Corporate training helps a company build technical skills in its own team: software and technology workshops, AI and automation training, and digital transformation training.",
+    "Programmes are customised: we agree the topics, depth and schedule with you before the training starts."
+   ],
+   "offers": [
+    "Employee technical training",
+    "Software and technology workshops",
+    "AI and automation training",
+    "Customised training solutions"
+   ],
+   "solves": [
+    "A team that needs new technical skills quickly",
+    "Staff unsure how to use AI and automation tools",
+    "No time to design a training programme in-house"
+   ],
+   "features": [
+    [
+     "Employee training",
+     "Technical topics matched to your team."
+    ],
+    [
+     "AI and automation",
+     "Practical training on AI tools and automation."
+    ],
+    [
+     "Digital transformation",
+     "Training that supports a move to digital processes."
+    ],
+    [
+     "Customised programmes",
+     "Content, depth and schedule agreed with you."
+    ]
+   ],
+   "benefits": [
+    "Training built around your team",
+    "Skills your business can use straight away",
+    "One partner for training and technology"
+   ],
+   "uses": [
+    [
+     "Upskilling a technical team",
+     "Add cloud, DevOps or testing skills."
+    ],
+    [
+     "AI awareness",
+     "Help staff use AI and automation safely."
+    ],
+    [
+     "Professional development",
+     "A programme for managers and analysts."
+    ]
+   ]
+  },
+  {
+   "division": "education",
+   "slug": "college-and-institutional-training",
+   "name": "College and Institutional Training",
+   "group": "Organisations",
+   "text": "Programmes with schools, colleges, universities and polytechnics: workshops, add-on courses, internships and final-year project guidance.",
+   "intro": "Programmes with schools, colleges, universities and polytechnics.",
+   "about": [
+    "LAX360 Education works with educational institutions to improve students' technical knowledge and industry exposure.",
+    "Activities can include technical workshops, seminars, guest lectures, add-on and value-added courses, internships, final-year project guidance and faculty development programmes, agreed through an institutional MoU where appropriate."
+   ],
+   "offers": [
+    "Technical workshops and seminars",
+    "Add-on and value-added courses",
+    "Internship programmes and final-year project guidance",
+    "Faculty development programmes"
+   ],
+   "solves": [
+    "A curriculum that needs industry-oriented add-ons",
+    "Students who need project guidance",
+    "Faculty who want updated technical skills"
+   ],
+   "features": [
+    [
+     "Add-on courses",
+     "Industry-oriented courses alongside the curriculum."
+    ],
+    [
+     "Workshops and seminars",
+     "Sessions for students across departments."
+    ],
+    [
+     "Internships and projects",
+     "Guided practical work for students."
+    ],
+    [
+     "Faculty programmes",
+     "Technical updates and teaching support."
+    ]
+   ],
+   "benefits": [
+    "Industry exposure for students",
+    "Flexible programme design",
+    "A clear agreement of what is delivered"
+   ],
+   "uses": [
+    [
+     "Department add-on course",
+     "A certificate course for a final-year batch."
+    ],
+    [
+     "Annual workshop series",
+     "Technical workshops across the year."
+    ],
+    [
+     "Project guidance",
+     "Mini and major project support."
+    ]
+   ]
+  },
+  {
+   "division": "education",
+   "slug": "skill-development-programs",
+   "name": "Skill Development Programs",
+   "group": "Learn",
+   "text": "Skill development for students and professionals, with career guidance, aptitude and soft skills sessions around the course you choose.",
+   "intro": "Skill development for students and professionals, from technical skills to career readiness.",
+   "about": [
+    "Skill development programmes combine a technical course with the supporting skills that help people move into work: career guidance, aptitude and technical training, and soft skills.",
+    "Programmes are shaped around the course and the group, so a college batch and a working professional can each follow a suitable plan."
+   ],
+   "offers": [
+    "Technical skill courses from the approved list",
+    "Career guidance sessions",
+    "Aptitude and soft skills sessions",
+    "Resume and interview preparation guidance"
+   ],
+   "solves": [
+    "Technical skills without career preparation",
+    "Unclear next steps after a course",
+    "Little practice with interviews and communication"
+   ],
+   "features": [
+    [
+     "Technical base",
+     "A course from the LAX360 Education list."
+    ],
+    [
+     "Career guidance",
+     "Sessions on choosing and preparing for a career path."
+    ],
+    [
+     "Aptitude and soft skills",
+     "Practice beyond the technical subject."
+    ],
+    [
+     "Interview preparation",
+     "Resume and interview guidance."
+    ]
+   ],
+   "benefits": [
+    "Preparation that goes beyond the syllabus",
+    "Support for the step after the course",
+    "Programmes shaped to the group"
+   ],
+   "uses": [
+    [
+     "Final-year batch",
+     "A technical course plus career preparation."
+    ],
+    [
+     "Career starter",
+     "A skills plan before applying for roles."
+    ],
+    [
+     "Returning professional",
+     "Refresh technical skills with guidance."
+    ]
+   ]
+  }
+ ]
+}

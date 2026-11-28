@@ -516,6 +516,561 @@
       "source": "/hi/services/growth/:path*",
       "destination": "https://lax360.in/hi/services/digitalmarketing/:path*",
       "permanent": true
+    },
+    {
+      "source": "/services/ai",
+      "destination": "https://lax360.in/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless",
+      "destination": "https://lax360.in/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation",
+      "destination": "https://lax360.in/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/services/mobile",
+      "destination": "https://lax360.in/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai/ai-application-development",
+      "destination": "https://lax360.in/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai/ai-chatbots-and-virtual-assistants",
+      "destination": "https://lax360.in/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai/ai-agent-development",
+      "destination": "https://lax360.in/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai/rag-based-ai-solutions",
+      "destination": "https://lax360.in/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai/business-process-automation",
+      "destination": "https://lax360.in/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai/workflow-automation",
+      "destination": "https://lax360.in/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai/ai-integration-and-consulting",
+      "destination": "https://lax360.in/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/api-hub-development",
+      "destination": "https://lax360.in/services/software/api-hub-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/headless-backend-development",
+      "destination": "https://lax360.in/services/software/headless-backend-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/multi-tenant-saas-development",
+      "destination": "https://lax360.in/services/software/multi-tenant-saas-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/white-label-saas-solutions",
+      "destination": "https://lax360.in/services/software/white-label-saas-solutions",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/authentication-apis",
+      "destination": "https://lax360.in/services/software/authentication-apis",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/billing-and-subscription-apis",
+      "destination": "https://lax360.in/services/software/billing-and-subscription-apis",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/payment-gateway-integration",
+      "destination": "https://lax360.in/services/software/payment-gateway-integration",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/booking-and-appointment-apis",
+      "destination": "https://lax360.in/services/software/booking-and-appointment-apis",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/crm-apis",
+      "destination": "https://lax360.in/services/software/crm-apis",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/notification-apis",
+      "destination": "https://lax360.in/services/software/notification-apis",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/file-and-media-apis",
+      "destination": "https://lax360.in/services/software/file-and-media-apis",
+      "permanent": true
+    },
+    {
+      "source": "/services/headless/ai-apis",
+      "destination": "https://lax360.in/services/software/ai-apis",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation/n8n-workflow-automation",
+      "destination": "https://lax360.in/services/software/n8n-workflow-automation",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation/business-process-automation",
+      "destination": "https://lax360.in/services/software/business-process-automation",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation/whatsapp-automation",
+      "destination": "https://lax360.in/services/software/whatsapp-automation",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation/email-automation",
+      "destination": "https://lax360.in/services/software/email-automation",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation/crm-automation",
+      "destination": "https://lax360.in/services/software/crm-automation",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation/ai-agent-workflows",
+      "destination": "https://lax360.in/services/software/ai-agent-workflows",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation/third-party-application-integration",
+      "destination": "https://lax360.in/services/software/third-party-application-integration",
+      "permanent": true
+    },
+    {
+      "source": "/services/automation/webhook-integration",
+      "destination": "https://lax360.in/services/software/webhook-integration",
+      "permanent": true
+    },
+    {
+      "source": "/services/mobile/appointment-booking-applications",
+      "destination": "https://lax360.in/services/software/appointment-booking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/services/mobile/field-staff-and-task-tracking-applications",
+      "destination": "https://lax360.in/services/software/field-staff-and-task-tracking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/services/mobile/employee-location-tracking-applications",
+      "destination": "https://lax360.in/services/software/employee-location-tracking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/services/mobile/business-billing-applications",
+      "destination": "https://lax360.in/services/software/business-billing-applications",
+      "permanent": true
+    },
+    {
+      "source": "/services/mobile/inventory-management-applications",
+      "destination": "https://lax360.in/services/software/inventory-management-applications",
+      "permanent": true
+    },
+    {
+      "source": "/services/mobile/custom-business-mobile-applications",
+      "destination": "https://lax360.in/services/software/custom-business-mobile-applications",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/ai",
+      "destination": "https://lax360.in/ta/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless",
+      "destination": "https://lax360.in/ta/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation",
+      "destination": "https://lax360.in/ta/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/mobile",
+      "destination": "https://lax360.in/ta/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/ai/ai-application-development",
+      "destination": "https://lax360.in/ta/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/ai/ai-chatbots-and-virtual-assistants",
+      "destination": "https://lax360.in/ta/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/ai/ai-agent-development",
+      "destination": "https://lax360.in/ta/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/ai/rag-based-ai-solutions",
+      "destination": "https://lax360.in/ta/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/ai/business-process-automation",
+      "destination": "https://lax360.in/ta/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/ai/workflow-automation",
+      "destination": "https://lax360.in/ta/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/ai/ai-integration-and-consulting",
+      "destination": "https://lax360.in/ta/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/api-hub-development",
+      "destination": "https://lax360.in/ta/services/software/api-hub-development",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/headless-backend-development",
+      "destination": "https://lax360.in/ta/services/software/headless-backend-development",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/multi-tenant-saas-development",
+      "destination": "https://lax360.in/ta/services/software/multi-tenant-saas-development",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/white-label-saas-solutions",
+      "destination": "https://lax360.in/ta/services/software/white-label-saas-solutions",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/authentication-apis",
+      "destination": "https://lax360.in/ta/services/software/authentication-apis",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/billing-and-subscription-apis",
+      "destination": "https://lax360.in/ta/services/software/billing-and-subscription-apis",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/payment-gateway-integration",
+      "destination": "https://lax360.in/ta/services/software/payment-gateway-integration",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/booking-and-appointment-apis",
+      "destination": "https://lax360.in/ta/services/software/booking-and-appointment-apis",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/crm-apis",
+      "destination": "https://lax360.in/ta/services/software/crm-apis",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/notification-apis",
+      "destination": "https://lax360.in/ta/services/software/notification-apis",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/file-and-media-apis",
+      "destination": "https://lax360.in/ta/services/software/file-and-media-apis",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/headless/ai-apis",
+      "destination": "https://lax360.in/ta/services/software/ai-apis",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation/n8n-workflow-automation",
+      "destination": "https://lax360.in/ta/services/software/n8n-workflow-automation",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation/business-process-automation",
+      "destination": "https://lax360.in/ta/services/software/business-process-automation",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation/whatsapp-automation",
+      "destination": "https://lax360.in/ta/services/software/whatsapp-automation",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation/email-automation",
+      "destination": "https://lax360.in/ta/services/software/email-automation",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation/crm-automation",
+      "destination": "https://lax360.in/ta/services/software/crm-automation",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation/ai-agent-workflows",
+      "destination": "https://lax360.in/ta/services/software/ai-agent-workflows",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation/third-party-application-integration",
+      "destination": "https://lax360.in/ta/services/software/third-party-application-integration",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/automation/webhook-integration",
+      "destination": "https://lax360.in/ta/services/software/webhook-integration",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/mobile/appointment-booking-applications",
+      "destination": "https://lax360.in/ta/services/software/appointment-booking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/mobile/field-staff-and-task-tracking-applications",
+      "destination": "https://lax360.in/ta/services/software/field-staff-and-task-tracking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/mobile/employee-location-tracking-applications",
+      "destination": "https://lax360.in/ta/services/software/employee-location-tracking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/mobile/business-billing-applications",
+      "destination": "https://lax360.in/ta/services/software/business-billing-applications",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/mobile/inventory-management-applications",
+      "destination": "https://lax360.in/ta/services/software/inventory-management-applications",
+      "permanent": true
+    },
+    {
+      "source": "/ta/services/mobile/custom-business-mobile-applications",
+      "destination": "https://lax360.in/ta/services/software/custom-business-mobile-applications",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/ai",
+      "destination": "https://lax360.in/hi/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless",
+      "destination": "https://lax360.in/hi/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation",
+      "destination": "https://lax360.in/hi/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/mobile",
+      "destination": "https://lax360.in/hi/services/software",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/ai/ai-application-development",
+      "destination": "https://lax360.in/hi/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/ai/ai-chatbots-and-virtual-assistants",
+      "destination": "https://lax360.in/hi/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/ai/ai-agent-development",
+      "destination": "https://lax360.in/hi/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/ai/rag-based-ai-solutions",
+      "destination": "https://lax360.in/hi/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/ai/business-process-automation",
+      "destination": "https://lax360.in/hi/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/ai/workflow-automation",
+      "destination": "https://lax360.in/hi/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/ai/ai-integration-and-consulting",
+      "destination": "https://lax360.in/hi/artificial-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/api-hub-development",
+      "destination": "https://lax360.in/hi/services/software/api-hub-development",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/headless-backend-development",
+      "destination": "https://lax360.in/hi/services/software/headless-backend-development",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/multi-tenant-saas-development",
+      "destination": "https://lax360.in/hi/services/software/multi-tenant-saas-development",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/white-label-saas-solutions",
+      "destination": "https://lax360.in/hi/services/software/white-label-saas-solutions",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/authentication-apis",
+      "destination": "https://lax360.in/hi/services/software/authentication-apis",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/billing-and-subscription-apis",
+      "destination": "https://lax360.in/hi/services/software/billing-and-subscription-apis",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/payment-gateway-integration",
+      "destination": "https://lax360.in/hi/services/software/payment-gateway-integration",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/booking-and-appointment-apis",
+      "destination": "https://lax360.in/hi/services/software/booking-and-appointment-apis",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/crm-apis",
+      "destination": "https://lax360.in/hi/services/software/crm-apis",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/notification-apis",
+      "destination": "https://lax360.in/hi/services/software/notification-apis",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/file-and-media-apis",
+      "destination": "https://lax360.in/hi/services/software/file-and-media-apis",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/headless/ai-apis",
+      "destination": "https://lax360.in/hi/services/software/ai-apis",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation/n8n-workflow-automation",
+      "destination": "https://lax360.in/hi/services/software/n8n-workflow-automation",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation/business-process-automation",
+      "destination": "https://lax360.in/hi/services/software/business-process-automation",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation/whatsapp-automation",
+      "destination": "https://lax360.in/hi/services/software/whatsapp-automation",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation/email-automation",
+      "destination": "https://lax360.in/hi/services/software/email-automation",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation/crm-automation",
+      "destination": "https://lax360.in/hi/services/software/crm-automation",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation/ai-agent-workflows",
+      "destination": "https://lax360.in/hi/services/software/ai-agent-workflows",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation/third-party-application-integration",
+      "destination": "https://lax360.in/hi/services/software/third-party-application-integration",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/automation/webhook-integration",
+      "destination": "https://lax360.in/hi/services/software/webhook-integration",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/mobile/appointment-booking-applications",
+      "destination": "https://lax360.in/hi/services/software/appointment-booking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/mobile/field-staff-and-task-tracking-applications",
+      "destination": "https://lax360.in/hi/services/software/field-staff-and-task-tracking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/mobile/employee-location-tracking-applications",
+      "destination": "https://lax360.in/hi/services/software/employee-location-tracking-applications",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/mobile/business-billing-applications",
+      "destination": "https://lax360.in/hi/services/software/business-billing-applications",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/mobile/inventory-management-applications",
+      "destination": "https://lax360.in/hi/services/software/inventory-management-applications",
+      "permanent": true
+    },
+    {
+      "source": "/hi/services/mobile/custom-business-mobile-applications",
+      "destination": "https://lax360.in/hi/services/software/custom-business-mobile-applications",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -577,6 +1132,10 @@
     },
     {
       "source": "/products/:slug([a-z0-9-]{1,80})",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/solutions/:slug([a-z0-9-]{1,80})",
       "destination": "/index.html"
     },
     {

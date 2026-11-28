@@ -1,4 +1,7 @@
-// The seven official LAX360 service categories. All copy lives here so pages never hard-code content: the Services page, the service detail pages,
+// LAX360's service structure: THREE ACTIVE divisions (Software & IT Services, Digital Marketing, Education & Training) and FOUR UPCOMING divisions (AI, IoT / Embedded Systems / Robotics,
+// CAD Designing & Training, Blockchain & Web 3.0; data/upcomingServices.js). `legacyDivisions` below keeps the full original copy of the earlier seven categories so that nothing is lost:
+// Headless SaaS & API, Workflow Automation (AI Workflow Automations & Integrations) and Mobile & Business Applications are now part of Software & IT Services (see `divisions`).
+// The seven official LAX360 service categories (the original copy). All copy lives here so pages never hard-code content: the Services page, the service detail pages,
 // the homepage "Our Services", About, the footer, the enquiry form and the chatbot knowledge (backend/app/knowledge/lax360_knowledge.py) all read
 // these names, so keep them in step. Copy describes what we offer and how we work; it makes no claims about results, clients or figures.
 // `group` (optional) sorts the offerings of a category into logical groups on its page.
@@ -12,7 +15,7 @@ export const processSteps = [
   { n: '04', title: 'Deploy & Improve', text: 'We help release it, gather feedback and keep improving after launch.' },
 ]
 
-export const divisions = [
+export const legacyDivisions = [
   {
     slug: 'software',
     number: '01',
@@ -324,15 +327,64 @@ export const divisions = [
 ]
 
 // Every offering gets its own slug (its page is /services/<category>/<slug>).
-divisions.forEach((d) => d.offerings.forEach((o) => { o.slug = slugify(o.name) }))
+legacyDivisions.forEach((d) => d.offerings.forEach((o) => { o.slug = o.slug || slugify(o.name) }))
 
 // (getOffering lives in offerings.js: it needs the long per-service copy in serviceDetails.js, which the home page does not.)
+
+// ---- The active divisions -------------------------------------------------------------------------------------------------------------------------------------------------------------
+const legacy = (slug) => legacyDivisions.find((d) => d.slug === slug)
+/** Earlier category addresses and where they live now. (The AI category became the upcoming AI division.) */
+export const MOVED_CATEGORIES = { headless: 'software', automation: 'software', mobile: 'software' }
+export const LEGACY_SECTION = { headless: 'headless', automation: 'automation', mobile: 'mobile' } // the sections of the Software & IT Services page the old categories became
+export const REMOVED_CATEGORIES = { ai: '/artificial-intelligence' }
+
+// The sub-services of Software & IT Services, in the order of the official list. Existing pages keep their addresses (a display name can change while its slug stays).
+const rename = (o, name, slug) => ({ ...o, name, slug: o.slug || slug })
+const swBase = legacy('software').offerings.map((o) => ({ ...o, origin: 'software' }))
+const pick = (name) => swBase.find((o) => o.name === name)
+const extra = (name, group, text) => ({ group, name, text, origin: 'software', slug: slugify(name) })
+const headlessOffer = extra('Headless SaaS & API Solutions', 'Platforms & integration', 'Reusable, API-first backend services (authentication, billing, bookings, notifications, payments, files) that developers, startups, agencies and businesses plug into their own products instead of building each one from scratch.')
+const aiWorkflowOffer = extra('AI Workflow Automations & Integrations', 'Platforms & integration', 'Automated workflows across WhatsApp, email, CRM and your business tools, with AI steps where they help (classifying, drafting, routing), built on connectors and webhooks. This is the AI work that is available today; the separate AI Bots, Agents and Employees division is under development.')
+const softwareOfferings = [
+  pick('Custom Software Development'),
+  pick('Website Development'),
+  pick('Web Application Development'),
+  pick('Mobile Application Development'),
+  rename({ ...pick('Business Management Systems'), group: 'Build' }, 'Business Application Development', 'business-management-systems'),
+  extra('Enterprise Software Solutions', 'Build', 'Software for larger organisations and multi-team operations: role-based access, approvals, reporting and integration with the systems already in place, scoped and documented before development starts.'),
+  rename({ ...pick('CRM & ERP Development'), group: 'Run the business' }, 'ERP & CRM Solutions', 'crm-and-erp-development'),
+  extra('SaaS Product Development', 'Build', 'Designing and building software products that many customers use on subscription: multi-tenant architecture, accounts and billing, and an admin back office.'),
+  headlessOffer,
+  aiWorkflowOffer,
+  extra('Third-Party Software Integrations', 'Platforms & integration', 'Connecting your applications with payment gateways, accounting tools, messaging services, CRMs and other third-party software through their APIs and webhooks.'),
+  extra('IT Consulting & Technology Solutions', 'Advice & support', 'Reviewing what you use today and recommending the right tools, architecture and next steps, with a written scope before any build starts.'),
+  extra('Software Maintenance & Support', 'Advice & support', 'Fixes, updates, monitoring and improvements after launch, on a scope that is agreed with you.'),
+  pick('E-commerce Development') && { ...pick('E-commerce Development'), group: 'Build' },
+].filter(Boolean)
+// Everything the earlier Headless, Workflow Automation and Mobile & Business categories offered stays available, grouped under the new umbrella sub-services.
+const carried = (slug, group) => legacy(slug).offerings.map((o) => ({ ...o, group, origin: slug })).filter((o) => !softwareOfferings.some((x) => x.slug === o.slug))
+const softwareMerged = {
+  ...legacy('software'),
+  short: 'Custom software, websites, web and mobile apps, business applications, ERP and CRM, SaaS products, headless SaaS and API solutions, AI workflow automations and integrations, IT consulting and software support.',
+  tags: ['Custom software', 'Web & mobile apps', 'ERP & CRM', 'Headless SaaS & APIs', 'AI workflow automation'],
+  offerings: [...softwareOfferings, ...carried('headless', 'Headless SaaS & API Solutions'), ...carried('automation', 'AI Workflow Automations & Integrations'), ...carried('mobile', 'Mobile & Business Applications')],
+  related: [],
+  number: '01',
+  status: 'active',
+}
+const growthActive = { ...legacy('growth'), number: '02', status: 'active', related: [] }
+const educationActive = { ...legacy('education'), number: '03', status: 'active', related: [] }
+/** The three ACTIVE service divisions. */
+export const divisions = [softwareMerged, growthActive, educationActive]
+divisions.forEach((d) => d.offerings.forEach((o) => { o.slug = o.slug || slugify(o.name) }))
 
 // All divisions (service categories), in page order.
 export const allDivisions = divisions.map((d) => ({ ...d, to: `/services/${divisionUrl(d.slug)}` }))
 
-/** A category by its id or by its public address segment (growth / digitalmarketing). */
-export const getDivision = (slug) => divisions.find((d) => d.slug === slug || divisionUrl(d.slug) === slug)
+/** A category by its id or by its public address segment (growth / digitalmarketing). The earlier category ids (headless, automation, mobile) resolve to Software & IT Services. */
+export const getDivision = (slug) => divisions.find((d) => d.slug === (MOVED_CATEGORIES[slug] || slug) || divisionUrl(d.slug) === slug)
+/** The original (pre-merge) category copy, for the page sections that keep their own layout. */
+export const getLegacyDivision = (slug) => legacy(slug)
 
 /** An offering's links: its anchor on the category's page. */
 export const offeringsByGroup = (d) => {

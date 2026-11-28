@@ -39,6 +39,27 @@ export const ITA = {
     payouts: ['Eligible commissions are consolidated monthly; no minimum payout threshold applies.', 'Settlements require LAX360 approval and are paid manually through approved bank transfer or UPI.', 'Early withdrawal requests may be submitted for the entire eligible available balance only, subject to approval.', 'Refunds may be adjusted against future commissions. Disputed amounts are held while undisputed amounts remain eligible.', 'If a dispute arises after approval but before payment, the settlement is cancelled and recalculated.'],
     note: 'Exact commission rates and settlement dates are communicated through approved commercial terms. No percentage is promised on this page.',
   },
+  // Terms from the IT Services and Common Terms sections of the Authorized Business Partner Agreement. No percentage, value or timeline is published: those stay in each partner's written agreement.
+  payments: [
+    'The Authorized Partner shall not collect project advances, milestone payments, service fees or any other customer payments on behalf of LAX360 unless prior written authorization is provided by the Company.',
+    'If the Company authorizes the partner to collect any customer payment, the partner must strictly follow the payment procedure and instructions specified by LAX360.',
+    'All project payments shall preferably be made directly to the officially designated bank account of LAX360.',
+    'The Authorized Partner shall not collect payments into personal bank accounts or unauthorized business accounts.',
+    'The partner shall not independently modify payment terms, offer unauthorized discounts, provide payment extensions or make financial commitments to customers without prior written approval from LAX360.',
+    "Any payment collected with the Company's authorization must be properly recorded, acknowledged and reported to LAX360.",
+    'The Authorized Partner shall not make any commitments regarding refunds, adjustments or payment settlements without approval from the Company.',
+  ],
+  arrangements: [
+    'All commercial arrangements between LAX360 and the Authorized Partner shall be discussed individually and mutually agreed upon by both parties.',
+    'Revenue-sharing arrangements, partner commissions, recurring service benefits, payment schedules and other financial terms shall be documented separately in a written agreement.',
+    'Any applicable revenue share or commission shall be determined based on the agreed commercial terms and the eligible service amount actually received by LAX360.',
+    'GST, refunds, cancelled transactions, discounts and separately charged third-party expenses shall be excluded from commercial calculations unless otherwise mutually agreed in writing.',
+    'For projects involving milestone-based payments, any applicable partner share shall be considered proportionately based on the eligible payments received by LAX360, subject to the separately agreed terms.',
+    'For annual maintenance, recurring support or other periodic services, any applicable commercial benefit shall be provided only where the arrangement, duration and payment conditions have been approved in writing.',
+    'No commission or revenue share shall be payable on cancelled projects, refunded amounts or unpaid customer invoices.',
+    'Any changes to the agreed commercial arrangements shall be valid only when mutually approved and recorded in writing by both parties.',
+    'Commercial terms are not published on this website. Partners who require further information may contact the LAX360 management team for an individual discussion.',
+  ],
   responsibilities: ['Maintain accurate customer information and obtain appropriate consent before submitting leads.', 'Use only approved branding, product information and sales materials.', 'Follow lead ownership, quotation, pricing and payment policies.', 'Protect customer data and confidential business information.', 'Do not make unauthorized commitments or claim direct vendor authorization.', 'Follow applicable laws, vendor licensing terms and the signed partner agreement.'],
   lax: ['Verifies lead ownership and confirms deal status, pricing and commercial terms', 'Handles technical consultation, development, testing, deployment and support', 'Provides product orientation, sales resources and the partner portal, where available', 'Approves and settles eligible commission monthly'],
   onboarding: ['Submit the Authorized Partner application', 'LAX360 reviews business details and eligibility', 'Complete the initial discussion and required verification', 'Review and accept the partner agreement', 'Head Office creates the approved account and sends an email invitation', 'Complete product orientation and activate approved portal access', 'Begin lead registration and sales coordination'],
@@ -72,8 +93,8 @@ export const ITA_PRODUCTS = {
       { name: 'Zoho', desc: 'Business applications' }, { name: 'Marg ERP', desc: 'Billing, inventory and accounting' }, { name: 'OpenAI', desc: 'AI integration technologies' }, { name: 'HexBis', desc: 'Catalogue', tag: 'Pending verification' }] },
     { title: 'IT & software services', items: [
       { name: 'Website Development', to: '/services/software/website-development' }, { name: 'Custom Software', to: '/services/software/custom-software-development' }, { name: 'Web Applications', to: '/services/software/web-application-development' },
-      { name: 'Mobile Applications', to: '/services/software/mobile-application-development' }, { name: 'AI Solutions, Agents & Voice AI', to: '/services/ai' }, { name: 'Business & Workflow Automation', to: '/services/automation' },
-      { name: 'Headless SaaS & APIs', to: '/services/headless' }, { name: 'Cloud & Hosting' }, { name: 'UI/UX' }, { name: 'Testing, Maintenance & Support' }] },
+      { name: 'Mobile Applications', to: '/services/software/mobile-application-development' }, { name: 'AI Solutions, Agents & Voice AI (under development)', to: '/artificial-intelligence' }, { name: 'Business & Workflow Automation', to: '/services/software/ai-workflow-automations-and-integrations' },
+      { name: 'Headless SaaS & APIs', to: '/services/software/headless-saas-and-api-solutions' }, { name: 'Cloud & Hosting' }, { name: 'UI/UX' }, { name: 'Testing, Maintenance & Support' }] },
     { title: 'Other partnership opportunities', items: [{ name: 'IT & Software Franchise', to: '/franchise/it' }, { name: 'IT & Software Referral Partner', to: '/referral-partner/it' }] },
   ],
 }

@@ -35,9 +35,22 @@ const Eyebrow = ({ d, light = false }) => {
   const Icon = divisionIcons[d.slug]
   return (
     <p className={`inline-flex items-center gap-2.5 rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] backdrop-blur-md ${light ? 'border-white/30 bg-white/10 text-white' : 'border-edge-strong bg-glass text-lav'}`}>
-      <Icon className="size-3.5" aria-hidden="true" />Category {d.number} · {d.name}
+      <Icon className="size-3.5" aria-hidden="true" />Active division {d.number} · {d.name}
     </p>
   )
+}
+
+/** A division's page heading from the database (Admin > Services > Service divisions > Page heading). The accented, gradient part keeps the page design: mark it with [square brackets]; without brackets
+ *  the last sentence is accented (or, for a single sentence, its last three words). */
+function HeroTitle({ text }) {
+  const t = (text || '').trim()
+  const hit = /^(.*?)\[(.+)\](.*)$/.exec(t)
+  let head, mark, tail
+  if (hit) { head = hit[1]; mark = hit[2]; tail = hit[3] } else {
+    const sentences = t.match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [t]
+    if (sentences.length > 1) { mark = sentences.pop().trim(); head = sentences.join('') } else { const w = t.split(/\s+/); mark = w.slice(-3).join(' '); head = w.slice(0, -3).join(' ') + ' '; tail = '' }
+  }
+  return <>{head}<BotHighlight delay={0.9}><span className="text-gradient">{mark}</span></BotHighlight>{tail}</>
 }
 
 const rise = (reduce, delay) => (reduce ? {} : { initial: { opacity: 0, y: 22 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay, ease: EASE } })
@@ -73,7 +86,7 @@ function HeroSoftware({ d }) {
         <div className="lg:col-span-6">
           <m.div {...rise(reduce, 0.05)}><Crumb d={d} /></m.div>
           <m.div {...rise(reduce, 0.1)} className="mt-6"><Eyebrow d={d} /></m.div>
-          <m.h1 {...rise(reduce, 0.18)} id="cat-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.2rem)]">Software that <BotHighlight delay={0.9}><span className="text-gradient">fits how you work.</span></BotHighlight></m.h1>
+          <m.h1 {...rise(reduce, 0.18)} id="cat-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.2rem)]"><HeroTitle text={d.heroLine} /></m.h1>
           <m.p {...rise(reduce, 0.28)} className="lead mt-6 max-w-xl text-soft">{d.short}</m.p>
           <m.div {...rise(reduce, 0.36)}><Ctas d={d} /></m.div>
         </div>
@@ -131,7 +144,7 @@ function HeroGrowth({ d }) {
         <div className="lg:order-2 lg:col-span-6">
           <m.div {...rise(reduce, 0.05)}><Crumb d={d} /></m.div>
           <m.div {...rise(reduce, 0.1)} className="mt-6"><Eyebrow d={d} /></m.div>
-          <m.h1 {...rise(reduce, 0.18)} id="cat-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.2rem)]">Be found. Be remembered. <BotHighlight delay={0.9}><span className="text-gradient">Be contacted.</span></BotHighlight></m.h1>
+          <m.h1 {...rise(reduce, 0.18)} id="cat-title" className="h1 mt-5 !text-[clamp(2.3rem,4.8vw,4.2rem)]"><HeroTitle text={d.heroLine} /></m.h1>
           <m.p {...rise(reduce, 0.28)} className="lead mt-6 max-w-xl text-soft">{d.short}</m.p>
           <m.div {...rise(reduce, 0.36)}><Ctas d={d} /></m.div>
         </div>
@@ -238,7 +251,7 @@ function HeroMobile({ d }) {
           <div className="relative mx-auto max-w-sm">
             <div className={`${frame} rotate-[-2deg]`}><img src={d.photo} alt="" width="1000" height="800" fetchPriority="high" decoding="async" className="aspect-[4/5] w-full object-cover" /></div>
             {d.offerings.slice(0, 3).map((o, i) => {
-              const Icon = serviceIcons[o.slug]
+              const Icon = serviceIcons[o.slug] || divisionIcons[d.slug]
               return (
                 <span key={o.slug} className={`glass absolute flex items-center gap-2 px-3 py-2 text-xs font-semibold sm:text-sm ${['-right-3 top-8', '-left-3 top-1/2', '-right-2 bottom-6'][i]} ${reduce ? '' : 'motion-safe:animate-[net-bob_5s_ease-in-out_infinite]'}`} style={{ animationDelay: `${i * 0.7}s` }}>
                   <Icon className="size-4 text-lav" aria-hidden="true" />{o.name.replace(' Applications', '')}
@@ -313,7 +326,7 @@ function SoftwareServices({ d }) {
           <ul className="grid gap-5 sm:grid-cols-2 lg:col-span-9">
             {g.items.map((o) => {
               n += 1
-              const Icon = serviceIcons[o.slug]
+              const Icon = serviceIcons[o.slug] || divisionIcons[d.slug]
               return (
                 <Reveal as="li" key={o.slug} delay={(n % 2) * 0.06}>
                   <Link to={offeringHref(d.slug, o.name)} className="glass-flat lift group flex h-full flex-col gap-3 p-6">
@@ -367,7 +380,7 @@ function GrowthServices({ d }) {
   return (
     <ol className="space-y-8">
       {d.offerings.map((o, i) => {
-        const Icon = serviceIcons[o.slug]
+        const Icon = serviceIcons[o.slug] || divisionIcons[d.slug]
         return (
           <Reveal as="li" key={o.slug} x={i % 2 ? 24 : -24} y={0}>
             <Link to={offeringHref(d.slug, o.name)} className={`glass-flat group grid overflow-hidden transition-colors duration-300 hover:border-lav md:grid-cols-12 ${i % 2 ? 'md:[&>span:first-child]:order-2' : ''}`}>
@@ -394,7 +407,7 @@ function HeadlessServices({ d }) {
           <p className="eyebrow text-lav">{g.title}</p>
           <ul className="mt-3 divide-y divide-edge">
             {g.items.map((o) => {
-              const Icon = serviceIcons[o.slug]
+              const Icon = serviceIcons[o.slug] || divisionIcons[d.slug]
               return (
                 <li key={o.slug}>
                   <Link to={offeringHref(d.slug, o.name)} className="group flex gap-3 py-3.5">
@@ -417,7 +430,7 @@ function AutomationServices({ d }) {
     <ol className="relative space-y-6 pl-14 md:pl-20">
       <span aria-hidden="true" className="absolute bottom-2 left-5 top-2 w-px bg-gradient-to-b from-lav via-accent to-transparent md:left-8" />
       {d.offerings.map((o, i) => {
-        const Icon = serviceIcons[o.slug]
+        const Icon = serviceIcons[o.slug] || divisionIcons[d.slug]
         return (
           <Reveal as="li" key={o.slug} delay={0.03}>
             <span className="absolute -left-14 flex size-10 items-center justify-center rounded-full border-2 border-accent bg-night font-display text-sm font-bold text-lav md:-left-20 md:size-14 md:text-lg">{i + 1}</span>
@@ -437,7 +450,7 @@ function MobileServices({ d }) {
   return (
     <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {d.offerings.map((o, i) => {
-        const Icon = serviceIcons[o.slug]
+        const Icon = serviceIcons[o.slug] || divisionIcons[d.slug]
         return (
           <Reveal as="li" key={o.slug} delay={(i % 3) * 0.07}>
             <Link to={offeringHref(d.slug, o.name)} className="group relative block overflow-hidden rounded-[1.75rem] border border-edge-strong">

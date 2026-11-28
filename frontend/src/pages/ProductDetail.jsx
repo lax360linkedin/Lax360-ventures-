@@ -48,8 +48,8 @@ export default function ProductDetail() {
   return (
     <PageContainer
       path={`/products/${p.slug}`}
-      title={p.name}
-      description={p.summary}
+      title={p.seoTitle || p.name}
+      description={p.seoDescription || p.summary}
       jsonLd={{ '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: p.name, description: p.summary, applicationCategory: 'BusinessApplication', publisher: { '@type': 'Organization', name: 'LAX360 Pvt Ltd' } }}
     >
       {/* hero */}
@@ -75,6 +75,7 @@ export default function ProductDetail() {
               {!live && <p className="mt-5 flex gap-2.5 rounded-2xl border border-edge bg-glass p-4 text-soft"><AlertCircle className="mt-0.5 size-5 shrink-0 text-lav" aria-hidden="true" />{STATUS_NOTE[p.status] || STATUS_NOTE.soon}</p>}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 {p.demoSiteLink && <LinkButton to={p.demoSiteLink} arrow>View live demo</LinkButton>}
+                {(p.links || []).map((l) => <LinkButton key={l.type} to={l.url} variant="secondary">{l.label}</LinkButton>)}
                 {live && p.productLink && <LinkButton to={p.productLink} arrow>{p.status === 'beta' ? 'Access the beta' : 'Access the product'}</LinkButton>}
                 {live && p.demoLink && <LinkButton to={p.demoLink} variant="secondary">Request a demo</LinkButton>}
                 <LinkButton to={`/demo?product=${encodeURIComponent(p.name)}`} variant={live && (p.productLink || p.demoLink) ? 'secondary' : 'primary'} arrow={!(live && (p.productLink || p.demoLink))}>Get a Demo</LinkButton>

@@ -20,6 +20,7 @@ from app.providers.gemini_provider import GeminiProvider
 from app.providers.openai_provider import OpenAIProvider
 from app.services import ai_service
 from app.services.ai_service import AIService
+from app.core.config import Settings
 
 GKEY = "AIza-test-fake-key-0000000000000000"
 
@@ -65,7 +66,7 @@ def test_gemini_request_mapping_and_result():
     assert call["model"] == "test-gemini-model"
     assert [c.role for c in call["contents"]] == ["user", "model", "user"]  # assistant -> Gemini's "model" role
     assert call["contents"][2].parts[0].text == "and CRM?"
-    assert call["config"].system_instruction == "SYSTEM PROMPT" and call["config"].max_output_tokens == 500
+    assert call["config"].system_instruction == "SYSTEM PROMPT" and call["config"].max_output_tokens == Settings.model_fields["chat_max_output_tokens"].default
     assert result.text == "Hello from fake Gemini." and result.provider == "gemini"
     assert (result.input_tokens, result.output_tokens) == (90, 20)
 

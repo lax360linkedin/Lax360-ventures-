@@ -22,14 +22,26 @@ def _prefix_subs(prefix: str) -> list[dict]:
     return _subs(*_prefix(prefix))
 
 
+def _sw(*slugs: str) -> list[dict]:
+    return _subs(*[f"software/{x}" for x in slugs])
+
+
+# The sub-services that sit under Software & IT Services (the earlier Headless SaaS & API, Workflow Automation and Mobile & Business Applications categories are parts of it now).
+_HEADLESS = ("api-hub-development", "headless-backend-development", "multi-tenant-saas-development", "white-label-saas-solutions", "authentication-apis", "billing-and-subscription-apis",
+             "payment-gateway-integration", "booking-and-appointment-apis", "crm-apis", "notification-apis", "file-and-media-apis", "ai-apis")
+_AUTOMATION = ("n8n-workflow-automation", "business-process-automation", "whatsapp-automation", "email-automation", "crm-automation", "ai-agent-workflows", "third-party-application-integration", "webhook-integration")
+_MOBILE = ("appointment-booking-applications", "field-staff-and-task-tracking-applications", "employee-location-tracking-applications", "business-billing-applications",
+           "inventory-management-applications", "custom-business-mobile-applications")
+
 SERVICE_MAINS = [
-    {"value": "software-development", "label": "Software Development", "subs": _subs("software/custom-software-development", "software/web-application-development", "software/business-management-systems")},
-    {"value": "website-development", "label": "Website Development", "subs": _subs("software/website-development", "software/e-commerce-development")},
-    {"value": "mobile-app-development", "label": "Mobile Application Development", "subs": _subs("software/mobile-application-development", *_prefix("mobile/"))},
-    {"value": "ai-solutions", "label": "AI & Generative AI Solutions", "subs": _subs("ai/ai-application-development", "ai/ai-chatbots-and-virtual-assistants", "ai/rag-based-ai-solutions", "ai/ai-integration-and-consulting", "headless/ai-apis")},
-    {"value": "ai-agents-automation", "label": "AI Agents & Business Automation", "subs": _subs("ai/ai-agent-development", "ai/business-process-automation", "ai/workflow-automation", *_prefix("automation/"))},
-    {"value": "crm-erp", "label": "CRM & ERP Solutions", "subs": _subs("software/crm-and-erp-development", "headless/crm-apis", "automation/crm-automation")},
-    {"value": "saas-development", "label": "SaaS Development", "subs": _subs(*[v for v in _prefix("headless/") if v not in ("headless/ai-apis", "headless/crm-apis")])},
+    {"value": "software-development", "label": "Software Development", "subs": _sw("custom-software-development", "web-application-development", "business-management-systems", "enterprise-software-solutions",
+                                                                                  "it-consulting-and-technology-solutions", "software-maintenance-and-support")},
+    {"value": "website-development", "label": "Website Development", "subs": _sw("website-development", "e-commerce-development")},
+    {"value": "mobile-app-development", "label": "Mobile Application Development", "subs": _sw("mobile-application-development", *_MOBILE)},
+    {"value": "ai-solutions", "label": "AI Workflow Automations & Integrations", "subs": _sw("ai-workflow-automations-and-integrations", "ai-agent-workflows", "third-party-software-integrations", "ai-apis")},
+    {"value": "ai-agents-automation", "label": "Workflow & Business Automation", "subs": _sw(*[x for x in _AUTOMATION if x != "ai-agent-workflows"])},
+    {"value": "crm-erp", "label": "ERP & CRM Solutions", "subs": _sw("crm-and-erp-development", "crm-apis", "crm-automation")},
+    {"value": "saas-development", "label": "SaaS & Headless API Solutions", "subs": _sw("saas-product-development", "headless-saas-and-api-solutions", *[x for x in _HEADLESS if x not in ("ai-apis", "crm-apis")])},
     {"value": "digital-marketing", "label": "Digital Marketing", "subs": _subs("growth/social-media-management", "growth/creatives", "growth/content-publishing")},
     {"value": "seo", "label": "SEO Services", "subs": _subs("growth/search-engine-optimization-seo")},
     {"value": "paid-ads", "label": "Paid Advertising", "subs": _subs("growth/paid-advertising")},

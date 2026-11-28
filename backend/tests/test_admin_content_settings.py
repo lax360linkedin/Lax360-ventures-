@@ -199,8 +199,8 @@ def test_network_partners_and_team_members_are_managed_validated_ordered_and_rem
     assert admin.post("/api/admin/content/network_partner", json=partner, headers=csrf).status_code == 201
     for bad in ({"category": "friend"}, {"website_link": "javascript:alert(1)"}, {"website_link": "ftp://x.example"}, {"description": ""}):
         assert admin.post("/api/admin/content/network_partner", json={**partner, "data": {**partner["data"], **bad}}, headers=csrf).status_code == 422, bad
-    ok = admin.post("/api/admin/content/network_partner", json={**partner, "title": "Second", "data": {**partner["data"], "category": "authorized", "website_link": "https://example.com", "partnership_type": "Authorized reseller", "collaboration": "Joint work.", "related_services": "automation/crm-automation,ai/*"}}, headers=csrf)
-    assert ok.status_code == 201
+    ok = admin.post("/api/admin/content/network_partner", json={**partner, "title": "Second", "data": {**partner["data"], "category": "authorized", "website_link": "https://example.com", "partnership_type": "Authorized reseller", "collaboration": "Joint work.", "related_services": "software/crm-automation,growth/*"}}, headers=csrf)
+    assert ok.status_code == 201, ok.json()
     assert [i["title"] for i in client.get("/api/public/content?kind=network_partner").json()["items"]] == ["Example Partner", "Second"]
 
     def member(name, **extra):
@@ -321,28 +321,28 @@ def test_service_hierarchy_workflow_for_testimonials_and_clients(app, db, client
     main = lambda cat: client.get(f"/api/public/services/{cat}/content").json()  # noqa: E731
     names = lambda payload, key: sorted(i["title"] for i in payload[key])  # noqa: E731
 
-    t = admin.post("/api/admin/content/testimonial", json={"title": "Rita", "data": {"person_type": "client", "role": "CEO", "quote": "Great RAG work.", "service": "ai/rag-based-ai-solutions"}, "status": "published", "sort_order": 1}, headers=csrf)
-    c = admin.post("/api/admin/content/client", json={"title": "Acme AI", "data": {"services": "ai/rag-based-ai-solutions,ai/ai-agent-development", "description": "d"}, "status": "published", "sort_order": 1}, headers=csrf)
+    t = admin.post("/api/admin/content/testimonial", json={"title": "Rita", "data": {"person_type": "client", "role": "CEO", "quote": "Great RAG work.", "service": "growth/search-engine-optimization-seo"}, "status": "published", "sort_order": 1}, headers=csrf)
+    c = admin.post("/api/admin/content/client", json={"title": "Acme AI", "data": {"services": "growth/search-engine-optimization-seo,growth/creatives", "description": "d"}, "status": "published", "sort_order": 1}, headers=csrf)
     assert t.status_code == 201 and c.status_code == 201
     home_t = [i["title"] for i in client.get("/api/public/content?kind=testimonial").json()["items"]]
     home_c = [i["title"] for i in client.get("/api/public/content?kind=client").json()["items"]]
     assert "Rita" in home_t and "Acme AI" in home_c  # the home page shows every published entry
-    assert names(sub("ai", "rag-based-ai-solutions"), "testimonials") == ["Rita"] and names(sub("ai", "rag-based-ai-solutions"), "clients") == ["Acme AI"]
-    assert names(sub("ai", "ai-agent-development"), "clients") == ["Acme AI"] and names(sub("ai", "ai-agent-development"), "testimonials") == []  # only the sub-services it was assigned
-    assert names(main("ai"), "testimonials") == ["Rita"] and names(main("ai"), "clients") == ["Acme AI"]  # the main page includes its sub-services
-    for other in (("ai", "workflow-automation"), ("software", "website-development"), ("growth", "paid-advertising")):
+    assert names(sub("growth", "search-engine-optimization-seo"), "testimonials") == ["Rita"] and names(sub("growth", "search-engine-optimization-seo"), "clients") == ["Acme AI"]
+    assert names(sub("growth", "creatives"), "clients") == ["Acme AI"] and names(sub("growth", "creatives"), "testimonials") == []  # only the sub-services it was assigned
+    assert names(main("growth"), "testimonials") == ["Rita"] and names(main("growth"), "clients") == ["Acme AI"]  # the main page includes its sub-services
+    for other in (("growth", "paid-advertising"), ("software", "website-development"), ("education", "technical-training")):
         assert sub(*other) == {"clients": [], "testimonials": []}, other  # unrelated pages never show it
     assert main("software") == {"clients": [], "testimonials": []}
 
     # an entry assigned to the main service as a whole shows on the main page and on every one of its sub-service pages
-    admin.post("/api/admin/content/testimonial", json={"title": "Whole AI", "data": {"person_type": "client", "role": "CTO", "quote": "All AI.", "service": "ai/*"}, "status": "published", "sort_order": 2}, headers=csrf)
-    assert "Whole AI" in names(sub("ai", "workflow-automation"), "testimonials") and "Whole AI" in names(main("ai"), "testimonials")
+    admin.post("/api/admin/content/testimonial", json={"title": "Whole AI", "data": {"person_type": "client", "role": "CTO", "quote": "All AI.", "service": "growth/*"}, "status": "published", "sort_order": 2}, headers=csrf)
+    assert "Whole AI" in names(sub("growth", "paid-advertising"), "testimonials") and "Whole AI" in names(main("growth"), "testimonials")
     assert "Whole AI" not in names(sub("software", "website-development"), "testimonials")
 
     # editing moves it, unpublishing removes it everywhere
     tid = t.json()["id"]
     admin.patch(f"/api/admin/content/item/{tid}", json={"data": {"person_type": "client", "role": "CEO", "quote": "Great RAG work.", "service": "software/website-development"}}, headers=csrf)
-    assert "Rita" not in names(sub("ai", "rag-based-ai-solutions"), "testimonials") and "Rita" in names(sub("software", "website-development"), "testimonials") and "Rita" in names(main("software"), "testimonials")
+    assert "Rita" not in names(sub("growth", "search-engine-optimization-seo"), "testimonials") and "Rita" in names(sub("software", "website-development"), "testimonials") and "Rita" in names(main("software"), "testimonials")
     admin.patch(f"/api/admin/content/item/{tid}", json={"status": "draft"}, headers=csrf)
     assert "Rita" not in names(sub("software", "website-development"), "testimonials") and "Rita" not in [i["title"] for i in client.get("/api/public/content?kind=testimonial").json()["items"]]
     # a hidden-from-home entry still shows on its service pages

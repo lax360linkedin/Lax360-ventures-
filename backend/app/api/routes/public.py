@@ -15,13 +15,13 @@ from app.core import pubcache
 from app.db.session import _factory, _read_factory, get_db, get_read_db
 from app.models import HeroVideo
 from app.schemas.common import ApiModel
-from app.services import channel_service, content_service, hero_video_service, media_service, seo_service, settings_service, translation_service
+from app.services import channel_service, content_service, hero_video_service, media_service, seo_service, settings_service, solutions_service, translation_service
 from app.core.errors import ApiError
 
 router = APIRouter(tags=["public"])
-CACHE = {"Cache-Control": "public, max-age=10, s-maxage=15, stale-while-revalidate=600"}  # short: a published change reaches visitors within seconds (no browser-side stale window: an edit must show on the next reload)
-# s-maxage / stale-while-revalidate are for the CDN in front of the API (Vercel's rewrite): it can answer visitors from its copy (at most ~15 s old, so an edit still shows quickly) and, while this
-# server is asleep or restarting, keep serving the last copy for up to 10 minutes while it wakes. Browsers still only keep a response for 10 s.
+CACHE = {"Cache-Control": "public, max-age=0, s-maxage=3, stale-if-error=600"}  # a published change shows on the very next load: browsers always revalidate, the CDN keeps a copy for 3 s only
+# stale-if-error (NOT stale-while-revalidate, which served the old copy first and the new one only after another reload): while this server is asleep or restarting the CDN may still answer
+# with its last copy for up to 10 minutes, but in normal operation nobody is ever shown an outdated page.
 
 
 def _cacheable(settings: Settings) -> bool:
@@ -62,6 +62,25 @@ def content_all(request: Request, db: Session = Depends(get_read_db), settings: 
     """Every kind's published items in one response: the website loads this once instead of one request per section. Built with two queries, cached for a few seconds
     (dropped as soon as anything is saved) and gzip-compressed."""
     return pubcache.cached_json(request, _cacheable(settings), "content-all", lambda d: {"kinds": content_service.public_bundle(d, settings)}, CACHE, db, _read_factory())
+
+
+@router.get("/public/solutions")
+def solutions(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
+    """The solutions portfolio as a slim list (categories and one card per solution). `migrated` is false until the portfolio has been moved to the database: the website then uses its built-in copy."""
+    return pubcache.cached_json(request, _cacheable(settings), "solutions", lambda d: solutions_service.public_index(d, settings), CACHE, db, _read_factory() if _cacheable(settings) else None)
+
+
+@router.get("/public/solutions/{slug}")
+def solution(slug: str, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> JSONResponse:
+    """One published solution with all its text (opened by its detail page)."""
+    import re
+
+    if not re.fullmatch(r"[a-z0-9-]{1,80}", slug):
+        raise ApiError(404, "not_found", "This solution was not found.")
+    data = solutions_service.public_detail(db, settings, slug)
+    if data is None:
+        raise ApiError(404, "not_found", "This solution was not found.")
+    return JSONResponse(data, headers=CACHE)
 
 
 @router.get("/public/contact-options")

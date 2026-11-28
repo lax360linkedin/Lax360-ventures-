@@ -91,7 +91,13 @@ def test_missing_database_url_gives_a_clear_safe_error(client, env):
 def test_check_db_reports_a_real_connection(env, capsys):
     cli.main(["check-db"])
     out = capsys.readouterr().out
-    assert "Connected: yes" in out and "Migration revision: 0025" in out and "Tables: all present" in out
+    from pathlib import Path
+
+    from alembic.config import Config
+    from alembic.script import ScriptDirectory
+
+    head = ScriptDirectory.from_config(Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))).get_current_head()
+    assert "Connected: yes" in out and f"Migration revision: {head}" in out and "Tables: all present" in out
     assert "Row-level security: enabled on all app tables" in out
     assert "password" not in out.lower()
 
@@ -160,7 +166,11 @@ def test_exported_sql_builds_the_same_schema_as_the_migrations(database_url):
     url = scratch_database(database_url, "lax360_test_sqlfile")
     with psycopg.connect(url, autocommit=True) as c:
         c.execute(sql)
-        assert c.execute("select version_num from alembic_version").fetchone()[0] == "0025"
+        from alembic.script import ScriptDirectory
+
+        cfg2 = Config(str(BACKEND / "alembic.ini"))
+        cfg2.set_main_option("script_location", str(BACKEND / "alembic"))
+        assert c.execute("select version_num from alembic_version").fetchone()[0] == ScriptDirectory.from_config(cfg2).get_current_head()
         assert c.execute("select count(*) from branches").fetchone()[0] == 3
         assert c.execute("select bool_and(relrowsecurity) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r'").fetchone()[0]
     engine = create_engine(url.replace("postgresql://", "postgresql+psycopg://", 1))

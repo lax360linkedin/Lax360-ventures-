@@ -107,6 +107,13 @@ def test_server_start_creates_the_admin_and_empty_password_does_not(env, app, db
 
     configure(env)  # settings are read when the app is created, so build a new one, as a restart would
     with TestClient(create_app(), base_url="http://localhost", raise_server_exceptions=False) as c:
+        import time
+
+        for _ in range(150):  # the initial admin is created in a background thread (it must never delay start-up), so give it a moment
+            db.rollback()
+            if db.scalar(select(func.count()).select_from(User)) == 1:
+                break
+            time.sleep(0.2)
         assert db.scalar(select(func.count()).select_from(User)) == 1
         assert c.post("/api/admin/auth/login", json={"email": "super admin", "password": SECRET}).status_code == 200
     assert SECRET not in caplog.text

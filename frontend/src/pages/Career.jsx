@@ -8,7 +8,7 @@ import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import BotHighlight from '../components/ui/BotHighlight.jsx'
-import { allDivisions } from '../data/services.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import { branchSentence, branches } from '../data/branches.js'
 import { applySteps, careerText, principles, typeLabels, workModeLabels } from '../data/career.js'
 import { useCareerJobs, useCareerPageText, useCareerPerks } from '../hooks/useCmsPages.js'
@@ -71,6 +71,7 @@ function JobCard({ job, i, onApply }) {
  * enquiry API and appear under Enquiries (type "Careers"). No vacancy, salary or perk is built in.
  */
 export default function Career() {
+  const { allDivisions } = useDivisionTools()
   const h1 = useH1Override()
   const site = useSite()
   const jobs = useCareerJobs()

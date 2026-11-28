@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Boxes, ChevronDown, Search } from 'lucide-react'
 import { ITF_PRODUCTS } from '../../data/itFranchise.js'
 import { useProductCatalogue } from '../../hooks/usePartnerProducts.js'
+import { useSolutionIndex } from '../../hooks/useSolutions.js'
+import { statusOf } from '../../data/solutions.js'
 
 // Same pattern as the Education course list: one shared open / closed state for the sidebar list and every "Our Products" button on the page.
 const PANEL_ID = 'product-panel'
@@ -16,6 +18,9 @@ const setOpenState = (v) => { if (store.open !== v) { store.open = v; emit() } }
 export function ProductAccordion({ accent = 'var(--color-primary)', catalogue: base = ITF_PRODUCTS, program = 'franchise' }) {
   const catalogue = useProductCatalogue(base, program) // the built-in list plus the administrator's changes
   const COUNT = catalogue.groups.reduce((n, g) => n + g.items.length, 0)
+  const sol = useSolutionIndex() // the Software & IT solutions portfolio, by category and by the partnership programs each solution is listed under
+  const flag = { franchise: 'partner_franchise', authorized: 'partner_authorized', 'authorized-partner': 'partner_authorized', referral: 'partner_referral', 'referral-partner': 'partner_referral' }[program] || 'partner_franchise'
+  const solutionGroups = useMemo(() => sol.categories.map((c) => ({ ...c, items: sol.solutions.filter((x) => x.category === c.slug && x[flag] !== false) })).filter((c) => c.items.length), [sol, flag])
   const open = useOpen()
   const id = useId()
   const [q, setQ] = useState('')
@@ -52,6 +57,23 @@ export function ProductAccordion({ accent = 'var(--color-primary)', catalogue: b
                     </ul>
                   </div>
                 ))}
+              </div>
+            )}
+            {solutionGroups.length > 0 && (
+              <div className="mt-6">
+                <h2 className="mb-2 border-b border-edge pb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: accent }}>Software & IT solutions ({solutionGroups.reduce((n, c) => n + c.items.length, 0)})</h2>
+                <div className="space-y-2">
+                  {solutionGroups.map((c) => (
+                    <details key={c.slug} className="rounded-lg border border-edge px-3 py-1 [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold">{c.name}<span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs text-lav">{c.items.length}</span></summary>
+                      <ul className="space-y-2 pb-3 pt-1">
+                        {c.items.filter((i) => !term || `${i.name} ${i.pitch}`.toLowerCase().includes(term)).map((i) => (
+                          <li key={i.slug} className="text-sm"><Link to={`/solutions/${i.slug}`} className="font-semibold text-fg underline-offset-2 hover:underline">{i.name}</Link><span className="ml-2 rounded-full border border-edge px-2 py-0.5 text-[0.6875rem] font-semibold text-soft">{statusOf(i.status).label}</span></li>
+                        ))}
+                      </ul>
+                    </details>
+                  ))}
+                </div>
               </div>
             )}
             <p className="mt-5 rounded-lg border border-edge p-3 text-xs text-soft">{catalogue.note}</p>

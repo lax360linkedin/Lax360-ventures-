@@ -51,13 +51,13 @@ class ApplicationIn(ApiModel):
 def content(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
     """Admin overrides, published FAQs and policies, brochure and portal links. Built once and reused (the in-process cache drops it the moment anything it is built from is saved, and
     rebuilds it in the background), then cached briefly by the CDN; a failure here leaves the built-in content on screen."""
-    return pubcache.cached_json(request, settings.app_env != "test", "partnerships", lambda d: ps.public_payload(d, settings), {"Cache-Control": "public, max-age=30, s-maxage=15, stale-while-revalidate=600"}, db, _read_factory() if settings.app_env != "test" else None)
+    return pubcache.cached_json(request, settings.app_env != "test", "partnerships", lambda d: ps.public_payload(d, settings), {"Cache-Control": "public, max-age=0, s-maxage=3, stale-if-error=600"}, db, _read_factory() if settings.app_env != "test" else None)
 
 
 @router.get("/menu")
 def menu(request: Request, db: Session = Depends(get_read_db), settings: Settings = Depends(get_settings)) -> Response:
     """The Partner With Us navigation menu (categories and their enabled divisions). Small and cacheable: the header asks for it only when a visitor opens the menu."""
-    return pubcache.cached_json(request, settings.app_env != "test", "partnerships-menu", lambda d: ps.public_menu(d), {"Cache-Control": "public, max-age=60, s-maxage=30, stale-while-revalidate=600"}, db, _read_factory() if settings.app_env != "test" else None)
+    return pubcache.cached_json(request, settings.app_env != "test", "partnerships-menu", lambda d: ps.public_menu(d), {"Cache-Control": "public, max-age=0, s-maxage=3, stale-if-error=600"}, db, _read_factory() if settings.app_env != "test" else None)
 
 
 @router.post("/applications", status_code=201, dependencies=[Depends(rate_limit("partner_apply", "partner_rate_limit_max", "partner_rate_limit_window_seconds"))])

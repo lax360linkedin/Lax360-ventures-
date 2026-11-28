@@ -6,20 +6,23 @@ import {
   Megaphone, MessageCircle, MessagesSquare, Package, Palette, PenLine, Receipt, Search, Share2, ShoppingCart, Sparkles, Users, Webhook, Wrench, KeyRound,
 } from 'lucide-react'
 import Reveal from '../../ui/Reveal.jsx'
-import { getDivision, offeringsByGroup } from '../../../data/services.js'
+import { getLegacyDivision, offeringsByGroup } from '../../../data/services.js'
+import { useDivisionTools } from '../../../hooks/useDivisions.js'
 import { divisionIcons } from '../../../utils/divisionIcons.js'
 import { offeringHref, divisionUrl } from '../../../utils/slugify.js'
 import { useSite } from '../../../hooks/useSite.js'
 import { useEducationPage, useEducationPrograms } from '../../../hooks/useEducation.js'
 import { serviceIcons } from '../../../utils/serviceIcons.js'
 
-const sw = getDivision('software')
-const ai = getDivision('ai')
-const growth = getDivision('growth')
-const headless = getDivision('headless')
-const automation = getDivision('automation')
-const mobile = getDivision('mobile')
-const education = getDivision('education')
+// The page follows the divisions as managed in the admin panel (hooks/useDivisions.js). The three sections below that have their own layout (Headless SaaS & API, AI Workflow Automations, Mobile & Business Applications)
+// are parts of Software & IT Services: they keep their text and design and list the sub-services of that division that belong to them.
+const CARRIED = ['headless', 'automation', 'mobile']
+const carriedSlugs = new Set(CARRIED.flatMap((c) => getLegacyDivision(c).offerings.map((o) => o.slug)))
+function carried(slug, sw) {
+  const lg = getLegacyDivision(slug)
+  const mine = (sw?.offerings || []).filter((o) => lg.offerings.some((x) => x.slug === o.slug)).map((o) => ({ ...o, group: lg.offerings.find((x) => x.slug === o.slug).group }))
+  return { ...lg, offerings: mine }
+}
 
 const img = (src, className = '') => <img src={src} alt="" width="1000" height="800" loading="lazy" decoding="async" className={`h-full w-full object-cover ${className}`} />
 
@@ -30,7 +33,7 @@ function Head({ d, className = '' }) {
     <Reveal className={className}>
       <div className="flex items-center gap-4">
         <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white shadow-lg"><Icon className="size-6" aria-hidden="true" /></span>
-        <span className="font-display text-sm font-semibold tracking-wider text-lav">CATEGORY {d.number}</span>
+        <span className="font-display text-sm font-semibold tracking-wider text-lav">{['headless', 'automation', 'mobile'].includes(d.slug) ? 'PART OF SOFTWARE & IT SERVICES' : `ACTIVE DIVISION ${d.number}`}</span>
       </div>
       <h2 className="h2 mt-5">{d.name}</h2>
       <p className="lead mt-4 text-soft">{d.overview}</p>
@@ -41,7 +44,7 @@ function Head({ d, className = '' }) {
         ))}
       </ul>
       <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1">
-        <Link to={`/services/${divisionUrl(d.slug)}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
+        <Link to={['headless', 'automation', 'mobile'].includes(d.slug) ? '/services/software' : `/services/${divisionUrl(d.slug)}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
         <Link to={`/contact?type=${d.enquiryType}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold">Enquire <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
       </div>
     </Reveal>
@@ -49,7 +52,7 @@ function Head({ d, className = '' }) {
 }
 
 /** 01 — photo beside the text; services as open lists grouped under their heading. */
-function Software() {
+function Software({ sw }) {
   const icons = [Boxes, Globe2, LayoutDashboard, Wrench, Users, ClipboardList, ShoppingCart]
   let n = -1
   return (
@@ -64,13 +67,13 @@ function Software() {
         <div className="lg:col-span-7">
           <Head d={sw} />
           <div className="mt-10 space-y-8">
-            {offeringsByGroup(sw).map((g) => (
+            {offeringsByGroup({ ...sw, offerings: sw.offerings.filter((o) => !carriedSlugs.has(o.slug)) }).map((g) => (
               <div key={g.title}>
                 <p className="eyebrow text-lav">{g.title}</p>
                 <ul className="mt-3 grid gap-x-8 sm:grid-cols-2">
                   {g.items.map((o) => {
                     n += 1
-                    const Icon = icons[n]
+                    const Icon = serviceIcons[o.slug] || icons[n % icons.length]
                     return (
                       <li key={o.name} className="border-t border-edge">
                         <Link to={offeringHref('software', o.name)} className="group flex gap-3 py-4">
@@ -91,56 +94,10 @@ function Software() {
 }
 
 /** 02 — wide photo banner on top, then numbered cards. */
-function Ai() {
-  const icons = [Sparkles, MessagesSquare, BrainCircuit, Search, Webhook, Boxes, ClipboardList]
-  const Icon = divisionIcons.ai
-  return (
-    <section id="ai" aria-label={ai.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] border-y border-edge bg-glass">
-      <div className="wrap section">
-        <Reveal>
-          <div className="relative overflow-hidden rounded-[2rem] border border-edge-strong">
-            {img(ai.photo, 'aspect-[16/8] sm:aspect-[21/8]')}
-            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-transparent" />
-            <div className="absolute inset-0 flex flex-col justify-end p-6 text-white sm:p-10">
-              <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg"><Icon className="size-6" aria-hidden="true" /></span>
-              <p className="mt-3 font-display text-sm font-semibold tracking-wider text-white/80">CATEGORY {ai.number}</p>
-              <h2 className="h2 mt-1 !text-white">{ai.name}</h2>
-            </div>
-          </div>
-        </Reveal>
-        <div className="mt-10 grid gap-8 lg:grid-cols-12">
-          <Reveal className="lg:col-span-5">
-            <p className="lead text-soft">{ai.overview}</p>
-            <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-lav">Helps when</p>
-            <ul className="mt-2 space-y-1.5">{ai.challenges.slice(0, 3).map((c) => <li key={c} className="flex gap-2.5 text-soft"><Check className="mt-1 size-4 shrink-0 text-lav" aria-hidden="true" />{c}</li>)}</ul>
-            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1">
-              <Link to={`/services/${divisionUrl(ai.slug)}`} className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Category details <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
-              <Link to="/contact?type=ai" className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold">Book an AI consultation <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
-            </div>
-          </Reveal>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:col-span-7">
-            {ai.offerings.map((o, i) => {
-              const OIcon = icons[i]
-              return (
-                <Reveal as="li" key={o.name} delay={(i % 2) * 0.07} className={i === ai.offerings.length - 1 && ai.offerings.length % 2 ? 'sm:col-span-2' : ''}>
-                  <Link to={offeringHref('ai', o.name)} className="glass-flat lift group flex h-full gap-4 p-5">
-                    <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-lav transition-colors duration-300 group-hover:bg-primary group-hover:text-white"><OIcon className="size-5" aria-hidden="true" /></span>
-                    <span><span className="block font-display text-lg font-semibold leading-tight">{o.name}</span><span className="mt-1.5 block text-soft">{o.text}</span></span>
-                  </Link>
-                </Reveal>
-              )
-            })}
-          </ul>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 const GROWTH_ICONS = { 'Social Media Management': Share2, 'Search Engine Optimization (SEO)': Search, Creatives: Palette, 'Content Publishing': PenLine, 'Paid Advertising': Megaphone }
 
 /** 03 — services as selectable pills; the chosen one is explained in a panel over the photo. */
-function Growth() {
+function Growth({ growth }) {
   const [pick, setPick] = useState(growth.offerings[0].name)
   const cur = growth.offerings.find((o) => o.name === pick)
   const CurIcon = GROWTH_ICONS[pick] || Megaphone
@@ -184,7 +141,7 @@ function Growth() {
 const HEADLESS_ICONS = { 'Authentication APIs': KeyRound, 'Billing & Subscription APIs': CreditCard, 'Payment Gateway Integration': CreditCard, 'Booking & Appointment APIs': CalendarCheck, 'CRM APIs': Users, 'Notification APIs': Mail, 'File & Media APIs': FileText, 'AI APIs': BrainCircuit }
 
 /** 04 — the featured category: a full-width gradient panel presenting reusable backend services and APIs, with an API Hub call to action. */
-function Headless() {
+function Headless({ headless }) {
   const site = useSite()
   const hubExternal = /^https?:/.test(site.apiHubUrl)
   const hubCls = 'group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-primary shadow-xl transition-transform duration-200 hover:-translate-y-0.5 dark:bg-sky dark:text-night'
@@ -211,7 +168,7 @@ function Headless() {
                   : <Link to={site.apiHubUrl} className={hubCls}>Explore the API Hub <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" aria-hidden="true" /></Link>}
                 <Link to="/contact?type=project" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3 font-semibold transition-colors hover:bg-white/10">Discuss your requirements</Link>
               </div>
-              <p className="mt-3 text-sm text-white/80"><Link to={`/services/${divisionUrl(headless.slug)}`} className="underline underline-offset-4">Category details</Link></p>
+              <p className="mt-3 text-sm text-white/80"><Link to="/services/software" className="underline underline-offset-4">Category details</Link></p>
             </div>
 
             <div className="lg:col-span-5">
@@ -262,7 +219,7 @@ POST  /v1/files`}</code></pre>
 }
 
 /** 05 — an illustrated trigger → workflow → action strip over the photo, then the list of automation services. */
-function Automation() {
+function Automation({ automation }) {
   const icons = [Webhook, ClipboardList, MessageCircle, Mail, Users, BrainCircuit, Boxes, Webhook]
   const nodes = [
     { label: 'Trigger', items: 'Form · WhatsApp · Email' },
@@ -314,7 +271,7 @@ function Automation() {
 }
 
 /** 06 — the phone photo first, then a card per application. */
-function Mobile() {
+function Mobile({ mobile }) {
   const icons = [CalendarCheck, ClipboardList, MapPin, Receipt, Package, Boxes]
   return (
     <section id="mobile" aria-label={mobile.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] wrap section">
@@ -346,7 +303,7 @@ function Mobile() {
 }
 
 /** 07 — Education & Training: photo and text, a card per programme, then the course call to action. Text, photo and programme cards follow the admin panel when set. */
-function Education() {
+function Education({ education }) {
   const page = useEducationPage()
   const ov = useEducationPrograms()
   return (
@@ -389,15 +346,44 @@ function Education() {
 }
 
 export default function ServiceCategories() {
+  const { getDivision, allDivisions } = useDivisionTools()
+  const sw = getDivision('software')
+  const growth = getDivision('growth')
+  const education = getDivision('education')
+  const headless = sw && carried('headless', sw)
+  const automation = sw && carried('automation', sw)
+  const mobile = sw && carried('mobile', sw)
+  const known = new Set(['software', 'growth', 'education'])
   return (
     <>
-      <Software />
-      <Ai />
-      <Growth />
-      <Headless />
-      <Automation />
-      <Mobile />
-      <Education />
+      {sw && <Software sw={sw} />}
+      {headless?.offerings.length > 0 && <Headless headless={headless} />}
+      {automation?.offerings.length > 0 && <Automation automation={automation} />}
+      {mobile?.offerings.length > 0 && <Mobile mobile={mobile} />}
+      {growth && growth.offerings.length > 0 && <Growth growth={growth} />}
+      {education && <Education education={education} />}
+      {allDivisions.filter((d) => !known.has(d.slug)).map((d) => <OtherDivision key={d.slug} d={d} />)}
     </>
+  )
+}
+
+/** A division an administrator added: a simple, themed section with its sub-services, so it appears on the Services page without any code change. */
+function OtherDivision({ d }) {
+  const Icon = divisionIcons[d.slug]
+  return (
+    <section id={d.slug} aria-label={d.name} className="scroll-mt-[calc(var(--header-bottom,92px)+var(--catnav-h,64px)+1rem)] wrap section">
+      <Head d={d} />
+      <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {d.offerings.map((o) => (
+          <li key={o.slug}>
+            <Link to={offeringHref(d.slug, o.name)} className="glass-flat lift group flex h-full flex-col gap-2 p-6">
+              <Icon className="size-6 text-lav" aria-hidden="true" />
+              <span className="font-display text-lg font-semibold transition-colors group-hover:text-lav">{o.name}</span>
+              <span className="text-soft">{o.text}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }

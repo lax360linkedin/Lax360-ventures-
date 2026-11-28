@@ -5,6 +5,7 @@ import Button from '../components/ui/Button.jsx'
 import Reveal from '../components/ui/Reveal.jsx'
 import SectionHeading from '../components/ui/SectionHeading.jsx'
 import { useEducationPrograms, withProgram } from '../hooks/useEducation.js'
+import { useDivisionTools } from '../hooks/useDivisions.js'
 import { getOffering } from '../data/offerings.js'
 import { divisionIcons } from '../utils/divisionIcons.js'
 import { serviceIcons } from '../utils/serviceIcons.js'
@@ -26,9 +27,13 @@ export default function ServiceItem() {
   const { slug, service } = useParams()
   const { pathname } = useLocation()
   const programs = useEducationPrograms() // Education & Training programmes: text and photo set in the admin panel
-  const base = getOffering(slug, service)
+  const { getDivision, divisions } = useDivisionTools()
+  const base = getOffering(slug, service, getDivision)
   const s = base && base.category.slug === 'education' ? withProgram(base, programs[service]) : base
-  if (!s) return <NotFound />
+  if (!s) { // a sub-service that was moved to another division keeps working at its old address
+    const now = divisions.find((x) => x.offerings.some((o) => o.slug === service))
+    return now ? <Navigate to={`/services/${divisionUrl(now.slug)}/${service}`} replace /> : <NotFound />
+  }
   const d = s.category
   if (slug !== divisionUrl(d.slug)) return <Navigate to={pathname.replace(`/services/${slug}/`, `/services/${divisionUrl(d.slug)}/`)} replace /> // an old address (/services/growth/...): go to the current one
   const CatIcon = divisionIcons[d.slug]

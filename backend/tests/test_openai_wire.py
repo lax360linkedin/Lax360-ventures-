@@ -54,7 +54,7 @@ def test_request_shape_and_response_parsing():
     assert seen["auth"] == "Bearer sk-test-wire-0000000000000"
     body = seen["body"]
     assert body["model"] == "test-model-id" and body["instructions"] == "Be helpful." and body["store"] is False
-    assert body["max_output_tokens"] == 500 and body["safety_identifier"] == "abc123"
+    assert body["max_output_tokens"] == Settings.model_fields["chat_max_output_tokens"].default and body["safety_identifier"] == "abc123"
     assert body["input"] == [{"role": "user", "content": "hello"}]
     assert result.text.startswith("Hi!") and result.input_tokens == 50 and result.output_tokens == 12 and result.response_id == "resp_wire_1"
     assert result.request_id == "req_wire_1"

@@ -8,7 +8,7 @@ import { COURSE_SUMMARY } from '../../data/educationCourses.js'
 // In-page navigation of the Education Authorized Partner page, in page order. PartnerOpportunity inserts Responsibilities, Process and Commercial between the two lists.
 export const EDUA_NAV_A = [['about', 'About'], ['who', 'Who can apply'], ['models', 'Partnership models'], ['courses', 'Courses'], ['provide', 'What we provide'], ['collab', 'College collaboration'], ['internships', 'Internships'], ['faculty', 'Faculty & staff training'],
   ['branding', 'Branding kit'], ['digital', 'Digital presence'], ['crm', 'CRM'], ['marketing', 'Marketing'], ['infrastructure', 'Infrastructure']]
-export const EDUA_NAV_B = [['documents', 'Documents'], ['application', 'Apply'], ['terms', 'Terms']]
+export const EDUA_NAV_B = [['documents', 'Documents'], ['application', 'Apply'], ['terms', 'Terms'], ['ip', 'Intellectual property'], ['legal', 'Legal & disputes'], ['termination', 'Termination']]
 
 const Two = ({ a, b, accent }) => <div className="grid gap-10 md:grid-cols-2"><div><h3 className="font-display text-xl font-semibold">{a[0]}</h3><div className="mt-4"><Checklist items={a[1]} accent={accent} /></div></div><div><h3 className="font-display text-xl font-semibold">{b[0]}</h3><div className="mt-4"><Checklist items={b[1]} accent={accent} /></div></div></div>
 const Numbered = ({ items }) => <ol className="grid gap-x-10 gap-y-1.5 text-[0.9375rem] md:grid-cols-2 lg:grid-cols-3">{items.map((d, i) => <li key={d} className="flex gap-3"><span className="w-7 shrink-0 text-right font-semibold tabular-nums text-soft">{i + 1}.</span>{d}</li>)}</ol>
@@ -87,6 +87,15 @@ export function EducationAuthorizedB({ accent }) {
       <Block id="terms" eyebrow="Important" title="Partnership terms and conditions" tint>
         <ol className="grid gap-x-10 gap-y-2 md:grid-cols-2">{e.terms.map((t, i) => <li key={t} className="flex gap-3"><span className="w-6 shrink-0 text-right font-semibold tabular-nums text-soft">{i + 1}.</span><span>{t}</span></li>)}</ol>
         <p className="mt-5 text-sm text-soft">See also the <Link to="/partner-with-us/terms-and-conditions" className="link-underline">partnership terms</Link> and the <Link to="/partner-with-us/privacy-policy" className="link-underline">partnership privacy notice</Link>.</p>
+      </Block>
+      <Block id="ip" eyebrow="Terms" title="Intellectual property">
+        <div className="max-w-3xl space-y-3 text-soft">{e.ip.map((t) => <p key={t}>{t}</p>)}</div>
+      </Block>
+      <Block id="legal" eyebrow="Terms" title="Legal compliance and dispute resolution" tint>
+        <ul className="max-w-3xl space-y-3 text-soft">{e.legal.map((t) => <li key={t} className="flex gap-3"><span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-current" /><span>{t}</span></li>)}</ul>
+      </Block>
+      <Block id="termination" eyebrow="Terms" title="Termination of partnership">
+        <ul className="max-w-3xl space-y-3 text-soft">{e.termination.map((t) => <li key={t} className="flex gap-3"><span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-current" /><span>{t}</span></li>)}</ul>
       </Block>
       <Block id="contact" eyebrow="Contact" title={EDU.contact.name}>
         <p className="text-soft">{EDU.contact.line}</p>

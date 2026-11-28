@@ -11,7 +11,8 @@ import { toLines, toParagraphs } from '../utils/cms.js'
  *   - the launch status drives every badge, notice and call to action; a service follows its category's status unless it has its own.
  */
 // The three original categories keep their addresses and icons when they come from the database.
-const LEGACY = { 'cad-engineering': { path: '/cad-engineering', icon: 'cad' }, robotics: { path: '/robotics', icon: 'robot' }, blockchain: { path: '/blockchain', icon: 'chain' } }
+const ADDED_LATER = new Set(['ai'])
+const LEGACY = { ai: { path: '/artificial-intelligence', icon: 'ai' }, 'cad-engineering': { path: '/cad-engineering', icon: 'cad' }, robotics: { path: '/robotics', icon: 'robot' }, blockchain: { path: '/blockchain', icon: 'chain' } }
 const titled = (text) => toLines(text).map((l) => { const i = l.indexOf(':'); return i > 0 ? { title: l.slice(0, i).trim(), text: l.slice(i + 1).trim() } : { title: l, text: '' } })
 const linked = (text) => toLines(text).map((l) => { const [label, ...rest] = l.split('|'); return { label: label.trim(), to: rest.join('|').trim() } }).filter((x) => x.label && x.to)
 const ok = (v) => (typeof v === 'string' ? v.trim() : '')
@@ -31,7 +32,10 @@ export function useUpcoming() {
   const svcs = fromDb ? dbSvcs : foundSvcs
   return useMemo(() => {
     const catItems = new Map((cats || []).map((i) => [i.slug, i]))
-    const base = fromDb ? [] : UPCOMING_CATEGORIES.map((c) => ({ ...c, builtin: true }))
+    // Once the categories live in the database the built-in copy is not used, except for a category added to the website later (the Artificial Intelligence division) that the database does not have yet:
+    // it appears at once, and the database row (created by `python -m app.cli refresh-upcoming --apply`, or in the admin panel) takes over from then on.
+    const dbSlugs = new Set((cats || []).map((i) => i.slug))
+    const base = (fromDb ? UPCOMING_CATEGORIES.filter((c) => ADDED_LATER.has(c.slug) && !dbSlugs.has(c.slug)) : UPCOMING_CATEGORIES).map((c) => ({ ...c, builtin: true }))
     const known = new Set(base.map((c) => c.slug))
     const extra = (cats || []).filter((i) => !known.has(i.slug)).map((i) => ({ slug: i.slug, name: i.title, short: i.title, builtin: false, services: [], areas: [], icon: '' }))
 

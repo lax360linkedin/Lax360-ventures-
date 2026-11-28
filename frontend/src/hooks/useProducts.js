@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 import { builtInProducts, productVisuals } from '../data/products.js'
-import { useContent } from './useSite.js'
+import { useContent, useSeeded } from './useSite.js'
 import { toLines, toParagraphs } from '../utils/cms.js'
+import { portfolioCategoryOf } from '../data/portfolio.js'
+import { linkButtons } from '../utils/links.js'
 
 const FEATURE = /^([^:]{2,60}):\s+(.+)$/
 
@@ -16,6 +18,7 @@ export function normaliseProduct(item) {
     slug: item.slug,
     name: item.title,
     category: d.category || 'other',
+    portfolioCategory: portfolioCategoryOf(item.slug, d.category, d.portfolio_category),
     status: ['live', 'beta', 'in_development', 'soon'].includes(d.status) ? d.status : 'soon',
     summary: d.summary || '',
     overview: toParagraphs(d.overview),
@@ -35,6 +38,9 @@ export function normaliseProduct(item) {
     productLink: d.product_link || '',
     demoLink: d.demo_link || '',
     ctaLabel: d.cta_label || 'Enquire about this product',
+    seoTitle: d.seo_title || '',
+    seoDescription: d.seo_description || '',
+    links: ['live', 'beta'].includes(d.status) ? linkButtons(d) : [],
   }
 }
 
@@ -57,5 +63,6 @@ export function useProductResources(slug) {
 /** The products to show: those published in the admin panel, or the built-in list until some are published. */
 export function useProducts() {
   const cms = useContent('product')
-  return useMemo(() => (cms && cms.length ? cms : builtInProducts).map(normaliseProduct), [cms])
+  const seeded = useSeeded('products') // once the products are in the database it is their only source: a product that is deleted or unpublished never comes back from the built-in list
+  return useMemo(() => (cms && cms.length ? cms : seeded ? [] : builtInProducts).map(normaliseProduct), [cms, seeded])
 }

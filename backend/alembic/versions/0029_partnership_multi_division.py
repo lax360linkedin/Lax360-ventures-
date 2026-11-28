@@ -9,7 +9,7 @@ Revision ID: 0029
 Revises: 0028
 """
 import sqlalchemy as sa
-from alembic import op
+from alembic import context, op
 
 revision = "0029"
 down_revision = "0028"
@@ -23,6 +23,9 @@ def upgrade() -> None:
         t.add_column(sa.Column("divisions", sa.JSON(), nullable=False, server_default=sa.text("'[]'")))
         t.add_column(sa.Column("all_divisions", sa.Boolean(), nullable=False, server_default="false"))
         t.add_column(sa.Column("other_interest", sa.String(300)))
+    if context.is_offline_mode():  # generating the SQL file (scripts/export_sql.py): there are no rows to read, so back-fill with one statement
+        op.execute("update pt_applications set divisions = json_build_array(division)")
+        return
     bind = op.get_bind()
     rows = bind.execute(sa.text("select id, division from pt_applications")).all()
     for rid, division in rows:

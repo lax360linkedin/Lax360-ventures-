@@ -9,7 +9,7 @@ const BUILTIN_NAMES = { education: 'Education & Training', 'digital-marketing': 
 /**
  * The business divisions a visitor can choose in any partnership form, in one list that follows the admin panel:
  *   - the divisions of the Partner With Us menu (the three built-in ones plus any an administrator added; switched-off ones are left out),
- *   - the upcoming service categories (CAD & Engineering Design, Robotics, Blockchain & Web 3.0, and any added), each with its status (Coming Soon, Under Development, ...).
+ *   - the upcoming service categories (Artificial Intelligence, IoT / Embedded Systems & Robotics, CAD Designing & Training, Blockchain & Web 3.0, and any added), each with its status (Coming Soon, Under Development, ...).
  * Returns [{ slug, label, upcoming, status, statusLabel }]. "All Business Divisions" and "Others" are added by the picker itself.
  */
 export function usePartnerDivisions() {

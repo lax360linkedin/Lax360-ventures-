@@ -33,6 +33,16 @@ const expiredListeners = { public: new Set(), admin: new Set() }
 /** Called when the server says the login session expired / is missing (the listener receives the error code). Returns an unsubscribe function. */
 export const onSessionExpired = (fn, realm = 'public') => { expiredListeners[realm].add(fn); return () => expiredListeners[realm].delete(fn) }
 
+/** The public site keeps its last data in localStorage to paint at once; after any admin write that copy is dropped so the next visit shows the new content straight away, not the old one first. */
+function forgetPublicSnapshots() {
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i)
+      if (k && k.startsWith('lax360-public-v1:')) localStorage.removeItem(k)
+    }
+  } catch { /* storage blocked: nothing was saved either */ }
+}
+
 export async function api(path, { method = 'GET', body, rawBody, contentType, as = 'json', signal, timeoutMs = 20000 } = {}) {
   const realm = realmOf(path)
   const controller = new AbortController()
@@ -58,6 +68,7 @@ export async function api(path, { method = 'GET', body, rawBody, contentType, as
     clearTimeout(timer)
   }
 
+  if (res.ok && method !== 'GET' && path.startsWith('/api/admin/')) forgetPublicSnapshots() // an admin change: this browser's saved copy of the public site is outdated now
   if (res.status === 204) return null
   if (as === 'blob' && res.ok) return { blob: await res.blob(), total: Number(res.headers.get('X-Total-Count') || 0) }
   let data = null
@@ -103,7 +114,7 @@ export function upload(path, file, { method = 'POST', contentType, onProgress, t
     xhr.onload = () => {
       let data = null
       try { data = JSON.parse(xhr.responseText) } catch { /* non-JSON body */ }
-      if (xhr.status >= 200 && xhr.status < 300) return resolve(data)
+      if (xhr.status >= 200 && xhr.status < 300) { if (path.startsWith("/api/admin/")) forgetPublicSnapshots(); return resolve(data) }
       const e = data?.error
       const error = new ApiError({ status: xhr.status, code: e?.code || 'http_error', message: e?.message || (xhr.status >= 500 ? 'Something went wrong on our side. Please try again.' : 'That upload could not be completed.'), fields: e?.fields || null, details: e?.details || null })
       if (realm === 'admin' && xhr.status === 401) expiredListeners.admin.forEach((fn) => fn(error.code))
