@@ -45,7 +45,7 @@ python -m app.cli refresh-upcoming --apply             # (see above)
 5. Submit one test enquiry from `/contact` and one upcoming-interest registration; confirm both reach the admin and the Google Sheet.
 
 ## Known limits (not blockers)
-- Tamil / Hindi: about 456 new English strings (new division, sub-service and upcoming-division copy) have no translation yet; those parts show in English.
+- Tamil / Hindi: complete as of 2026-11-28.
 - Admin edits to the heading of the three designed division pages change SEO text and the generic page; the hero headlines of those three designed layouts are still in the page code.
 - Testimonials assigned to the former AI / Headless / Workflow / Mobile service pages need re-assigning to the matching Software & IT Services sub-services.
 - Lighthouse mobile scores are about 35-45 in simulation; desktop 60-80. Real-device and hosting limits (Render cold starts, database distance) apply.
@@ -83,7 +83,7 @@ All 21 entries are kept as seeded and unchanged: 19 have their original live lin
 - The solutions, preview pictures and unified Products admin reach production only after you deploy and run the commands below; until then the live Admin Panel is the old one.
 - Not tested against real Supabase storage or real Google Sheets (by your rule): upload and sheet sync were tested against local storage and fakes. Check one picture upload and one enquiry after deploy.
 - Product edit forms keep their own 8 screenshot slots; the new drag-and-drop gallery editor is on solutions.
-- ~2,200 solution-detail strings have no Tamil / Hindi translation yet.
+- Tamil / Hindi: complete for every string the build collects (2026-11-28); new English copy added later needs translating (check `public/i18n-strings.json` against the catalogs after each build).
 - Demo-request interest is not written to the Consultation worksheet (it never had that column).
 
 ## Mandatory commands after deploying (backend first, then frontend)

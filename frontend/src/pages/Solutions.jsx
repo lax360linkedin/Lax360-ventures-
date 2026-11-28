@@ -10,7 +10,7 @@ export default function Solutions() {
       <section className="wrap pb-8 pt-10 md:pt-14" aria-labelledby="solutions-title">
         <p className="eyebrow text-lav">Software & IT solutions</p>
         <h1 id="solutions-title" className="h1 mt-3 !text-[clamp(2.2rem,4.6vw,4rem)]">Solutions for <span className="text-gradient">every kind of business.</span></h1>
-        <p className="lead mt-5 max-w-3xl text-soft">Browse software, web applications, mobile apps, websites, APIs and AI agents. Each page says plainly whether a solution is available, built to order, or still under development.</p>
+        <p className="lead mt-5 max-w-3xl text-soft">Browse software, web applications, mobile apps, websites, APIs and AI agents. LAX360 provides these solutions and can customise them to your business requirements.</p>
       </section>
       <div className="wrap pb-12"><SolutionsExplorer idPrefix="sol" /></div>
     </PageContainer>

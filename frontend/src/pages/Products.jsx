@@ -76,7 +76,7 @@ export default function Products() {
       </section>
 
       <section id="products" aria-labelledby="list-title" className="wrap section scroll-mt-[calc(var(--header-bottom,92px)+1rem)]">
-        <SectionHeading id="list-title" eyebrow="Our products" title="The LAX360" gradient="product portfolio." lead="Software, web applications, mobile apps, live websites, APIs and AI agents in one place. Each card says plainly whether it is available, built to order or still under development." />
+        <SectionHeading id="list-title" eyebrow="Our products" title="The LAX360" gradient="product portfolio." lead="Software, web applications, mobile apps, live websites, APIs and AI agents in one place. LAX360 provides these solutions and can customise them to your business requirements." />
         <div className="mt-8"><PortfolioCatalogue /></div>
         <div className="mt-10"><CustomStatement /></div>
         <p className="mt-8 text-center"><Link to="/websites" className="link-underline inline-flex min-h-11 items-center gap-1.5 font-semibold text-lav">Browse every live website and demo <ArrowUpRight className="size-4" aria-hidden="true" /></Link></p>
